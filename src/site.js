@@ -1,4 +1,4 @@
-// The site's script: the motion, the two clocks, and the question box. Every part checks that its elements are on
+// The site's script: the motion, the duty log clock, and the question box. Every part checks that its elements are on
 // the page, and every part leaves the page whole without it: the content is in the HTML, visible, and script only
 // times its arrival or adds what changes by the minute.
 (function () {
@@ -73,14 +73,12 @@
     Array.prototype.forEach.call(steps, function (s) { mid.observe(s); });
   }
 
-  // The time in Israel, for the duty log's now and the footer's clock. Checked every 20 seconds.
+  // The time in Israel, for the duty log's now. Checked every 20 seconds.
   var fmt = new Intl.DateTimeFormat('he-IL', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit', hour12: false });
   var log = d.querySelector('[data-log]'), now = d.querySelector('[data-now]');
-  var clockTile = d.querySelector('[data-clock-tile]');
   var tick = function () {
     var hm = fmt.format(new Date());
-    each('[data-clock], [data-now-time]', function (el) { el.textContent = hm; el.setAttribute('datetime', hm); });
-    if (clockTile) clockTile.hidden = false;
+    each('[data-now-time]', function (el) { el.textContent = hm; el.setAttribute('datetime', hm); });
     if (log && now) {
       var mins = function (s) { var p = s.split(':'); return +p[0] * 60 + +p[1]; };
       var after = null;

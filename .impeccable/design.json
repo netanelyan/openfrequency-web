@@ -606,7 +606,7 @@
       },
       "display": {
         "displayName": "Display",
-        "purpose": "Every h1 and h2, the typed question line, the footer clock and wordmark."
+        "purpose": "Every h1 and h2, the typed question line and the footer wordmark."
       },
       "lead": {
         "displayName": "Lead",

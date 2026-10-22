@@ -89,7 +89,6 @@ const about = (cfg) => `
 <div class="wrap narrow">
 <h2 id="about-h">מי אנחנו</h2>
 <p class="lede">${cfg.t('about.who')} ${cfg.t('about.why')}</p>
-<p class="quiet">OpenFrequency, ${cfg.t('city')}.</p>
 </div>
 </section>`;
 

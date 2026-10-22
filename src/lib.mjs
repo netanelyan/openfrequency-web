@@ -14,7 +14,6 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 const metaIncluded = (raw) => raw.price?.metaFees === 'included';
 export const FACTS = {
   domain: { label: 'הדומיין', kind: 'text' },
-  city: { label: 'העיר', kind: 'text' },
   whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
   'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
   'about.who': { label: 'משפט על מי אנחנו', kind: 'text' },

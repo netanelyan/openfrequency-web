@@ -78,7 +78,7 @@ em and en dashes, a colon in a heading, `!!`, gendered slashes, bureaucratic phr
 | `assets/brand/` | the marks, copied from openfrequency-toran; never redrawn |
 | `assets/fonts/` | Heebo (OFL), self-hosted, so no visitor's address goes to Google |
 | `assets/photos/` | three archival photographs and a map from Wikimedia Commons, resized; `credits.json` holds each one's source and licence, printed in the footer |
-| `src/site.js` | the motion, the two clocks (the duty log's now, the footer's Ashdod time) and the question box |
+| `src/site.js` | the motion, the duty log's clock and the question box |
 | `src/forms.mjs`, `src/form.js` | the two forms, every word they can show, and the script that sends them |
 | `server/lead.mjs` | the lead endpoint |
 | `deploy/` | the Caddyfile, the endpoint's systemd service and env file, and the deploy script |

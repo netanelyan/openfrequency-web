@@ -5,7 +5,7 @@ import path from 'node:path';
 import { FACTS, ROOT, esc, mark, credits } from './lib.mjs';
 import { demoForm, formCopy } from './forms.mjs';
 
-// The two scripts, comments and indentation out: site.js on every page (motion, the clocks, the duty log, the
+// The two scripts, comments and indentation out: site.js on every page (motion, the duty log clock, the
 // question box), form.js only where there is a form.
 const squeeze = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8')
   .split('\n').filter((l) => !/^\s*\/\//.test(l)).map((l) => l.trim()).filter(Boolean).join('\n');
@@ -69,12 +69,11 @@ function footer(cfg, photos) {
     : `<span class="wa">בוואטסאפ <mark class="ph">[${esc(FACTS.whatsapp.label)}]</mark></span>`;
   return `<footer class="foot">
 <div class="board">
-<div class="t-who"><p class="wa">אנחנו OpenFrequency, מ${cfg.t('city')}. בנינו את תורן ואת תדר.</p><p class="legal">© 2026 OpenFrequency</p></div>
+<div class="t-who"><p class="wa">אנחנו OpenFrequency. בנינו את תורן ואת תדר.</p><p class="legal">© 2026 OpenFrequency</p></div>
 <nav class="t-nav" aria-labelledby="f-nav"><h2 id="f-nav">באתר</h2><ul>
 <li><a href="/toran">תורן</a></li><li><a href="/#teder">תדר</a></li><li><a href="/toran#price">מחיר</a></li>
 <li><a href="/toran#faq">שאלות</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/terms">תנאי שימוש</a></li>
 </ul></nav>
-<div class="t-time" data-clock-tile hidden><h2>ב${cfg.t('city')} עכשיו</h2><p class="clock"><time data-clock></time></p></div>
 <div class="t-wa"><h2>תכתבו לנו</h2>${waLink}</div>
 <p class="word" aria-hidden="true">${mark('openfrequency', 84)}OpenFrequency</p>
 <a class="go" href="/#demo"><span>לבנות דמו לחנות</span><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M38 22H8M18 12 8 22l10 10"/></svg></a>

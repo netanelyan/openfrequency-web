@@ -203,7 +203,7 @@ A hue-less silver and ink system with one action blue, three brand-mark colours,
 
 ### Hierarchy
 - **Figure** (700, clamp 88–216px, 0.86, -0.035em, tabular): the price only.
-- **Display** (700, clamp 28–72px, 1.04, -0.012em, balanced wrap): every h1 and h2, the typed question line, the footer clock and wordmark.
+- **Display** (700, clamp 28–72px, 1.04, -0.012em, balanced wrap): every h1 and h2, the typed question line, and the footer wordmark.
 - **Lead** (600, clamp 20–24px, 1.3; 1.45 for 400 lede paragraphs): h3, FAQ questions, lede and about paragraphs, the close line. Ledes are 34–50ch.
 - **Body** (400, 17px from 900px and 16px below, 1.6): running text, up to 46–62ch.
 - **Small** (400 or 600, 14px): captions, labels, table heads, the legal line and credits.
@@ -266,7 +266,7 @@ Surfaces have one radius: 18px for tiles, glass stages, photo frames, chats, the
 - **Rows and the duty log:** two-ended rows with odd rows on tile at a 12px radius. Dots mark who answers: Toran green answered alone, action blue passed to you, faint not yet. The log's present minute is a 12% blue row whose dot beats.
 - **Eval table:** a real table with tabular figures and odd rows striped on tile at 12% radius corners. Zeros are OK green. On a phone it stays a table with short heads.
 - **FAQ tiles:** details tiles with lead questions and a drawn plus that turns to minus. An open tile fills action blue with white text.
-- **Footer board:** a grid of tiles (12 columns from 700px, two below). It holds a night tile with the wordmark at display size, an action-blue go tile with a drawn arrow that slides 6px on hover, a clock tile and a links tile.
+- **Footer board:** a grid of tiles (12 columns from 700px, one below). It holds a night tile with the wordmark at display size, an action-blue go tile with a drawn arrow that slides 6px on hover, a links tile and a WhatsApp tile.
 - **Closing field:** a full-bleed night section with the demo dialog (sheet, 18px) open beside the line.
 - **Teder field:** one violet field at 18px holding the wave mark and the waitlist form.
 
