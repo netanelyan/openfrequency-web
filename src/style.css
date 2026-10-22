@@ -1,0 +1,331 @@
+/* OpenFrequency's public site. One stylesheet, inlined whole into every page; right to left, phone first.
+
+   The look is Teder's (openfrequency-teder/src/web/static/style.css), so the company's pages read as one family:
+   a silver wallpaper with no hue of its own, frosted glass panes with a lit top edge, the system typeface with
+   Heebo behind it, grey glass pills and one filled blue button per decision. The tokens are Teder's, light and
+   dark, including its Increase Contrast and Reduce Transparency fallbacks. Only the sizes are new: a page that
+   sells is read once, top to bottom, so the type is larger than a dashboard's.
+
+   The colour on the page is the colour that means something: blue for the action, and the three marks, each on
+   its own tile from assets/brand (the company's halftone on #2747D6, Toran's dots on #0F7A54, Teder's wave on
+   #6A3FD6). Contrast (WCAG) as measured in Teder: ink 13:1 on the page, the quiet text 5.7:1, white on the
+   button blue 4.7:1; dark, the quiet text 7.0:1 and the blue 4.6:1. */
+
+@font-face {
+  font-family: 'Heebo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/heebo-hebrew.woff2') format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'Heebo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/heebo-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light;
+  --text: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, 'Helvetica Neue', Arial, sans-serif;
+  --display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, 'Helvetica Neue', Arial, sans-serif;
+  --bg: #eeeff2;
+  --wall: radial-gradient(120% 80% at 85% -10%, #ffffff 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(160deg, #fafafb 0%, #e2e3e8 32%, #f4f4f6 52%, #e4e5ea 74%, #f7f7f9 100%);
+  --surface: rgba(255, 255, 255, 0.58);
+  --surface-hi: rgba(255, 255, 255, 0.72);
+  --edge: rgba(255, 255, 255, 0.7);
+  --rim: rgba(255, 255, 255, 0.95);
+  --shadow-tile: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 32px -14px rgba(0, 0, 0, 0.14);
+  --inset: rgba(255, 255, 255, 0.55);
+  --fill: rgba(118, 118, 128, 0.12);
+  --fill-2: rgba(118, 118, 128, 0.2);
+  --seg-on: rgba(255, 255, 255, 0.95);
+  --field: rgba(255, 255, 255, 0.8);
+  --line: rgba(0, 0, 0, 0.08);
+  --line-2: rgba(0, 0, 0, 0.16);
+  --ink: #1d1d1f;
+  --ink-2: #424245;
+  --ink-3: #6e6e73;
+  --ink-p: #56565b;
+  --accent: #0066cc;
+  --accent-p: #0060c0;
+  --accent-fill: #0071e3;
+  --accent-fill-2: #0077ed;
+  --accent-ink: #ffffff;
+  --ok: #19702f;
+  --warn: #a44200;
+  --warn-bg: #fff4e5;
+  --bar-float: rgba(250, 250, 252, 0.78);
+  /* the open menu is solid: it sits inside the header's glass, and a blur nested in a blur can't see the page */
+  --sheet: #fafafc;
+  --bar-edge: rgba(0, 0, 0, 0.08);
+  --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.06);
+  /* the closing band: the one dark surface in the light theme */
+  --night: #1d1d1f;
+  --night-ink: #f5f5f7;
+  --night-ink-2: #c7c7cc;
+  --glass: saturate(1.6) blur(24px);
+  --r: 18px;
+  --r-l: 26px;
+  --r-m: 12px;
+  --gut: 16px;
+  --max: 1120px;
+  --narrow: 820px;
+  --top: 76px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #111113;
+    --wall: radial-gradient(120% 80% at 85% -10%, #2c2c30 0%, rgba(44, 44, 48, 0) 55%),
+      linear-gradient(160deg, #1c1c1f 0%, #0b0b0d 30%, #2a2a2e 52%, #0e0e10 76%, #1f1f22 100%);
+    --surface: rgba(44, 44, 48, 0.55);
+    --surface-hi: rgba(58, 58, 62, 0.55);
+    --edge: rgba(255, 255, 255, 0.1);
+    --rim: rgba(255, 255, 255, 0.14);
+    --shadow-tile: 0 1px 2px rgba(0, 0, 0, 0.3), 0 14px 36px -14px rgba(0, 0, 0, 0.7);
+    --inset: rgba(255, 255, 255, 0.06);
+    --fill: rgba(118, 118, 128, 0.24);
+    --fill-2: rgba(118, 118, 128, 0.32);
+    --seg-on: #636366;
+    --field: rgba(0, 0, 0, 0.3);
+    --line: rgba(255, 255, 255, 0.08);
+    --line-2: rgba(255, 255, 255, 0.16);
+    --ink: #f5f5f7;
+    --ink-2: #d2d2d7;
+    --ink-3: #a1a1a6;
+    --ink-p: #b8b8bd;
+    --accent: #2997ff;
+    --accent-p: #2997ff;
+    --ok: #30d158;
+    --warn: #ff9f0a;
+    --warn-bg: #2d1f08;
+    --bar-float: rgba(30, 30, 32, 0.78);
+    --sheet: #1e1e20;
+    --bar-edge: rgba(255, 255, 255, 0.1);
+    --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4);
+    --night: #000000;
+  }
+}
+
+/* Increase Contrast: the quiet text and the hairlines come up, and the glass goes nearly solid. */
+@media (prefers-contrast: more) {
+  :root { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: #c7c7cc; --line-2: #8e8e93; --bar-float: #fafafc; --bar-edge: #8e8e93; --surface: rgba(255, 255, 255, 0.94); --surface-hi: rgba(255, 255, 255, 0.94); --edge: #c7c7cc; }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root { --ink-2: #f5f5f7; --ink-3: #d2d2d7; --ink-p: #f5f5f7; --line: #545458; --line-2: #8e8e93; --bar-float: #1e1e20; --bar-edge: #8e8e93; --surface: rgba(29, 29, 31, 0.96); --surface-hi: rgba(29, 29, 31, 0.96); --edge: #545458; }
+}
+/* Reduce Transparency, or a browser without backdrop blur: the glass is solid. */
+@media (prefers-reduced-transparency: reduce) {
+  :root { --bar-float: #fafafc; --surface: #ffffff; --surface-hi: #ffffff; --inset: #f5f5f7; --fill: #e8e8ed; --fill-2: #dcdce1; --field: #ffffff; }
+}
+@media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: dark) {
+  :root { --bar-float: #1e1e20; --surface: #1d1d1f; --surface-hi: #1d1d1f; --inset: #2a2a2c; --fill: #2c2c2e; --fill-2: #3a3a3c; --field: #161617; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root { --bar-float: #fafafc; --surface: rgba(255, 255, 255, 0.9); --surface-hi: rgba(255, 255, 255, 0.9); }
+  @media (prefers-color-scheme: dark) { :root { --bar-float: #1e1e20; --surface: rgba(29, 29, 31, 0.92); --surface-hi: rgba(29, 29, 31, 0.92); } }
+}
+
+/* ------------------------------------------------------------ the page */
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--top) + 12px); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.6 var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--wall); }
+main { flex: 1; }
+@media (min-width: 900px) { body { font-size: 17px; } }
+
+a { color: var(--accent-p); text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent-fill) 60%, transparent); outline-offset: 2px; border-radius: 8px; }
+.skip { position: absolute; z-index: 50; top: -60px; inset-inline-start: 12px; padding: 10px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); }
+.skip:focus { top: 12px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+.num { font-variant-numeric: tabular-nums; }
+svg.i { width: 22px; height: 22px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.wrap { max-width: calc(var(--max) + 2 * var(--gut)); margin-inline: auto; padding-inline: var(--gut); }
+.wrap.narrow { max-width: calc(var(--narrow) + 2 * var(--gut)); }
+@media (min-width: 700px) { :root { --gut: 32px; } }
+
+h1, h2, h3 { margin: 0; color: var(--ink); font-family: var(--display); text-wrap: balance; }
+h1 { font-size: clamp(32px, 3.2vw + 20px, 56px); line-height: 1.1; font-weight: 700; }
+h2 { font-size: clamp(26px, 1.6vw + 20px, 40px); line-height: 1.15; font-weight: 700; }
+h3 { font-size: 19px; line-height: 1.3; font-weight: 600; }
+p { margin: 0 0 1em; }
+p:last-child { margin-bottom: 0; }
+.lede { font-size: clamp(18px, 0.4vw + 16px, 21px); line-height: 1.55; color: var(--ink-2); }
+.quiet { color: var(--ink-p); }
+.sec { padding-block: 56px; }
+@media (min-width: 900px) { .sec { padding-block: 88px; } }
+
+/* A pane of frosted glass: translucent, blurred, whiter at the top, with a lit edge. */
+.glass {
+  background: linear-gradient(180deg, var(--surface-hi), var(--surface));
+  -webkit-backdrop-filter: var(--glass);
+  backdrop-filter: var(--glass);
+  border-radius: var(--r-l);
+  box-shadow: var(--shadow-tile), inset 0 0 0 1px var(--edge), inset 0 1px 0 var(--rim);
+}
+
+/* ------------------------------------------------------------ the marks */
+
+/* The tile and the glyph are the brand files': the glyph fills the tile, rx 24 on 100, the colour is the product's
+   and never the accent. Size comes from --s, set where the mark is used. */
+.mark { --s: 32px; display: block; flex: none; width: var(--s); height: var(--s); border-radius: 24%; color: #fff; overflow: hidden; }
+.mark svg { display: block; width: 100%; height: 100%; }
+.mark.openfrequency { background: #2747d6; }
+.mark.toran { background: #0f7a54; }
+.mark.teder { background: #6a3fd6; }
+
+/* ------------------------------------------------------------ buttons and fields */
+
+/* One filled blue button per decision; every other button is a grey pill. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--ink);
+  font: 500 16px/1 var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:hover { background: var(--fill-2); }
+.btn:active { opacity: 0.75; }
+.btn.primary { background: var(--accent-fill); color: var(--accent-ink); }
+.btn.primary:hover { background: var(--accent-fill-2); }
+.btn.sm { min-height: 40px; padding: 0 16px; font-size: 14px; }
+.btn[disabled], .btn[aria-busy='true'] { opacity: 0.5; pointer-events: none; }
+
+label.f { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+label.f small { font-weight: 400; font-size: 13px; color: var(--ink-3); }
+input[type='text'], input[type='url'], input[type='tel'], input[type='email'], textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-m);
+  background: var(--field);
+  color: var(--ink);
+  font: 400 17px/1.35 var(--text);
+}
+input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-fill) 25%, transparent); }
+::placeholder { color: var(--ink-3); opacity: 1; }
+
+/* ------------------------------------------------------------ the header: a capsule of glass that stays on top */
+
+/* On a phone: the mark and the name, the one action, and a menu for the four links. From 900px the links sit in
+   the middle of the capsule as a grey segmented pill, the way Teder's are. The capsule lifts once the page scrolls
+   under it. */
+.top { position: sticky; top: 0; z-index: 30; padding: 10px var(--gut) 0; }
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: var(--max);
+  height: 60px;
+  margin-inline: auto;
+  padding-inline: 8px 6px;
+  border-radius: 999px;
+  background: var(--bar-float);
+  -webkit-backdrop-filter: var(--glass);
+  backdrop-filter: var(--glass);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05), inset 0 0 0 1px var(--bar-edge), inset 0 1px 0 var(--rim);
+  transition: box-shadow 0.25s ease;
+}
+.scrolled .bar { box-shadow: var(--shadow-float), inset 0 0 0 1px var(--bar-edge), inset 0 1px 0 var(--rim); }
+.brand { display: flex; align-items: center; gap: 8px; min-height: 44px; flex: none; color: var(--ink); text-decoration: none; }
+.brand b { font: 700 16px/1 var(--display); }
+.bar .cta { margin-inline-start: auto; padding: 0 14px; flex: none; }
+.nav { display: none; }
+
+.menu { flex: none; }
+.menu summary { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; list-style: none; cursor: pointer; color: var(--ink); }
+.menu summary::-webkit-details-marker { display: none; }
+.menu summary:hover { background: var(--fill); }
+.menu .close, .menu[open] .open { display: none; }
+.menu[open] .close { display: block; }
+.menu nav {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline: var(--gut);
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  border-radius: 22px;
+  background: var(--sheet);
+  box-shadow: var(--shadow-float), inset 0 0 0 1px var(--bar-edge), inset 0 1px 0 var(--rim);
+}
+.menu nav a { display: flex; align-items: center; min-height: 52px; padding: 0 16px; border-radius: 14px; color: var(--ink); font-size: 18px; font-weight: 500; text-decoration: none; }
+.menu nav a:hover, .menu nav a[aria-current='page'] { background: var(--fill); }
+
+/* A narrow phone: the action gets a size smaller, and below 360px the name goes to screen readers only, so the
+   action always keeps its full words. */
+@media (max-width: 389px) { .bar .cta { padding: 0 11px; font-size: 13px; } .brand { gap: 6px; } .brand b { font-size: 15px; } }
+@media (max-width: 359px) { .brand b { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+
+@media (min-width: 900px) {
+  .bar { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; padding-inline: 12px 10px; }
+  .brand { gap: 9px; }
+  .brand b { font-size: 17px; }
+  .bar .cta { justify-self: end; padding: 0 16px; }
+  .nav { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--fill); }
+  .nav a { display: inline-flex; align-items: center; min-height: 38px; padding: 0 18px; border-radius: 999px; color: var(--ink-2); font-size: 14px; font-weight: 500; text-decoration: none; transition: background-color 0.15s ease, color 0.15s ease; }
+  .nav a:hover { color: var(--ink); background: var(--fill); }
+  .nav a[aria-current='page'] { color: var(--ink); font-weight: 600; background: var(--seg-on); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.04); }
+  .menu { display: none; }
+}
+
+/* ------------------------------------------------------------ the closing band and the footer */
+
+/* The one dark surface on a light page: a last line and one button. In the dark theme it goes to black, a step
+   below the wallpaper, with a hairline on top. */
+.band { margin-top: 32px; padding-block: 64px; background: var(--night); color: var(--night-ink-2); text-align: center; }
+.band h2 { color: var(--night-ink); }
+.band p { margin: 16px auto 28px; max-width: 46ch; font-size: clamp(17px, 0.4vw + 15px, 20px); }
+@media (min-width: 900px) { .band { padding-block: 96px; } }
+@media (prefers-color-scheme: dark) { .band { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1); } }
+.band .ph { color: var(--night-ink); }
+
+.foot { padding-block: 28px 40px; color: var(--ink-p); font-size: 14px; }
+.foot .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; }
+.foot .who { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--ink-2); font-weight: 500; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.foot nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-2); text-decoration: none; }
+.foot nav a:hover { color: var(--ink); text-decoration: underline; }
+
+/* ------------------------------------------------------------ drafts */
+
+/* A fact that is not in site.config.json yet. Only a draft build can show one; the real build stops instead. */
+.ph { padding: 0 4px; border-radius: 6px; background: color-mix(in srgb, #ff9f0a 24%, transparent); outline: 1px dashed var(--warn); color: inherit; font: inherit; }
+.draft { margin: 0; padding: 8px var(--gut); background: var(--warn-bg); color: var(--warn); font-size: 13px; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

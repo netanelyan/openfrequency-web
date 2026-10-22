@@ -1,0 +1,18 @@
+{
+  "name": "openfrequency-web",
+  "private": true,
+  "description": "OpenFrequency's public website: static pages built from site.config.json",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "draft": "node build.mjs --draft",
+    "serve": "node scripts/serve.mjs",
+    "shots": "node scripts/shots.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.56.0"
+  }
+}
