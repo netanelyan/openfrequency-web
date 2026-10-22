@@ -25,31 +25,40 @@
     Array.prototype.forEach.call(el.children, function (c, i) { c.style.setProperty('--i', i); });
     if (seen) seen.observe(el); else el.classList.add('in');
   });
-  each('.drift', function (el) { if (seen) seen.observe(el); else el.classList.add('in'); });
+  each('.drift, .reveal', function (el) { if (seen) seen.observe(el); else el.classList.add('in'); });
 
-  // The first screen's chat plays once: each of the store's answers is preceded by Toran's three typing dots.
-  var heroChat = d.querySelector('[data-hero-chat] .msgs');
-  if (heroChat && !still) {
-    var items = Array.prototype.slice.call(heroChat.children);
-    items.forEach(function (li) { li.classList.add('wait-in'); });
-    var t = 500;
+  // A chat stage marked data-play plays once as it comes into view: messages arrive in their order, and each answer
+  // is preceded by Toran's three typing dots. Messages the layout hides (the second exchange on a phone) sit out.
+  var play = function (stage) {
+    var items = Array.prototype.slice.call(stage.querySelectorAll('.msgs > li'))
+      .filter(function (li) { return getComputedStyle(li).display !== 'none'; })
+      .sort(function (a, b) { return (+a.getAttribute('data-o') || 0) - (+b.getAttribute('data-o') || 0); });
+    var t = 400;
     items.forEach(function (li) {
       if (li.classList.contains('them')) {
         var typing = d.createElement('li');
         typing.className = 'msg them typing wait-in';
         typing.setAttribute('aria-hidden', 'true');
         typing.innerHTML = '<span class="dots"><i></i><i></i><i></i></span>';
-        heroChat.insertBefore(typing, li);
+        li.parentNode.insertBefore(typing, li);
         setTimeout(function () { typing.classList.remove('wait-in'); }, t);
-        t += 1100;
+        t += 1000;
         setTimeout(function () { typing.remove(); li.classList.remove('wait-in'); }, t);
-        t += 700;
+        t += 600;
       } else {
         setTimeout(function () { li.classList.remove('wait-in'); }, t);
-        t += 900;
+        t += 800;
       }
     });
-  }
+  };
+  if (!still) each('[data-play]', function (stage) {
+    each('.msgs > li', function (li) { li.classList.add('wait-in'); }, stage);
+    if (!('IntersectionObserver' in window)) return play(stage);
+    var once = new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) { once.disconnect(); play(stage); }
+    }, { rootMargin: '0px 0px -20% 0px' });
+    once.observe(stage);
+  });
 
   // How it goes: the statement in the middle of the screen sets the state of the held fragment.
   var steps = d.querySelectorAll('.step[data-step]'), states = d.querySelectorAll('.held [data-state]');

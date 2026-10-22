@@ -1,0 +1,903 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T15:41:57.843Z",
+  "title": "Design System: OpenFrequency",
+  "extensions": {
+    "colorMeta": {
+      "wallpaper-base": {
+        "role": "neutral",
+        "displayName": "Silver Wallpaper",
+        "canonical": "#eeeff2",
+        "approxOklch": "oklch(95.2% 0.004 271.4)",
+        "dark": "#111113",
+        "purpose": "Page base under the fixed silver gradient; browser theme colour.",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#232426",
+          "#3f4042",
+          "#5d5d60",
+          "#7f8083",
+          "#a3a4a7",
+          "#c9cacd",
+          "#edeef1"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#1d1d1f",
+        "approxOklch": "oklch(23.2% 0.004 286.1)",
+        "dark": "#f5f5f7",
+        "purpose": "Headings and body.",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#242426",
+          "#3f3f42",
+          "#5d5d60",
+          "#808082",
+          "#a4a4a7",
+          "#cacacd",
+          "#eeeef1"
+        ]
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Ink Secondary",
+        "canonical": "#424245",
+        "approxOklch": "oklch(38.0% 0.005 286.2)",
+        "dark": "#d2d2d7",
+        "purpose": "Inactive nav, definitions.",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#242426",
+          "#3f3f42",
+          "#5d5d60",
+          "#808083",
+          "#a4a4a8",
+          "#cacace",
+          "#eeeef2"
+        ]
+      },
+      "ink-quiet": {
+        "role": "neutral",
+        "displayName": "Quiet Ink",
+        "canonical": "#56565b",
+        "approxOklch": "oklch(45.5% 0.008 286.1)",
+        "dark": "#b8b8bd",
+        "purpose": "Captions, table heads, footer labels, dimmed steps (5.7:1 light, 7.0:1 dark).",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#242328",
+          "#3f3f44",
+          "#5d5d62",
+          "#808085",
+          "#a4a4a9",
+          "#cacad0",
+          "#eeeef4"
+        ]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Faint Ink",
+        "canonical": "#6e6e73",
+        "approxOklch": "oklch(54.0% 0.008 286.1)",
+        "dark": "#a1a1a6",
+        "purpose": "Placeholders, message times, typing dots, neutral status dots.",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#242428",
+          "#3f3f44",
+          "#5d5d62",
+          "#808085",
+          "#a4a4a9",
+          "#cacacf",
+          "#eeeef4"
+        ]
+      },
+      "action-blue": {
+        "role": "primary",
+        "displayName": "Action Blue",
+        "canonical": "#0071e3",
+        "approxOklch": "oklch(56.3% 0.193 256.2)",
+        "dark": "#0071e3",
+        "purpose": "One filled button per decision; open FAQ tile; footer go tile; focus ring; caret.",
+        "tonalRamp": [
+          "#000a20",
+          "#03234b",
+          "#003d81",
+          "#025ab7",
+          "#197df0",
+          "#68a6fa",
+          "#aacdfd",
+          "#e4f0ff"
+        ]
+      },
+      "action-blue-hover": {
+        "role": "primary",
+        "displayName": "Action Blue Pressed",
+        "canonical": "#0062cc",
+        "approxOklch": "oklch(51.3% 0.182 257.0)",
+        "dark": "#0062cc",
+        "purpose": "Hover of the action blue; keeps white at 4.5:1.",
+        "tonalRamp": [
+          "#000a20",
+          "#03224c",
+          "#013c82",
+          "#0459b9",
+          "#2a7dea",
+          "#68a6fc",
+          "#aacdfe",
+          "#e5effe"
+        ]
+      },
+      "link-blue": {
+        "role": "primary",
+        "displayName": "Link Blue",
+        "canonical": "#0060c0",
+        "approxOklch": "oklch(50.0% 0.169 255.7)",
+        "dark": "#2997ff",
+        "purpose": "Inline links on the page.",
+        "tonalRamp": [
+          "#000a20",
+          "#01234c",
+          "#043e7d",
+          "#0b5bb2",
+          "#2e7fe2",
+          "#65a6fc",
+          "#a8cdfe",
+          "#e5f0fe"
+        ]
+      },
+      "interface-blue": {
+        "role": "primary",
+        "displayName": "Interface Blue",
+        "canonical": "#0066cc",
+        "approxOklch": "oklch(52.2% 0.177 255.8)",
+        "dark": "#2997ff",
+        "purpose": "Links inside product fragments.",
+        "tonalRamp": [
+          "#000a20",
+          "#02234b",
+          "#093e7b",
+          "#005ab6",
+          "#287ee7",
+          "#68a6f9",
+          "#aacdfd",
+          "#e4f0ff"
+        ]
+      },
+      "on-action": {
+        "role": "neutral",
+        "displayName": "On Action",
+        "canonical": "#ffffff",
+        "approxOklch": "oklch(100.0% 0.000 89.9)",
+        "dark": "#ffffff",
+        "purpose": "Text on action blue, violet and night.",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
+        ]
+      },
+      "glass-surface": {
+        "role": "neutral",
+        "displayName": "Glass Pane",
+        "canonical": "rgba(255, 255, 255, 0.58)",
+        "approxOklch": "oklch(98.0% 0.002 271.4)",
+        "dark": "rgba(44, 44, 48, 0.55)",
+        "purpose": "Lower stop of the glass stage gradient.",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242425",
+          "#3f4041",
+          "#5d5d5f",
+          "#808081",
+          "#a4a4a6",
+          "#cacacc",
+          "#eeeef0"
+        ]
+      },
+      "glass-surface-hi": {
+        "role": "neutral",
+        "displayName": "Glass Pane Lit",
+        "canonical": "rgba(255, 255, 255, 0.72)",
+        "approxOklch": "oklch(98.7% 0.001 271.4)",
+        "dark": "rgba(58, 58, 62, 0.55)",
+        "purpose": "Upper stop of the glass stage gradient.",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242425",
+          "#3f4040",
+          "#5d5d5e",
+          "#808081",
+          "#a4a4a5",
+          "#cacacb",
+          "#eeeeef"
+        ]
+      },
+      "glass-bar": {
+        "role": "neutral",
+        "displayName": "Header Glass",
+        "canonical": "rgba(250, 250, 252, 0.78)",
+        "approxOklch": "oklch(97.8% 0.003 281.8)",
+        "dark": "rgba(30, 30, 32, 0.78)",
+        "purpose": "The header capsule.",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242425",
+          "#3f3f41",
+          "#5d5d5f",
+          "#808082",
+          "#a4a4a6",
+          "#cacacc",
+          "#eeeef0"
+        ]
+      },
+      "tile": {
+        "role": "neutral",
+        "displayName": "Tile",
+        "canonical": "rgba(255, 255, 255, 0.55)",
+        "approxOklch": "oklch(97.9% 0.002 271.4)",
+        "dark": "rgba(255, 255, 255, 0.06)",
+        "purpose": "Tiles, rows, table stripes, footer board; one tone off the wallpaper.",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242425",
+          "#3f4041",
+          "#5d5d5f",
+          "#808081",
+          "#a4a4a6",
+          "#cacacc",
+          "#eeeef0"
+        ]
+      },
+      "tile-hover": {
+        "role": "neutral",
+        "displayName": "Tile Lit",
+        "canonical": "rgba(255, 255, 255, 0.8)",
+        "approxOklch": "oklch(99.0% 0.001 271.4)",
+        "dark": "rgba(255, 255, 255, 0.1)",
+        "purpose": "Tile hover, suggestion chips.",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#3f4040",
+          "#5d5d5e",
+          "#808081",
+          "#a4a4a5",
+          "#cacacb",
+          "#eeeeef"
+        ]
+      },
+      "fill": {
+        "role": "neutral",
+        "displayName": "Grey Fill",
+        "canonical": "rgba(118, 118, 128, 0.12)",
+        "approxOklch": "oklch(90.9% 0.005 275.9)",
+        "dark": "rgba(118, 118, 128, 0.24)",
+        "purpose": "Grey pill buttons, segmented nav track, rows inside UI cards.",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#232427",
+          "#3f3f43",
+          "#5d5d61",
+          "#7f8083",
+          "#a3a4a8",
+          "#c9cace",
+          "#edeef2"
+        ]
+      },
+      "fill-hover": {
+        "role": "neutral",
+        "displayName": "Grey Fill Pressed",
+        "canonical": "rgba(118, 118, 128, 0.2)",
+        "approxOklch": "oklch(87.9% 0.006 278.0)",
+        "dark": "rgba(118, 118, 128, 0.32)",
+        "purpose": "Grey pill hover.",
+        "tonalRamp": [
+          "#0a0b0e",
+          "#232427",
+          "#3f3f43",
+          "#5d5d61",
+          "#7f8084",
+          "#a3a4a8",
+          "#c9cace",
+          "#edeef3"
+        ]
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "Field",
+        "canonical": "rgba(255, 255, 255, 0.85)",
+        "approxOklch": "oklch(99.3% 0.001 271.4)",
+        "dark": "rgba(0, 0, 0, 0.3)",
+        "purpose": "Input ground.",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#3f4040",
+          "#5d5d5e",
+          "#808080",
+          "#a4a4a5",
+          "#cacacb",
+          "#eeeeef"
+        ]
+      },
+      "field-stroke": {
+        "role": "neutral",
+        "displayName": "Field Stroke",
+        "canonical": "rgba(0, 0, 0, 0.16)",
+        "approxOklch": "oklch(83.5% 0.004 271.4)",
+        "dark": "rgba(255, 255, 255, 0.16)",
+        "purpose": "Input border.",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#232426",
+          "#3f4042",
+          "#5d5d60",
+          "#7f8082",
+          "#a4a4a7",
+          "#c9cacd",
+          "#edeef1"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgba(0, 0, 0, 0.08)",
+        "approxOklch": "oklch(89.4% 0.004 271.4)",
+        "dark": "rgba(255, 255, 255, 0.08)",
+        "purpose": "Only inside fragments: chat header and caption dividers.",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#232426",
+          "#3f4042",
+          "#5d5d60",
+          "#7f8083",
+          "#a4a4a7",
+          "#c9cacd",
+          "#edeef1"
+        ]
+      },
+      "sheet": {
+        "role": "neutral",
+        "displayName": "Sheet",
+        "canonical": "#fafafc",
+        "approxOklch": "oklch(98.6% 0.003 286.4)",
+        "dark": "#1e1e20",
+        "purpose": "Solid surface: phone menu, chat header, UI cards, closing dialog.",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242425",
+          "#3f3f41",
+          "#5d5d5f",
+          "#808082",
+          "#a4a4a6",
+          "#cacacc",
+          "#eeeef0"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Night",
+        "canonical": "#1d1d1f",
+        "approxOklch": "oklch(23.2% 0.004 286.1)",
+        "dark": "#000000",
+        "purpose": "The closing field and the footer wordmark tile.",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#242426",
+          "#3f3f42",
+          "#5d5d60",
+          "#808082",
+          "#a4a4a7",
+          "#cacacd",
+          "#eeeef1"
+        ]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "#f5f5f7",
+        "approxOklch": "oklch(97.1% 0.003 286.4)",
+        "dark": "#f5f5f7",
+        "purpose": "Headings on night.",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242425",
+          "#3f3f41",
+          "#5d5d5f",
+          "#808082",
+          "#a4a4a6",
+          "#cacacc",
+          "#eeeef0"
+        ]
+      },
+      "night-ink-quiet": {
+        "role": "neutral",
+        "displayName": "Night Ink Quiet",
+        "canonical": "#c7c7cc",
+        "approxOklch": "oklch(83.1% 0.007 286.2)",
+        "dark": "#c7c7cc",
+        "purpose": "Body on night.",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#242427",
+          "#3f3f43",
+          "#5d5d61",
+          "#808084",
+          "#a4a4a9",
+          "#cacacf",
+          "#eeeef3"
+        ]
+      },
+      "toran-green": {
+        "role": "secondary",
+        "displayName": "Toran Green",
+        "canonical": "#0f7a54",
+        "approxOklch": "oklch(51.4% 0.108 162.2)",
+        "dark": "#0f7a54",
+        "purpose": "Toran's mark tile; 'answered alone' dots and pills.",
+        "tonalRamp": [
+          "#000f07",
+          "#012c1c",
+          "#074c33",
+          "#106f4c",
+          "#35946c",
+          "#5eba90",
+          "#85e1b5",
+          "#c4fee0"
+        ]
+      },
+      "teder-violet": {
+        "role": "secondary",
+        "displayName": "Teder Violet",
+        "canonical": "#6a3fd6",
+        "approxOklch": "oklch(51.0% 0.216 289.5)",
+        "dark": "#6a3fd6",
+        "purpose": "Teder's mark tile; the one colour field.",
+        "tonalRamp": [
+          "#0d002c",
+          "#280362",
+          "#460e9e",
+          "#6234cc",
+          "#835ef6",
+          "#a392fe",
+          "#c9c3fc",
+          "#eeecff"
+        ]
+      },
+      "openfrequency-blue": {
+        "role": "secondary",
+        "displayName": "OpenFrequency Blue",
+        "canonical": "#2747d6",
+        "approxOklch": "oklch(47.7% 0.220 266.9)",
+        "dark": "#2747d6",
+        "purpose": "OpenFrequency's mark tile.",
+        "tonalRamp": [
+          "#010132",
+          "#080375",
+          "#131db1",
+          "#2848d7",
+          "#4a73f7",
+          "#7fa1f8",
+          "#b5cafc",
+          "#e7eeff"
+        ]
+      },
+      "ok-green": {
+        "role": "tertiary",
+        "displayName": "OK Green",
+        "canonical": "#19702f",
+        "approxOklch": "oklch(48.0% 0.128 147.5)",
+        "dark": "#30d158",
+        "purpose": "Success lines, the eval zeros.",
+        "tonalRamp": [
+          "#001002",
+          "#042d0d",
+          "#014e19",
+          "#19702f",
+          "#439452",
+          "#69ba75",
+          "#8fe19a",
+          "#c9ffcf"
+        ]
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Warn Amber",
+        "canonical": "#a44200",
+        "approxOklch": "oklch(50.5% 0.144 45.1)",
+        "dark": "#ff9f0a",
+        "purpose": "Form errors, invalid border, draft banner, placeholder outline.",
+        "tonalRamp": [
+          "#190500",
+          "#401500",
+          "#6a2903",
+          "#983f08",
+          "#c45f2c",
+          "#ed8453",
+          "#fbb99b",
+          "#feeae1"
+        ]
+      },
+      "warn-ground": {
+        "role": "tertiary",
+        "displayName": "Warn Ground",
+        "canonical": "#fff4e5",
+        "approxOklch": "oklch(97.2% 0.023 75.9)",
+        "dark": "#2d1f08",
+        "purpose": "Form message and draft banner ground.",
+        "tonalRamp": [
+          "#110a02",
+          "#2b2317",
+          "#473e32",
+          "#655c4f",
+          "#887f71",
+          "#ada395",
+          "#d3c9ba",
+          "#f8edde"
+        ]
+      },
+      "bubble-sent": {
+        "role": "tertiary",
+        "displayName": "WhatsApp Sent",
+        "canonical": "#d9fdd3",
+        "approxOklch": "oklch(95.7% 0.067 141.1)",
+        "dark": "#144d37",
+        "purpose": "Sent bubble, inside chats only.",
+        "tonalRamp": [
+          "#011000",
+          "#0f2c0a",
+          "#2b4826",
+          "#486743",
+          "#6a8b65",
+          "#8eb088",
+          "#b3d6ad",
+          "#d7fad1"
+        ]
+      },
+      "bubble-received": {
+        "role": "tertiary",
+        "displayName": "WhatsApp Received",
+        "canonical": "#ffffff",
+        "approxOklch": "oklch(100.0% 0.000 89.9)",
+        "dark": "#2c2c2e",
+        "purpose": "Received bubble, inside chats only.",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
+        ]
+      },
+      "chat-ground": {
+        "role": "tertiary",
+        "displayName": "WhatsApp Ground",
+        "canonical": "#efeae2",
+        "approxOklch": "oklch(93.9% 0.012 79.8)",
+        "dark": "#0b141a",
+        "purpose": "Chat background, inside chats only.",
+        "tonalRamp": [
+          "#0e0b06",
+          "#27231e",
+          "#433f39",
+          "#615d56",
+          "#848078",
+          "#a9a49c",
+          "#cfcac2",
+          "#f3eee6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "The price only."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Every h1 and h2, the typed question line, the footer clock and wordmark."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "h3, FAQ questions, ledes and about paragraphs (400 at 1.45), the close line."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text; 16px below 900px, 17px from 900px."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Captions, labels, table heads, legal, credits."
+      }
+    },
+    "wallpaper": {
+      "light": "radial-gradient(120% 80% at 85% -10%, #ffffff 0%, rgba(255,255,255,0) 60%), linear-gradient(160deg, #fafafb 0%, #e2e3e8 32%, #f4f4f6 52%, #e4e5ea 74%, #f7f7f9 100%)",
+      "dark": "radial-gradient(120% 80% at 85% -10%, #2c2c30 0%, rgba(44,44,48,0) 55%), linear-gradient(160deg, #1c1c1f 0%, #0b0b0d 30%, #2a2a2e 52%, #0e0e10 76%, #1f1f22 100%)",
+      "purpose": "Fixed behind the page (body::before); hue-less silver."
+    },
+    "glass": {
+      "backdropFilter": "saturate(1.6) blur(24px)",
+      "background": "linear-gradient(180deg, var(--surface-hi), var(--surface))",
+      "edge": "inset 0 0 0 1px rgba(255,255,255,.7) (dark .1)",
+      "rim": "inset 0 1px 0 rgba(255,255,255,.95) (dark .14)",
+      "purpose": "Header capsule and product stages only; solid under Reduce Transparency or without backdrop-filter support."
+    },
+    "shadows": [
+      {
+        "name": "glass-stage",
+        "value": "0 1px 2px rgba(0,0,0,0.04), 0 12px 32px -14px rgba(0,0,0,0.14), inset 0 0 0 1px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.95)",
+        "purpose": "Glass stages holding product fragments. Dark: 0 1px 2px rgba(0,0,0,.3), 0 14px 36px -14px rgba(0,0,0,.7)."
+      },
+      {
+        "name": "header-rest",
+        "value": "0 2px 10px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.95)",
+        "purpose": "Header capsule at the top of the page."
+      },
+      {
+        "name": "float",
+        "value": "0 8px 30px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06)",
+        "purpose": "Header once scrolled; the open phone menu. Dark: 0 8px 30px rgba(0,0,0,.6), 0 1px 3px rgba(0,0,0,.4)."
+      },
+      {
+        "name": "message",
+        "value": "0 1px 0.5px rgba(0,0,0,0.13)",
+        "purpose": "WhatsApp's own bubble shadow, inside chats only."
+      },
+      {
+        "name": "dialog",
+        "value": "0 30px 60px -20px rgba(0,0,0,0.6)",
+        "purpose": "The demo dialog on the night field."
+      },
+      {
+        "name": "focus",
+        "value": "outline: 3px solid color-mix(in srgb, #0071e3 60%, transparent); outline-offset: 3px",
+        "purpose": "Every focus-visible."
+      },
+      {
+        "name": "field-focus",
+        "value": "0 0 0 4px color-mix(in srgb, #0071e3 22%, transparent)",
+        "purpose": "Input focus with blue border."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Every arrival, press and state change."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.77, 0, 0.175, 1)",
+        "purpose": "Declared; reserved."
+      },
+      {
+        "name": "press",
+        "value": "transform: scale(0.97) 160ms ease-out",
+        "purpose": "Buttons and suggestion chips; footer go tile scales to 0.985."
+      },
+      {
+        "name": "rise",
+        "value": "opacity 700ms, translateY(22px) to 0 over 900ms ease-out, 80ms stagger",
+        "purpose": "Children of a data-rise group, once on arrival."
+      },
+      {
+        "name": "chat-play",
+        "value": "opacity + translateY(8px) scale(0.98), 350ms/450ms ease-out; first at 400ms, typing dots 1000ms before each reply, 600ms after, 800ms between sent messages",
+        "purpose": "A data-play stage plays its chat once in view."
+      },
+      {
+        "name": "held-state",
+        "value": "opacity 350ms, translateY(16px) scale(0.98) 500ms ease-out",
+        "purpose": "'How it goes' fragment changes state with the statement at mid-screen (desk, with script)."
+      },
+      {
+        "name": "photo-reveal",
+        "value": "clip-path inset(0 0 100% 0) to inset(0), 1.2s ease-out",
+        "purpose": "Archival photo frames open from the top once."
+      },
+      {
+        "name": "photo-drift",
+        "value": "scale(1.08) to 1, 2.4s ease-out",
+        "purpose": "Large photographs settle as they arrive."
+      },
+      {
+        "name": "answer-in",
+        "value": "translateY(10px) scale(0.98) to rest, 420ms ease-out",
+        "purpose": "The question box's reply."
+      },
+      {
+        "name": "typing-dots",
+        "value": "1.2s ease-in-out infinite, 150ms stagger, 4px lift",
+        "purpose": "Toran's typing mark."
+      },
+      {
+        "name": "now-beat",
+        "value": "2.4s ease-in-out infinite, 7px ring of 20% blue",
+        "purpose": "The duty log's present-minute dot."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "all transitions and animations none",
+        "purpose": "Content is visible by default; nothing waits or moves."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone-narrow",
+        "value": "389px"
+      },
+      {
+        "name": "tablet",
+        "value": "700px"
+      },
+      {
+        "name": "desk",
+        "value": "900px"
+      },
+      {
+        "name": "hero-split",
+        "value": "1000px"
+      }
+    ],
+    "accessibilityModes": [
+      "prefers-contrast: more (quiet ink to ink, glass and tiles near solid)",
+      "prefers-reduced-transparency (glass solid)",
+      "no backdrop-filter support (glass near solid)",
+      "prefers-reduced-motion"
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one filled blue pill of a decision.",
+      "html": "<button class=\"ds-btn-primary\">לבנות דמו</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 26px;border:0;border-radius:999px;background:#0071e3;color:#fff;font:600 17px/1 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif;cursor:pointer;transition:background-color .2s ease,transform .16s cubic-bezier(.23,1,.32,1)}.ds-btn-primary:hover{background:#0062cc}.ds-btn-primary:active{transform:scale(.97)}.ds-btn-primary:focus-visible{outline:3px solid rgba(0,113,227,.6);outline-offset:3px}"
+    },
+    {
+      "name": "Grey Pill Button",
+      "kind": "button",
+      "refersTo": "button-pill",
+      "description": "Every button that is not the decision.",
+      "html": "<button class=\"ds-btn-pill\">להצטרף לרשימת ההמתנה</button>",
+      "css": ".ds-btn-pill{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 26px;border:0;border-radius:999px;background:rgba(118,118,128,.12);color:#1d1d1f;font:600 17px/1 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif;cursor:pointer;transition:background-color .2s ease,transform .16s cubic-bezier(.23,1,.32,1)}.ds-btn-pill:hover{background:rgba(118,118,128,.2)}.ds-btn-pill:active{transform:scale(.97)}.ds-btn-pill:focus-visible{outline:3px solid rgba(0,113,227,.6);outline-offset:3px}"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Labelled text field; label above in small 600.",
+      "html": "<label class=\"ds-f\">הכתובת של החנות<input class=\"ds-input\" dir=\"ltr\" placeholder=\"shop.co.il\"></label>",
+      "css": ".ds-f{display:flex;flex-direction:column;gap:6px;font:600 14px/1.4 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif;color:#1d1d1f;direction:rtl}.ds-input{min-height:54px;padding:12px 16px;border:1px solid rgba(0,0,0,.16);border-radius:12px;background:rgba(255,255,255,.85);color:#1d1d1f;font:400 17px/1.35 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif;transition:border-color .2s ease,box-shadow .2s ease}.ds-input::placeholder{color:#6e6e73}.ds-input:focus{outline:none;border-color:#0071e3;box-shadow:0 0 0 4px rgba(0,113,227,.22)}"
+    },
+    {
+      "name": "Header Capsule",
+      "kind": "nav",
+      "refersTo": "header-capsule",
+      "description": "Sticky glass pill: mark and name, segmented nav, small primary button.",
+      "html": "<div class=\"ds-bar\" dir=\"rtl\"><b class=\"ds-brand\"><span class=\"ds-mark\"></span>OpenFrequency</b><nav class=\"ds-nav\"><a aria-current=\"page\">תורן</a><a>תדר</a><a>מחיר</a><a>שאלות</a></nav><a class=\"ds-cta\">לבנות דמו לחנות</a></div>",
+      "css": ".ds-bar{display:flex;align-items:center;gap:8px;height:60px;padding-inline:12px 10px;border-radius:999px;background:rgba(250,250,252,.78);backdrop-filter:saturate(1.6) blur(24px);box-shadow:0 2px 10px rgba(0,0,0,.05),inset 0 0 0 1px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.95);font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif}.ds-brand{display:flex;align-items:center;gap:9px;font-size:17px;color:#1d1d1f}.ds-mark{width:32px;height:32px;border-radius:24%;background:#2747d6}.ds-nav{display:flex;gap:2px;padding:3px;margin-inline:auto;border-radius:999px;background:rgba(118,118,128,.12)}.ds-nav a{display:inline-flex;align-items:center;min-height:38px;padding:0 18px;border-radius:999px;color:#424245;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .15s ease,color .15s ease}.ds-nav a:hover{color:#1d1d1f;background:rgba(118,118,128,.12)}.ds-nav a[aria-current]{color:#1d1d1f;font-weight:600;background:rgba(255,255,255,.95);box-shadow:0 1px 3px rgba(0,0,0,.1)}.ds-cta{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:999px;background:#0071e3;color:#fff;font-size:14px;font-weight:600;cursor:pointer}.ds-cta:hover{background:#0062cc}"
+    },
+    {
+      "name": "Glass Stage with Chat",
+      "kind": "custom",
+      "refersTo": "chat-bubble-sent",
+      "description": "The signature: a WhatsApp fragment at true size on a pane of glass.",
+      "html": "<div class=\"ds-stage\" dir=\"rtl\"><figure class=\"ds-chat\"><div class=\"ds-chat-top\"><span class=\"ds-ava\"></span><span><b>החנות</b><small>וואטסאפ</small></span><span class=\"ds-tag\">דוגמה</span></div><ol class=\"ds-msgs\"><li class=\"ds-msg ds-me\">יש את השמלה במידה M?<time>02:14</time></li><li class=\"ds-msg ds-them\">יש. במידה M נשארו 2.<time>02:14</time></li></ol></figure></div>",
+      "css": ".ds-stage{display:grid;place-items:center;padding:24px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.58));backdrop-filter:saturate(1.6) blur(24px);box-shadow:0 1px 2px rgba(0,0,0,.04),0 12px 32px -14px rgba(0,0,0,.14),inset 0 0 0 1px rgba(255,255,255,.7),inset 0 1px 0 rgba(255,255,255,.95);font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif}.ds-chat{margin:0;width:100%;max-width:420px;overflow:hidden;border-radius:18px;background:#efeae2;color:#1d1d1f;font-size:15px}.ds-chat-top{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fafafc;border-bottom:1px solid rgba(0,0,0,.08)}.ds-chat-top b{display:block;font-size:15px}.ds-chat-top small{display:block;color:#6e6e73;font-size:13px}.ds-ava{width:38px;height:38px;border-radius:50%;background:#0f7a54}.ds-tag{margin-inline-start:auto;padding:3px 10px;border-radius:999px;background:rgba(118,118,128,.12);color:#424245;font-size:12px;font-weight:600}.ds-msgs{display:flex;flex-direction:column;gap:6px;margin:0;padding:14px 12px 16px;list-style:none}.ds-msg{position:relative;max-width:86%;padding:7px 11px 19px;border-radius:12px;line-height:1.42;box-shadow:0 1px .5px rgba(0,0,0,.13)}.ds-msg time{position:absolute;bottom:3px;inset-inline-end:9px;color:#6e6e73;font-size:11px}.ds-me{align-self:flex-end;background:#d9fdd3;border-start-end-radius:3px}.ds-them{align-self:flex-start;background:#fff;border-start-start-radius:3px}"
+    },
+    {
+      "name": "Striped Rows",
+      "kind": "card",
+      "refersTo": "row",
+      "description": "Two-ended rows striped on tile; dots say who answers.",
+      "html": "<ul class=\"ds-rows\" dir=\"rtl\"><li><i class=\"ds-dot\"></i>מחירים, מידות ומלאי</li><li><i class=\"ds-dot\"></i>משלוחים והחזרות</li><li><i class=\"ds-dot ds-yours\"></i>בקשות להנחה</li></ul>",
+      "css": ".ds-rows{display:grid;gap:4px;margin:0;padding:0;list-style:none;font:400 17px/1.6 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif;color:#1d1d1f}.ds-rows li{display:flex;gap:12px;align-items:baseline;padding:12px 16px;border-radius:12px}.ds-rows li:nth-child(odd){background:rgba(255,255,255,.55)}.ds-dot{width:10px;height:10px;flex:none;border-radius:50%;background:#0f7a54}.ds-yours{background:#0071e3}"
+    },
+    {
+      "name": "FAQ Tile",
+      "kind": "card",
+      "refersTo": "faq-tile-open",
+      "description": "Details tile; an open question fills action blue.",
+      "html": "<details class=\"ds-faq\" dir=\"rtl\" open><summary>צריך לחבר משהו בחנות?<span class=\"ds-pm\"></span></summary><p>תשובה קצרה מתוך הקובץ.</p></details>",
+      "css": ".ds-faq{border-radius:18px;background:rgba(255,255,255,.55);font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif;color:#1d1d1f;transition:background-color .25s ease}.ds-faq summary{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px;padding:16px 24px;list-style:none;cursor:pointer;font:600 22px/1.35 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif;border-radius:18px}.ds-faq summary::-webkit-details-marker{display:none}.ds-faq:not([open]) summary:hover{background:rgba(255,255,255,.8)}.ds-pm{position:relative;width:18px;height:18px;flex:none}.ds-pm::before,.ds-pm::after{content:'';position:absolute;inset-inline-start:0;top:7.5px;width:18px;height:3px;border-radius:2px;background:currentColor;transition:transform .3s cubic-bezier(.23,1,.32,1)}.ds-pm::after{transform:rotate(90deg)}.ds-faq[open]{background:#0071e3;color:#fff}.ds-faq[open] .ds-pm::after{transform:rotate(0)}.ds-faq p{margin:0;padding:0 24px 24px}"
+    },
+    {
+      "name": "Footer Go Tile",
+      "kind": "custom",
+      "refersTo": "footer-go-tile",
+      "description": "The board tile that is the action; the arrow slides on hover.",
+      "html": "<a class=\"ds-go\" dir=\"rtl\"><span>לבנות דמו לחנות</span><svg viewBox=\"0 0 44 44\" aria-hidden=\"true\"><path d=\"M38 22H8M18 12 8 22l10 10\"/></svg></a>",
+      "css": ".ds-go{display:flex;flex-direction:column;justify-content:space-between;min-height:160px;padding:22px;border-radius:18px;background:#0071e3;color:#fff;font:700 22px/1.3 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif;text-decoration:none;cursor:pointer;transition:background-color .2s ease,transform .16s cubic-bezier(.23,1,.32,1)}.ds-go:hover{background:#0062cc}.ds-go:active{transform:scale(.985)}.ds-go svg{width:40px;height:40px;align-self:flex-end;stroke:#fff;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(.23,1,.32,1)}.ds-go:hover svg{transform:translateX(-6px)}"
+    },
+    {
+      "name": "Form Message",
+      "kind": "custom",
+      "refersTo": "form-message",
+      "description": "Inline status when a lead does not arrive, with the WhatsApp way out.",
+      "html": "<div class=\"ds-msgbox\" dir=\"rtl\"><p>הפרטים לא הגיעו אלינו. אפשר לשלוח אותם בוואטסאפ.</p><a class=\"ds-btn-sm\">לשלוח בוואטסאפ</a></div>",
+      "css": ".ds-msgbox{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 14px;border-radius:12px;background:#fff4e5;color:#1d1d1f;font:400 14px/1.5 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, Arial, sans-serif}.ds-msgbox p{margin:0;flex:1 1 260px}.ds-btn-sm{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:999px;background:#0071e3;color:#fff;font-weight:600;cursor:pointer}.ds-btn-sm:hover{background:#0062cc}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Product on Duty",
+    "overview": "The site lives inside the Teder owner-site world, pinned by the owner's brief: a silver wallpaper with no hue of its own, frosted glass with a lit edge, the system typeface with Heebo behind it, pill buttons, and one action blue. Inside that world the page is quiet so the product can be loud. The colour, the detail and the motion belong to working fragments of Toran (marked `data-ui`): a WhatsApp chat with its own bubbles, greens and times; a settings card that changes state; a duty log with the present minute on it. Everything around those fragments is silver surfaces of the same tone, five type sizes and generous space.\n\nDepth is rationed. Glass is reserved for what floats (the header capsule) and for the stages a product fragment stands on. Every other surface is a tile one tone step off the wallpaper, with no line and no shadow. The one dark surface in the light theme is the closing field; the one colour field is Teder's violet. Three credited black-and-white archival photographs stand for the world around the product, never for its customers.\n\nThe page is Hebrew, right to left, phone first, and in light and dark from the same tokens. It honours Increase Contrast and Reduce Transparency by making the glass and tiles nearly solid, and Reduce Motion by showing everything in place.",
+    "keyCharacteristics": [
+      "Hue-less silver wallpaper (a fixed radial plus linear gradient over the wallpaper base)",
+      "Glass only on the header and the product's stages, with a lit 1px rim",
+      "Tiles one tone step off the wallpaper, without lines or shadows",
+      "Five visible type sizes, system stack with Heebo",
+      "One filled action blue per decision, and every other button a grey pill",
+      "Product fragments carry their own interface conventions and sizes",
+      "Credited black-and-white archival photographs"
+    ],
+    "rules": [
+      {
+        "name": "The No Hue Wallpaper Rule",
+        "body": "The wallpaper and every tile are hue-less silver. Colour arrives only with the product's fragments, the brand marks, the action blue and the one violet field.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Blue Per Decision Rule",
+        "body": "Each decision gets one filled action-blue button. Every other button is a grey pill. The open FAQ tile and the footer's go tile are the only other blue fills.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mark Colour Rule",
+        "body": "A mark's tile colour is the product's own and never the accent. The marks are the brand files and are never redrawn.",
+        "section": "colors"
+      },
+      {
+        "name": "The Five Sizes Rule",
+        "body": "Outside product fragments, visible text uses only figure, display, lead, body and small.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Colon Heading Rule",
+        "body": "Headings are whole Hebrew sentences or phrases, never \"label: statement\", and never split by a colon.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glass Means Something Rule",
+        "body": "Glass goes on the header and on the stages product fragments stand on. Nothing else is glass, and glass is never nested in glass (the open menu is solid sheet).",
+        "section": "elevation"
+      },
+      {
+        "name": "The No Line, No Shadow Tile Rule",
+        "body": "Tiles, rows, table stripes and the footer board are separated by one tone step alone.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep the wallpaper and tiles hue-less, and let colour enter through product fragments, brand marks, the action blue and the single violet field.",
+      "**Do** give each decision exactly one filled action-blue pill, and make every other button a grey pill.",
+      "**Do** put glass only on the header and the stages that hold product fragments, with the lit edge (inset 1px edge plus 1px top rim).",
+      "**Do** separate tiles, rows and table stripes by one tone step, at 18px for surfaces and 12px for inner elements.",
+      "**Do** keep visible text to the five sizes, and let fragments keep their interface sizes inside `data-ui`.",
+      "**Do** label every made-up chat, day and store as an example, and take every fact from site.config.json.",
+      "**Do** make motion play once, on the out curve, with content visible by default and nothing moving under reduced motion.",
+      "**Do** provide solid fallbacks for Increase Contrast, Reduce Transparency and browsers without backdrop blur."
+    ],
+    "donts": [
+      "**Don't** add lines or shadows to tiles, or nest glass inside glass.",
+      "**Don't** use a brand mark's colour as the accent, or redraw a mark.",
+      "**Don't** put colons in headings.",
+      "**Don't** present the archival photographs as customers, stores or the team, or show them in colour.",
+      "**Don't** build the category's hero plus three identical feature cards plus logos plus pricing cards. Show the product working instead.",
+      "**Don't** let WhatsApp's greens and chat ground leave a chat fragment.",
+      "**Don't** invent customers, testimonials, logos or numbers, and don't offer a free trial."
+    ]
+  }
+}

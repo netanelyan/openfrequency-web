@@ -8,17 +8,17 @@ import { chat } from '../chat.mjs';
 const customer = chat({
   id: 'pair-c', who: 'החנות שלכם', sub: 'בטלפון של הלקוח', face: 'ח', tag: '', names: { me: 'לקוח', them: 'החנות' },
   msgs: [
-    ['me', '02:16', 'ואפשר לאסוף מהמחסן?'],
-    ['them', '02:16', 'את זה אני לא יודע. אני בודק עם החנות, ואחזור אליך כאן.'],
-    ['them', '08:21', 'בדקתי. אפשר לאסוף מהמחסן בימים א׳ עד ה׳, עד 17:00.'],
+    ['me', '02:16', 'ואפשר לאסוף מהמחסן?', false, 1],
+    ['them', '02:16', 'את זה אני לא יודע. אני בודק עם החנות, ואחזור אליך כאן.', false, 2],
+    ['them', '08:21', 'בדקתי. אפשר לאסוף מהמחסן בימים א׳ עד ה׳, עד 17:00.', false, 6],
   ],
 });
 const owner = chat({
   id: 'pair-o', who: 'תורן', sub: 'בטלפון שלכם', face: mark('toran', 36), tag: '', names: { me: 'אתם', them: 'תורן' },
   msgs: [
-    ['them', '02:16', 'לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?'],
-    ['me', '08:20', 'כן, בימים א׳ עד ה׳ עד 17:00'],
-    ['them', '08:21', 'שלחתי לו. שמרתי את זה, ומהפעם הבאה אני עונה על זה לבד.'],
+    ['them', '02:16', 'לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?', false, 3],
+    ['me', '08:20', 'כן, בימים א׳ עד ה׳ עד 17:00', false, 4],
+    ['them', '08:21', 'שלחתי לו. שמרתי את זה, ומהפעם הבאה אני עונה על זה לבד.', false, 5],
   ],
 });
 
@@ -69,13 +69,13 @@ export default (cfg) => ({
   body: `
 <section class="phero" aria-labelledby="t-h">
 <div class="wrap">
-<div data-rise>
+<div>
 ${mark('toran', 112, 'תורן')}
 <h1 id="t-h">תורן עונה ללקוחות שלכם בוואטסאפ</h1>
 <p class="lede">הוא קורא את האתר של החנות ועונה מתוך מה שכתוב בו. מה שאין באתר הוא שואל אתכם, ואת התשובה שלכם הוא זוכר לפעם הבאה.</p>
 <div class="actions"><a class="btn primary" href="/#demo">לבנות דמו לחנות</a><a class="btn" href="#status">מה עובד היום</a></div>
 </div>
-<figure class="photo drift" data-rise>
+<figure class="photo drift reveal">
 <div class="frame"><img src="/img/switchboard-1971-1400.jpg" srcset="/img/switchboard-1971-800.jpg 800w, /img/switchboard-1971-1400.jpg 1400w" sizes="(min-width: 900px) 520px, 100vw" width="1400" height="888" alt="חיילת יושבת מול מרכזיית טלפונים, ביד אחת מחברת כבל ובשנייה סופגנייה" decoding="async"></div>
 <figcaption>תורן הוא מי שבתורנות. חיילת במרכזייה צבאית ביום הראשון של חנוכה, 1971.</figcaption>
 </figure>
@@ -84,11 +84,11 @@ ${mark('toran', 112, 'תורן')}
 
 <section class="sec" id="ask" aria-labelledby="ask-h">
 <div class="wrap">
-<div class="sec-head" data-rise>
+<div class="sec-head">
 <h2 id="ask-h">כשהוא לא יודע, הוא שואל אתכם</h2>
 <p class="lede">כשלקוח שואל משהו שאין עליו תשובה באתר, תורן אומר לו שהוא בודק, ושולח לכם את השאלה בוואטסאפ. אתם עונים במשפט, הוא מעביר ללקוח, ומהפעם הבאה הוא עונה על זה לבד.</p>
 </div>
-<div class="stage glass">
+<div class="stage glass" data-play>
 <div class="pair">
 ${customer}
 ${owner}
@@ -100,8 +100,8 @@ ${owner}
 
 <section class="sec" id="alone" aria-labelledby="alone-h">
 <div class="wrap">
-<div class="sec-head" data-rise><h2 id="alone-h">מה הוא עונה לבד, ומה הוא משאיר לכם</h2></div>
-<div class="two" data-rise>
+<div class="sec-head"><h2 id="alone-h">מה הוא עונה לבד, ומה הוא משאיר לכם</h2></div>
+<div class="two">
 <div><h3>עונה לבד</h3>${rows(ALONE)}</div>
 <div><h3>משאיר לכם</h3>${rows(YOURS, 'yours')}</div>
 </div>
@@ -110,11 +110,11 @@ ${owner}
 
 <section class="sec" id="auto" aria-labelledby="auto-h">
 <div class="wrap narrow">
-<div class="sec-head" data-rise>
+<div class="sec-head">
 <h2 id="auto-h">הודעות שיוצאות לבד</h2>
 <p class="lede">חוץ מלענות, תורן יכול לשלוח ארבע הודעות לפי מה שקורה בחנות. הן יוצאות רק ללקוחות שאישרו לקבל מהחנות הודעות בוואטסאפ, ו-Meta גובה על כל אחת מהן (<a href="/#price">כמה זה עולה</a>).</p>
 </div>
-<dl class="auto" data-rise>
+<dl class="auto">
 ${AUTO.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('\n')}
 </dl>
 </div>
@@ -122,7 +122,7 @@ ${AUTO.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('\n')}
 
 <section class="sec" id="talk" aria-labelledby="talk-h">
 <div class="wrap side">
-<div data-rise>
+<div>
 <h2 id="talk-h">ואפשר גם לכתוב לו</h2>
 <p class="lede">כותבים לתורן בוואטסאפ כמו לעובד בחנות. מספרים לו על מבצע חדש, מעדכנים זמן משלוח, או שואלים על מה לקוחות שאלו השבוע.</p>
 </div>
@@ -132,8 +132,8 @@ ${AUTO.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('\n')}
 
 <section class="sec" id="status" aria-labelledby="status-h">
 <div class="wrap">
-<div class="sec-head" data-rise><h2 id="status-h">מה עובד היום, ומה עוד לא</h2></div>
-<div class="two" data-rise>
+<div class="sec-head"><h2 id="status-h">מה עובד היום, ומה עוד לא</h2></div>
+<div class="two">
 <div><h3>עובד היום</h3>${rows(fromConfig(cfg, 'toran.today'))}</div>
 <div><h3>עוד לא</h3>${rows(fromConfig(cfg, 'toran.notYet'), 'later')}</div>
 </div>

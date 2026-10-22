@@ -38,7 +38,7 @@ function header(current) {
 export function closing(cfg, page) {
   return `<section class="close-sec" aria-labelledby="close-h">
 <div class="wrap">
-<div data-rise>
+<div>
 <h2 id="close-h">הדמו מתחיל בכתובת של החנות</h2>
 <p>תוך ${cfg.t('demo.time')} נשלח לכם עמוד עם הדמו. כותבים לו בוואטסאפ כמו לקוח, ורואים מה הוא עונה.</p>
 </div>
@@ -56,7 +56,6 @@ function creditLine() {
     'photos/switchboard-1971-1400.jpg': 'חיילת במרכזייה צבאית, 1971',
     'photos/ashdod-map-1960-1000.jpg': 'מפת אשדוד, 1960',
     'photos/ashdod-port-1964-1400.jpg': 'בניית נמל אשדוד, 1964',
-    'photos/ashdod-breakwater-1964-1000.jpg': 'שובר הגלים של נמל אשדוד, 1964',
   };
   const list = credits().filter((c) => he[c.file]).map((c) =>
     `<a href="${esc(c.page)}" rel="noopener">${he[c.file]}</a>, ${esc(String(c.creator).replace(/^w:/, ''))}, ${esc(c.license)}`);

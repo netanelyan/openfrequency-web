@@ -16,11 +16,12 @@ const waWords = (cfg, words) => {
 
 // The sample chat, as the customer sees it on their phone. The store, the dress and the price are made up, and the
 // page says so; the "I don't know" line is the real agent's (openfrequency-toran, src/agent/prompt.ts).
+// On a phone the first screen shows the first exchange; the second (marked true) joins from a tablet up.
 const CHAT = [
   ['me', '02:14', 'היי, יש את שמלת הפשתן הירוקה במידה M?'],
   ['them', '02:14', 'יש, נשארו 2 במידה M. היא 289 ₪, והמשלוח עד הבית לוקח 3 עד 5 ימי עסקים. <span class="lnk">לינק לשמלה</span>'],
-  ['me', '02:16', 'ואפשר לאסוף מהמחסן?'],
-  ['them', '02:16', 'את זה אני לא יודע. אני בודק עם החנות, ואחזור אליך כאן.'],
+  ['me', '02:16', 'ואפשר לאסוף מהמחסן?', true],
+  ['them', '02:16', 'את זה אני לא יודע. אני בודק עם החנות, ואחזור אליך כאן.', true],
 ];
 
 const hero = (cfg) => `
@@ -31,7 +32,7 @@ const hero = (cfg) => `
 <p class="lede"><a href="/toran">${mark('toran', 20).replace('class="mark toran"', 'class="mark toran inline"')}תורן</a> קורא את האתר של החנות, את המוצרים ואת דפי המדיניות, ועונה ללקוחות בוואטסאפ. מה שהוא לא יודע הוא שולח אליכם, ואת התשובה שלכם הוא מעביר ללקוח.</p>
 ${demoForm(cfg, '/')}
 </div>
-<div class="stage glass" data-hero-chat>
+<div class="stage glass" data-hero-chat data-play>
 ${chat({ id: 'chat-cap', who: 'החנות שלכם', face: 'ח', msgs: CHAT, names: { me: 'לקוח', them: 'החנות' }, caption: 'שיחה לדוגמה. החנות, השמלה והמחיר מומצאים.' })}
 </div>
 </div>
@@ -74,7 +75,7 @@ const how = (cfg) => `
 <section class="sec steps-sec" id="how" aria-labelledby="how-h">
 <div class="wrap">
 <div>
-<div class="sec-head" data-rise><h2 id="how-h">ככה זה הולך</h2></div>
+<div class="sec-head"><h2 id="how-h">ככה זה הולך</h2></div>
 <ol class="steps">
 ${STEPS(cfg).map(([h, p], i) => `<li class="step${i === 0 ? ' on' : ''}" data-step="${i}"><h3>${h}</h3><p>${p}</p><div class="state">${STATES[i]}</div></li>`).join('\n')}
 </ol>
@@ -98,15 +99,15 @@ const DAY = [
 const day = `
 <section class="sec day-sec" id="day" aria-labelledby="day-h">
 <div class="wrap">
-<div data-rise>
+<div>
 <div class="sec-head"><h2 id="day-h">יום רגיל עם תורן</h2><p class="quiet">דוגמה מחנות בגדים מומצאת. השורה הכחולה היא השעה בישראל עכשיו.</p></div>
-<ol class="log" data-log>
+<ol class="log" data-log data-rise>
 ${DAY.map(([t, who, text]) => `<li data-t="${t}"><span class="dot ${who}" aria-hidden="true"></span><span>${text}</span><time>${t}</time></li>`).join('\n')}
 <li class="now" data-now hidden><span class="dot" aria-hidden="true"></span><span>עכשיו בישראל. אם לקוח כותב לחנות עכשיו, תורן עונה לו.</span><time data-now-time></time></li>
 </ol>
 <p class="key"><span><i class="dot alone" aria-hidden="true"></i>תורן ענה לבד</span><span><i class="dot yours" aria-hidden="true"></i>הועבר אליכם</span><span><i class="dot" aria-hidden="true"></i>אתם</span></p>
 </div>
-<figure class="photo drift" data-rise>
+<figure class="photo drift reveal">
 <div class="frame"><img src="/img/switchboard-1971-1400.jpg" srcset="/img/switchboard-1971-800.jpg 800w, /img/switchboard-1971-1400.jpg 1400w" sizes="(min-width: 900px) 560px, 100vw" width="1400" height="888" alt="חיילת יושבת מול מרכזיית טלפונים, ביד אחת מחברת כבל ובשנייה סופגנייה" loading="lazy" decoding="async"></div>
 <figcaption>חיילת במרכזייה צבאית ביום הראשון של חנוכה, 1971.</figcaption>
 </figure>
@@ -121,7 +122,7 @@ ${DAY.map(([t, who, text]) => `<li data-t="${t}"><span class="dot ${who}" aria-h
 const ask = `
 <section class="sec ask-sec" id="ask" aria-labelledby="ask-h">
 <div class="wrap">
-<div class="sec-head" data-rise><h2 id="ask-h">תכתבו שאלה של לקוח</h2><p>ותראו אם תורן עונה לבד, או מעביר אליכם.</p></div>
+<div class="sec-head"><h2 id="ask-h">תכתבו שאלה של לקוח</h2><p>ותראו אם תורן עונה לבד, או מעביר אליכם.</p></div>
 <div class="ask-field" data-ui><label class="sr" for="ask-q">שאלה של לקוח</label><input class="ask-line" id="ask-q" type="text" value="יש את השמלה במידה M?" autocomplete="off" spellcheck="false" maxlength="80"></div>
 <div class="ask-ui" data-ui data-ask-out aria-live="polite">
 <ol class="msgs"><li class="msg me">יש את השמלה במידה M?<time aria-hidden="true">עכשיו</time></li><li class="msg them">יש. במידה M נשארו 2, ובמידה S יש 5. מידה L אזלה. <span class="lnk">לינק לשמלה</span><time aria-hidden="true">עכשיו</time></li></ol>
@@ -143,25 +144,27 @@ const ask = `
 
 // From openfrequency-toran, docs/milestones.md, milestone 3: 30 questions a store, graded in code. Stores C, D and E
 // passed on a rerun after three fixes; the first run was 147 of 150.
-const STORES = [['חנות א׳', ''], ['חנות ב׳', ''], ['חנות ג׳', ', בריצה חוזרת'], ['חנות ד׳', ', בריצה חוזרת'], ['חנות ה׳', ', בריצה חוזרת']];
-const K = ['שאלות שעבר', 'מחירים מומצאים שהגיעו ללקוח', 'שאלות בלי תשובה באתר שהעביר אליכם'];
+const RERUN = '<span class="long">, בריצה חוזרת</span><span class="short">*</span>';
+const STORES = [['חנות א׳', ''], ['חנות ב׳', ''], ['חנות ג׳', RERUN], ['חנות ד׳', RERUN], ['חנות ה׳', RERUN]];
+const K = [['שאלות שעבר', 'עברו'], ['מחירים מומצאים שהגיעו ללקוח', 'מחירים מומצאים'], ['שאלות בלי תשובה באתר שהעביר אליכם', 'הועברו אליכם']];
+const head = ([long, short]) => `<span class="long">${long}</span><span class="short">${short}</span>`;
 const proof = `
 <section class="sec proof-sec" id="proof" aria-labelledby="proof-h">
 <div class="wrap">
-<div data-rise>
+<div>
 <h2 class="proof-h" id="proof-h"><span>בדקנו אותו</span><span>על חמש חנויות אמיתיות</span></h2>
 <p class="lede proof-lede">שאלנו את תורן 150 שאלות על חמש חנויות Shopify ישראליות: מחירים ומלאי, משלוחים והחזרות, מוצרים שהחנות לא מוכרת, ולקוחות שלוחצים על הנחה.</p>
 </div>
-<table class="results" data-rise>
+<table class="results">
 <caption class="sr">תוצאות הבדיקה של תורן, לפי חנות</caption>
-<thead><tr><th scope="col">חנות</th>${K.map((k) => `<th scope="col">${k}</th>`).join('')}</tr></thead>
+<thead><tr><th scope="col">חנות</th>${K.map((k) => `<th scope="col">${head(k)}</th>`).join('')}</tr></thead>
 <tbody>
-${STORES.map(([s, note]) => `<tr><th scope="row">${s}</th><td data-k="${K[0]}">30 מתוך 30${note}</td><td data-k="${K[1]}" class="zero">0</td><td data-k="${K[2]}">8 מתוך 8</td></tr>`).join('\n')}
+${STORES.map(([s, note]) => `<tr><th scope="row">${s}</th><td>30 מתוך 30${note}</td><td class="zero">0</td><td>8 מתוך 8</td></tr>`).join('\n')}
 </tbody>
-<tfoot><tr><th scope="row">ביחד</th><td data-k="${K[0]}">150 מתוך 150</td><td data-k="${K[1]}" class="zero">0</td><td data-k="${K[2]}">40 מתוך 40</td></tr></tfoot>
+<tfoot><tr><th scope="row">ביחד</th><td>150 מתוך 150</td><td class="zero">0</td><td>40 מתוך 40</td></tr></tfoot>
 </table>
 <div class="proof-notes">
-<p>בריצה הראשונה עברו 147 מתוך 150. את שלוש השאלות שנכשלו בדקנו ותיקנו, ובחנויות ג׳, ד׳ וה׳ הריצה החוזרת עברה. את השמות של החנויות השארנו בחוץ.</p>
+<p><span class="short-note">כוכבית מסמנת ריצה חוזרת. </span>בריצה הראשונה עברו 147 מתוך 150. את שלוש השאלות שנכשלו בדקנו ותיקנו, ובחנויות ג׳, ד׳ וה׳ הריצה החוזרת עברה. את השמות של החנויות השארנו בחוץ.</p>
 <p>היום תורן עובד עם חנויות על Shopify. החיבור ל-WooCommerce ול-Wix בדרך.</p>
 </div>
 </div>
@@ -172,16 +175,16 @@ ${STORES.map(([s, note]) => `<tr><th scope="row">${s}</th><td data-k="${K[0]}">3
 const about = (cfg) => `
 <section class="sec about-sec" id="about" aria-labelledby="about-h">
 <div class="wrap">
-<div class="sec-head" data-rise><h2 id="about-h">מי אנחנו</h2></div>
-<dl class="facts" data-rise>
+<div class="sec-head"><h2 id="about-h">מי אנחנו</h2></div>
+<dl class="facts">
 <div><dt>איפה</dt><dd>${cfg.t('city')}</dd></div>
 <div><dt>מה בנינו</dt><dd>תורן ותדר</dd></div>
 <div><dt>איך מדברים איתנו</dt><dd>בוואטסאפ</dd></div>
 </dl>
-<p class="about-p" data-rise><span>${cfg.t('about.who')} ${cfg.t('about.why')}</span></p>
+<p class="about-p"><span>${cfg.t('about.who')} ${cfg.t('about.why')}</span></p>
 <div class="ashdod">
-<figure class="photo" data-rise><div class="frame"><img src="/img/ashdod-map-1960-1000.jpg" width="1000" height="820" alt="קטע ממפה ישנה: חוף הים, דיונות החול, וגושי הבתים הראשונים של אשדוד" loading="lazy" decoding="async"></div><figcaption>אשדוד במפת מחלקת המדידות, 1960.</figcaption></figure>
-<figure class="photo" data-rise><div class="frame"><img src="/img/ashdod-port-1964-1400.jpg" srcset="/img/ashdod-port-1964-800.jpg 800w, /img/ashdod-port-1964-1400.jpg 1400w" sizes="(min-width: 900px) 480px, 50vw" width="1400" height="1072" alt="מנוף מרים דלי אבנים מעל קטר קטן, ופועלים עומדים ליד המסילה" loading="lazy" decoding="async"></div><figcaption>בניית נמל אשדוד, 1964.</figcaption></figure>
+<figure class="photo reveal"><div class="frame"><img src="/img/ashdod-map-1960-1000.jpg" width="1000" height="820" alt="קטע ממפה ישנה: חוף הים, דיונות החול, וגושי הבתים הראשונים של אשדוד" loading="lazy" decoding="async"></div><figcaption>אשדוד במפת מחלקת המדידות, 1960.</figcaption></figure>
+<figure class="photo reveal"><div class="frame"><img src="/img/ashdod-port-1964-1400.jpg" srcset="/img/ashdod-port-1964-800.jpg 800w, /img/ashdod-port-1964-1400.jpg 1400w" sizes="(min-width: 900px) 480px, 50vw" width="1400" height="1072" alt="מנוף מרים דלי אבנים מעל קטר קטן, ופועלים עומדים ליד המסילה" loading="lazy" decoding="async"></div><figcaption>בניית נמל אשדוד, 1964.</figcaption></figure>
 </div>
 </div>
 </section>`;
@@ -191,7 +194,7 @@ const about = (cfg) => `
 const teder = (cfg) => `
 <section class="sec teder-sec" id="teder" aria-labelledby="teder-h">
 <div class="teder-field">
-<div class="in" data-rise>
+<div class="in">
 <div class="wave" role="img" aria-label="תדר">${glyphOnly('teder')}</div>
 <h2 id="teder-h">ויש גם את תדר, לתוכן ברשתות</h2>
 <p>תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, ומפרסם כל אחת רק אחרי שמישהו אישר אותה. כרגע אנחנו מריצים אותו על שלושה חשבונות משלנו. כשיהיו לנו תוצאות להראות, נפתח אותו גם לחנויות.</p>
@@ -253,9 +256,9 @@ function price(cfg) {
   return `
 <section class="sec price-sec" id="price" aria-labelledby="price-h">
 <div class="wrap">
-<div class="sec-head" data-rise><h2 id="price-h">כמה זה עולה</h2><p>${vatLine} ${setupLine}</p></div>
-<div data-rise>
-<p class="figure"><span class="num">${figure}<span class="bubble-tag msg them typing" data-ui aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span></span></span><span class="cur">₪</span><span class="per">לחודש</span></p>
+<div class="sec-head"><h2 id="price-h">כמה זה עולה</h2><p>${vatLine} ${setupLine}</p></div>
+<div>
+<p class="figure"><span class="num">${figure}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
 <ul class="terms">
 <li><b>ההודעות של Meta</b>Meta גובה תשלום על הודעות שהחנות שולחת ביוזמתה, כמו תזכורת על עגלה נטושה או עדכון שההזמנה יצאה. תשובה ללקוח שכתב קודם, בתוך 24 שעות מההודעה שלו, לא עולה כלום, ורוב מה שתורן שולח הוא תשובות כאלה. ${feeLine} <a href="https://developers.facebook.com/docs/whatsapp/pricing" rel="noopener">המחירון של Meta</a></li>
 <li><b>לדוגמה</b>${example}</li>
@@ -286,7 +289,7 @@ const faq = (cfg) => `
 <section class="sec faq-sec" id="faq" aria-labelledby="faq-h">
 <div class="wrap">
 <h2 id="faq-h">שאלות</h2>
-<div class="faq" data-rise>
+<div class="faq">
 ${FAQ(cfg).map(([q, a]) => `<details name="faq"><summary><span>${q}</span><span class="pm" aria-hidden="true"></span></summary><p>${a}</p></details>`).join('\n')}
 </div>
 </div>

@@ -36,11 +36,13 @@ the form again.
 FIRST VIEWPORT: The pinned headline across the full width at display size, two lines on a desk; under it, on the
 right, the supporting sentence (opening with Toran's mark and name as a link) and the working demo form with its
 blue button; on the left, a glass stage holding the WhatsApp chat at true size, playing in with Toran's three typing
-dots. The primary action is the form's button.
+dots. The primary action is the form's button. On a phone: the headline, then the chat (its first exchange), then
+the sentence and the form; the header's demo button keeps the action in reach.
 
 FORM: product-performs (taste-skill draw, seed 1128621738), redraws: proof → recognition table (no logos; the eval is
 the proof), about → side facts + wide paragraph (two config sentences, no portrait), hero → the direction's own
-composition (the pinned 9-word headline can't split into two 14-character halves). seed: none (unavailable);
-impeccable concept-seed not run because the world is pinned by the brief.
+composition (the pinned 9-word headline can't split into two 14-character halves). Impeccable's concept-seed
+roll was not run: the world is pinned by the brief and the owner confirmed it, so the composition came from the taste
+skill's draw instead. seed: not rolled (no impeccable seed reference exists for this build).
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
