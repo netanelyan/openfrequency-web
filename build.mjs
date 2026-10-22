@@ -8,12 +8,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, readConfig, lint, minifyCss } from './src/lib.mjs';
 import { page } from './src/layout.mjs';
+import home from './src/pages/home.mjs';
 import kit from './src/pages/kit.mjs';
 
 const draft = process.argv.includes('--draft');
 const OUT = path.join(ROOT, 'dist');
 
-const PAGES = [];
+const PAGES = [home];
 const DRAFT_PAGES = [kit];
 
 const cfg = readConfig(draft);

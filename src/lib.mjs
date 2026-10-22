@@ -7,13 +7,28 @@ export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 
 export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-// Each fact the site states, with the words a draft shows in its place. A key missing here is a build error,
-// so a new fact gets a label before it gets a page.
+// Each fact the site states: the words a draft shows in its place, and what a value must look like. A key in
+// site.config.json that is not here is a build error, so a new fact gets a label before it gets a page.
+//   kind: 'text', 'number' (0 or more), or the list of allowed values
+//   unless: the fact is not needed when this is true (the build then lets it stay empty)
+const metaIncluded = (raw) => raw.price?.metaFees === 'included';
 export const FACTS = {
-  domain: 'הדומיין',
-  city: 'העיר',
-  whatsapp: 'מספר הוואטסאפ שלנו',
-  'demo.time': 'זמן הכנת דמו',
+  domain: { label: 'הדומיין', kind: 'text' },
+  city: { label: 'העיר', kind: 'text' },
+  whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
+  'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
+  'about.who': { label: 'משפט על מי אנחנו', kind: 'text' },
+  'about.why': { label: 'משפט על למה בנינו את תורן', kind: 'text' },
+  'price.monthly': { label: 'המחיר החודשי', kind: 'number' },
+  'price.vat': { label: 'כולל או לא כולל מע״מ', kind: ['included', 'excluded'] },
+  'price.setup': { label: 'דמי הקמה, 0 אם אין', kind: 'number' },
+  'price.metaFees': { label: 'איך משלמים ל-Meta', kind: ['direct', 'billed', 'included'] },
+  'price.metaMarketing': { label: 'מחיר הודעת שיווק של Meta', kind: 'number', unless: metaIncluded },
+  'price.metaUtility': { label: 'מחיר הודעת עדכון של Meta', kind: 'number', unless: metaIncluded },
+  'price.exampleCarts': { label: 'מספר תזכורות בדוגמה', kind: 'number' },
+  'price.exampleUpdates': { label: 'מספר עדכוני משלוח בדוגמה', kind: 'number' },
+  'price.commitmentMonths': { label: 'חודשי התחייבות, 0 אם אין', kind: 'number' },
+  'price.stops': { label: 'מתי החיוב נעצר', kind: ['period-end', 'immediately'] },
 };
 
 // The config, read so that nothing missing can be shown as a guess. An empty value ('' or null) is missing.
@@ -22,36 +37,44 @@ export function readConfig(draft) {
   const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf8'));
   const missing = new Map();
   const empty = (v) => v === null || v === '' || v === undefined;
+  const at = (key) => key.split('.').reduce((o, k) => (o == null ? undefined : o[k]), raw);
+  const label = (key) => FACTS[key].label;
 
   const walk = (o, pre = '') => {
     for (const [k, v] of Object.entries(o)) {
       const key = pre + k;
-      if (v && typeof v === 'object' && !Array.isArray(v)) walk(v, key + '.');
-      else {
-        if (!(key in FACTS)) throw new Error(`site.config.json: "${key}" has no label in FACTS (src/lib.mjs)`);
-        if (empty(v)) missing.set(key, FACTS[key]);
-      }
+      if (v && typeof v === 'object' && !Array.isArray(v)) { walk(v, key + '.'); continue; }
+      const f = FACTS[key];
+      if (!f) throw new Error(`site.config.json: "${key}" has no entry in FACTS (src/lib.mjs)`);
+      if (empty(v)) { if (!f.unless?.(raw)) missing.set(key, f.label); continue; }
+      if (f.kind === 'number' && !(typeof v === 'number' && v >= 0)) throw new Error(`site.config.json: "${key}" must be a number, 0 or more (got ${JSON.stringify(v)})`);
+      if (Array.isArray(f.kind) && !f.kind.includes(v)) throw new Error(`site.config.json: "${key}" must be one of ${f.kind.join(', ')} (got ${JSON.stringify(v)})`);
     }
   };
   walk(raw);
+  for (const key of Object.keys(FACTS)) if (at(key) === undefined) throw new Error(`site.config.json: "${key}" is not there (add it, empty if not decided)`);
 
   const get = (key) => {
-    if (!(key in FACTS)) throw new Error(`no fact called "${key}" in FACTS (src/lib.mjs)`);
-    const v = key.split('.').reduce((o, k) => (o == null ? undefined : o[k]), raw);
-    if (empty(v)) { missing.set(key, FACTS[key]); return null; }
+    if (!FACTS[key]) throw new Error(`no fact called "${key}" in FACTS (src/lib.mjs)`);
+    const v = at(key);
+    if (empty(v)) { missing.set(key, label(key)); return null; }
     return v;
   };
   // A fact as text on the page: escaped, or a visible placeholder in a draft.
+  const ph = (key) => `<mark class="ph">[${esc(label(key))}]</mark>`;
   const t = (key, fmt = String) => {
     const v = get(key);
-    return v == null ? `<mark class="ph">[${esc(FACTS[key])}]</mark>` : esc(fmt(v));
+    return v == null ? ph(key) : esc(fmt(v));
   };
 
   const wa = get('whatsapp');
   if (wa != null && !/^972[1-9]\d{7,8}$/.test(String(wa))) throw new Error(`site.config.json: whatsapp must be digits in international form, like 9725XXXXXXXX (got "${wa}")`);
 
-  return { get, t, missing, draft };
+  return { get, t, ph, missing, draft };
 }
+
+// Shekels the way the site writes them: 1,290 ₪, and 0.15 ₪ for a fraction.
+export const ils = (n) => `${n.toLocaleString('he-IL', { maximumFractionDigits: 2 })} ₪`;
 
 // ---------------------------------------------------------------- the marks
 

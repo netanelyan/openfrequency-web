@@ -37,7 +37,7 @@ function footer(cfg) {
   const wa = cfg.get('whatsapp');
   const waLink = wa
     ? `<a href="https://wa.me/${wa}">תכתבו לנו בוואטסאפ</a>`
-    : `<a href="#">תכתבו לנו בוואטסאפ <mark class="ph">[${esc(FACTS.whatsapp)}]</mark></a>`;
+    : `<a href="#">תכתבו לנו בוואטסאפ <mark class="ph">[${esc(FACTS.whatsapp.label)}]</mark></a>`;
   return `<footer class="foot">
 <div class="wrap">
 <p class="who">${mark('openfrequency', 28)}<span>OpenFrequency, ${cfg.t('city')}</span></p>

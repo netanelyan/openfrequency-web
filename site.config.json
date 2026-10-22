@@ -4,5 +4,21 @@
   "whatsapp": "",
   "demo": {
     "time": ""
+  },
+  "about": {
+    "who": "",
+    "why": ""
+  },
+  "price": {
+    "monthly": null,
+    "vat": "",
+    "setup": null,
+    "metaFees": "",
+    "metaMarketing": null,
+    "metaUtility": null,
+    "exampleCarts": null,
+    "exampleUpdates": null,
+    "commitmentMonths": null,
+    "stops": ""
   }
 }
