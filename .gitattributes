@@ -1,0 +1,4 @@
+# LF everywhere: deploy.sh runs in bash and the service and Caddy files go to Linux as they are.
+* text=auto eol=lf
+*.png binary
+*.woff2 binary
