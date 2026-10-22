@@ -4,6 +4,7 @@
 //                            or a page fails the copy lint
 //   node build.mjs --draft   the same pages with each missing fact shown as a visible [placeholder], marked noindex,
 //                            plus the style kit at /_kit; for looking, never for shipping
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, readConfig, lint, minifyCss } from './src/lib.mjs';
@@ -28,6 +29,27 @@ for (const def of draft ? [...PAGES, ...DRAFT_PAGES] : PAGES) {
   const p = def(cfg);
   const file = p.file || (p.path === '/' ? 'index.html' : p.path.slice(1) + '/index.html');
   files.set(file, page(cfg, css, p));
+}
+
+// Each page carries its own Content-Security-Policy: everything comes from this site, and the only scripts and
+// styles that run are the inline ones the build wrote, by hash. (Caddy adds what a <meta> can't: frame-ancestors.)
+const hash = (s) => `'sha256-${crypto.createHash('sha256').update(s, 'utf8').digest('base64')}'`;
+for (const [file, html] of files) {
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => hash(m[1]));
+  const styles = [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => hash(m[1]));
+  const csp = [
+    "default-src 'self'",
+    `script-src ${scripts.join(' ') || "'none'"}`,
+    `style-src 'self' ${styles.join(' ')}`,
+    "style-src-attr 'unsafe-inline'", // the marks' size, style="--s:32px"
+    "img-src 'self' data:",
+    "font-src 'self'",
+    "connect-src 'self'",
+    "form-action 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+  ].join('; ');
+  files.set(file, html.replace('<meta charset="utf-8">', `<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="${csp}">`));
 }
 
 const errors = [...files].flatMap(([file, html]) => lint(file, html, { draft }));

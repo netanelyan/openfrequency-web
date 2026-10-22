@@ -39,6 +39,22 @@ Telegram: create a bot with @BotFather (its token is `TELEGRAM_BOT_TOKEN`), send
 `https://api.telegram.org/bot<token>/getUpdates` and take `message.chat.id` (`TELEGRAM_CHAT_ID`). Both go in the
 server's env file, never in this repo.
 
+## Deploy
+
+On the VPS the pages are static files served by the host's Caddy, and the lead endpoint is one small systemd
+service. `deploy/` has the Caddyfile, the service, its env file, and the script:
+
+```sh
+DEPLOY_HOST=user@vps ./deploy/deploy.sh
+```
+
+It runs the real build and the tests, uploads the pages as a new release and switches to it in one step (the last 5
+are kept, so rolling back is one `ln -sfn`), updates the endpoint only if it changed, and checks the live site over
+HTTPS. The one-time setup is at the top of the script. Each page carries its own Content-Security-Policy with the
+hashes of its inline script and style; Caddy adds the headers a page can't set.
+
+What's left before launch is in `TODO.md`.
+
 ## Facts
 
 Every price, number and time the site states lives in `site.config.json`, never in a template. An empty value
@@ -63,4 +79,5 @@ em and en dashes, a colon in a heading, `!!`, gendered slashes, bureaucratic phr
 | `assets/fonts/` | Heebo (OFL), self-hosted, so no visitor's address goes to Google |
 | `src/forms.mjs`, `src/form.js` | the two forms, every word they can show, and the script that sends them |
 | `server/lead.mjs` | the lead endpoint |
+| `deploy/` | the Caddyfile, the endpoint's systemd service and env file, and the deploy script |
 | `scripts/` | the local server (it proxies `/api` like Caddy), the screenshots, the form check |

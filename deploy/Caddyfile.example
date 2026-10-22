@@ -1,0 +1,68 @@
+# OpenFrequency's public site, for the host's Caddy (the one Teder uses, /etc/caddy/Caddyfile). Needs Caddy 2.8 or
+# later. Put the domain in (replace example.co.il, three times), append this to /etc/caddy/Caddyfile, then:
+#   sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy
+#
+# The pages are static files in /var/www/openfrequency-web/current (deploy/deploy.sh puts them there). /api/* goes to
+# the lead endpoint on 127.0.0.1:4720 (deploy/openfrequency-web-leads.service).
+#
+# Routes kept open for later:
+#   /toran        stays Toran's page
+#   /s/*          Toran's pitch pages will live here; robots.txt already disallows it. Until then it is a 404.
+#   app.<domain>  reserved for the owner's login; nothing answers there yet.
+
+www.example.co.il {
+	redir https://example.co.il{uri} permanent
+}
+
+example.co.il {
+	encode zstd gzip
+	root * /var/www/openfrequency-web/current
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+		# The rest of the policy is in each page, with the hashes of its inline script and style (build.mjs).
+		Content-Security-Policy "frame-ancestors 'none'"
+		-Server
+	}
+
+	# The lead endpoint. If it is down, the 502 is answered by handle_errors below.
+	handle /api/* {
+		reverse_proxy 127.0.0.1:4720
+	}
+
+	# Toran's pitch pages, later: handle /s/* { reverse_proxy <toran> }
+
+	handle {
+		# Pages are folders: /toran is /toran/index.html. A page is checked on every visit, so a deploy shows at
+		# once; the fonts keep for a year, the icons and the share image for a week.
+		try_files {path} {path}/index.html
+		@fonts path /fonts/*
+		@images path /favicon.svg /apple-touch-icon.png /icon-512.png /og/*
+		@pages not path /fonts/* /favicon.svg /apple-touch-icon.png /icon-512.png /og/*
+		header @fonts Cache-Control "public, max-age=31536000, immutable"
+		header @images Cache-Control "public, max-age=604800"
+		header @pages Cache-Control "no-cache"
+		file_server
+	}
+
+	# A page that isn't there gets the 404 page, with its 404 status.
+	handle_errors 404 {
+		rewrite * /404.html
+		file_server
+	}
+
+	# The lead endpoint down or not answering: a plain form post lands on the try-again page (with the WhatsApp
+	# link), and the form's script reads the 5xx and offers WhatsApp in place.
+	handle_errors 502 503 504 {
+		rewrite * /try-again/index.html
+		file_server
+	}
+}
+
+# Reserved for the owner's login, later:
+# app.example.co.il {
+# 	reverse_proxy <the dashboard>
+# }

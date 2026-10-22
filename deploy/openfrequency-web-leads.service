@@ -1,0 +1,51 @@
+# /etc/systemd/system/openfrequency-web-leads.service
+#
+# The site's lead endpoint (server/lead.mjs) on 127.0.0.1:4720, behind Caddy. It needs Node 22.13 or later (for
+# node:sqlite); nothing else is installed. deploy/deploy.sh copies server/lead.mjs to /opt/openfrequency-web/server/
+# and restarts this when it changes.
+#
+# Once:
+#   sudo mkdir -p /etc/openfrequency-web && sudo cp deploy/lead.env.example /etc/openfrequency-web/lead.env
+#   sudo chmod 600 /etc/openfrequency-web/lead.env     (and fill it in)
+#   sudo cp deploy/openfrequency-web-leads.service /etc/systemd/system/ && sudo systemctl daemon-reload
+#   sudo systemctl enable --now openfrequency-web-leads
+#
+# The leads: /var/lib/openfrequency-web/leads.db. To read them:
+#   sudo LEADS_DB=/var/lib/openfrequency-web/leads.db node /opt/openfrequency-web/server/lead.mjs list 50
+
+[Unit]
+Description=OpenFrequency site: the lead endpoint
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+StateDirectory=openfrequency-web
+WorkingDirectory=/opt/openfrequency-web
+EnvironmentFile=/etc/openfrequency-web/lead.env
+Environment=NODE_ENV=production
+Environment=PORT=4720
+Environment=TRUST_PROXY=1
+Environment=LEADS_DB=/var/lib/openfrequency-web/leads.db
+ExecStart=/usr/bin/node server/lead.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+
+# Hardening: it can write only its own state directory, and talk only to Caddy and Telegram.
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_INET AF_INET6
+LockPersonality=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
