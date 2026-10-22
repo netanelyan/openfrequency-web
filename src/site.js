@@ -50,9 +50,10 @@
         t += 800;
       }
     });
+    each('[data-pop]', function (p) { setTimeout(function () { p.classList.remove('wait-in'); }, t + 200); }, stage);
   };
   if (!still) each('[data-play]', function (stage) {
-    each('.msgs > li', function (li) { li.classList.add('wait-in'); }, stage);
+    each('.msgs > li, [data-pop]', function (li) { li.classList.add('wait-in'); }, stage);
     if (!('IntersectionObserver' in window)) return play(stage);
     var once = new IntersectionObserver(function (es) {
       if (es[0].isIntersecting) { once.disconnect(); play(stage); }
@@ -125,22 +126,65 @@
       return { keep: KEEP, why: WHY.none };
     };
     var esc = function (s) { return s.replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-    var render = function () {
-      var q = box.value.trim();
-      if (!q) return;
-      var a = answer(q);
-      var alone = Array.isArray(a);
-      out.innerHTML = '<ol class="msgs"><li class="msg me">' + esc(q) + '<time aria-hidden="true">עכשיו</time></li>'
-        + '<li class="msg them">' + (alone ? a[0] : esc(a.keep)) + '<time aria-hidden="true">עכשיו</time></li></ol>'
-        + '<p class="verdict">' + (alone ? '<span class="ui-s alone">ענה לבד</span>' + a[1] : '<span class="ui-s yours">הועבר אליכם</span>' + a.why) + '</p>';
-      if (!still) out.firstChild.lastChild.classList.add('answer-in');
+    var add = function (cls, html) {
+      var li = d.createElement('li');
+      li.className = cls;
+      li.innerHTML = html;
+      out.appendChild(li);
+      out.scrollTop = out.scrollHeight;
+      return li;
     };
-    var wait;
-    box.addEventListener('input', function () { clearTimeout(wait); wait = setTimeout(render, 350); });
-    box.addEventListener('keydown', function (e) { if (e.key === 'Enter') { clearTimeout(wait); render(); } });
+    // A question goes into the chat as the customer's message; the answer follows Toran's typing dots, with a line
+    // under it on where it came from, or why it went to the store. The chat keeps the last few exchanges.
+    var send = function (raw) {
+      var q = raw.trim();
+      if (!q) return;
+      while (out.children.length > 9) out.removeChild(out.firstChild);
+      add('msg me', esc(q) + '<time aria-hidden="true">עכשיו</time>');
+      var a = answer(q), alone = Array.isArray(a);
+      var reply = function () {
+        add('msg them' + (still ? '' : ' answer-in'), (alone ? a[0] : esc(a.keep)) + '<time aria-hidden="true">עכשיו</time>');
+        add('sys', alone ? '<span class="ui-s alone">ענה לבד</span>' + a[1] : '<span class="ui-s yours">הועבר אליכם</span>' + a.why);
+      };
+      if (still) return reply();
+      var typing = add('msg them typing', '<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>');
+      setTimeout(function () { typing.remove(); reply(); }, 900);
+    };
+    var form = d.querySelector('[data-ask-form]');
+    if (form) {
+      form.hidden = false;
+      form.addEventListener('submit', function (e) { e.preventDefault(); send(box.value); box.value = ''; });
+    }
     if (ex) {
       ex.hidden = false;
-      each('button', function (b) { b.addEventListener('click', function () { box.value = b.textContent; render(); }); }, ex);
+      each('button', function (b) { b.addEventListener('click', function () { send(b.textContent); }); }, ex);
     }
+  }
+
+  // Teder's phone shows its slides like stories: one at a time, a bar filling across the top for each.
+  each('[data-reel]', function (reel) {
+    var imgs = reel.querySelectorAll('img'), bars = reel.querySelectorAll('.bars i'), i = 0;
+    var show = function () {
+      Array.prototype.forEach.call(imgs, function (im, k) { im.classList.toggle('on', k === i); });
+      Array.prototype.forEach.call(bars, function (b, k) { b.classList.toggle('done', k < i); b.classList.toggle('run', k === i); });
+    };
+    reel.classList.add('live');
+    show();
+    if (!still) setInterval(function () { i = (i + 1) % imgs.length; show(); }, 3200);
+  });
+
+  // On a phone, the way to a demo stays at the bottom of the screen once the first screen is behind, and steps aside
+  // while a form or the footer is in view.
+  var dock = d.querySelector('[data-dock]');
+  if (dock && 'IntersectionObserver' in window) {
+    var past = false, near = new Set();
+    var set = function () { dock.classList.toggle('on', past && !near.size); };
+    new IntersectionObserver(function (es) {
+      past = !es[0].isIntersecting && es[0].boundingClientRect.top < 0; set();
+    }).observe(d.querySelector('main > section'));
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) near.add(e.target); else near.delete(e.target); }); set();
+    });
+    each('.demo, .wait, .close-sec, .foot', function (el) { io.observe(el); });
   }
 })();

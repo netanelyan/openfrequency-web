@@ -273,7 +273,11 @@ Surfaces have one radius: 18px for tiles, glass stages, photo frames, chats, the
 ### Product Fragments (signature, data-ui)
 - **Chat:** a WhatsApp conversation as one phone shows it, with a sheet header (avatar or mark, name, a "דוגמה" tag), the chat ground, and sent and received bubbles with a 3px tail corner and times. It plays in once on arrival: messages appear in order (opacity plus 8px rise, 350–450ms), and each reply is preceded by Toran's three typing dots. Every chat is invented and says so.
 - **Held stage:** "how it goes." Three statements scroll past a sticky glass stage whose UI card changes state. The statement in view goes to ink and the others to quiet. States cross-fade with a 16px rise over 350–500ms. Without script or with reduced motion, each state sits under its statement.
-- **Question box:** the headline is an input at display size. Answers render as a chat with an "answered alone" or "passed to you" status pill.
+- **Question box:** a chat window beside its heading: the made-up store's header, the doodled ground, a row of questions to tap and an input bar with a round send button in Toran's green. A question goes in as the customer's message, the answer follows Toran's typing dots, and a centred system line under it says "answered alone" (with the page it came from) or "passed to you" (with why). The window keeps the last few exchanges.
+- **Phone:** a dark frame with 46px top corners, an island, and the screen inside, cut off by the bottom edge of its door. Toran's door holds the sample chat; Teder's plays three slides like stories, a bar filling across the top of each over 3.2s, with two more slides fanned behind it.
+- **Pop:** a notification card that sticks out over a phone's edge, sheet-coloured with an 18px radius and a soft shadow: what reaches the owner. On Toran's phone it drops in after the chat has played (the question Toran couldn't answer); on Teder's it's the slide waiting for approval.
+- **Doodled ground:** every chat's ground carries a faint tile of line drawings (a bag, a heart, a star, a box, a bubble, a clock), as WhatsApp's does, at about 7% under the ground colour.
+- **Dock:** below 700px, on the home page and /toran, the demo button sits on a frosted bar at the bottom of the screen once the first screen is behind, and slides away while a form, the closing or the footer is in view.
 
 ### Motion
 - **Easing:** out `cubic-bezier(0.23, 1, 0.32, 1)` everywhere. In-out `cubic-bezier(0.77, 0, 0.175, 1)` is reserved.
@@ -283,7 +287,7 @@ Surfaces have one radius: 18px for tiles, glass stages, photo frames, chats, the
 - **Without motion:** content is visible by default, and reduced motion removes every transition and animation.
 
 ### Imagery
-Teder is shown by its own output: opening slides Teder made for our three accounts (@sheela.tova, @kav.emtza, @shekel.leshekel), resized from openfrequency-teder into assets/teder, fanned three at a time in the home page's Teder door and run as a sideways-scrolling row with scroll-snap in its section, 12px corners. One credited black-and-white archival photograph from Wikimedia Commons, a 1971 switchboard on duty, appears on /toran's day on duty, in grayscale with contrast 1.04 inside an 18px frame, captioned and credited at the foot of the page. It is never presented as our customer, store or team.
+Teder is shown by its own output: opening slides Teder made for our three accounts (@sheela.tova, @kav.emtza, @shekel.leshekel), resized from openfrequency-teder into assets/teder, played and fanned on the phone in the home page's Teder door and run as a sideways-scrolling row with scroll-snap in its section, 12px corners. One credited black-and-white archival photograph from Wikimedia Commons, a 1971 switchboard on duty, appears on /toran's day on duty, in grayscale with contrast 1.04 inside an 18px frame, captioned and credited at the foot of the page. It is never presented as our customer, store or team.
 
 ## Do's and Don'ts
 

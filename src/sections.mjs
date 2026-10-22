@@ -119,20 +119,25 @@ ${DAY.map(([t, who, text]) => `<li data-t="${t}"><span class="dot ${who}" aria-h
 // real store's site, and hands off the rest with Toran's real line. Without script, the prefilled question keeps
 // its answer, written here.
 export const askBox = `
-<div class="ask-field" data-ui><label class="sr" for="ask-q">שאלה של לקוח</label><input class="ask-line" id="ask-q" type="text" value="יש את השמלה במידה M?" autocomplete="off" spellcheck="false" maxlength="80"></div>
-<div class="ask-ui" data-ui data-ask-out aria-live="polite">
-<ol class="msgs"><li class="msg me">יש את השמלה במידה M?<time aria-hidden="true">עכשיו</time></li><li class="msg them">יש. במידה M נשארו 2, ובמידה S יש 5. מידה L אזלה. <span class="lnk">לינק לשמלה</span><time aria-hidden="true">עכשיו</time></li></ol>
-<p class="verdict"><span class="ui-s alone">ענה לבד</span>מדף המוצר</p>
-</div>
-<div>
+<figure class="chat try" data-ui aria-label="חנות בגדים לדוגמה, שיחה עם תורן">
+<div class="chat-top"><span class="ava" aria-hidden="true">ח</span><span><b>חנות בגדים לדוגמה</b><small>תורן עונה</small></span><span class="tag">דוגמה</span></div>
+<ol class="msgs" data-ask-out aria-live="polite">
+<li class="msg me">יש את השמלה במידה M?<time aria-hidden="true">עכשיו</time></li>
+<li class="msg them">יש. במידה M נשארו 2, ובמידה S יש 5. מידה L אזלה. <span class="lnk">לינק לשמלה</span><time aria-hidden="true">עכשיו</time></li>
+<li class="sys"><span class="ui-s alone">ענה לבד</span>מדף המוצר</li>
+</ol>
 <div class="ask-ex" data-ask-ex hidden>
 <button type="button">כמה עולה משלוח?</button>
 <button type="button">אפשר לאסוף מהמחסן?</button>
 <button type="button">יש הנחה אם אקנה שתיים?</button>
 <button type="button">אפשר להחזיר אם לא מתאים?</button>
 </div>
-<p class="ask-note">זו הדגמה בדפדפן, על חנות בגדים מומצאת ועם תשובות שכתבנו מראש. בדמו שנבנה לכם, תורן עונה מהאתר של החנות שלכם.</p>
-</div>
+<form class="ask-bar" data-ask-form hidden>
+<label class="sr" for="ask-q">שאלה של לקוח</label>
+<input id="ask-q" type="text" placeholder="תכתבו שאלה של לקוח" autocomplete="off" maxlength="80" enterkeyhint="send">
+<button class="send" type="submit" aria-label="לשלוח"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg></button>
+</form>
+</figure>
 `;
 
 // ---------------------------------------------------------------- the proof: Toran's eval

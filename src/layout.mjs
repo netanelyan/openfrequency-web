@@ -112,6 +112,7 @@ ${missing}${header(path)}
 ${body}
 </main>
 ${close ? closing(cfg, path) : ''}
+${path === '/' || path === '/toran' ? '<div class="dock" data-dock><a class="btn primary" href="#demo">לבנות דמו לחנות</a></div>' : ''}
 ${footer(cfg, photos)}
 <script>
 ${siteJs}
