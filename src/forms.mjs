@@ -17,15 +17,16 @@ const open = (cfg, kind, page, cls, id = '') =>
 <input type="hidden" name="page" value="${page}">
 ${honeypot}`;
 
-const status = (kind) => `<div class="form-msg" id="msg-${kind}" role="status" aria-live="polite" hidden></div>`;
+const status = (id) => `<div class="form-msg" id="msg-${id}" role="status" aria-live="polite" hidden></div>`;
 
-export function demoForm(cfg, page) {
-  return `${open(cfg, 'demo', page, 'glass demo', 'demo')}
+// The demo form. A page can hold it twice (the first screen and the close), so each copy has its own id.
+export function demoForm(cfg, page, id = 'demo') {
+  return `${open(cfg, 'demo', page, 'demo', id)}
 <label class="f">הכתובת של החנות<input name="store" type="text" inputmode="url" autocomplete="url" dir="ltr" placeholder="shop.co.il" required></label>
 <label class="f">הוואטסאפ שלכם<input name="contact" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="050-0000000" required></label>
 <button class="btn primary" type="submit">לבנות דמו</button>
 <p class="when">הדמו מוכן תוך ${cfg.t('demo.time')}, ונשלח אותו למספר הזה.</p>
-${status('demo')}
+${status(id)}
 </form>`;
 }
 

@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { serve } from './serve.mjs';
+import { capturePage } from './capture.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'docs/screenshots');
@@ -27,21 +28,19 @@ fs.mkdirSync(OUT, { recursive: true });
 for (const p of paths) {
   for (const [w, h, scale] of [[390, 844, 2], [1440, 900, 1]]) {
     for (const scheme of ['light', 'dark']) {
-      const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: scale, colorScheme: scheme, locale: 'he-IL' });
+      const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: scale, colorScheme: scheme, locale: 'he-IL', bypassCSP: true });
       const pg = await ctx.newPage();
       await pg.goto(base + p, { waitUntil: 'networkidle' });
       await pg.evaluate(() => document.fonts.ready);
-      // The wallpaper is fixed, so a full-page capture would cut it off after the first screen. A viewport as tall
-      // as the page draws it once behind everything, which is close to what a visitor sees while scrolling.
-      const full = await pg.evaluate(() => document.documentElement.scrollHeight);
-      await pg.setViewportSize({ width: w, height: full });
-      const file = `${name(p)}-${w}-${scheme}.png`;
-      await pg.screenshot({ path: path.join(OUT, file) });
+      // Let the first screen's chat finish playing (about six seconds), so the shot shows the whole conversation.
+      if (await pg.$('[data-hero-chat]')) await pg.waitForTimeout(6500);
       if (w === 390 && menu) {
-        await pg.setViewportSize({ width: w, height: h });
         await pg.click('.menu summary');
         await pg.screenshot({ path: path.join(OUT, `${name(p)}-390-${scheme}-menu.png`) });
+        await pg.click('.menu summary');
       }
+      await capturePage(pg, path.join(OUT, `${name(p)}-${w}-${scheme}.png`));
+      const file = `${name(p)}-${w}-${scheme}.png`;
       console.log(file);
       await ctx.close();
     }

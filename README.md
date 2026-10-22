@@ -12,7 +12,7 @@ frosted glass, the system typeface with Heebo behind it); the marks are the bran
 ```sh
 npm install          # only playwright-core, for screenshots
 npm run build        # dist/; stops while any fact in site.config.json is empty, or the copy lint fails
-npm run draft        # the same, with each missing fact shown as a visible [placeholder], plus the style kit at /_kit
+npm run draft        # the same, with each missing fact shown as a visible [placeholder]
 npm run serve        # dist/ on http://127.0.0.1:4730
 npm run shots        # docs/screenshots: every page at 390px and 1440px, light and dark (add --menu for the phone menu)
 ```
@@ -77,6 +77,8 @@ em and en dashes, a colon in a heading, `!!`, gendered slashes, bureaucratic phr
 | `src/pages/` | one module per page |
 | `assets/brand/` | the marks, copied from openfrequency-toran; never redrawn |
 | `assets/fonts/` | Heebo (OFL), self-hosted, so no visitor's address goes to Google |
+| `assets/photos/` | three archival photographs and a map from Wikimedia Commons, resized; `credits.json` holds each one's source and licence, printed in the footer |
+| `src/site.js` | the motion, the two clocks (the duty log's now, the footer's Ashdod time) and the question box |
 | `src/forms.mjs`, `src/form.js` | the two forms, every word they can show, and the script that sends them |
 | `server/lead.mjs` | the lead endpoint |
 | `deploy/` | the Caddyfile, the endpoint's systemd service and env file, and the deploy script |

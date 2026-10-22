@@ -88,6 +88,12 @@ const glyphs = {};
 const glyph = (file) =>
   (glyphs[file] ??= fs.readFileSync(path.join(ROOT, 'assets/brand/svg', file + '.svg'), 'utf8').trim().replace('<svg ', '<svg aria-hidden="true" focusable="false" '));
 
+// A glyph alone, in currentColor, for a field already in the mark's own colour (Teder's wave on its violet).
+export const glyphOnly = (name) => glyph(`${name}-glyph`);
+
+// The archival photographs' credits, recorded by the taste skill's assets script when each was downloaded.
+export const credits = () => JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/photos/credits.json'), 'utf8'));
+
 export function mark(name, size, label = '') {
   const file = name === 'openfrequency' ? (size <= 48 ? 'openfrequency-glyph-small' : 'openfrequency-glyph') : `${name}-glyph`;
   const a11y = label ? ` role="img" aria-label="${esc(label)}"` : ' aria-hidden="true"';

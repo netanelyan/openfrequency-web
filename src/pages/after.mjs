@@ -7,7 +7,7 @@ const plain = (path, title, body) => (cfg) => ({ path, title: `${title} | OpenFr
 
 export const thanks = plain('/thanks', 'קיבלנו את הכתובת של החנות', (cfg) => `
 <section class="sec after">
-<div class="wrap narrow">
+<div class="wrap narrow" data-rise>
 <h1>קיבלנו את הכתובת של החנות</h1>
 <p class="lede">תוך ${cfg.t('demo.time')} נשלח לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p>
 <div class="actions"><a class="btn" href="/">לעמוד הבית</a></div>
@@ -16,7 +16,7 @@ export const thanks = plain('/thanks', 'קיבלנו את הכתובת של הח
 
 export const thanksTeder = plain('/thanks/teder', 'רשמנו אתכם לרשימת ההמתנה של תדר', () => `
 <section class="sec after">
-<div class="wrap narrow">
+<div class="wrap narrow" data-rise>
 <h1>רשמנו אתכם לרשימת ההמתנה של תדר</h1>
 <p class="lede">נכתוב לכם כשתדר ייפתח לחנויות. עד אז, אם יש לכם חנות, אפשר לבנות לה דמו של <a href="/toran">תורן</a>.</p>
 <div class="actions"><a class="btn primary" href="/#demo">לבנות דמו לחנות</a><a class="btn" href="/">לעמוד הבית</a></div>
@@ -30,7 +30,7 @@ export const tryAgain = plain('/try-again', 'הפרטים לא הגיעו אלי
     : `<span class="btn primary">לשלוח בוואטסאפ ${cfg.ph('whatsapp')}</span>`;
   return `
 <section class="sec after">
-<div class="wrap narrow">
+<div class="wrap narrow" data-rise>
 <h1>הפרטים לא הגיעו אלינו</h1>
 <p class="lede">הטופס לא נשלח. אפשר לשלוח לנו את הכתובת של החנות בוואטסאפ, או לנסות שוב בעוד כמה דקות.</p>
 <div class="actions">${button}<a class="btn" href="/#demo">לנסות שוב</a></div>

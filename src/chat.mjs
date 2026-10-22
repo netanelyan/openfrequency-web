@@ -7,7 +7,7 @@
 export function chat({ id, who, sub = 'וואטסאפ', face, tag = 'דוגמה', caption, msgs, names }) {
   const avatar = face.startsWith('<') ? face : `<span class="ava" aria-hidden="true">${face}</span>`;
   const name = caption ? `aria-labelledby="${id}"` : `aria-label="${who}, ${sub}"`;
-  return `<figure class="chat glass" ${name}>
+  return `<figure class="chat" data-ui ${name}>
 <div class="chat-top">${avatar}<span><b>${who}</b><small>${sub}</small></span>${tag ? `<span class="tag">${tag}</span>` : ''}</div>
 <ol class="msgs">
 ${msgs.map(([side, time, text]) => `<li class="msg ${side}"><span class="sr">${names[side]}, ${time}. </span>${text}<time aria-hidden="true">${time}</time></li>`).join('\n')}

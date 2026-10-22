@@ -60,7 +60,7 @@ for (const [w, scheme] of [[390, 'light'], [1440, 'dark']]) {
   await pg.fill('form[data-form=teder] [name=contact]', 'me@example.com');
   await pg.click('form[data-form=teder] button[type=submit]');
   await pg.waitForSelector('form[data-form=teder] .done');
-  await shot(pg.locator('#teder .panel'), `teder-${w}-${scheme}`);
+  await shot(pg.locator('#teder .teder-field'), `teder-${w}-${scheme}`);
   await ctx.close();
 }
 

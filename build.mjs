@@ -3,7 +3,7 @@
 //   node build.mjs           the real build: stops, and writes nothing, while any fact in site.config.json is empty
 //                            or a page fails the copy lint
 //   node build.mjs --draft   the same pages with each missing fact shown as a visible [placeholder], marked noindex,
-//                            plus the style kit at /_kit; for looking, never for shipping
+//                            for looking, never for shipping
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,13 +12,12 @@ import { page } from './src/layout.mjs';
 import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
 import { thanks, thanksTeder, tryAgain } from './src/pages/after.mjs';
-import kit from './src/pages/kit.mjs';
 
 const draft = process.argv.includes('--draft');
 const OUT = path.join(ROOT, 'dist');
 
 const PAGES = [home, toran, thanks, thanksTeder, tryAgain];
-const DRAFT_PAGES = [kit];
+const DRAFT_PAGES = [];
 
 const cfg = readConfig(draft);
 const css = minifyCss(fs.readFileSync(path.join(ROOT, 'src/style.css'), 'utf8'));
@@ -72,6 +71,7 @@ for (const f of ['heebo-hebrew.woff2', 'heebo-latin.woff2', 'HEEBO-LICENSE.txt']
 copy('assets/brand/svg/openfrequency-small.svg', 'favicon.svg');
 copy('assets/brand/png/openfrequency-180.png', 'apple-touch-icon.png');
 copy('assets/brand/png/openfrequency-512.png', 'icon-512.png');
+for (const f of fs.readdirSync(path.join(ROOT, 'assets/photos'))) if (f.endsWith('.jpg')) copy('assets/photos/' + f, 'img/' + f);
 
 const kb = (n) => (n / 1024).toFixed(1) + ' KB';
 console.log(`${draft ? 'Draft' : 'Built'}: ${files.size} page${files.size === 1 ? '' : 's'} in dist/ (CSS ${kb(css.length)} inlined)`);

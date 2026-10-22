@@ -3,3 +3,6 @@ dist/
 private/
 *.db
 *.db-*
+.taste-skill/
+.impeccable/review/
+.impeccable/config.local.json
