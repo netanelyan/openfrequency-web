@@ -1,7 +1,9 @@
-// Toran's page: what it does, how a question it can't answer reaches the owner, what it answers alone, the messages
-// it sends by itself, the owner's own chat with it, and, last, which of that works today.
+// Toran's page: everything about Toran, in the order an owner asks it. The chat and the form; how it goes; what
+// happens to a question it can't answer; what it answers alone; a day on duty; its eval; the messages it sends by
+// itself; the owner's own chat with it; the price; the owners' questions; and, last, which of that works today.
 import { esc, mark } from '../lib.mjs';
 import { chat } from '../chat.mjs';
+import { hero, how, day, proof, price, faq } from '../sections.mjs';
 
 // One question, seen on both phones. The customer's side continues the home page's sample chat; the owner's side is
 // how Toran asks and what it does with the answer. Made up, and the captions say so.
@@ -62,30 +64,19 @@ const fromConfig = (cfg, key) => cfg.get(key)?.map(esc) ?? [cfg.ph(key)];
 
 export default (cfg) => ({
   path: '/toran',
+  forms: true,
   closing: true,
   photos: true,
-  title: 'תורן, סוכן וואטסאפ לחנויות אונליין | OpenFrequency',
-  description: 'תורן עונה ללקוחות של החנות בוואטסאפ מתוך מה שכתוב באתר. מה שאין באתר הוא שואל אתכם, ואת התשובה הוא זוכר. כאן גם מה עובד היום ומה עוד לא.',
-  body: `
-<section class="phero" aria-labelledby="t-h">
-<div class="wrap">
-<div>
-${mark('toran', 112, 'תורן')}
-<h1 id="t-h">תורן עונה ללקוחות שלכם בוואטסאפ</h1>
-<p class="lede">הוא קורא את האתר של החנות ועונה מתוך מה שכתוב בו. מה שאין באתר הוא שואל אתכם, ואת התשובה שלכם הוא זוכר לפעם הבאה.</p>
-<div class="actions"><a class="btn primary" href="/#demo">לבנות דמו לחנות</a><a class="btn" href="#status">מה עובד היום</a></div>
-</div>
-<figure class="photo drift reveal">
-<div class="frame"><img src="/img/switchboard-1971-1400.jpg" srcset="/img/switchboard-1971-800.jpg 800w, /img/switchboard-1971-1400.jpg 1400w" sizes="(min-width: 900px) 520px, 100vw" width="1400" height="888" alt="חיילת יושבת מול מרכזיית טלפונים, ביד אחת מחברת כבל ובשנייה סופגנייה" decoding="async"></div>
-<figcaption>תורן הוא מי שבתורנות. חיילת במרכזייה צבאית ביום הראשון של חנוכה, 1971.</figcaption>
-</figure>
-</div>
-</section>
-
-<section class="sec" id="ask" aria-labelledby="ask-h">
+  title: 'תורן, מישהו שעונה בוואטסאפ של החנות שלכם | OpenFrequency',
+  description: 'תורן עונה ללקוחות של החנות בוואטסאפ מתוך מה שכתוב באתר, גם בלילה. מה שאין באתר הוא שואל אתכם, ואת התשובה הוא זוכר. כאן גם המחיר, ומה עובד היום ומה עוד לא.',
+  body: [
+    hero(cfg),
+    how(cfg),
+    `
+<section class="sec" id="handoff" aria-labelledby="handoff-h">
 <div class="wrap">
 <div class="sec-head">
-<h2 id="ask-h">כשהוא לא יודע, הוא שואל אתכם</h2>
+<h2 id="handoff-h">כשהוא לא יודע, הוא שואל אתכם</h2>
 <p class="lede">כשלקוח שואל משהו שאין עליו תשובה באתר, תורן אומר לו שהוא בודק, ושולח לכם את השאלה בוואטסאפ. אתם עונים במשפט, הוא מעביר ללקוח, ומהפעם הבאה הוא עונה על זה לבד.</p>
 </div>
 <div class="stage glass" data-play>
@@ -106,13 +97,15 @@ ${owner}
 <div><h3>משאיר לכם</h3>${rows(YOURS, 'yours')}</div>
 </div>
 </div>
-</section>
-
+</section>`,
+    day,
+    proof,
+    `
 <section class="sec" id="auto" aria-labelledby="auto-h">
 <div class="wrap narrow">
 <div class="sec-head">
 <h2 id="auto-h">הודעות שיוצאות לבד</h2>
-<p class="lede">חוץ מלענות, תורן יכול לשלוח ארבע הודעות לפי מה שקורה בחנות. הן יוצאות רק ללקוחות שאישרו לקבל מהחנות הודעות בוואטסאפ, ו-Meta גובה על כל אחת מהן (<a href="/#price">כמה זה עולה</a>).</p>
+<p class="lede">חוץ מלענות, תורן יכול לשלוח ארבע הודעות לפי מה שקורה בחנות. הן יוצאות רק ללקוחות שאישרו לקבל מהחנות הודעות בוואטסאפ, ו-Meta גובה על כל אחת מהן (<a href="#price">כמה זה עולה</a>).</p>
 </div>
 <dl class="auto">
 ${AUTO.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('\n')}
@@ -128,8 +121,10 @@ ${AUTO.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('\n')}
 </div>
 <div class="stage glass">${talk}</div>
 </div>
-</section>
-
+</section>`,
+    price(cfg),
+    faq(cfg),
+    `
 <section class="sec" id="status" aria-labelledby="status-h">
 <div class="wrap">
 <div class="sec-head"><h2 id="status-h">מה עובד היום, ומה עוד לא</h2></div>
@@ -139,4 +134,5 @@ ${AUTO.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('\n')}
 </div>
 </div>
 </section>`,
+  ].join('\n'),
 });

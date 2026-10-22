@@ -152,7 +152,7 @@ components:
 
 The site lives inside the Teder owner-site world, pinned by the owner's brief: a silver wallpaper with no hue of its own, frosted glass with a lit edge, the system typeface with Heebo behind it, pill buttons, and one action blue. Inside that world the page is quiet so the product can be loud. The colour, the detail and the motion belong to working fragments of Toran (marked `data-ui`): a WhatsApp chat with its own bubbles, greens and times; a settings card that changes state; a duty log with the present minute on it. Everything around those fragments is silver surfaces of the same tone, five type sizes and generous space.
 
-Depth is rationed. Glass is reserved for what floats (the header capsule) and for the stages a product fragment stands on. Every other surface is a tile one tone step off the wallpaper, with no line and no shadow. The one dark surface in the light theme is the closing field; the one colour field is Teder's violet. Three credited black-and-white archival photographs stand for the world around the product, never for its customers.
+Depth is rationed. Glass is reserved for what floats (the header capsule) and for the stages a product fragment stands on. Every other surface is a tile one tone step off the wallpaper, with no line and no shadow. The one dark surface in the light theme is the closing field; the one colour field is Teder's violet. The home page is the company's: a door to each product in its own material, Toran's chat on glass and Teder's real slides on its violet. One credited black-and-white archival photograph (a 1971 switchboard on duty) stands for the meaning of Toran's name on its page, never for its customers.
 
 The page is Hebrew, right to left, phone first, and in light and dark from the same tokens. It honours Increase Contrast and Reduce Transparency by making the glass and tiles nearly solid, and Reduce Motion by showing everything in place.
 
@@ -283,7 +283,7 @@ Surfaces have one radius: 18px for tiles, glass stages, photo frames, chats, the
 - **Without motion:** content is visible by default, and reduced motion removes every transition and animation.
 
 ### Imagery
-Three credited black-and-white archival photographs from Wikimedia Commons: a 1971 switchboard on duty, Ashdod's 1960 map, and its port in 1964. They are rendered in grayscale with contrast 1.04 inside 18px frames, captioned, and credited at the foot of the page as their licences ask. They show the world around the product and are never presented as our customers, stores or team.
+Teder is shown by its own output: opening slides Teder made for our three accounts (@sheela.tova, @kav.emtza, @shekel.leshekel), resized from openfrequency-teder into assets/teder, fanned three at a time in the home page's Teder door and run as a sideways-scrolling row with scroll-snap in its section, 12px corners. One credited black-and-white archival photograph from Wikimedia Commons, a 1971 switchboard on duty, appears on /toran's day on duty, in grayscale with contrast 1.04 inside an 18px frame, captioned and credited at the foot of the page. It is never presented as our customer, store or team.
 
 ## Do's and Don'ts
 

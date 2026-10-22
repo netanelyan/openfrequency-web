@@ -16,7 +16,7 @@ export async function preparePage(pg) {
       i.loading = 'eager';
       return i.complete && i.naturalWidth ? i.decode().catch(() => {}) : new Promise((r) => { i.onload = i.onerror = r; });
     }));
-    document.querySelectorAll('[data-rise], .drift, .reveal').forEach((e) => e.classList.add('in'));
+    document.querySelectorAll('[data-rise], .drift, .reveal, .fan').forEach((e) => e.classList.add('in'));
     document.querySelectorAll('.msg.typing[aria-hidden]').forEach((e) => e.remove());
     document.querySelectorAll('.wait-in').forEach((e) => e.classList.remove('wait-in'));
   });

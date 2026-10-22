@@ -366,7 +366,9 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .hero > .wrap { display: grid; gap: 24px; grid-template-areas: 'head' 'stage' 'text'; }
 @media (max-width: 999px) { .hero .msg.later { display: none; } }
 /* The brief's headline is a whole sentence: two lines from a tablet up, three on a phone. */
-.hero h1 { grid-area: head; margin-top: 12px; }
+.hero-head { grid-area: head; }
+.hero-head .mark { margin-bottom: 20px; }
+.hero h1 { margin: 0; }
 .hero-text { grid-area: text; }
 .hero .stage { grid-area: stage; padding: clamp(10px, 1.6vw, 18px); }
 .hero .stage .chat { max-width: none; }
@@ -381,6 +383,46 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .demo .btn { width: 100%; }
 .demo .when { margin: 0; color: var(--ink-p); font-size: var(--fs-small); }
 @media (min-width: 700px) { .demo { grid-template-columns: 1fr 1fr; align-items: end; } .demo .btn, .demo .when { grid-column: 1 / -1; } }
+
+/* ------------------------------------------------------------ the home page: the company and its two products */
+
+/* The first screen: what we do, then a door to each product in its own material. Toran's is glass with its chat
+   answering; Teder's is its violet with three of its real slides fanned. On a phone the doors stack. */
+.co-hero { padding-block: 28px 16px; }
+.co-hero h1 { margin-top: 12px; max-width: 20ch; }
+.co-hero .lede { margin-top: 18px; }
+.doors { display: grid; gap: 14px; margin-top: clamp(28px, 4vw, 44px); }
+@media (min-width: 900px) { .doors { grid-template-columns: 1fr 1fr; gap: 18px; } .co-hero { padding-top: 48px; } }
+.door { display: flex; flex-direction: column; gap: 20px; min-width: 0; padding: clamp(18px, 2.2vw, 26px); border-radius: var(--r); }
+.door-top { display: flex; align-items: center; gap: 14px; }
+.door-top h2 { font-size: var(--fs-lead); line-height: 1.2; }
+.door-top p { margin: 2px 0 0; color: var(--ink-2); }
+.door-ui { flex: 1; display: grid; align-content: start; }
+.door-ui .chat { max-width: none; }
+.door-act { display: flex; flex-wrap: wrap; gap: 10px; }
+.teder-door { background: var(--teder); color: #fff; }
+.teder-door h2, .teder-door p { color: #fff; }
+.wave { display: block; flex: none; color: #fff; }
+.teder-door .wave { width: 48px; }
+.wave svg { display: block; width: 100%; height: auto; }
+.btn.light { background: #fff; color: var(--teder-ink); }
+@media (hover: hover) { .btn.light:hover { background: var(--teder-hover); } }
+/* Three of Teder's slides, fanned like cards in a hand; they open from a stack as the door comes into view. */
+.fan { position: relative; flex: 1; min-height: clamp(260px, 30vw, 360px); }
+.fan img { position: absolute; top: 50%; left: 50%; width: 34%; max-width: 180px; height: auto; border-radius: 12px; box-shadow: 0 22px 40px -18px rgba(0, 0, 0, 0.6); transform: translate(-50%, -50%) translateX(var(--x, 0)) rotate(var(--rot, 0deg)); transition: transform 0.9s var(--ease-out); }
+.fan img:nth-child(1) { --x: 62%; --rot: 7deg; }
+.fan img:nth-child(2) { --x: 0%; --rot: 0deg; z-index: 2; }
+.fan img:nth-child(3) { --x: -62%; --rot: -7deg; }
+@media (prefers-reduced-motion: no-preference) {
+  .js .fan:not(.in) img { --x: 0%; --rot: 0deg; }
+}
+
+/* Toran on the home page: the question box, then the first step. */
+.toran-cta { grid-column: 1 / -1; display: grid; gap: 20px 40px; margin-top: clamp(32px, 5vw, 64px); padding: clamp(20px, 3vw, 32px); border-radius: var(--r); background: var(--tile); }
+.toran-cta h3 { margin-bottom: 8px; }
+.toran-cta .demo { margin-top: 0; }
+@media (min-width: 900px) { .toran-cta { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; } }
+.about-sec h2 { margin-bottom: 16px; }
 
 /* ------------------------------------------------------------ how it goes: one fragment, held, changing state */
 
@@ -500,29 +542,12 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
   .results .short, .proof-notes .short-note { display: inline; }
 }
 
-/* ------------------------------------------------------------ who we are: side facts, a wide paragraph, Ashdod */
-
-.about-sec .wrap { display: grid; gap: 28px; }
-.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; margin: 0; }
-.facts div { margin: 0; }
-.facts dt { color: var(--ink-p); font-size: var(--fs-small); }
-.facts dd { margin: 2px 0 0; font-weight: 600; }
-.about-p { font-size: var(--fs-lead); line-height: 1.45; max-width: 46ch; }
-.ashdod { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; margin-top: clamp(16px, 4vw, 48px); }
-.ashdod .photo .frame { aspect-ratio: 5 / 4; }
-@media (min-width: 900px) {
-  .about-sec .wrap { grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr); gap: 32px 56px; }
-  .about-sec .sec-head { grid-column: 1 / -1; margin-bottom: 0; }
-  .facts { grid-template-columns: 1fr; align-content: start; }
-  .ashdod { grid-column: 1 / -1; grid-template-columns: 1.25fr 1fr; gap: 16px; }
-}
-
 /* ------------------------------------------------------------ Teder: its own field of colour */
 
 .teder-sec { padding-inline: var(--gut); }
 .teder-field { max-width: var(--max); margin-inline: auto; padding: clamp(36px, 6vw, 88px) clamp(20px, 5vw, 72px); border-radius: var(--r); background: var(--teder); color: #fff; }
 .teder-field .in { display: grid; gap: 28px; max-width: var(--max); margin-inline: auto; }
-.teder-field h2 { color: #fff; max-width: 16ch; }
+.teder-field h2 { color: #fff; }
 .teder-field p { max-width: 52ch; color: #fff; }
 .teder-field .wave { width: clamp(88px, 12vw, 168px); color: #fff; }
 .teder-field .wave svg { display: block; width: 100%; height: auto; }
@@ -534,10 +559,16 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .teder-field .small { color: rgba(255, 255, 255, 0.86); }
 .teder-field .done h3, .teder-field .done p { color: #fff; }
 @media (min-width: 900px) {
-  .teder-field .in { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
-  .teder-field .wave { grid-column: 2; grid-row: 1 / span 3; }
+  .teder-field .in.head { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+  .teder-field .in.head .wave { grid-column: 2; grid-row: 1 / span 2; }
   .teder-field .wait { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
 }
+.teder-field .in.tail { gap: 16px; }
+/* The real slides, in a row that scrolls sideways and stops on each one. */
+.slides { display: flex; gap: 12px; max-width: var(--max); margin: clamp(28px, 4vw, 48px) auto; padding: 4px 4px 14px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-color: rgba(255, 255, 255, 0.5) transparent; }
+.slides figure { flex: none; width: clamp(150px, 17vw, 210px); margin: 0; scroll-snap-align: start; }
+.slides img { display: block; width: 100%; height: auto; border-radius: 12px; }
+.slides:focus-visible { outline-color: #fff; }
 
 /* ------------------------------------------------------------ the price, very large */
 
@@ -616,6 +647,10 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 @media (min-width: 700px) and (max-width: 999px) { .board .t-who, .board .t-nav, .board .t-time, .board .t-wa { grid-column: span 6; } }
 
 /* ------------------------------------------------------------ the Toran page */
+
+.pair-note { margin-top: 14px; max-width: 60ch; }
+.side h2 + .lede { margin-top: 16px; }
+.proof-lede { margin-top: 24px; max-width: 46ch; }
 
 .pair-note { margin-top: 14px; max-width: 60ch; }
 .side h2 + .lede { margin-top: 16px; }

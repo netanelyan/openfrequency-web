@@ -25,7 +25,7 @@
     Array.prototype.forEach.call(el.children, function (c, i) { c.style.setProperty('--i', i); });
     if (seen) seen.observe(el); else el.classList.add('in');
   });
-  each('.drift, .reveal', function (el) { if (seen) seen.observe(el); else el.classList.add('in'); });
+  each('.drift, .reveal, .fan', function (el) { if (seen) seen.observe(el); else el.classList.add('in'); });
 
   // A chat stage marked data-play plays once as it comes into view: messages arrive in their order, and each answer
   // is preceded by Toran's three typing dots. Messages the layout hides (the second exchange on a phone) sit out.

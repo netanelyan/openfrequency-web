@@ -19,30 +19,28 @@ Unresolved: the 15 facts in site.config.json (price, demo time, the about senten
 
 ## Direction contract
 
-THESIS: The product performs. Toran is shown doing its job before it is described: a chat on the first screen, a
-held fragment that changes state with each step, a duty log with now on it, and a question box the visitor types
-into. It refuses the category's hero + three feature cards + logos + pricing cards.
+THESIS: The company and its two products, side by side. The home page opens a door to each product in its own
+material and shows each doing its job: Toran's chat answering, Teder's real slides. It refuses a one-product hero with
+the other product as a footnote, and any page about the company's city instead of its products. Toran's depth lives
+on /toran.
 
-OWN-WORLD: Teder's silver wallpaper with no hue; frosted glass only on the header and the stages the product's
-fragments stand on; tiles one tone step off the wallpaper with no lines or shadows; system type in five sizes;
-round blue buttons; WhatsApp's own bubbles, greens and times inside data-ui fragments; three black-and-white archival
-photographs (a 1971 switchboard on duty, Ashdod's 1960 map, its port in 1964); Teder's own violet as one field.
+OWN-WORLD: Teder's silver wallpaper with no hue; glass on the header, Toran's door and the stages its fragments stand
+on; Teder's own violet as its door and its field; tiles one tone step off the wallpaper; system type in five sizes;
+round blue buttons (white on violet); WhatsApp's bubbles inside data-ui fragments; Teder's real opening slides from
+our three accounts.
 
-STORY: Someone answers your store's WhatsApp at night (the chat proves it), here is how it goes (three steps on one
-fragment), this is a day on duty (with now), try a question yourself (it answers or hands off), it was tested and
-doesn't invent prices (the eval table), who we are (Ashdod), Teder, the price in full, the owners' questions, then
-the form again.
+STORY: We build two products for online stores (headline and sentence); here is each, working (the doors); try Toran
+with a customer's question and ask for a demo; see what Teder made for our accounts and join its waitlist; who we
+are; the demo form again.
 
-FIRST VIEWPORT: The pinned headline across the full width at display size, two lines on a desk; under it, on the
-right, the supporting sentence (opening with Toran's mark and name as a link) and the working demo form with its
-blue button; on the left, a glass stage holding the WhatsApp chat at true size, playing in with Toran's three typing
-dots. The primary action is the form's button. On a phone: the headline, then the chat (its first exchange), then
-the sentence and the form; the header's demo button keeps the action in reach.
+FIRST VIEWPORT: The headline "עונים ללקוחות שלכם, ומכינים לכם תוכן" across the top, the sentence naming both products
+under it, then two doors of equal width: Toran's (glass, its mark, a line, its chat playing in, "לבנות דמו לחנות" and
+"עוד על תורן") and Teder's (violet, its wave, a line, three real slides fanning open, "להצטרף לרשימת ההמתנה"). On a
+phone the doors stack, Toran's first.
 
-FORM: product-performs (taste-skill draw, seed 1128621738), redraws: proof → recognition table (no logos; the eval is
-the proof), about → side facts + wide paragraph (two config sentences, no portrait), hero → the direction's own
-composition (the pinned 9-word headline can't split into two 14-character halves). Impeccable's concept-seed
-roll was not run: the world is pinned by the brief and the owner confirmed it, so the composition came from the taste
-skill's draw instead. seed: not rolled (no impeccable seed reference exists for this build).
+FORM: product-performs (taste-skill draw, seed 1128621738), recomposed on 2026-10-22 at the owner's direction ("the
+website is for a company which provides 2 services"): the first screen became two product doors; Toran's held steps,
+day, eval, price and questions moved to /toran with the brief's pinned headline. Impeccable's concept-seed roll was
+not run: the world is pinned by the brief. seed: not rolled (no impeccable seed reference exists for this build).
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

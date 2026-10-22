@@ -72,6 +72,7 @@ copy('assets/brand/svg/openfrequency-small.svg', 'favicon.svg');
 copy('assets/brand/png/openfrequency-180.png', 'apple-touch-icon.png');
 copy('assets/brand/png/openfrequency-512.png', 'icon-512.png');
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/photos'))) if (f.endsWith('.jpg')) copy('assets/photos/' + f, 'img/' + f);
+for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder'))) if (f.endsWith('.jpg')) copy('assets/teder/' + f, 'teder/' + f);
 
 const kb = (n) => (n / 1024).toFixed(1) + ' KB';
 console.log(`${draft ? 'Draft' : 'Built'}: ${files.size} page${files.size === 1 ? '' : 's'} in dist/ (CSS ${kb(css.length)} inlined)`);

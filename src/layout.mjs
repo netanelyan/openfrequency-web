@@ -15,19 +15,21 @@ const formJs = squeeze('src/form.js');
 const NAV = [
   ['/toran', 'תורן'],
   ['/#teder', 'תדר'],
-  ['/#price', 'מחיר'],
-  ['/#faq', 'שאלות'],
+  ['/toran#price', 'מחיר'],
+  ['/toran#faq', 'שאלות'],
 ];
 
 const menuIcon = `<svg class="i open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg><svg class="i close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 
 function header(current) {
+  // The demo form is on the home page and on Toran's; elsewhere the button goes to the home page's.
+  const demo = current === '/' || current === '/toran' ? '#demo' : '/#demo';
   const links = NAV.map(([href, label]) => `<a href="${href}"${href === current ? ' aria-current="page"' : ''}>${label}</a>`).join('');
   return `<header class="top">
 <div class="bar">
 <a class="brand" href="/">${mark('openfrequency', 32)}<b>OpenFrequency</b></a>
 <nav class="nav" aria-label="ראשי">${links}</nav>
-<a class="btn primary sm cta" href="/#demo">לבנות דמו לחנות</a>
+<a class="btn primary sm cta" href="${demo}">לבנות דמו לחנות</a>
 <details class="menu"><summary aria-label="תפריט">${menuIcon}</summary><nav aria-label="ראשי">${links}</nav></details>
 </div>
 </header>`;
@@ -54,8 +56,6 @@ ${demoForm(cfg, page, 'demo-end')}
 function creditLine() {
   const he = {
     'photos/switchboard-1971-1400.jpg': 'חיילת במרכזייה צבאית, 1971',
-    'photos/ashdod-map-1960-1000.jpg': 'מפת אשדוד, 1960',
-    'photos/ashdod-port-1964-1400.jpg': 'בניית נמל אשדוד, 1964',
   };
   const list = credits().filter((c) => he[c.file]).map((c) =>
     `<a href="${esc(c.page)}" rel="noopener">${he[c.file]}</a>, ${esc(String(c.creator).replace(/^w:/, ''))}, ${esc(c.license)}`);
@@ -71,8 +71,8 @@ function footer(cfg, photos) {
 <div class="board">
 <div class="t-who"><p class="wa">אנחנו OpenFrequency, מ${cfg.t('city')}. בנינו את תורן ואת תדר.</p><p class="legal">© 2026 OpenFrequency</p></div>
 <nav class="t-nav" aria-labelledby="f-nav"><h2 id="f-nav">באתר</h2><ul>
-<li><a href="/toran">תורן</a></li><li><a href="/#teder">תדר</a></li><li><a href="/#price">מחיר</a></li>
-<li><a href="/#faq">שאלות</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/terms">תנאי שימוש</a></li>
+<li><a href="/toran">תורן</a></li><li><a href="/#teder">תדר</a></li><li><a href="/toran#price">מחיר</a></li>
+<li><a href="/toran#faq">שאלות</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/terms">תנאי שימוש</a></li>
 </ul></nav>
 <div class="t-time" data-clock-tile hidden><h2>ב${cfg.t('city')} עכשיו</h2><p class="clock"><time data-clock></time></p></div>
 <div class="t-wa"><h2>תכתבו לנו</h2>${waLink}</div>
