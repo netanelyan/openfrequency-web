@@ -390,6 +390,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .teder > p { color: var(--ink-2); }
 .wait { display: grid; gap: 12px; margin-top: 24px; }
 .wait + p { margin-top: 10px; }
+.wait.sent + p { display: none; }
 @media (min-width: 700px) { .wait { grid-template-columns: minmax(0, 1fr) auto; align-items: end; } }
 
 /* The price, in the serious register: the amount first and large, then each rule under its own small heading. */
@@ -444,6 +445,23 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .side { display: grid; gap: 28px; align-items: center; }
 .side h2 { margin-bottom: 16px; }
 @media (min-width: 900px) { .side { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; } .side .chat { justify-self: end; } }
+
+/* ------------------------------------------------------------ forms: messages, the thank-you, the honeypot */
+
+/* The honeypot: off the screen and out of the tab order, there only for scripts that fill every field. */
+.hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.demo, .wait { position: relative; }
+.form-msg { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 14px; border-radius: var(--r-m); background: var(--warn-bg); color: var(--ink); font-size: 15px; }
+.form-msg[hidden] { display: none; }
+.form-msg p { margin: 0; flex: 1 1 260px; }
+input[aria-invalid='true'] { border-color: var(--warn); }
+.btn[aria-busy='true'] { opacity: 0.6; }
+.done { grid-column: 1 / -1; outline: none; }
+.done h3 { margin-bottom: 6px; }
+.done p { color: var(--ink-2); }
+.done bdi { direction: ltr; unicode-bidi: isolate; }
+.after { padding-block: 72px 96px; }
+.after h1 { margin-bottom: 16px; }
 
 /* ------------------------------------------------------------ the closing band and the footer */
 

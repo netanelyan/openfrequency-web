@@ -17,8 +17,25 @@ function resolve(url) {
   return null;
 }
 
-export function serve(port = 4730) {
+// /api/* goes to the lead endpoint, as Caddy sends it; when that isn't running, a plain post gets the try-again page
+// and a script gets a 502, the same as on the server.
+function proxy(req, res, apiPort) {
+  const up = http.request({ host: '127.0.0.1', port: apiPort, path: req.url, method: req.method, headers: req.headers }, (r) => {
+    res.writeHead(r.statusCode, r.headers);
+    r.pipe(res);
+  });
+  up.on('error', () => {
+    const page = path.join(DIST, 'try-again/index.html');
+    const html = String(req.headers.accept || '').includes('text/html') && fs.existsSync(page);
+    res.writeHead(502, { 'Content-Type': html ? TYPES['.html'] : 'text/plain' });
+    res.end(html ? fs.readFileSync(page) : 'bad gateway');
+  });
+  req.pipe(up);
+}
+
+export function serve(port = 4730, apiPort = Number(process.env.API_PORT) || 4720) {
   const server = http.createServer((req, res) => {
+    if (req.url.startsWith('/api/')) return proxy(req, res, apiPort);
     const f = resolve(req.url);
     const nf = path.join(DIST, '404.html');
     const file = f || (fs.existsSync(nf) ? nf : null);

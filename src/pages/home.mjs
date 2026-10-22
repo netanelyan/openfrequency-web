@@ -1,6 +1,7 @@
 // The home page: Toran first, then how it goes, a day with it, who we are, Teder, the price, and the questions.
 import { esc, ils, mark } from '../lib.mjs';
 import { chat } from '../chat.mjs';
+import { demoForm, tederForm, formCopy } from '../forms.mjs';
 
 // The sample chat, as the customer sees it on their phone: their own messages on the left, the store's on the right.
 // The store, the product and the price are made up, and the page says so; the "I don't know" line is the real
@@ -107,6 +108,7 @@ const FAQ = [
 
 export default (cfg) => ({
   path: '/',
+  forms: true,
   title: 'תורן, מישהו שעונה בוואטסאפ של החנות שלכם | OpenFrequency',
   description: 'תורן קורא את האתר של החנות ועונה ללקוחות בוואטסאפ, גם בלילה. מה שהוא לא יודע הוא מעביר אליכם. שולחים לנו את הכתובת של החנות ומקבלים דמו.',
   body: `
@@ -118,13 +120,7 @@ export default (cfg) => ({
 </div>
 <div class="hero-text">
 <p class="lede">תורן קורא את האתר של החנות, את המוצרים ואת דפי המדיניות, ועונה ללקוחות בוואטסאפ. מה שהוא לא יודע הוא שולח אליכם בוואטסאפ, ואת התשובה שלכם הוא מעביר ללקוח.</p>
-<form class="glass demo" id="demo" action="/api/lead" method="post">
-<input type="hidden" name="source" value="home-hero">
-<label class="f">הכתובת של החנות<input name="store" type="text" inputmode="url" autocomplete="url" dir="ltr" placeholder="shop.co.il" required></label>
-<label class="f">הוואטסאפ שלכם<input name="contact" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="050-0000000" required></label>
-<button class="btn primary" type="submit">לבנות דמו</button>
-<p class="when">הדמו מוכן תוך ${cfg.t('demo.time')}, ונשלח אותו למספר הזה.</p>
-</form>
+${demoForm(cfg, '/')}
 </div>
 ${sample}
 </div>
@@ -169,11 +165,7 @@ ${mark('openfrequency', 56)}
 ${mark('teder', 56)}
 <h2 id="teder-h">ויש גם את תדר, לתוכן ברשתות</h2>
 <p>תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, ומפרסם כל אחת רק אחרי שמישהו אישר אותה. כרגע אנחנו מריצים אותו על שלושה חשבונות משלנו. כשיהיו לנו תוצאות להראות, נפתח אותו גם לחנויות.</p>
-<form class="wait" action="/api/lead" method="post">
-<input type="hidden" name="source" value="home-teder">
-<label class="f">הוואטסאפ או המייל שלכם<input name="contact" type="text" autocomplete="email" dir="ltr" required></label>
-<button class="btn" type="submit">להצטרף לרשימת ההמתנה</button>
-</form>
+${tederForm(cfg, '/')}
 <p class="quiet small">נכתוב לכם כשתדר ייפתח לחנויות.</p>
 </div>
 </div>
@@ -188,5 +180,6 @@ ${price(cfg)}
 ${FAQ.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('\n')}
 </div>
 </div>
-</section>`,
+</section>
+${formCopy(cfg)}`,
 });

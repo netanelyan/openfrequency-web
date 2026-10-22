@@ -10,7 +10,9 @@
     "build": "node build.mjs",
     "draft": "node build.mjs --draft",
     "serve": "node scripts/serve.mjs",
-    "shots": "node scripts/shots.mjs"
+    "shots": "node scripts/shots.mjs",
+    "leads": "node server/lead.mjs",
+    "test": "node --test test/*.test.mjs"
   },
   "devDependencies": {
     "playwright-core": "^1.56.0"

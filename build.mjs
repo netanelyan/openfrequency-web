@@ -10,12 +10,13 @@ import { ROOT, readConfig, lint, minifyCss } from './src/lib.mjs';
 import { page } from './src/layout.mjs';
 import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
+import { thanks, thanksTeder, tryAgain } from './src/pages/after.mjs';
 import kit from './src/pages/kit.mjs';
 
 const draft = process.argv.includes('--draft');
 const OUT = path.join(ROOT, 'dist');
 
-const PAGES = [home, toran];
+const PAGES = [home, toran, thanks, thanksTeder, tryAgain];
 const DRAFT_PAGES = [kit];
 
 const cfg = readConfig(draft);

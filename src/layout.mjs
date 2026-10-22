@@ -1,5 +1,11 @@
 // The frame every page shares: the head, the sticky glass header, the dark closing band and the footer.
-import { FACTS, esc, mark } from './lib.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { FACTS, ROOT, esc, mark } from './lib.mjs';
+
+// The form script, comments and indentation out; inlined only where there is a form.
+const formJs = fs.readFileSync(path.join(ROOT, 'src/form.js'), 'utf8')
+  .split('\n').filter((l) => !/^\s*\/\//.test(l)).map((l) => l.trim()).filter(Boolean).join('\n');
 
 const NAV = [
   ['/toran', 'תורן'],
@@ -58,7 +64,7 @@ var m=d.querySelector('.menu');if(!m)return;d.addEventListener('click',function(
 d.addEventListener('keydown',function(e){if(e.key==='Escape'&&m.open){m.open=false;m.querySelector('summary').focus()}})})();
 </script>`;
 
-export function page(cfg, css, { path, title, description, body, closing = true, noindex = false }) {
+export function page(cfg, css, { path, title, description, body, closing = true, noindex = false, forms = false }) {
   const missing = cfg.draft && cfg.missing.size
     ? `<p class="draft" role="note">טיוטה. חסרים עוד ${cfg.missing.size} פרטים ב-site.config.json, והאתר לא ייבנה בלעדיהם.</p>`
     : '';
@@ -85,6 +91,7 @@ ${body}
 ${closing ? band(cfg) : ''}
 ${footer(cfg)}
 ${script}
+${forms ? `<script>\n${formJs}\n</script>` : ''}
 </body>
 </html>
 `;
