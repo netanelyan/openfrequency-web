@@ -9,7 +9,7 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 
 // Each fact the site states: the words a draft shows in its place, and what a value must look like. A key in
 // site.config.json that is not here is a build error, so a new fact gets a label before it gets a page.
-//   kind: 'text', 'number' (0 or more), or the list of allowed values
+//   kind: 'text', 'number' (0 or more), 'lines' (a list of sentences), or the list of allowed values
 //   unless: the fact is not needed when this is true (the build then lets it stay empty)
 const metaIncluded = (raw) => raw.price?.metaFees === 'included';
 export const FACTS = {
@@ -29,6 +29,8 @@ export const FACTS = {
   'price.exampleUpdates': { label: 'מספר עדכוני משלוח בדוגמה', kind: 'number' },
   'price.commitmentMonths': { label: 'חודשי התחייבות, 0 אם אין', kind: 'number' },
   'price.stops': { label: 'מתי החיוב נעצר', kind: ['period-end', 'immediately'] },
+  'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
+  'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },
 };
 
 // The config, read so that nothing missing can be shown as a guess. An empty value ('' or null) is missing.
@@ -36,7 +38,7 @@ export const FACTS = {
 export function readConfig(draft) {
   const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf8'));
   const missing = new Map();
-  const empty = (v) => v === null || v === '' || v === undefined;
+  const empty = (v) => v === null || v === '' || v === undefined || (Array.isArray(v) && v.length === 0);
   const at = (key) => key.split('.').reduce((o, k) => (o == null ? undefined : o[k]), raw);
   const label = (key) => FACTS[key].label;
 
@@ -48,6 +50,8 @@ export function readConfig(draft) {
       if (!f) throw new Error(`site.config.json: "${key}" has no entry in FACTS (src/lib.mjs)`);
       if (empty(v)) { if (!f.unless?.(raw)) missing.set(key, f.label); continue; }
       if (f.kind === 'number' && !(typeof v === 'number' && v >= 0)) throw new Error(`site.config.json: "${key}" must be a number, 0 or more (got ${JSON.stringify(v)})`);
+      if (f.kind === 'lines' && !(Array.isArray(v) && v.every((x) => typeof x === 'string' && x.trim()))) throw new Error(`site.config.json: "${key}" must be a list of sentences`);
+      if (f.kind !== 'lines' && Array.isArray(v)) throw new Error(`site.config.json: "${key}" must not be a list`);
       if (Array.isArray(f.kind) && !f.kind.includes(v)) throw new Error(`site.config.json: "${key}" must be one of ${f.kind.join(', ')} (got ${JSON.stringify(v)})`);
     }
   };

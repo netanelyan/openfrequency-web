@@ -1,5 +1,6 @@
 // The home page: Toran first, then how it goes, a day with it, who we are, Teder, the price, and the questions.
 import { esc, ils, mark } from '../lib.mjs';
+import { chat } from '../chat.mjs';
 
 // The sample chat, as the customer sees it on their phone: their own messages on the left, the store's on the right.
 // The store, the product and the price are made up, and the page says so; the "I don't know" line is the real
@@ -11,13 +12,10 @@ const CHAT = [
   ['them', '02:16', 'את זה אני לא יודע. אני בודק עם החנות, ואחזור אליך כאן.'],
 ];
 
-const chat = `<figure class="chat glass" aria-labelledby="chat-cap">
-<div class="chat-top"><span class="ava" aria-hidden="true">ח</span><span><b>החנות שלכם</b><small>וואטסאפ</small></span><span class="tag">דוגמה</span></div>
-<ol class="msgs">
-${CHAT.map(([who, time, text]) => `<li class="msg ${who}"><span class="sr">${who === 'me' ? 'לקוח' : 'החנות'}, ${time}. </span>${text}<time aria-hidden="true">${time}</time></li>`).join('\n')}
-</ol>
-<figcaption id="chat-cap">שיחה לדוגמה. החנות, השמלה והמחיר מומצאים.</figcaption>
-</figure>`;
+const sample = chat({
+  id: 'chat-cap', who: 'החנות שלכם', face: 'ח', msgs: CHAT, names: { me: 'לקוח', them: 'החנות' },
+  caption: 'שיחה לדוגמה. החנות, השמלה והמחיר מומצאים.',
+});
 
 // One store's day, made up and marked as such. It follows the sample chat: the pickup question at 02:16 is the one
 // the owner answers in the morning.
@@ -128,7 +126,7 @@ export default (cfg) => ({
 <p class="when">הדמו מוכן תוך ${cfg.t('demo.time')}, ונשלח אותו למספר הזה.</p>
 </form>
 </div>
-${chat}
+${sample}
 </div>
 </section>
 

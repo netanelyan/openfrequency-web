@@ -9,12 +9,13 @@ import path from 'node:path';
 import { ROOT, readConfig, lint, minifyCss } from './src/lib.mjs';
 import { page } from './src/layout.mjs';
 import home from './src/pages/home.mjs';
+import toran from './src/pages/toran.mjs';
 import kit from './src/pages/kit.mjs';
 
 const draft = process.argv.includes('--draft');
 const OUT = path.join(ROOT, 'dist');
 
-const PAGES = [home];
+const PAGES = [home, toran];
 const DRAFT_PAGES = [kit];
 
 const cfg = readConfig(draft);

@@ -406,6 +406,45 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .faq details[open] summary::after { content: '\2212'; }
 .faq details p { margin: 0 0 20px; max-width: 64ch; color: var(--ink-2); }
 
+/* ------------------------------------------------------------ the Toran page */
+
+/* A product page opens on its mark, large, then the headline. */
+.phero { padding-top: 40px; }
+.phero h1 { margin: 24px 0 16px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+@media (min-width: 900px) { .phero { padding-top: 72px; } }
+
+.narrow-head { max-width: var(--narrow); margin-inline: auto; margin-bottom: 32px; }
+.narrow-head h2 { margin-bottom: 16px; }
+
+/* One question on two phones: the customer's and the owner's, side by side from 800px. */
+.pair { display: grid; gap: 20px; max-width: 920px; margin-inline: auto; }
+.pair .chat { max-width: none; padding-bottom: 0; }
+.pair-note { max-width: 920px; margin: 16px auto 0; color: var(--ink-p); font-size: 14px; }
+@media (min-width: 800px) { .pair { grid-template-columns: 1fr 1fr; align-items: start; } }
+
+.two { display: grid; gap: 28px; }
+.two h3 { margin-bottom: 14px; }
+@media (min-width: 700px) { .two { grid-template-columns: 1fr 1fr; gap: 40px; } }
+.ticks { margin: 0; padding: 0; list-style: none; }
+.ticks li { display: flex; gap: 12px; padding-block: 8px; color: var(--ink-2); }
+.ticks li + li { border-top: 1px solid var(--line); }
+.ticks svg.i { margin-top: 2px; color: var(--ok); }
+.ticks.yours svg.i { color: var(--accent-p); }
+.ticks.later svg.i { color: var(--ink-3); }
+
+.auto { margin: 28px 0 0; }
+.auto > div { display: grid; gap: 4px; padding-block: 14px; }
+.auto > div + div { border-top: 1px solid var(--line); }
+.auto dt { font-weight: 600; color: var(--ink); }
+.auto dd { margin: 0; color: var(--ink-2); }
+@media (min-width: 700px) { .auto > div { grid-template-columns: 160px minmax(0, 1fr); gap: 24px; } }
+
+/* The owner's chat with Toran: the words on one side, the chat on the other from 900px. */
+.side { display: grid; gap: 28px; align-items: center; }
+.side h2 { margin-bottom: 16px; }
+@media (min-width: 900px) { .side { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; } .side .chat { justify-self: end; } }
+
 /* ------------------------------------------------------------ the closing band and the footer */
 
 /* The one dark surface on a light page: a last line and one button. In the dark theme it goes to black, a step
