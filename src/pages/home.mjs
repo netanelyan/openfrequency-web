@@ -34,7 +34,7 @@ const hero = `
 </article>
 <article class="door teder-door" aria-labelledby="door-teder">
 <div class="door-top"><span class="wave" aria-hidden="true">${glyphOnly('teder')}</span><div><h2 id="door-teder">תדר</h2><p>כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.</p></div></div>
-<div class="door-act"><a class="btn light" href="/teder#wait">להצטרף לרשימת ההמתנה</a><a class="btn on-color" href="/teder">עוד על תדר</a></div>
+<div class="door-act"><a class="btn light" href="/teder">עוד על תדר</a></div>
 ${reel}
 </article>
 </div>

@@ -1,7 +1,6 @@
 // Teder's page: what it makes, on its own violet, with the waitlist in reach; the opening slide of a slideshow it
 // made in each subject; and how a slideshow gets made, from openfrequency-teder's README ("What it does").
 import { mark } from '../lib.mjs';
-import { tederForm } from '../forms.mjs';
 import { COVERS, cover, reel } from '../teder.mjs';
 
 const MAKING = [
@@ -14,9 +13,8 @@ const MAKING = [
 
 export default (cfg) => ({
   path: '/teder',
-  forms: true,
   title: 'תדר, מצגות בעברית לטיקטוק ולאינסטגרם | OpenFrequency',
-  description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, וכל מצגת עולה רק אחרי שמישהו אישר אותה. אפשר להצטרף לרשימת ההמתנה.',
+  description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, וכל מצגת עולה רק אחרי שמישהו אישר אותה.',
   body: `
 <section class="thero" aria-labelledby="hero-h">
 <div class="teder-field">
@@ -24,10 +22,6 @@ export default (cfg) => ({
 ${mark('teder', 72)}
 <h1 id="hero-h"><span class="hl">מצגות אוטומטיות</span> בעברית לטיקטוק ולאינסטגרם</h1>
 <p class="lede">תדר כותב ומעצב את המצגות, ומפרסם כל אחת רק אחרי שמישהו אישר אותה.</p>
-<div id="wait">
-${tederForm(cfg, '/teder')}
-<p class="small">נכתוב לכם כשתדר ייפתח לחנויות.</p>
-</div>
 </div>
 ${reel}
 </div>

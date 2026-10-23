@@ -1,5 +1,5 @@
 // The forms end to end in Chrome, against the real endpoint, with a screenshot of each state into docs/screenshots:
-// the thank-you, a bad address, the endpoint down (the WhatsApp way), the Teder waitlist, and a plain post without JS.
+// the thank-you, a bad address, the endpoint down (the WhatsApp way), and a plain post without JS.
 // Needs a build first (npm run draft). Nothing is sent to Telegram; the leads go to a throwaway database.
 import fs from 'node:fs';
 import os from 'node:os';
@@ -28,7 +28,7 @@ const browser = await chromium.launch({ channel: 'chrome' });
 async function at(width, scheme, js = true) {
   const ctx = await browser.newContext({ viewport: { width, height: 900 }, deviceScaleFactor: width < 600 ? 2 : 1, colorScheme: scheme, javaScriptEnabled: js });
   const pg = await ctx.newPage();
-  await pg.goto(base + '/');
+  await pg.goto(base + '/toran');
   // The draft has no WhatsApp number yet; give the forms a made-up one so the fallback link can be seen.
   if (js) await pg.evaluate(() => document.querySelectorAll('form[data-form]').forEach((f) => f.setAttribute('data-wa', '972500000000')));
   return { ctx, pg };
@@ -39,7 +39,7 @@ for (const [w, scheme] of [[390, 'light'], [1440, 'dark']]) {
   // The thank-you.
   let { ctx, pg } = await at(w, scheme);
   await pg.fill('#demo [name=store]', 'https://www.my-shop.co.il/collections/all');
-  await pg.fill('#demo [name=contact]', '050-123-4567');
+  await pg.fill('#demo [name=contact]', w < 600 ? '050-123-4567' : '050-123-4568'); // one demo per number
   await pg.click('#demo button[type=submit]');
   await pg.waitForSelector('#demo .done');
   assert.equal(await pg.textContent('#demo .done bdi'), 'my-shop.co.il');
@@ -56,11 +56,6 @@ for (const [w, scheme] of [[390, 'light'], [1440, 'dark']]) {
   assert.equal(await pg.evaluate(() => document.activeElement.name), 'store');
   await shot(pg.locator('#demo'), `store-${w}-${scheme}`);
 
-  // The Teder waitlist.
-  await pg.fill('form[data-form=teder] [name=contact]', 'me@example.com');
-  await pg.click('form[data-form=teder] button[type=submit]');
-  await pg.waitForSelector('form[data-form=teder] .done');
-  await shot(pg.locator('#teder .teder-field'), `teder-${w}-${scheme}`);
   await ctx.close();
 }
 
@@ -93,7 +88,7 @@ api = await startApi();
 {
   const { ctx, pg } = await at(390, 'light', false);
   await pg.fill('#demo [name=store]', 'nojs-shop.co.il');
-  await pg.fill('#demo [name=contact]', '0501234567');
+  await pg.fill('#demo [name=contact]', '0501234569');
   await Promise.all([pg.waitForNavigation(), pg.click('#demo button[type=submit]')]);
   assert.equal(new URL(pg.url()).pathname, '/thanks');
   await pg.screenshot({ path: path.join(OUT, 'form-thanks-nojs-390-light.png') });
@@ -103,4 +98,4 @@ api = await startApi();
 await browser.close();
 api.kill();
 site.close();
-console.log('forms: thank-you, bad address, Teder, endpoint down (with and without JS), plain post: all as expected');
+console.log('forms: thank-you, bad address, endpoint down (with and without JS), plain post: all as expected');

@@ -84,7 +84,7 @@ ${channelWindow(cfg)}
 </div>
 </section>
 
-<section class="sec close-sec" id="demo" aria-labelledby="demo-h">
+<section class="sec close-sec" aria-labelledby="demo-h">
 <div class="wrap narrow">
 <h2 id="demo-h">לבנות דמו לחנות שלכם</h2>
 <p class="lede">שולחים לנו את הכתובת של החנות, ואנחנו בונים דמו מהמוצרים ומדפי המדיניות שבאתר. כותבים לו כמו לקוח, ורואים מה הוא עונה.</p>

@@ -5,7 +5,6 @@ import { esc } from './lib.mjs';
 // The first words of a WhatsApp message to us, when the endpoint can't take the form. {store} is the typed address.
 export const WA_TEXT = {
   demo: 'היי, אשמח לדמו של תורן לחנות {store}',
-  teder: 'היי, אשמח להצטרף לרשימת ההמתנה של תדר',
   any: 'היי, אשמח לדמו של תורן לחנות שלי: ',
 };
 
@@ -33,22 +32,12 @@ ${status(id)}
 </form>`;
 }
 
-export function tederForm(cfg, page) {
-  return `${open(cfg, 'teder', page, 'wait')}
-<label class="f">הוואטסאפ או המייל שלכם<input name="contact" type="text" autocomplete="email" dir="ltr" required></label>
-<button class="btn" type="submit">להצטרף לרשימת ההמתנה</button>
-${status('teder')}
-</form>`;
-}
-
 // Once per page that has a form.
 export function formCopy(cfg) {
   const wa = '<a class="btn sm primary" data-wa href="#">לשלוח בוואטסאפ</a>';
   return `<template id="done-demo"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>${within(cfg) ? `${within(cfg)} נשלח` : 'כשהדמו מוכן, נשלח'} לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p></div></template>
-<template id="done-teder"><div class="done" tabindex="-1"><h3>רשמנו אתכם</h3><p>נכתוב לכם כשתדר ייפתח לחנויות.</p></div></template>
 <template id="msg-store"><p>הכתובת של החנות לא נראית לנו נכונה. אפשר לכתוב אותה כמו בדפדפן, למשל shop.co.il.</p></template>
 <template id="msg-contact-demo"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את הדמו.</p></template>
-<template id="msg-contact-teder"><p>צריך מספר וואטסאפ או כתובת מייל, כדי שנוכל לכתוב לכם.</p></template>
 <template id="msg-dup"><p>כבר קיבלנו בקשה לדמו מהמספר הזה, והלינק יגיע לוואטסאפ הזה. לדמו לחנות נוספת, אפשר לכתוב לנו בוואטסאפ.</p>${wa}</template>
 <template id="msg-rate"><p>קיבלנו כבר כמה פניות מהחיבור הזה בשעה האחרונה. אפשר לנסות שוב בעוד שעה, או לשלוח לנו בוואטסאפ.</p>${wa}</template>
 <template id="msg-down"><p>משהו אצלנו לא עובד כרגע, והפרטים לא הגיעו אלינו. אפשר לשלוח לנו אותם בוואטסאפ.</p>${wa}</template>

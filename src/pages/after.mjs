@@ -15,15 +15,6 @@ export const thanks = plain('/thanks', 'קיבלנו את הכתובת של הח
 </div>
 </section>`);
 
-export const thanksTeder = plain('/thanks/teder', 'רשמנו אתכם לרשימת ההמתנה של תדר', () => `
-<section class="sec after">
-<div class="wrap narrow" data-rise>
-<h1>רשמנו אתכם לרשימת ההמתנה של תדר</h1>
-<p class="lede">נכתוב לכם כשתדר ייפתח לחנויות. עד אז, אם יש לכם חנות, אפשר לבנות לה דמו של <a href="/toran">תורן</a>.</p>
-<div class="actions"><a class="btn primary" href="/toran#demo">לבנות דמו לחנות</a><a class="btn" href="/">לעמוד הבית</a></div>
-</div>
-</section>`);
-
 // Our WhatsApp, for when the form can't take it; until we have a number, the public draft doesn't offer it.
 const hasWa = (cfg) => cfg.has('whatsapp') || cfg.banner;
 const waButton = (cfg, label) => {
