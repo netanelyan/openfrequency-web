@@ -1,6 +1,6 @@
 // Toran's page, built around where customers write: one agent and one inbox, whichever channel the customer picks.
-// The headline and the tabs; the window that changes with the tab, the same question and answer in each; the owner's
-// one inbox; what it answers alone and what it leaves for you; the price; and the demo form, once, at the end.
+// The headline and the tabs, and the window that changes with the tab, the same question and answer in each; then the
+// demo form, once, straight after; the owner's one inbox; what it answers alone and what it leaves for you; the price.
 // Which channels Toran answers in comes from Toran's /channels.json, or site.config.json (toran.channels) when Toran
 // doesn't answer (build.mjs); every sentence that names them is built from
 // it, so the page never says a channel works before it does. The owners' questions are on /faq.
@@ -84,6 +84,14 @@ ${channelWindow(cfg)}
 </div>
 </section>
 
+<section class="sec close-sec" id="demo" aria-labelledby="demo-h">
+<div class="wrap narrow">
+<h2 id="demo-h">לבנות דמו לחנות שלכם</h2>
+<p class="lede">שולחים לנו את הכתובת של החנות, ואנחנו בונים דמו מהמוצרים ומדפי המדיניות שבאתר. כותבים לו כמו לקוח, ורואים מה הוא עונה.</p>
+${demoForm(cfg, '/toran')}
+</div>
+</section>
+
 <section class="sec" id="inbox" aria-labelledby="inbox-h">
 <div class="wrap side">
 <div>
@@ -102,16 +110,9 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 <div><h3>עונה לבד</h3>${rows(ALONE)}</div>
 <div><h3>משאיר לכם</h3>${rows(YOURS, 'yours')}<p class="quiet">כשאין באתר תשובה, הוא אומר ללקוח שהוא בודק, במקום לנחש, ושולח לכם את השאלה. מה שתענו הוא יזכור לפעם הבאה.</p></div>
 </div>
-</div>
-</section>
-${price(cfg)}
-<section class="sec close-sec" id="demo" aria-labelledby="demo-h">
-<div class="wrap narrow">
-<h2 id="demo-h">לבנות דמו לחנות שלכם</h2>
-<p class="lede">שולחים לנו את הכתובת של החנות, ואנחנו בונים דמו מהמוצרים ומדפי המדיניות שבאתר. כותבים לו כמו לקוח, ורואים מה הוא עונה.</p>
-${demoForm(cfg, '/toran')}
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
-</section>`,
+</section>
+${price(cfg)}`,
   };
 };
