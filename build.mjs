@@ -7,7 +7,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, readConfig, lint, minifyCss } from './src/lib.mjs';
+import { ROOT, readConfig, lint, minifyCss, markNames } from './src/lib.mjs';
 import { page } from './src/layout.mjs';
 import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
@@ -29,7 +29,7 @@ const files = new Map();
 for (const def of draft ? [...PAGES, ...DRAFT_PAGES] : PAGES) {
   const p = def(cfg);
   const file = p.file || (p.path === '/' ? 'index.html' : p.path.slice(1) + '/index.html');
-  files.set(file, page(cfg, css, p));
+  files.set(file, markNames(page(cfg, css, p)));
 }
 
 // Each page carries its own Content-Security-Policy: everything comes from this site, and the only scripts and
@@ -69,7 +69,7 @@ for (const [file, html] of files) {
 }
 
 const copy = (from, to) => { fs.mkdirSync(path.dirname(path.join(OUT, to)), { recursive: true }); fs.copyFileSync(path.join(ROOT, from), path.join(OUT, to)); };
-for (const f of ['heebo-hebrew.woff2', 'heebo-latin.woff2', 'HEEBO-LICENSE.txt']) copy('assets/fonts/' + f, 'fonts/' + f);
+for (const f of ['heebo-hebrew.woff2', 'heebo-latin.woff2', 'HEEBO-LICENSE.txt', 'space-mono-700-latin.woff2', 'SPACE-MONO-LICENSE.txt']) copy('assets/fonts/' + f, 'fonts/' + f);
 copy('assets/brand/svg/openfrequency-small.svg', 'favicon.svg');
 copy('assets/brand/png/openfrequency-180.png', 'apple-touch-icon.png');
 copy('assets/brand/png/openfrequency-512.png', 'icon-512.png');

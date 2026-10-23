@@ -187,6 +187,9 @@ A hue-less silver and ink system with one action blue, three brand-mark colours,
 - **Sent Bubble**, **Received Bubble** and **Chat Ground** are WhatsApp's own colours (dark #144d37, #2c2c2e, #0b141a). They never leave a chat fragment.
 - **OK Green** (ok-green) is for success lines. **Warn** on **Warn Ground** is for form errors, "fixed" status and the draft banner.
 
+### Product names
+Toran and Teder are Hebrew words, so in a sentence they are set as names: the product's colour, weight 600, on a light tint of that colour (`.pn`). The build does it (`markNames` in `src/lib.mjs`), so new copy needs nothing. In a heading only the colour stays. A name standing alone, the nav, buttons, links and the product fragments are left as they are.
+
 ### Named Rules
 **The No Hue Wallpaper Rule.** The wallpaper and every tile are hue-less silver. Colour arrives only with the product's fragments, the brand marks, the action blue and the one violet field.
 
@@ -198,12 +201,13 @@ A hue-less silver and ink system with one action blue, three brand-mark colours,
 
 **Display Font:** the system display stack (SF Pro Display, SF Hebrew, Segoe UI, Noto Sans Hebrew), with Heebo self-hosted as the Hebrew and Latin fallback
 **Body Font:** the system text stack (SF Pro Text, SF Hebrew), with the same fallbacks
+**Wordmark Font:** Space Mono 700, self-hosted (Latin only), for the name OpenFrequency where it is the logo: the header, the footer brand and the footer wordmark
 
 **Character:** the owner's brief pins the platform's own typeface. Hierarchy therefore comes from size, weight 700 against 400, and tight negative tracking on the large sizes, not from a contrasting face.
 
 ### Hierarchy
 - **Figure** (700, clamp 88–216px, 0.86, -0.035em, tabular): the price only.
-- **Display** (700, clamp 28–72px, 1.04, -0.012em, balanced wrap): every h1 and h2, the typed question line, and the footer wordmark.
+- **Display** (700, clamp 28–72px, 1.04, -0.012em, balanced wrap): every h1 and h2 and the typed question line. The footer wordmark is the same size class in Space Mono.
 - **Lead** (600, clamp 20–24px, 1.3; 1.45 for 400 lede paragraphs): h3, FAQ questions, lede and about paragraphs, the close line. Ledes are 34–50ch.
 - **Body** (400, 17px from 900px and 16px below, 1.6): running text, up to 46–62ch.
 - **Small** (400 or 600, 14px): captions, labels, table heads, the legal line and credits.

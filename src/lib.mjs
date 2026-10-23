@@ -96,6 +96,36 @@ export function mark(name, size, label = '') {
   return `<span class="mark ${name}" style="--s:${size}px"${a11y}>${glyph(file)}</span>`;
 }
 
+// ---------------------------------------------------------------- the product names
+
+// Toran and Teder are Hebrew words, so in a sentence a reader can take them for the plain words (a duty officer,
+// a frequency). Every mention in running text is set as a name: <span class="pn toran">. A prefix letter (ו, ל,
+// ש...) stays outside the span. A name standing alone (a door's heading), the nav, buttons, links and the
+// product's own UI (data-ui) are left alone: they already carry the mark, or they are the product talking.
+const SKIP = /^(?:head|script|style|title|nav|button|a|b|textarea|select|label)$/;
+const NAME = /(^|[^֐-׿])([ובלמשהכ]{0,2})(תורן|תדר)(?![֐-׿])/g;
+const ALONE = /^\s*(?:תורן|תדר)\s*$/;
+export function markNames(html) {
+  let skip = null; // [tag, depth] of the element being skipped
+  return html.split(/(<[^>]+>)/).map((part) => {
+    if (part.startsWith('<')) {
+      const m = /^<(\/?)([a-z0-9]+)/i.exec(part);
+      if (!m) return part;
+      const close = m[1], tag = m[2].toLowerCase();
+      if (skip) {
+        if (tag === skip[0]) skip[1] += close ? -1 : 1;
+        if (skip[1] === 0) skip = null;
+      } else if (!close && !part.endsWith('/>') && (SKIP.test(tag) || /\sdata-ui[\s>=]/.test(part))) {
+        skip = [tag, 1];
+      }
+      return part;
+    }
+    if (skip || ALONE.test(part)) return part;
+    return part.replace(NAME, (_, pre, prefix, name) =>
+      `${pre}${prefix}<span class="pn ${name === 'תורן' ? 'toran' : 'teder'}${prefix ? ' after' : ''}">${name}</span>`);
+  }).join('');
+}
+
 // ---------------------------------------------------------------- the copy lint
 
 // A backstop for the hebrew-voice rewrite pass, run on every built page. It catches the patterns that are easy to

@@ -30,9 +30,20 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('/fonts/space-mono-700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   color-scheme: light;
   --text: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, 'Helvetica Neue', Arial, sans-serif;
+  /* the company's name, wherever it is the logo */
+  --wordmark: 'Space Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', Heebo, 'Helvetica Neue', Arial, sans-serif;
   --bg: #eeeff2;
   --wall: radial-gradient(120% 80% at 85% -10%, #ffffff 0%, rgba(255, 255, 255, 0) 60%),
@@ -64,6 +75,9 @@
   --ok: #19702f;
   --toran: #0f7a54;
   --teder: #6a3fd6;
+  /* a product's name inside a sentence */
+  --toran-name: #0c6b49;
+  --teder-name: #5b33c2;
   /* on Teder's violet field: the button's ink and its hover */
   --teder-ink: #3d1f9a;
   --teder-hover: #f1ecff;
@@ -103,6 +117,8 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
+    --toran-name: #5fd6a6;
+    --teder-name: #b9a2ff;
     --bg: #111113;
     --wall: radial-gradient(120% 80% at 85% -10%, #2c2c30 0%, rgba(44, 44, 48, 0) 55%),
       linear-gradient(160deg, #1c1c1f 0%, #0b0b0d 30%, #2a2a2e 52%, #0e0e10 76%, #1f1f22 100%);
@@ -227,6 +243,15 @@ p:last-child { margin-bottom: 0; }
 .mark.openfrequency { background: var(--of); }
 .mark.toran { background: var(--toran); }
 .mark.teder { background: var(--teder); }
+/* Toran and Teder inside a sentence, set as names (markNames in lib.mjs), so nobody reads them as the plain words */
+.pn { padding: 0 0.22em 0.04em; border-radius: 0.34em; font-weight: 600; white-space: nowrap; color: var(--pn); background: color-mix(in srgb, var(--pn) 11%, transparent); }
+.pn.toran { --pn: var(--toran-name); }
+.pn.teder { --pn: var(--teder-name); }
+/* glued to its prefix letter: בתדר reads as one word */
+.pn.after { padding-inline-start: 0.08em; border-start-start-radius: 0.14em; border-end-start-radius: 0.14em; }
+/* in a heading the colour alone is enough */
+:is(h1, h2, h3) .pn { padding: 0; background: none; }
+.teder-door .pn, .teder-field .pn, .foot .pn { color: inherit; background: rgba(255, 255, 255, 0.16); }
 .mark.inline { display: inline-block; vertical-align: -0.18em; margin-inline-end: 0.3em; --s: 1.05em; }
 
 /* ------------------------------------------------------------ buttons and fields */
@@ -296,7 +321,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 }
 .scrolled .bar { box-shadow: var(--shadow-float), inset 0 0 0 1px var(--bar-edge), inset 0 1px 0 var(--rim); }
 .brand { display: flex; align-items: center; gap: 9px; min-height: 44px; flex: none; color: var(--ink); text-decoration: none; }
-.brand b { font: 700 17px/1 var(--display); letter-spacing: -0.01em; }
+.brand b { font: 700 16px/1 var(--wordmark); letter-spacing: -0.04em; }
 .bar .brand .mark { transition: transform 0.4s var(--ease-out); }
 @media (hover: hover) { .bar .brand:hover .mark { transform: rotate(-8deg) scale(1.06); } }
 .bar .cta { margin-inline-start: auto; padding: 0 16px; flex: none; }
@@ -417,10 +442,10 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .co-hero h1 .hl { padding-inline: 0.08em; background: linear-gradient(transparent 58%, color-mix(in srgb, var(--of) 30%, transparent) 58%, color-mix(in srgb, var(--of) 30%, transparent) 92%, transparent 92%); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 @media (prefers-color-scheme: dark) { .co-hero h1 .hl { background: linear-gradient(transparent 58%, rgb(110 135 255 / 0.42) 58%, rgb(110 135 255 / 0.42) 92%, transparent 92%); } }
 .co-hero .lede { margin-top: 18px; max-width: 40ch; }
-/* Our mark, large and half see-through behind the headline, pushed toward the left edge. The doors' glass blurs it. */
-.co-bg { position: absolute; z-index: -1; top: -150px; left: clamp(-200px, calc(50% - 820px), -40px); color: var(--of); opacity: 0.2; pointer-events: none; }
-.co-bg svg { display: block; width: clamp(460px, 52vw, 780px); height: auto; }
-@media (max-width: 899px) { .co-bg { top: 60px; left: -170px; opacity: 0.16; } .co-bg svg { width: 520px; } }
+/* The mark's dots alone, large, faint and turned 30 degrees behind the headline, pushed toward the left edge. The doors' glass blurs them. */
+.co-bg { position: absolute; z-index: -1; top: -190px; left: clamp(-300px, calc(50% - 820px), -100px); color: var(--of); opacity: 0.2; pointer-events: none; }
+.co-bg svg { display: block; width: clamp(620px, 62vw, 940px); height: auto; transform: rotate(30deg); }
+@media (max-width: 899px) { .co-bg { top: -20px; left: -260px; opacity: 0.16; } .co-bg svg { width: 680px; } }
 @media (prefers-color-scheme: dark) { .co-bg { color: #8ea2ff; opacity: 0.22; } }
 @media (prefers-color-scheme: dark) and (max-width: 899px) { .co-bg { opacity: 0.16; } }
 .doors { display: grid; gap: 14px; margin-top: clamp(28px, 4vw, 44px); }
@@ -655,7 +680,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .foot-wa { color: var(--night-ink); font: 600 var(--fs-lead)/1.3 var(--display); }
 .foot .ph { color: var(--night-ink); }
 .foot-legal { margin: clamp(36px, 5vw, 56px) 0 0; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: var(--night-ink-2); font-size: 13px; }
-.foot-word { margin: 18px 0 0; color: rgba(255, 255, 255, 0.07); font: 800 12.6cqi/0.74 var(--display); letter-spacing: -0.05em; white-space: nowrap; text-align: center; direction: ltr; user-select: none; }
+.foot-word { margin: 18px 0 0; color: rgba(255, 255, 255, 0.07); font: 700 13.4cqi/0.8 var(--wordmark); letter-spacing: -0.06em; white-space: nowrap; text-align: center; direction: ltr; user-select: none; }
 @media (min-width: 700px) { .foot-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1000px) { .foot-cols { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr) minmax(0, 0.7fr) minmax(0, 1fr); gap: 40px; } }
 
