@@ -11,12 +11,14 @@ import { ROOT, readConfig, lint, minifyCss } from './src/lib.mjs';
 import { page } from './src/layout.mjs';
 import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
+import teder from './src/pages/teder.mjs';
+import faq from './src/pages/faq.mjs';
 import { thanks, thanksTeder, tryAgain } from './src/pages/after.mjs';
 
 const draft = process.argv.includes('--draft');
 const OUT = path.join(ROOT, 'dist');
 
-const PAGES = [home, toran, thanks, thanksTeder, tryAgain];
+const PAGES = [home, toran, teder, faq, thanks, thanksTeder, tryAgain];
 const DRAFT_PAGES = [];
 
 const cfg = readConfig(draft);
@@ -71,7 +73,6 @@ for (const f of ['heebo-hebrew.woff2', 'heebo-latin.woff2', 'HEEBO-LICENSE.txt']
 copy('assets/brand/svg/openfrequency-small.svg', 'favicon.svg');
 copy('assets/brand/png/openfrequency-180.png', 'apple-touch-icon.png');
 copy('assets/brand/png/openfrequency-512.png', 'icon-512.png');
-for (const f of fs.readdirSync(path.join(ROOT, 'assets/photos'))) if (f.endsWith('.jpg')) copy('assets/photos/' + f, 'img/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder'))) if (f.endsWith('.jpg')) copy('assets/teder/' + f, 'teder/' + f);
 
 const kb = (n) => (n / 1024).toFixed(1) + ' KB';

@@ -1,4 +1,4 @@
-// The site's script: the motion, the duty log clock, and the question box. Every part checks that its elements are on
+// The site's script: the motion and the question box. Every part checks that its elements are on
 // the page, and every part leaves the page whole without it: the content is in the HTML, visible, and script only
 // times its arrival or adds what changes by the minute.
 (function () {
@@ -25,7 +25,7 @@
     Array.prototype.forEach.call(el.children, function (c, i) { c.style.setProperty('--i', i); });
     if (seen) seen.observe(el); else el.classList.add('in');
   });
-  each('.drift, .reveal, .fan', function (el) { if (seen) seen.observe(el); else el.classList.add('in'); });
+  each('.fan', function (el) { if (seen) seen.observe(el); else el.classList.add('in'); });
 
   // A chat stage marked data-play plays once as it comes into view: messages arrive in their order, and each answer
   // is preceded by Toran's three typing dots. Messages the layout hides (the second exchange on a phone) sit out.
@@ -74,56 +74,41 @@
     Array.prototype.forEach.call(steps, function (s) { mid.observe(s); });
   }
 
-  // The time in Israel, for the duty log's now. Checked every 20 seconds.
-  var fmt = new Intl.DateTimeFormat('he-IL', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit', hour12: false });
-  var log = d.querySelector('[data-log]'), now = d.querySelector('[data-now]');
-  var tick = function () {
-    var hm = fmt.format(new Date());
-    each('[data-now-time]', function (el) { el.textContent = hm; el.setAttribute('datetime', hm); });
-    if (log && now) {
-      var mins = function (s) { var p = s.split(':'); return +p[0] * 60 + +p[1]; };
-      var after = null;
-      each('li[data-t]', function (li) { if (!after && mins(li.getAttribute('data-t')) > mins(hm)) after = li; }, log);
-      if (after) log.insertBefore(now, after); else log.appendChild(now);
-      now.hidden = false;
-    }
-  };
-  tick();
-  setInterval(tick, 20000);
-
-  // The question box: a made-up store's facts, and Toran's real line for everything else.
+  // The question box: Toran answering for OpenFrequency, from what this site says. Every suggested question has an
+  // answer; anything else gets Toran's real line for a question it can't answer.
   var box = d.getElementById('ask-q'), out = d.querySelector('[data-ask-out]'), ex = d.querySelector('[data-ask-ex]');
   if (box && out) {
-    var link = function (w) { return ' <span class="lnk">' + w + '</span>'; };
+    var link = function (href, w) { return ' <a class="lnk" href="' + href + '">' + w + '</a>'; };
     var A = {
-      stock: ['יש. במידה M נשארו 2, ובמידה S יש 5. מידה L אזלה.' + link('לינק לשמלה'), 'מדף המוצר'],
-      price: ['שמלת הפשתן עולה 289 ₪.' + link('לינק לשמלה'), 'מדף המוצר'],
-      ship: ['משלוח עד הבית לוקח 3 עד 5 ימי עסקים ועולה 29 ₪. בהזמנה מעל 300 ₪ המשלוח חינם.', 'מדף המשלוחים'],
-      returns: ['אפשר להחזיר או להחליף תוך 14 יום מהקבלה, כשהפריט באריזה המקורית.' + link('מדיניות החזרות'), 'מדף ההחזרות'],
-      pay: ['אפשר לשלם באשראי, בביט או בפייפאל.', 'מעמוד התשלום'],
-      color: ['השמלה באה בירוק ובשחור.' + link('לינק לשמלה'), 'מדף המוצר'],
+      toran: ['תורן עונה ללקוחות של החנות בוואטסאפ, מתוך מה שכתוב באתר שלה: מוצרים, מחירים, מלאי ודפי המדיניות. מה שלא כתוב שם, הוא שואל אתכם ומעביר את התשובה ללקוח.' + link('/toran', 'לעמוד של תורן'), 'מהעמוד של תורן'],
+      teder: ['תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, וכל מצגת עולה רק אחרי שמישהו אישר אותה. הוא עוד לא פתוח לחנויות, ואפשר להצטרף לרשימת ההמתנה.' + link('/teder', 'לעמוד של תדר'), 'מהעמוד של תדר'],
+      demo: ['שולחים לנו את הכתובת של החנות ומספר וואטסאפ. אנחנו בונים דמו מהמוצרים ומדפי המדיניות שבאתר שלכם, ושולחים לכם לינק. כותבים לו כמו לקוח, ורואים מה הוא עונה.' + link('/toran#demo', 'לבנות דמו לחנות'), 'מהעמוד של תורן'],
+      store: ['היום תורן עובד עם חנויות על Shopify. החיבור ל-WooCommerce ול-Wix בדרך.', 'מהעמוד של תורן'],
+      price: ['המחיר החודשי, ומה ש-Meta גובה על הודעות שהחנות שולחת ביוזמתה, כתובים בעמוד של תורן, עם דוגמה במספרים.' + link('/toran#price', 'כמה זה עולה'), 'מהעמוד של תורן'],
+      wrong: ['תורן לא ממציא תשובות. הוא עונה רק ממה שכתוב באתר של החנות, וכשאין לו תשובה הוא שואל אתכם במקום לנחש. בשבועיים הראשונים אנחנו גם קוראים איתכם את השיחות ומתקנים.', 'מהשאלות באתר'],
+      number: ['כן. הלקוחות ממשיכים לכתוב לאותו מספר, ואנחנו מחברים אותו ל-WhatsApp Business Platform של Meta יחד איתכם.', 'מהשאלות באתר'],
+      install: ['לדמו לא צריך להתקין כלום. תורן קורא את מה שכבר מופיע באתר. כדי לחבר את המספר של החנות צריך חשבון עסקי ב-Meta, ואת החיבור עושים יחד.', 'מהשאלות באתר'],
+      night: ['כן. תורן עונה גם בשתיים בלילה, ומה שהוא לא יודע מחכה לכם לבוקר.', 'מהעמוד של תורן'],
+      who: ['אנחנו OpenFrequency. בנינו את תורן, שעונה ללקוחות של חנויות בוואטסאפ, ואת תדר, שכותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם.', 'מעמוד הבית'],
     };
-    var KEEP = 'את זה אני לא יודע. אני בודק עם החנות, ואחזור אליך כאן.';
-    var WHY = {
-      deal: 'בקשות להנחה או להחזר כספי הוא משאיר לכם.',
-      order: 'הוא עוד לא רואה הזמנות, אז שאלה על הזמנה מסוימת עוברת אליכם.',
-      none: 'זה לא כתוב באתר, אז השאלה נשלחת אליכם בוואטסאפ.',
-      en: 'באנגלית הוא עונה באנגלית. גם כאן זה לא כתוב באתר, אז השאלה עוברת אליכם.',
-    };
+    var KEEP = 'את זה אני לא יודע. אני בודק עם הצוות, ואחזור אליך כאן.';
+    var WHY = 'בחנות אמיתית השאלה הייתה עוברת לבעלים בוואטסאפ. כאן זו הדגמה, אז היא לא נשלחת.';
+    var EN = ["Toran answers a store's customers on WhatsApp, from what's on the store's site, in Hebrew or in English." + link('/toran#demo', 'Build a demo for your store'), 'ענה לבד, באנגלית'];
     var has = function (q, words) { return words.some(function (w) { return q.indexOf(w) > -1; }); };
     var answer = function (raw) {
       var q = ' ' + raw.toLowerCase() + ' ';
-      if (/[a-z]/.test(q) && !/[֐-׿]/.test(q)) return { keep: "I'm checking this with the store and will update you here.", why: WHY.en };
-      if (has(q, ['הנחה', 'קופון', 'קוד', 'זול', 'החזר כספי', 'זיכוי'])) return { keep: KEEP, why: WHY.deal };
-      if (has(q, ['הזמנה', 'הזמנתי', 'החבילה', 'מעקב', 'הגיעה', 'עוד לא הגיע'])) return { keep: KEEP, why: WHY.order };
-      if (has(q, ['לאסוף', 'איסוף', 'מחסן', 'חנות פיזית'])) return { keep: KEEP, why: WHY.none };
-      if (has(q, ['משלוח', 'שליח', 'דואר', 'יגיע', 'מגיע', 'ימי עסקים'])) return A.ship;
-      if (has(q, ['להחזיר', 'החזרה', 'להחליף', 'החלפה', 'לא מתאים'])) return A.returns;
-      if (has(q, ['לשלם', 'תשלום', 'ביט', 'אשראי', 'פייפאל', 'paypal'])) return A.pay;
-      if (has(q, ['צבע', 'שחור', 'ירוק'])) return A.color;
-      if (has(q, ['מידה', 'מידות', 'מלאי', 'נשאר', 'אזל', ' s ', ' m ', ' l ', ' xl ', ' m?', ' s?', ' l?'])) return A.stock;
-      if (has(q, ['מחיר', 'עולה', 'כמה זה', '₪', 'שקל'])) return A.price;
-      return { keep: KEEP, why: WHY.none };
+      if (/[a-z]/.test(q) && !/[֐-׿]/.test(q)) return EN;
+      if (has(q, ['טועה', 'טעות', 'ממציא', 'להמציא', 'לא נכון', 'לנחש', 'משקר'])) return A.wrong;
+      if (has(q, ['wix', 'woo', 'shopify', 'וויקס', 'ויקס', 'שופיפיי', 'פלטפורמ', 'אתר שלי', 'החנות שלי על'])) return A.store;
+      if (has(q, ['עולה', 'מחיר', 'כמה זה', '₪', 'שקל', 'לשלם', 'תשלום', 'חודשי', 'יקר'])) return A.price;
+      if (has(q, ['דמו', 'לנסות', 'להתחיל', 'מתחילים'])) return A.demo;
+      if (has(q, ['להתקין', 'התקנה', 'קוד באתר'])) return A.install;
+      if (has(q, ['המספר', 'מספר של', 'מספר שלי', 'וואטסאפ עסקי'])) return A.number;
+      if (has(q, ['לילה', 'בלילה', 'שעות', '24'])) return A.night;
+      if (has(q, ['תדר', 'מצגת', 'מצגות', 'טיקטוק', 'אינסטגרם', 'תוכן'])) return A.teder;
+      if (has(q, ['תורן', 'וואטסאפ', 'לקוחות', 'שירות'])) return A.toran;
+      if (has(q, ['מי אתם', 'openfrequency', 'החברה', 'אתם'])) return A.who;
+      return { keep: KEEP, why: WHY };
     };
     var esc = function (s) { return s.replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
     var add = function (cls, html) {
@@ -144,7 +129,7 @@
       var a = answer(q), alone = Array.isArray(a);
       var reply = function () {
         add('msg them' + (still ? '' : ' answer-in'), (alone ? a[0] : esc(a.keep)) + '<time aria-hidden="true">עכשיו</time>');
-        add('sys', alone ? '<span class="ui-s alone">ענה לבד</span>' + a[1] : '<span class="ui-s yours">הועבר אליכם</span>' + a.why);
+        add('sys', alone ? '<span class="ui-s alone">ענה לבד</span>' + a[1] : '<span class="ui-s yours">לא כתוב באתר</span>' + a.why);
       };
       if (still) return reply();
       var typing = add('msg them typing', '<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>');

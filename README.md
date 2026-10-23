@@ -72,13 +72,13 @@ em and en dashes, a colon in a heading, `!!`, gendered slashes, bureaucratic phr
 | Path | What |
 | --- | --- |
 | `build.mjs` | renders `src/pages` into `dist/`, inlines the CSS, checks the facts and the copy |
-| `src/layout.mjs` | the head, the sticky glass header, the dark closing band, the footer |
+| `src/layout.mjs` | the head, the sticky glass header, the footer |
 | `src/style.css` | Teder's tokens (light, dark, Increase Contrast, Reduce Transparency) and the site's components |
-| `src/pages/` | one module per page |
+| `src/pages/` | one module per page: home, `/toran`, `/teder`, `/faq`, and where a form lands without JS |
+| `src/teder.mjs` | Teder's real slides and its phone, shared by the home page and `/teder` |
 | `assets/brand/` | the marks, copied from openfrequency-toran; never redrawn |
 | `assets/fonts/` | Heebo (OFL), self-hosted, so no visitor's address goes to Google |
-| `assets/photos/` | three archival photographs and a map from Wikimedia Commons, resized; `credits.json` holds each one's source and licence, printed in the footer |
-| `src/site.js` | the motion, the duty log's clock and the question box |
+| `src/site.js` | the motion, and the question box (Toran answering about OpenFrequency) |
 | `src/forms.mjs`, `src/form.js` | the two forms, every word they can show, and the script that sends them |
 | `server/lead.mjs` | the lead endpoint |
 | `deploy/` | the Caddyfile, the endpoint's systemd service and env file, and the deploy script |

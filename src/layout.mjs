@@ -1,84 +1,77 @@
-// The frame every page shares: the head, the sticky glass header, the closing field with the form already open,
-// and the footer's board of tiles.
+// The frame every page shares: the head, the sticky glass header, and the footer.
 import fs from 'node:fs';
 import path from 'node:path';
-import { FACTS, ROOT, esc, mark, credits } from './lib.mjs';
-import { demoForm, formCopy } from './forms.mjs';
+import { FACTS, ROOT, esc, mark } from './lib.mjs';
+import { formCopy } from './forms.mjs';
 
-// The two scripts, comments and indentation out: site.js on every page (motion, the duty log clock, the
-// question box), form.js only where there is a form.
+// The two scripts, comments and indentation out: site.js on every page (motion and the question box), form.js only
+// where there is a form.
 const squeeze = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8')
   .split('\n').filter((l) => !/^\s*\/\//.test(l)).map((l) => l.trim()).filter(Boolean).join('\n');
 const siteJs = squeeze('src/site.js');
 const formJs = squeeze('src/form.js');
 
-const NAV = [
-  ['/toran', 'תורן'],
-  ['/#teder', 'תדר'],
-  ['/toran#price', 'מחיר'],
-  ['/toran#faq', 'שאלות'],
+// The two products, each behind its own mark, then the pages that are about both.
+const PRODUCTS = [
+  ['/toran', 'toran', 'תורן', 'עונה ללקוחות בוואטסאפ'],
+  ['/teder', 'teder', 'תדר', 'מצגות לטיקטוק ולאינסטגרם'],
 ];
+const LINKS = [
+  ['/toran#price', 'מחיר'],
+  ['/faq', 'שאלות'],
+];
+
+// The way to a demo: the form on Toran's page.
+const DEMO = (current) => (current === '/toran' ? '#demo' : '/toran#demo');
 
 const menuIcon = `<svg class="i open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg><svg class="i close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 
 function header(current) {
-  // The demo form is on the home page and on Toran's; elsewhere the button goes to the home page's.
-  const demo = current === '/' || current === '/toran' ? '#demo' : '/#demo';
-  const links = NAV.map(([href, label]) => `<a href="${href}"${href === current ? ' aria-current="page"' : ''}>${label}</a>`).join('');
+  const here = (href) => (href === current ? ' aria-current="page"' : '');
+  const nav = [
+    ...PRODUCTS.map(([href, name, label]) => `<a href="${href}"${here(href)}>${mark(name, 20)}${label}</a>`),
+    ...LINKS.map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`),
+  ].join('');
+  // On a phone the menu opens on the products, each with what it does, then the rest and the demo.
+  const sheet = `<div class="sheet-products">${PRODUCTS.map(([href, name, label, what]) =>
+    `<a class="prod" href="${href}"${here(href)}>${mark(name, 40)}<span><b>${label}</b><small>${what}</small></span></a>`).join('')}</div>
+<div class="sheet-links">${LINKS.map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`).join('')}</div>
+<a class="btn primary" href="${DEMO(current)}">לבנות דמו לחנות</a>`;
   return `<header class="top">
 <div class="bar">
-<a class="brand" href="/">${mark('openfrequency', 32)}<b>OpenFrequency</b></a>
-<nav class="nav" aria-label="ראשי">${links}</nav>
-<a class="btn primary sm cta" href="${demo}">לבנות דמו לחנות</a>
-<details class="menu"><summary aria-label="תפריט">${menuIcon}</summary><nav aria-label="ראשי">${links}</nav></details>
+<a class="brand" href="/"${current === '/' ? ' aria-current="page"' : ''}>${mark('openfrequency', 32)}<b>OpenFrequency</b></a>
+<nav class="nav" aria-label="ראשי">${nav}</nav>
+<a class="btn primary sm cta" href="${DEMO(current)}">לבנות דמו לחנות</a>
+<details class="menu"><summary aria-label="תפריט">${menuIcon}</summary><nav aria-label="ראשי">${sheet}</nav></details>
 </div>
 </header>`;
 }
 
-// The last field on the pages that sell: the closing line on the dark ground, and beside it the first step of the
-// product already open, the demo form at its true size.
-export function closing(cfg, page) {
-  return `<section class="close-sec" aria-labelledby="close-h">
-<div class="wrap">
-<div>
-<h2 id="close-h">הדמו מתחיל בכתובת של החנות</h2>
-<p>תוך ${cfg.t('demo.time')} נשלח לכם עמוד עם הדמו. כותבים לו בוואטסאפ כמו לקוח, ורואים מה הוא עונה.</p>
-</div>
-<div class="dialog" data-ui>
-<p class="dialog-t">${mark('openfrequency', 28)}דמו לחנות שלכם</p>
-${demoForm(cfg, page, 'demo-end')}
-</div>
-</div>
-</section>`;
-}
-
-// Credits for the archival pictures, as their licences ask, small at the foot of every page.
-function creditLine() {
-  const he = {
-    'photos/switchboard-1971-1400.jpg': 'חיילת במרכזייה צבאית, 1971',
-  };
-  const list = credits().filter((c) => he[c.file]).map((c) =>
-    `<a href="${esc(c.page)}" rel="noopener">${he[c.file]}</a>, ${esc(String(c.creator).replace(/^w:/, ''))}, ${esc(c.license)}`);
-  return list.length ? `<p class="credits">תמונות מוויקישיתוף: ${list.join(' · ')}.</p>` : '';
-}
-
-function footer(cfg, photos) {
+// The footer: one dark panel. Who we are, the two products, the site's pages, how to reach us, and the name set
+// large along the bottom edge.
+function footer(cfg, current) {
   const wa = cfg.get('whatsapp');
   const waLink = wa
-    ? `<a class="wa" href="https://wa.me/${wa}">בוואטסאפ</a>`
-    : `<span class="wa">בוואטסאפ <mark class="ph">[${esc(FACTS.whatsapp.label)}]</mark></span>`;
+    ? `<a class="foot-wa" href="https://wa.me/${wa}">לכתוב לנו בוואטסאפ</a>`
+    : `<span class="foot-wa">לכתוב לנו בוואטסאפ <mark class="ph">[${esc(FACTS.whatsapp.label)}]</mark></span>`;
   return `<footer class="foot">
-<div class="board">
-<div class="t-who"><p class="wa">אנחנו OpenFrequency. בנינו את תורן ואת תדר.</p><p class="legal">© 2026 OpenFrequency</p></div>
-<nav class="t-nav" aria-labelledby="f-nav"><h2 id="f-nav">באתר</h2><ul>
-<li><a href="/toran">תורן</a></li><li><a href="/#teder">תדר</a></li><li><a href="/toran#price">מחיר</a></li>
-<li><a href="/toran#faq">שאלות</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/terms">תנאי שימוש</a></li>
-</ul></nav>
-<div class="t-wa"><h2>תכתבו לנו</h2>${waLink}</div>
-<p class="word" aria-hidden="true">${mark('openfrequency', 84)}OpenFrequency</p>
-<a class="go" href="/#demo"><span>לבנות דמו לחנות</span><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M38 22H8M18 12 8 22l10 10"/></svg></a>
+<div class="foot-in">
+<div class="foot-cols">
+<div class="foot-who">
+<a class="brand" href="/">${mark('openfrequency', 40)}<b>OpenFrequency</b></a>
+<p>בנינו שני מוצרים לחנויות אונליין. תורן עונה ללקוחות בוואטסאפ, ותדר כותב ומעצב מצגות לטיקטוק ולאינסטגרם.</p>
 </div>
-${photos ? creditLine() : ''}
+<nav aria-labelledby="f-prod"><h2 id="f-prod">המוצרים</h2><ul>
+${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}">${mark(name, 28)}<span><b>${label}</b><small>${what}</small></span></a></li>`).join('\n')}
+</ul></nav>
+<nav aria-labelledby="f-site"><h2 id="f-site">באתר</h2><ul>
+<li><a href="/faq">שאלות</a></li><li><a href="/toran#price">מחיר</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/terms">תנאי שימוש</a></li>
+</ul></nav>
+<div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<a class="btn primary sm" href="${DEMO(current)}">לבנות דמו לחנות</a></div>
+</div>
+<p class="foot-legal">© 2026 OpenFrequency</p>
+<p class="foot-word" aria-hidden="true">OpenFrequency</p>
+</div>
 </footer>`;
 }
 
@@ -86,7 +79,7 @@ ${photos ? creditLine() : ''}
 // site.js never arrives, the flag comes off after three seconds and everything simply shows.
 const early = `<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.ofSite)document.documentElement.classList.remove('js')},3000)</script>`;
 
-export function page(cfg, css, { path, title, description, body, closing: close = false, noindex = false, forms = false, photos = false }) {
+export function page(cfg, css, { path, title, description, body, noindex = false, forms = false, dock = false }) {
   const missing = cfg.draft && cfg.missing.size
     ? `<p class="draft" role="note">טיוטה. חסרים עוד ${cfg.missing.size} פרטים ב-site.config.json, והאתר לא ייבנה בלעדיהם.</p>`
     : '';
@@ -111,13 +104,12 @@ ${missing}${header(path)}
 <main id="main">
 ${body}
 </main>
-${close ? closing(cfg, path) : ''}
-${path === '/' || path === '/toran' ? '<div class="dock" data-dock><a class="btn primary" href="#demo">לבנות דמו לחנות</a></div>' : ''}
-${footer(cfg, photos)}
+${dock ? `<div class="dock" data-dock><a class="btn primary" href="${DEMO(path)}">לבנות דמו לחנות</a></div>` : ''}
+${footer(cfg, path)}
 <script>
 ${siteJs}
 </script>
-${forms || close ? `${formCopy(cfg)}\n<script>\n${formJs}\n</script>` : ''}
+${forms ? `${formCopy(cfg)}\n<script>\n${formJs}\n</script>` : ''}
 </body>
 </html>
 `;

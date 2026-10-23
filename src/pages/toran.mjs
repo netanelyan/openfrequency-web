@@ -1,9 +1,9 @@
 // Toran's page: everything about Toran, in the order an owner asks it. The chat and the form; how it goes; what
-// happens to a question it can't answer; what it answers alone; a day on duty; its eval; the messages it sends by
-// itself; the owner's own chat with it; the price; the owners' questions; and, last, which of that works today.
+// happens to a question it can't answer; what it answers alone; the messages it sends by itself; the owner's own chat
+// with it; the price; and, last, which of that works today. The owners' questions are on /faq.
 import { esc, mark } from '../lib.mjs';
 import { chat } from '../chat.mjs';
-import { hero, how, day, proof, price, faq } from '../sections.mjs';
+import { hero, how, price } from '../sections.mjs';
 
 // One question, seen on both phones. The customer's side continues the home page's sample chat; the owner's side is
 // how Toran asks and what it does with the answer. Made up, and the captions say so.
@@ -65,8 +65,7 @@ const fromConfig = (cfg, key) => cfg.get(key)?.map(esc) ?? [cfg.ph(key)];
 export default (cfg) => ({
   path: '/toran',
   forms: true,
-  closing: true,
-  photos: true,
+  dock: true,
   title: 'תורן, מישהו שעונה בוואטסאפ של החנות שלכם | OpenFrequency',
   description: 'תורן עונה ללקוחות של החנות בוואטסאפ מתוך מה שכתוב באתר, גם בלילה. מה שאין באתר הוא שואל אתכם, ואת התשובה הוא זוכר. כאן גם המחיר, ומה עובד היום ומה עוד לא.',
   body: [
@@ -98,8 +97,6 @@ ${owner}
 </div>
 </div>
 </section>`,
-    day,
-    proof,
     `
 <section class="sec" id="auto" aria-labelledby="auto-h">
 <div class="wrap narrow">
@@ -123,7 +120,6 @@ ${AUTO.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('\n')}
 </div>
 </section>`,
     price(cfg),
-    faq(cfg),
     `
 <section class="sec" id="status" aria-labelledby="status-h">
 <div class="wrap">
@@ -132,6 +128,7 @@ ${AUTO.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('\n')}
 <div><h3>עובד היום</h3>${rows(fromConfig(cfg, 'toran.today'))}</div>
 <div><h3>עוד לא</h3>${rows(fromConfig(cfg, 'toran.notYet'), 'later')}</div>
 </div>
+<p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>`,
   ].join('\n'),
