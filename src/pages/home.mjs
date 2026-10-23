@@ -18,7 +18,7 @@ const DOOR_CHAT = [
 
 const hero = `
 <section class="co-hero" aria-labelledby="hero-h">
-<div class="co-bg" aria-hidden="true">${mark('openfrequency', 640)}</div>
+<div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
 <div class="wrap">
 <h1 id="hero-h">פלטפורמות יצירת התוכן ושירות הלקוחות המובילות בארץ</h1>
 <p class="lede">תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות שלכם בוואטסאפ, מתוך מה שכתוב באתר, גם בשתיים בלילה.</p>

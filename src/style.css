@@ -416,11 +416,11 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .co-hero h1 { margin-top: 12px; max-width: 14em; font-size: clamp(32px, 4.3vw, 62px); }
 .co-hero .lede { margin-top: 18px; max-width: 40ch; }
 /* Our mark, large and half see-through behind the headline, pushed toward the left edge. The doors' glass blurs it. */
-.co-bg { position: absolute; z-index: -1; top: -24px; left: clamp(-160px, calc(50% - 760px), 0px); opacity: 0.5; pointer-events: none; }
-.co-bg .mark { --s: clamp(300px, 34vw, 500px); transform: rotate(-8deg); }
-@media (max-width: 899px) { .co-bg { top: 150px; left: -120px; opacity: 0.22; } .co-bg .mark { --s: 340px; } }
-@media (prefers-color-scheme: dark) { .co-bg { opacity: 0.42; } }
-@media (prefers-color-scheme: dark) and (max-width: 899px) { .co-bg { opacity: 0.25; } }
+.co-bg { position: absolute; z-index: -1; top: -150px; left: clamp(-200px, calc(50% - 820px), -40px); color: var(--of); opacity: 0.2; pointer-events: none; }
+.co-bg svg { display: block; width: clamp(460px, 52vw, 780px); height: auto; }
+@media (max-width: 899px) { .co-bg { top: 60px; left: -170px; opacity: 0.16; } .co-bg svg { width: 520px; } }
+@media (prefers-color-scheme: dark) { .co-bg { color: #8ea2ff; opacity: 0.22; } }
+@media (prefers-color-scheme: dark) and (max-width: 899px) { .co-bg { opacity: 0.16; } }
 .doors { display: grid; gap: 14px; margin-top: clamp(28px, 4vw, 44px); }
 @media (min-width: 900px) { .doors { grid-template-columns: 1fr 1fr; gap: 18px; } .co-hero { padding-top: 48px; } }
 .door { --pad: clamp(18px, 2.2vw, 28px); display: flex; flex-direction: column; gap: 20px; min-width: 0; overflow: hidden; padding: var(--pad) var(--pad) 0; border-radius: var(--r); }
