@@ -1,4 +1,5 @@
-// The lead endpoint, run as it runs on the server: a real process, a real SQLite file, and a fake Telegram.
+// The lead endpoint, run as it runs on the server: a real process, a real SQLite file, a fake Telegram and a fake
+// Toran intake.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -18,6 +19,9 @@ let telegram; // the fake: records what it is sent, and can be told to fail
 const sent = [];
 let telegramDown = false;
 let proc;
+let toran; // the fake intake: records what it is handed
+const handed = [];
+const TOKEN = 'x'.repeat(40);
 
 before(async () => {
   telegram = http.createServer((req, res) => {
@@ -31,10 +35,21 @@ before(async () => {
     });
   });
   await new Promise((ok) => telegram.listen(0, '127.0.0.1', ok));
+  toran = http.createServer((req, res) => {
+    let b = '';
+    req.on('data', (c) => (b += c));
+    req.on('end', () => {
+      handed.push({ path: req.url, auth: req.headers.authorization, body: JSON.parse(b) });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end('{"ok":true}');
+    });
+  });
+  await new Promise((ok) => toran.listen(0, '127.0.0.1', ok));
   proc = spawn(process.execPath, ['server/lead.mjs'], {
     env: {
       ...process.env, PORT: String(PORT), LEADS_DB: DB, TRUST_PROXY: '1', SITE_ORIGIN: 'https://example.co.il',
       TELEGRAM_BOT_TOKEN: 'T', TELEGRAM_CHAT_ID: 'C', TELEGRAM_API: `http://127.0.0.1:${telegram.address().port}`,
+      TORAN_INTAKE_URL: `http://127.0.0.1:${toran.address().port}/internal/lead`, OF_INTERNAL_TOKEN: TOKEN,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -47,6 +62,7 @@ before(async () => {
 after(async () => {
   proc.kill();
   telegram.close();
+  toran.close();
 });
 
 let ipN = 0;
@@ -103,6 +119,23 @@ test('a demo lead is saved, then sent to Telegram', async () => {
   assert.equal(m.body.chat_id, 'C');
   assert.match(m.body.text, /shop\.co\.il/);
   assert.match(m.body.text, /wa\.me\/972501234567/);
+  // and handed to Toran, which adds the store to its dashboard
+  assert.ok(r.forwarded_at, 'marked as handed over');
+  assert.deepEqual(handed.at(-1), { path: '/internal/lead', auth: `Bearer ${TOKEN}`, body: { url: 'https://shop.co.il/', whatsapp: '972501234567' } });
+});
+
+test('one demo per WhatsApp number: a second ask is answered, and nothing is saved or handed over', async () => {
+  const before = rows().length, toToran = handed.length;
+  let res = await post({ source: 'demo', store: 'another-shop.co.il', contact: '+972 50-123-4567', page: '/toran' });
+  assert.equal(res.status, 409);
+  assert.equal((await res.json()).error, 'dup');
+  res = await post({ source: 'demo', store: 'third-shop.co.il', contact: '0501234567' }, { json: false });
+  assert.equal(res.headers.get('location'), '/thanks/already');
+  await settle();
+  assert.equal(rows().length, before);
+  assert.equal(handed.length, toToran);
+  // The same number may still join Teder's waitlist.
+  assert.equal((await post({ source: 'teder', contact: '0501234567' })).status, 200);
 });
 
 test('a plain form post is redirected to the thank-you page for its form', async () => {

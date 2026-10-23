@@ -46,6 +46,7 @@ export function formCopy(cfg) {
 <template id="msg-store"><p>הכתובת של החנות לא נראית לנו נכונה. אפשר לכתוב אותה כמו בדפדפן, למשל shop.co.il.</p></template>
 <template id="msg-contact-demo"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את הדמו.</p></template>
 <template id="msg-contact-teder"><p>צריך מספר וואטסאפ או כתובת מייל, כדי שנוכל לכתוב לכם.</p></template>
+<template id="msg-dup"><p>כבר קיבלנו בקשה לדמו מהמספר הזה, והלינק יגיע לוואטסאפ הזה. לדמו לחנות נוספת, אפשר לכתוב לנו בוואטסאפ.</p>${wa}</template>
 <template id="msg-rate"><p>קיבלנו כבר כמה פניות מהחיבור הזה בשעה האחרונה. אפשר לנסות שוב בעוד שעה, או לשלוח לנו בוואטסאפ.</p>${wa}</template>
 <template id="msg-down"><p>משהו אצלנו לא עובד כרגע, והפרטים לא הגיעו אלינו. אפשר לשלוח לנו אותם בוואטסאפ.</p>${wa}</template>
 <template id="msg-bad"><p>הטופס לא נשלח. אפשר לנסות שוב, או לשלוח לנו בוואטסאפ.</p>${wa}</template>`;

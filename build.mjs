@@ -13,12 +13,12 @@ import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
 import teder from './src/pages/teder.mjs';
 import faq from './src/pages/faq.mjs';
-import { thanks, thanksTeder, tryAgain } from './src/pages/after.mjs';
+import { thanks, thanksAgain, thanksTeder, tryAgain } from './src/pages/after.mjs';
 
 const draft = process.argv.includes('--draft');
 const OUT = path.join(ROOT, 'dist');
 
-const PAGES = [home, toran, teder, faq, thanks, thanksTeder, tryAgain];
+const PAGES = [home, toran, teder, faq, thanks, thanksAgain, thanksTeder, tryAgain];
 const DRAFT_PAGES = [];
 
 const cfg = readConfig(draft);

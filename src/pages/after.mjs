@@ -1,5 +1,6 @@
-// Where a form lands without JS: a thank-you for each form, and a page for when it didn't go through (an invalid
-// field, the rate limit, or the endpoint down, which Caddy sends here too). None of them is indexed.
+// Where a form lands without JS: a thank-you for each form, one for a number that already asked for a demo, and a
+// page for when it didn't go through (an invalid field, the rate limit, or the endpoint down, which Caddy sends here
+// too). None of them is indexed.
 import { esc } from '../lib.mjs';
 import { WA_TEXT } from '../forms.mjs';
 
@@ -23,11 +24,25 @@ export const thanksTeder = plain('/thanks/teder', 'רשמנו אתכם לרשי�
 </div>
 </section>`);
 
-export const tryAgain = plain('/try-again', 'הפרטים לא הגיעו אלינו', (cfg) => {
+// Our WhatsApp, for when the form can't take it.
+const waButton = (cfg, label) => {
   const wa = cfg.get('whatsapp');
-  const button = wa
-    ? `<a class="btn primary" href="https://wa.me/${wa}?text=${esc(encodeURIComponent(WA_TEXT.any))}">לשלוח בוואטסאפ</a>`
-    : `<span class="btn primary">לשלוח בוואטסאפ ${cfg.ph('whatsapp')}</span>`;
+  return wa
+    ? `<a class="btn primary" href="https://wa.me/${wa}?text=${esc(encodeURIComponent(WA_TEXT.any))}">${label}</a>`
+    : `<span class="btn primary">${label} ${cfg.ph('whatsapp')}</span>`;
+};
+
+export const thanksAgain = plain('/thanks/already', 'כבר קיבלנו בקשה מהמספר הזה', (cfg) => `
+<section class="sec after">
+<div class="wrap narrow" data-rise>
+<h1>כבר קיבלנו בקשה מהמספר הזה</h1>
+<p class="lede">יש לנו כבר בקשה לדמו מהמספר הזה, והלינק יגיע לוואטסאפ שלו. לדמו לחנות נוספת, אפשר לכתוב לנו בוואטסאפ.</p>
+<div class="actions">${waButton(cfg, 'לכתוב לנו בוואטסאפ')}<a class="btn" href="/">לעמוד הבית</a></div>
+</div>
+</section>`);
+
+export const tryAgain = plain('/try-again', 'הפרטים לא הגיעו אלינו', (cfg) => {
+  const button = waButton(cfg, 'לשלוח בוואטסאפ');
   return `
 <section class="sec after">
 <div class="wrap narrow" data-rise>
