@@ -108,7 +108,7 @@ test("both demos, Toran's and Teder's, take a store and a WhatsApp number", () =
 test('a demo lead is saved, then sent to Telegram', async () => {
   const res = await post({ source: 'demo', store: 'https://www.shop.co.il', contact: '050-1234567', page: '/' });
   assert.equal(res.status, 200);
-  assert.deepEqual(await res.json(), { ok: true, source: 'demo', store: 'shop.co.il' });
+  assert.deepEqual(await res.json(), { ok: true, source: 'demo', store: 'shop.co.il', saved: ['demo'] });
   await settle();
   const r = rows().at(-1);
   assert.equal(r.store, 'shop.co.il');
@@ -200,4 +200,20 @@ test('when Telegram is down the lead is still saved, marked unsent', async () =>
 test('too big a body is refused', async () => {
   const res = await post({ source: 'teder', contact: 'x'.repeat(5000) });
   assert.equal(res.status, 413);
+});
+
+test('the join page asks for one or both demos: a row for each, and only the ones this number has not asked for yet', async () => {
+  assert.equal(validate({ source: 'join', store: 'a.co.il', contact: '0530000001' }).error, 'products', 'nothing ticked');
+  const before = rows().length, toToran = handed.length;
+  let res = await post({ source: 'join', toran: '1', teder: '1', store: 'both.co.il', contact: '0530000001', page: '/join' });
+  assert.equal(res.status, 200);
+  assert.deepEqual((await res.json()).saved, ['demo', 'teder']);
+  await settle();
+  assert.deepEqual(rows().slice(before).map((r) => [r.source, r.store, r.contact]), [['demo', 'both.co.il', '972530000001'], ['teder', 'both.co.il', '972530000001']]);
+  assert.equal(handed.length, toToran + 1, 'only the Toran one goes to Toran');
+  // Asking again for both: Toran's is already there, so nothing new; Teder alone from a new number is saved alone.
+  res = await post({ source: 'join', toran: '1', teder: '1', store: 'both.co.il', contact: '0530000001' });
+  assert.equal(res.status, 409);
+  res = await post({ source: 'join', teder: '1', store: 'teder-only.co.il', contact: '0530000002', page: '/join' }, { json: false });
+  assert.equal(res.headers.get('location'), '/thanks/teder');
 });

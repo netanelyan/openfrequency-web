@@ -2,7 +2,7 @@
 import { ils, mark } from '../lib.mjs';
 import { waWords } from '../sections.mjs';
 
-const TORAN = (cfg) => [
+export const TORAN = (cfg) => [
   ['אפשר להשאיר את המספר שכבר יש לחנות?',
     'כן. הלקוחות ממשיכים לכתוב לאותו מספר, ואנחנו מחברים אותו ל-WhatsApp Business Platform של Meta יחד איתכם.'],
   ['ומה אם הוא עונה ללקוח משהו לא נכון?',

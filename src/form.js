@@ -1,10 +1,14 @@
 // The site's one script beyond the header: it sends a form without leaving the page. Without it the forms still
 // work, as plain posts that land on /thanks or /try-again. Every word it shows is in the page, in a <template>, so
 // the copy lint reads it like the rest.
-//   form[data-form="demo" | "teder"]: data-wa is our WhatsApp number (empty in a draft), data-wa-text the message
+//   form[data-form="demo" | "teder" | "join"]: data-wa is our WhatsApp number (empty in a draft), data-wa-text the message
 //   it starts with, where {store} is the address they typed.
 (function () {
   var forms = document.querySelectorAll('form[data-form]');
+  // /join?p=teder (or toran) ticks that product alone.
+  var p = new URLSearchParams(location.search).get('p');
+  var jf = document.querySelector('form[data-form=join]');
+  if (jf && (p === 'teder' || p === 'toran')) ['toran', 'teder'].forEach(function (k) { jf.elements[k].checked = k === p; });
   for (var i = 0; i < forms.length; i++) forms[i].addEventListener('submit', send);
 
   function send(e) {
@@ -47,7 +51,7 @@
       else wa.remove();
     }
     msg.hidden = false;
-    var field = key === 'store' ? f.elements.store : key.indexOf('contact') === 0 ? f.elements.contact : null;
+    var field = key === 'store' ? f.elements.store : key.indexOf('contact') === 0 ? f.elements.contact : key === 'products' ? f.elements.toran : null;
     if (field) {
       field.setAttribute('aria-invalid', 'true');
       field.setAttribute('aria-describedby', msg.id);

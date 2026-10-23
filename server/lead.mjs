@@ -87,18 +87,22 @@ export function mobile(s) {
   return null;
 }
 
-
-// The form's fields, checked. Returns { lead } or { error }: 'store', 'contact' or 'bad'. Both forms ask for a demo:
-// 'demo' is Toran's, 'teder' a sample slideshow from Teder; each takes the store's address and a WhatsApp number.
+// The form's fields, checked. Returns { lead, sources } or { error }: 'store', 'contact', 'products' or 'bad'. Every
+// form asks for a demo: 'demo' is Toran's, 'teder' a sample slideshow from Teder, and 'join' (the join page) either or
+// both, ticked as toran=1 and teder=1. Each takes the store's address and a WhatsApp number; `sources` is the demos
+// asked for, one saved row each.
 export function validate(f) {
   const source = f.source;
-  if (source !== 'demo' && source !== 'teder') return { error: 'bad' };
+  if (source !== 'demo' && source !== 'teder' && source !== 'join') return { error: 'bad' };
   const page = typeof f.page === 'string' && /^\/[\w\-/]{0,60}$/.test(f.page) ? f.page : null;
+  const ticked = (v) => v === '1' || v === 1 || v === true || v === 'on';
+  const sources = source !== 'join' ? [source] : [...(ticked(f.toran) ? ['demo'] : []), ...(ticked(f.teder) ? ['teder'] : [])];
+  if (!sources.length) return { error: 'products' };
   const store = storeHost(f.store);
   if (!store) return { error: 'store' };
   const contact = mobile(f.contact);
   if (!contact) return { error: 'contact' };
-  return { lead: { source, store, contact, page } };
+  return { lead: { source: sources[0], store, contact, page }, sources };
 }
 
 // ---------------------------------------------------------------- the rate limit, in memory
@@ -256,24 +260,28 @@ export function createServer(db) {
     const ip = clientIp(req);
     if (!allowed(ip)) return reply(req, res, 429, { ok: false, error: 'rate' });
 
-    const { lead, error } = validate(fields);
+    const { lead, sources, error } = validate(fields);
     if (error) return reply(req, res, 400, { ok: false, error });
 
-    // One demo of each product per number. The check and the insert below run with no await between them, so two
-    // posts at once can't both get through.
-    if (db.prepare('SELECT 1 FROM leads WHERE source = ? AND contact = ?').get(lead.source, lead.contact)) {
-      count(ip);
-      return reply(req, res, 409, { ok: false, error: 'dup' });
-    }
+    // One demo of each product per number: of the demos asked for, only the ones this number hasn't asked for yet are
+    // saved, and if there are none left it is answered "we have it". The check and the insert run with no await
+    // between them, so two posts at once can't both get through.
+    const fresh = sources.filter((s) => !db.prepare('SELECT 1 FROM leads WHERE source = ? AND contact = ?').get(s, lead.contact));
+    count(ip);
+    if (!fresh.length) return reply(req, res, 409, { ok: false, error: 'dup' });
 
     const created_at = new Date().toISOString();
-    const { lastInsertRowid } = db.prepare('INSERT INTO leads (created_at, source, store, contact, page) VALUES (?, ?, ?, ?, ?)')
-      .run(created_at, lead.source, lead.store, lead.contact, lead.page);
-    count(ip);
-    reply(req, res, 200, { ok: true, source: lead.source, ...(lead.store ? { store: lead.store } : {}) });
-    const row = { id: Number(lastInsertRowid), created_at, ...lead };
-    notify(db, row);
-    forward(db, row);
+    const rows = fresh.map((source) => {
+      const { lastInsertRowid } = db.prepare('INSERT INTO leads (created_at, source, store, contact, page) VALUES (?, ?, ?, ?, ?)')
+        .run(created_at, source, lead.store, lead.contact, lead.page);
+      return { id: Number(lastInsertRowid), created_at, ...lead, source };
+    });
+    // Without JS, a Teder-only request lands on Teder's thank-you, anything with Toran on Toran's.
+    reply(req, res, 200, { ok: true, source: fresh.includes('demo') ? 'demo' : 'teder', store: lead.store, saved: fresh });
+    for (const row of rows) {
+      notify(db, row);
+      forward(db, row);
+    }
   });
 }
 

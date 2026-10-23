@@ -35,12 +35,12 @@ function header(cfg, current) {
   const nav = [
     ...PRODUCTS.map(([href, name, label]) => `<a href="${href}"${here(href)}>${mark(name, 20)}${label}</a>`),
     ...LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`),
-    `<a href="${DEMO(current)}">הצטרפות</a>`,
+    `<a href="/join"${here('/join')}>הצטרפות</a>`,
   ].join('');
   // On a phone the menu opens on the products, each with what it does, then the rest, joining, and the tools.
   const sheet = `<div class="sheet-products">${PRODUCTS.map(([href, name, label, what]) =>
     `<a class="prod" href="${href}"${here(href)}>${mark(name, 40)}<span><b>${label}</b><small>${what}</small></span></a>`).join('')}</div>
-<div class="sheet-links">${LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`).join('')}<a href="${DEMO(current)}">הצטרפות</a></div>
+<div class="sheet-links">${LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`).join('')}<a href="/join"${here('/join')}>הצטרפות</a></div>
 <a class="btn primary" href="${TOOLS}">לניהול הכלים</a>`;
   return `<header class="top">
 <div class="bar">

@@ -1,11 +1,12 @@
 // The demo forms, Toran's and Teder's, and every word they can show: the thank-you that takes a form's place, and the messages under the
 // button. They live in the page as <template>s, which src/form.js copies in.
-import { esc } from './lib.mjs';
+import { esc, mark } from './lib.mjs';
 
 // The first words of a WhatsApp message to us, when the endpoint can't take the form. {store} is the typed address.
 export const WA_TEXT = {
   demo: 'היי, אשמח לדמו של תורן לחנות {store}',
   teder: 'היי, אשמח למצגת לדוגמה של תדר לחנות {store}',
+  join: 'היי, אשמח להצטרף עם החנות {store}',
   any: 'היי, אשמח לדמו של תורן לחנות שלי: ',
 };
 
@@ -38,11 +39,33 @@ ${status(id)}
 </form>`;
 }
 
+// The join page's form: Toran, Teder or both, ticked on a card each, then the same two fields. Toran is ticked to start
+// with; a link to /join?p=teder ticks Teder instead (form.js).
+export function joinForm(cfg) {
+  const card = (name, label, what, on) => `<label class="pick"><input type="checkbox" name="${name === 'toran' ? 'toran' : 'teder'}" value="1"${on ? ' checked' : ''}><span class="pick-box">${mark(name, 44)}<span><b>${label}</b><small>${what}</small></span><span class="pick-tick" aria-hidden="true"></span></span></label>`;
+  return `${open(cfg, 'join', '/join', 'demo join', 'join')}
+<fieldset class="picks"><legend>במה מתחילים</legend>
+<div class="pick-row">
+${card('toran', 'תורן', 'עונה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל', true)}
+${card('teder', 'תדר', 'כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם', false)}
+</div>
+</fieldset>
+<label class="f">הכתובת של החנות<input name="store" type="text" inputmode="url" autocomplete="url" dir="ltr" placeholder="shop.co.il" required></label>
+<label class="f">הוואטסאפ שלכם<input name="contact" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="050-0000000" required></label>
+<button class="btn primary" type="submit">להצטרף</button>
+<p class="when">הלינק לדמו יגיע למספר הזה.</p>
+${status('join')}
+</form>`;
+}
+
 // Once per page that has a form.
 export function formCopy(cfg) {
   const wa = '<a class="btn sm primary" data-wa href="#">לשלוח בוואטסאפ</a>';
   return `<template id="done-demo"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>${within(cfg) ? `${within(cfg)} נשלח` : 'כשהדמו מוכן, נשלח'} לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p></div></template>
 <template id="done-teder"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>כשהמצגת לדוגמה מוכנה, נשלח לכם אותה לוואטסאפ, בגודל של טיקטוק ושל אינסטגרם.</p></div></template>
+<template id="done-join"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>אנחנו בונים לכם דמו מהאתר, והלינק יגיע אליכם לוואטסאפ. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p></div></template>
+<template id="msg-products"><p>צריך לבחור לפחות אחד, תורן או תדר.</p></template>
+<template id="msg-contact-join"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את הדמו.</p></template>
 <template id="msg-store"><p>הכתובת של החנות לא נראית לנו נכונה. אפשר לכתוב אותה כמו בדפדפן, למשל shop.co.il.</p></template>
 <template id="msg-contact-demo"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את הדמו.</p></template>
 <template id="msg-contact-teder"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את המצגת.</p></template>
