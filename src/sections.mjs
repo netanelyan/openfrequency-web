@@ -25,7 +25,7 @@ export const CHAT = [
 export const hero = (cfg) => `
 <section class="hero" aria-labelledby="hero-h">
 <div class="wrap">
-<div class="hero-head">${mark('toran', 88, 'תורן')}<h1 id="hero-h">מישהו שעונה בוואטסאפ של החנות שלכם 24/7</h1></div>
+<div class="hero-head">${mark('toran', 88, 'תורן')}<h1 id="hero-h">מישהו שעונה בוואטסאפ של החנות שלכם <span class="hl" dir="ltr">24/7</span></h1></div>
 <div class="hero-text">
 <p class="lede">תורן קורא את האתר של החנות, את המוצרים ואת דפי המדיניות, ועונה ללקוחות בוואטסאפ. מה שהוא לא יודע הוא שולח אליכם, ואת התשובה שלכם הוא מעביר ללקוח.</p>
 ${demoForm(cfg, '/toran')}
