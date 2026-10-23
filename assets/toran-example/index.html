@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f4f4f6">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>עמוד לדוגמה של תורן | OpenFrequency</title>
+<meta name="description" content="עברנו על האתר שלכם, על 14 המוצרים ועל עמודי המשלוחים וההחזרות. תורן כבר מכיר אותם.">
+<link rel="preload" href="/fonts/heebo-hebrew.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Generated from src/brand.ts: the family's colours, radii and fonts. Edit them there. */
+:root {
+  --brand-toran: #0F7A54;
+  --brand-of: #2747D6;
+  --brand-teder: #6A3FD6;
+  --brand-whatsapp: #0F7A54;
+  --accent-fill: #0071E3;
+  --accent-fill-2: #0077ED;
+  --accent: #0066CC;
+  --text: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', 'Helvetica Neue', Arial, sans-serif;
+  --display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Hebrew', system-ui, 'Segoe UI', 'Noto Sans Hebrew', 'Helvetica Neue', Arial, sans-serif;
+  --r: 18px;
+  --r-m: 12px;
+  --r-s: 10px;
+  --r-pill: 980px;
+  --r-mark: 24%;
+}
+@media (prefers-color-scheme: dark) { :root { --accent: #2997FF; } }
+svg.mk { display: block; flex: none; }
+
+/* The pitch page, in the Teder family's look: a silver wallpaper, frosted glass panels, pill buttons. One centred
+   column, phone first, light only. The store's colour (--store, from /s/<slug>/theme.css, already dark enough for
+   white text) is its initial and its chat bubbles and nothing else; Toran green is the WhatsApp buttons and the mark.
+   The family's tokens come from brand.css. Heebo is served from /static/fonts, never from Google. */
+
+@font-face {
+  font-family: 'Heebo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/heebo-hebrew.woff2') format('woff2-variations'), url('/fonts/heebo-hebrew.woff2') format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'Heebo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/heebo-latin.woff2') format('woff2-variations'), url('/fonts/heebo-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Hebrew', 'Heebo', sans-serif;
+  --ink: #1d1d1f;
+  --ink-2: #424245;
+  --ink-3: #56565b;
+  --link: #0066cc;
+  --wall: radial-gradient(120% 80% at 85% -10%, #fff 0%, transparent 60%), linear-gradient(160deg, #fafafb, #e2e3e8 32%, #f4f4f6 52%, #e4e5ea 74%, #f7f7f9);
+  --glass: rgba(255, 255, 255, 0.62);
+  --glass-edge: rgba(255, 255, 255, 0.75);
+  --grey-pill: rgba(118, 118, 128, 0.12);
+  --green: var(--brand-toran, #0f7a54);
+  --green-2: #0c6646;
+  --store: #4a4a52;
+  --store-ink: #fff;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; min-height: 100%; background-color: #eeeff2; background-image: var(--wall); background-repeat: no-repeat; background-size: 100% 100%; }
+body { margin: 0; min-height: 100vh; color: var(--ink); font: 400 17px/1.6 var(--font); -webkit-font-smoothing: antialiased; }
+a { color: var(--link); }
+bdi { unicode-bidi: isolate; }
+img { max-width: 100%; }
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 20px calc(28px + env(safe-area-inset-bottom)); }
+
+/* the top line: who it's for, who made it */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0 0; font-size: 13px; color: var(--ink-3); }
+.top .for { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.by { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.by svg.mk { display: block; }
+
+/* the owner's own view of a page nobody else can see yet */
+.held { margin: 16px 0 0; padding: 12px 16px; border-radius: 16px; background: rgba(255, 204, 0, 0.16); border: 1px solid rgba(150, 110, 0, 0.22); font-size: 14px; line-height: 1.5; color: #4d3b00; }
+.held ul, .held p { margin: 6px 0 0; padding-inline-start: 18px; }
+.held p { padding: 0; }
+.ph { unicode-bidi: isolate; background: #fff1b8; color: #6b4f00; border-radius: 6px; padding: 0 4px; font-weight: 600; }
+
+/* the hero */
+.hero { text-align: center; padding: 44px 0 30px; }
+.marks { display: flex; justify-content: center; align-items: center; gap: 12px; }
+.initial { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--store); color: var(--store-ink); font: 700 28px/1 var(--font); box-shadow: 0 8px 20px -10px rgba(0, 0, 0, 0.35); }
+.initial.sm { width: 40px; height: 40px; font-size: 18px; box-shadow: none; }
+h1 { font-size: clamp(30px, 8.6vw, 42px); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin: 22px auto 14px; max-width: 640px; text-wrap: balance; overflow-wrap: anywhere; }
+.lede { font-size: 18px; line-height: 1.6; color: var(--ink-2); margin: 0 auto 24px; max-width: 560px; text-wrap: pretty; }
+.quiet { font-size: 14px; line-height: 1.55; color: var(--ink-3); margin: 14px auto 0; max-width: 460px; }
+.code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.95em; direction: ltr; }
+
+/* buttons: pills. Green is Toran's WhatsApp; grey is everything else */
+.wa, .grey { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; padding: 0 24px; border-radius: 999px; font: 600 17px/1 var(--font); text-decoration: none; white-space: nowrap; transition: background 0.15s, transform 0.15s; }
+.wa { background: var(--green); color: #fff; box-shadow: 0 10px 24px -12px rgba(15, 122, 84, 0.65); }
+.wa:hover { background: var(--green-2); }
+.wa:active, .grey:active { transform: scale(0.98); }
+.wa.big { min-height: 58px; padding: 0 32px; font-size: 18px; width: 100%; max-width: 360px; }
+.wa-i { flex: none; }
+.grey { background: var(--grey-pill); color: var(--ink); }
+.grey:hover { background: rgba(118, 118, 128, 0.2); }
+.wa.off, .grey.off { background: var(--grey-pill); color: var(--ink-3); box-shadow: none; cursor: default; }
+a:focus-visible, .wa:focus-visible, .grey:focus-visible { outline: 3px solid rgba(0, 102, 204, 0.45); outline-offset: 3px; }
+
+/* the glass */
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6); border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 #fff, 0 12px 32px -14px rgba(0, 0, 0, 0.14); border-radius: 26px; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: rgba(255, 255, 255, 0.9); }
+}
+
+/* the sample chat */
+.chat { overflow: hidden; }
+.ch-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid rgba(0, 0, 0, 0.06); }
+.ch-head b { display: block; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; }
+.ch-head small { display: block; font-size: 13px; color: var(--ink-3); }
+.prod { display: flex; align-items: center; gap: 12px; margin: 14px 18px 0; padding: 8px; border-radius: 16px; background: rgba(255, 255, 255, 0.7); }
+.prod img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; flex: none; background: #eee; }
+.prod b { display: block; font-size: 15px; line-height: 1.3; font-weight: 600; }
+.prod small { display: block; font-size: 14px; color: var(--ink-2); }
+.msgs { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px 20px; }
+.msg { max-width: 84%; padding: 10px 14px; border-radius: 20px; font-size: 16px; line-height: 1.5; }
+.msg p { margin: 0; overflow-wrap: anywhere; }
+.msg.c { align-self: flex-start; background: var(--grey-pill); color: var(--ink); border-start-start-radius: 6px; }
+.msg.s { align-self: flex-end; background: var(--store); color: var(--store-ink); border-start-end-radius: 6px; }
+.msg .lnk { text-decoration: underline; text-underline-offset: 2px; word-break: break-all; opacity: 0.92; }
+.msgs .empty { margin: 0; text-align: center; color: var(--ink-3); }
+.caption { font-size: 13px; color: var(--ink-3); text-align: center; margin: 12px 8px 0; }
+
+/* if they connect it */
+.if { padding: 40px 4px 8px; }
+.if h2 { font-size: 24px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; margin: 0 0 14px; }
+.if ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.if li { position: relative; padding-inline-start: 20px; color: var(--ink-2); }
+.if li::before { content: ''; position: absolute; inset-inline-start: 2px; top: 0.7em; width: 7px; height: 7px; border-radius: 50%; background: rgba(29, 29, 31, 0.35); }
+
+/* the note from OpenFrequency */
+.note { margin-top: 32px; padding: 24px 22px; }
+.note p { margin: 0 0 12px; color: var(--ink); }
+.note p + p { color: var(--ink-2); }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+/* the footer */
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-top: 36px; padding: 16px 4px 0; border-top: 1px solid rgba(0, 0, 0, 0.07); font-size: 13px; color: var(--ink-3); }
+.foot a { color: var(--ink-3); }
+
+/* a phone's docked button, once the hero's has scrolled away */
+.dock { position: fixed; inset-inline: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(244, 244, 246, 0.82); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); border-top: 1px solid rgba(0, 0, 0, 0.06); transform: translateY(110%); transition: transform 0.25s ease; display: flex; justify-content: center; }
+.dock.show { transform: none; }
+.dock .wa { width: 100%; max-width: 420px; }
+@media (min-width: 721px) { .dock { display: none; } }
+@media (max-width: 720px) { .wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom)); } }
+body.preview .dock { display: none; }
+
+/* a page that is gone */
+.gone { padding-top: 22vh; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+:root{--store:#b4532a;--store-ink:#ffffff}
+.example { margin: 14px 0 0; padding: 12px 16px; border-radius: 16px; background: rgba(39, 71, 214, 0.08); border: 1px solid rgba(39, 71, 214, 0.2); color: #1a2a7a; font-size: 14px; line-height: 1.55; }
+.example b { display: block; margin-bottom: 2px; }
+.example a { color: inherit; font-weight: 600; }
+</style>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap" data-slug="kli-cheres-ortc">
+  <header class="top">
+    <span class="for">עמוד שהכנו בשביל <bdi>כלי חרס של נורית</bdi></span>
+    <span class="by"><svg class="mk" aria-hidden="true" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="24" fill="#2747D6"/><g color="#fff"><g fill="currentColor"><circle cx="30" cy="40" r="2.6"/><circle cx="30" cy="50" r="3"/><circle cx="30" cy="60" r="2.6"/><circle cx="40" cy="30" r="2.6"/><circle cx="40" cy="40" r="3.6"/><circle cx="40" cy="50" r="4.2"/><circle cx="40" cy="60" r="3.6"/><circle cx="40" cy="70" r="2.6"/><circle cx="50" cy="30" r="3"/><circle cx="50" cy="40" r="4.2"/><circle cx="50" cy="50" r="5.2"/><circle cx="50" cy="60" r="4.2"/><circle cx="50" cy="70" r="3"/><circle cx="60" cy="30" r="2.6"/><circle cx="60" cy="40" r="3.6"/><circle cx="60" cy="50" r="4.2"/><circle cx="60" cy="60" r="3.6"/><circle cx="60" cy="70" r="2.6"/><circle cx="70" cy="40" r="2.6"/><circle cx="70" cy="50" r="3"/><circle cx="70" cy="60" r="2.6"/></g></g></svg><span dir="ltr">OpenFrequency</span></span>
+  </header>
+  <aside class="example" role="note"><b>זה עמוד לדוגמה, בשביל חנות שלא קיימת.</b>ככה נראה העמוד שחנות מקבלת מאיתנו. שיחת הדוגמה היא מה שתורן ענה באמת מתוך האתר הבדיוני שלה. בעמוד של חנות אמיתית הכפתור הירוק פותח וואטסאפ, ותורן עונה שם בתור החנות. <a href="/toran#demo">לבנות דמו לחנות שלכם</a></aside>
+  
+
+  <section class="hero">
+    <div class="marks"><span class="initial" aria-hidden="true">כ</span><svg class="mk" role="img" aria-label="תורן" width="64" height="64" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="24" fill="#0F7A54"/><g color="#fff"><g fill="currentColor"><circle cx="30" cy="50" r="7.5"/><circle cx="50" cy="50" r="7.5"/><circle cx="70" cy="50" r="7.5"/></g></g></svg></div>
+    <h1>בנינו ל<bdi>כלי חרס של נורית</bdi> תורן לוואטסאפ</h1>
+    <p class="lede">עברנו על האתר שלכם, על 14 המוצרים ועל עמודי המשלוחים וההחזרות. תורן כבר מכיר אותם. אפשר לכתוב לו עכשיו כמו לקוח ולראות מה הוא עונה.</p>
+    <a class="wa big" href="/toran#demo"><svg class="wa-i" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3Z"/></svg><span>לכתוב לו בוואטסאפ</span></a>
+    <p class="quiet">הוא רץ על מספר שלנו, אז אף לקוח שלכם לא רואה אותו. ההודעה שנפתחת מתחילה בקוד <bdi class="code">DEMO-KQ4A</bdi>, וככה הוא יודע שזו החנות שלכם.</p>
+  </section>
+
+  <section class="glass chat" data-depth="25" aria-label="שיחת דוגמה">
+    <header class="ch-head"><span class="initial sm" aria-hidden="true">כ</span><div><b><bdi>כלי חרס של נורית</bdi></b><small>שיחה על מוצר אמיתי מהאתר שלכם</small></div></header>
+    <div class="prod"><div><b>עציץ תלוי</b><small>79 ₪</small></div></div>
+    <div class="msgs"><div class="msg c"><p>היי, יש לכם עציץ תלוי? כמה זה עולה?</p></div><div class="msg s"><p>כן, יש עציץ תלוי עם חבל כותנה וחור ניקוז. מידה S עולה 79 ₪ ו-M עולה 99 ₪, ושתיהן במלאי. L עולה 129 ₪, אבל היא אזלה כרגע. איזו מידה מתאימה לכם?</p></div><div class="msg c"><p>ותוך כמה זמן זה מגיע?</p></div><div class="msg s"><p>ההזמנה מגיעה תוך 3 עד 5 ימי עסקים. משלוח עד הבית עולה 35 ₪, ומעל 300 ₪ הוא בחינם. אפשר גם לאסוף מהסטודיו בקיבוץ בלי תשלום, אחרי שמתאמים מראש.</p></div></div>
+  </section>
+  <p class="caption">את השאלות כתבנו אנחנו. התשובות הן מה שתורן ענה באמת, ולא שינינו בהן מילה.</p>
+
+  <section class="if" data-depth="50">
+    <h2>אם תחברו אותו למספר של החנות</h2>
+    <ul>
+      <li>לקוחות יקבלו תשובות כאלה גם כשאתם באמצע יום עמוס, או כבר ישנים.</li>
+      <li>שאלה שהוא לא יודע לענות עליה מגיעה אליכם בוואטסאפ. עונים לו פעם אחת, ובפעם הבאה הוא כבר יודע.</li>
+      <li>מי שהסכים לקבל מכם הודעות יקבל תזכורת כשהוא משאיר מוצרים בעגלה, ואחרי שהוא מזמין, לינק למעקב אחרי המשלוח.</li>
+    </ul>
+  </section>
+
+  <section class="glass note" data-depth="75">
+    <p>את תורן בונים אצלנו ב־OpenFrequency. בשבועיים הראשונים אנחנו קוראים איתכם את השיחות ומתקנים מה שצריך.</p>
+    <div class="btns">
+      <a class="wa " href="/toran#demo"><svg class="wa-i" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3Z"/></svg><span>לכתוב לתורן</span></a>
+    </div>
+  </section>
+
+  <footer class="foot" data-depth="100">
+    <span class="by"><svg class="mk" aria-hidden="true" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="24" fill="#2747D6"/><g color="#fff"><g fill="currentColor"><circle cx="30" cy="40" r="2.6"/><circle cx="30" cy="50" r="3"/><circle cx="30" cy="60" r="2.6"/><circle cx="40" cy="30" r="2.6"/><circle cx="40" cy="40" r="3.6"/><circle cx="40" cy="50" r="4.2"/><circle cx="40" cy="60" r="3.6"/><circle cx="40" cy="70" r="2.6"/><circle cx="50" cy="30" r="3"/><circle cx="50" cy="40" r="4.2"/><circle cx="50" cy="50" r="5.2"/><circle cx="50" cy="60" r="4.2"/><circle cx="50" cy="70" r="3"/><circle cx="60" cy="30" r="2.6"/><circle cx="60" cy="40" r="3.6"/><circle cx="60" cy="50" r="4.2"/><circle cx="60" cy="60" r="3.6"/><circle cx="60" cy="70" r="2.6"/><circle cx="70" cy="40" r="2.6"/><circle cx="70" cy="50" r="3"/><circle cx="70" cy="60" r="2.6"/></g></g></svg><span><span dir="ltr">OpenFrequency</span>, אשדוד</span></span>
+    
+  </footer>
+</div>
+<div class="dock"><a class="wa " href="/toran#demo"><svg class="wa-i" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3Z"/></svg><span>לכתוב לו בוואטסאפ</span></a></div>
+<script>
+(() => {
+  const first = document.querySelector('.hero .wa'), dock = document.querySelector('.dock');
+  if (first && dock && 'IntersectionObserver' in window) new IntersectionObserver(([e]) => dock.classList.toggle('show', !e.isIntersecting && e.boundingClientRect.top < 0)).observe(first);
+})();
+</script>
+</body>
+</html>
