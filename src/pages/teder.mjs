@@ -1,6 +1,7 @@
-// Teder's page, in the shape of Toran's: the headline and a button down to the demo form, beside one slideshow under
-// TikTok and Instagram tabs; the one screen where the day's slideshows wait for approval; what it does alone and what
-// is left for you; and the demo form at the end. What it does comes from openfrequency-teder's README ("What it does").
+// Teder's page, in the shape of Toran's, on its own violet: the headline and a button down to the demo form, beside its
+// slideshows under TikTok and Instagram tabs; the one screen where the day's slideshows wait for approval; what it
+// does alone and what is left for you; and the demo form at the end. What it does comes from openfrequency-teder's
+// README ("What it does").
 import { mark } from '../lib.mjs';
 import { approvals, platformWindow } from '../teder.mjs';
 import { demoForm } from '../forms.mjs';
@@ -21,10 +22,11 @@ export default (cfg) => ({
   title: 'תדר, מצגות אוטומטיות בעברית לטיקטוק ולאינסטגרם | OpenFrequency',
   description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, וכל מצגת עולה רק אחרי שמישהו אישר אותה.',
   body: `
-<section class="hero ch-hero teder-hero" aria-labelledby="hero-h">
-<div class="wrap">
-<div class="hero-head">${mark('teder', 72, 'תדר')}<h1 id="hero-h"><span class="hl">מצגות אוטומטיות</span> בעברית לטיקטוק ולאינסטגרם</h1></div>
-<div class="hero-text">
+<section class="thero" aria-labelledby="hero-h">
+<div class="teder-field ch-field">
+<div class="thero-text">
+${mark('teder', 72, 'תדר')}
+<h1 id="hero-h"><span class="hl">מצגות אוטומטיות</span> בעברית לטיקטוק ולאינסטגרם</h1>
 <p class="lede">תדר כותב ומעצב את המצגות, ומפרסם כל אחת רק אחרי שמישהו אישר אותה. אותה מצגת יוצאת בגודל של טיקטוק ובגודל של אינסטגרם.</p>
 <a class="btn primary hero-cta" href="#demo">לנסות את תדר על החנות שלכם</a>
 </div>

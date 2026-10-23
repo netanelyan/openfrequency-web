@@ -67,7 +67,7 @@ ${items.map((t) => `<div class="ch-panel" id="ch-${t.key}">
 <h3 class="ch-name">${t.name}</h3>
 ${t.bare ? t.window : `<div class="stage glass">${t.window}</div>`}
 </div>`).join('\n')}
-<p class="ch-note">${note}</p>
+${note ? `<p class="ch-note">${note}</p>` : ''}
 </div>`;
 }
 

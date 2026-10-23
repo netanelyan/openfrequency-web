@@ -510,6 +510,19 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .tt-stage { display: grid; justify-items: center; align-items: end; overflow: hidden; padding: 32px 16px 0; border-radius: var(--r); background: var(--teder); }
 .tt-stage .reel-sit { height: clamp(380px, 32vw, 440px); }
 .tt-stage .pop, .tt-stage .pop b { color: var(--ink); }
+/* On Teder's violet first screen: the text, and beside it the tabs, the phone standing on the violet itself and cut by
+   its bottom edge, the post on glass above it. */
+.ch-field .ch-box { min-width: 0; }
+.ch-field .tt-stage { padding: 8px 0 0; border-radius: 0; background: none; }
+.ch-field .ch-panel .stage { margin-bottom: clamp(28px, 5vw, 64px); }
+.ch-field .ch-tabs { background: rgba(255, 255, 255, 0.16); }
+.ch-field .ch-tabs button { color: #fff; }
+.ch-field .ch-tabs button[aria-selected="true"] { background: #fff; color: var(--teder-ink); }
+.ch-field .ch-tabs button:not([aria-selected="true"]) .logo.tiktok { color: #fff; }
+.ch-field .ch-tabs button[aria-selected="true"] .logo.tiktok { color: #000; }
+.ch-field .hero-cta { justify-self: start; }
+.ch-field h1 { font-size: clamp(30px, 3.3vw, 46px); }
+@media (min-width: 1000px) { .teder-field.ch-field { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); } }
 .tt-stage .pop small { color: var(--ink-3); }
 .igp-act svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
 .igp { width: 100%; max-width: 380px; margin: 0 auto; overflow: hidden; border-radius: 14px; background: var(--sheet); color: var(--ink); }

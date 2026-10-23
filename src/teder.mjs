@@ -36,12 +36,12 @@ export const platformWindow = () => tabBox([
   // TikTok: the phone playing the covers like stories, on Teder's violet, as it stands on the home page.
   { key: 'tiktok', name: named('tiktok'), bare: true, window: `<div class="tt-stage">${reel}</div>` },
   { key: 'instagram', name: named('instagram'), window: `<figure class="igp" data-ui aria-label="${esc(`${SHOW.account}, אינסטגרם`)}">
-<div class="chat-top"><span class="ava" aria-hidden="true">ע</span><span><b dir="ltr">${SHOW.handle}</b><small>${esc(SHOW.account)}</small></span></div>
+<div class="chat-top"><span class="ava" aria-hidden="true">ע</span><span><b dir="ltr">${SHOW.handle}</b><small>${esc(SHOW.account)} · חשבון לדוגמה</small></span></div>
 ${img(SAMPLE, 'ig', true)}
 <div class="igp-act" aria-hidden="true">${ICONS.heart}${ICONS.comment}${ICONS.send}<span class="igp-dots">${Array.from({ length: SHOW.slides }, (_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</span></div>
 <figcaption><b dir="ltr">${SHOW.handle}</b> ${esc(SAMPLE.topic)}</figcaption>
 </figure>` },
-], { label: 'איפה המצגת עולה', note: 'מצגות שתדר הכין, כמו שהן נראות בכל פלטפורמה. הפוסט באינסטגרם הוא מחשבון בדיוני על צמחי בית.' });
+], { label: 'איפה המצגת עולה' });
 
 // The approval screen: the slideshows of the day, each with where it goes out and what happened to it.
 const STATUS = { yours: 'מחכה לאישור', fixed: 'אושרה, תעלה ב-19:40', alone: 'עלתה' };
