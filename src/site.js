@@ -158,33 +158,6 @@
     if (!still) setInterval(function () { i = (i + 1) % imgs.length; show(); }, 3200);
   });
 
-  // Each slideshow on Teder's page steps a slide at a time with its arrows; the dots and the count follow the frame,
-  // however it was moved. In right-to-left the frame scrolls to negative positions, hence the sign.
-  each('[data-deck]', function (deck) {
-    var track = deck.querySelector('.post-slides'), n = track.children.length;
-    var prev = deck.querySelector('.prev'), next = deck.querySelector('.next'), count = deck.querySelector('.post-count');
-    var dots = deck.querySelectorAll('.post-dots i'), i = 0, want = null;
-    var sign = getComputedStyle(track).direction === 'rtl' ? -1 : 1;
-    var at = function () { return Math.round(Math.abs(track.scrollLeft) / track.clientWidth); };
-    var show = function () {
-      i = Math.min(n - 1, at());
-      if (i === want) want = null;
-      Array.prototype.forEach.call(dots, function (d, k) { d.classList.toggle('on', k === i); });
-      count.textContent = (i + 1) + '/' + n;
-      prev.disabled = i === 0;
-      next.disabled = i === n - 1;
-    };
-    // A second click while the frame is still moving counts from where the first one is headed.
-    var go = function (k) { want = Math.max(0, Math.min(n - 1, k)); track.scrollTo({ left: sign * want * track.clientWidth, behavior: still ? 'auto' : 'smooth' }); };
-    var from = function () { return want === null ? i : want; };
-    prev.addEventListener('click', function () { go(from() - 1); });
-    next.addEventListener('click', function () { go(from() + 1); });
-    track.addEventListener('scroll', show, { passive: true });
-    track.addEventListener('scrollend', function () { want = null; show(); });
-    prev.hidden = next.hidden = count.hidden = false;
-    show();
-  });
-
   // On a phone, the way to a demo stays at the bottom of the screen once the first screen is behind, and steps aside
   // while a form or the footer is in view.
   var dock = d.querySelector('[data-dock]');

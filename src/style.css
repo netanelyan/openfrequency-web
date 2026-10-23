@@ -643,42 +643,24 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
   .teder-field .wait { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
   .teder-field .reel-sit { align-self: end; height: 460px; }
 }
-/* Whole slideshows, each as a post in an Instagram feed: the account on top, the slides one at a time in a 4:5 frame,
-   arrows on the frame and a dot for each slide under it. The frame scrolls sideways and stops on each slide, so a
-   finger swipes it; the arrows and the count come with the script. */
-.posts { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 262px), 1fr)); }
-.post { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 12px 12px 14px; }
-.post-top { display: flex; align-items: center; gap: 9px; min-width: 0; padding-inline: 2px; }
-.post-face { display: grid; flex: none; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--teder); color: #fff; font: 700 15px/1 var(--text); box-shadow: 0 0 0 2px var(--tile-2), 0 0 0 3.5px var(--teder); }
-.post-top h3 { margin: 0; font: 700 15px/1.2 var(--text); letter-spacing: 0; white-space: nowrap; }
-.post-handle { overflow: hidden; color: var(--ink-3); font-size: 13px; white-space: nowrap; text-overflow: ellipsis; }
-.post-tag { flex: none; margin-inline-start: auto; padding: 3px 8px; border-radius: 99px; background: var(--fill); color: var(--ink-2); font-size: 12px; white-space: nowrap; }
-.post-frame { position: relative; overflow: hidden; border-radius: 12px; background: #111; box-shadow: 0 1px 0 var(--line), 0 18px 36px -22px rgba(0, 0, 0, 0.5); aspect-ratio: 4 / 5; }
-.post-slides { display: flex; height: 100%; margin: 0; padding: 0; overflow-x: auto; list-style: none; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
-.post-slides::-webkit-scrollbar { display: none; }
-.post-slides:focus-visible { outline: 3px solid var(--teder); outline-offset: -3px; }
-.post-slides li { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; }
-.post-slides img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.post-go { position: absolute; top: 50%; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.9); color: #1d1d1f; box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.45); cursor: pointer; transform: translateY(-50%); transition: opacity 0.2s ease, transform 0.2s var(--ease-out); }
-.post-go svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.post-go.prev { inset-inline-start: 10px; }
-.post-go.next { inset-inline-end: 10px; }
-.post-go[hidden], .post-count[hidden] { display: none; }
-.post-go:disabled { opacity: 0; pointer-events: none; }
-.post-go:active { transform: translateY(-50%) scale(0.92); }
-.post-go:focus-visible { outline: 3px solid var(--teder); outline-offset: 2px; }
-@media (hover: hover) {
-  .post-go:not(:focus-visible) { opacity: 0; }
-  .post-frame:hover .post-go:not(:disabled) { opacity: 1; }
+/* The opening slide of one slideshow in each subject, named by its subject on top so a visitor finds theirs at a
+   glance: four across on a wide screen, two on a phone. */
+.covers { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+@media (max-width: 559px) { .covers { grid-template-columns: 1fr 1fr; gap: 10px; } }
+.cover { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 12px 12px 14px; }
+.cover-subject { display: flex; align-items: center; gap: 8px; margin: 0; padding-inline: 2px; font: 700 var(--fs-lead, 18px)/1.2 var(--text); letter-spacing: 0; }
+.cover-subject::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--teder); }
+.cover img { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 1px 0 var(--line), 0 18px 36px -22px rgba(0, 0, 0, 0.5); }
+.cover-topic { margin: 0; padding-inline: 2px; color: var(--ink); font-size: 15px; line-height: 1.4; }
+.cover-from { margin: -4px 0 0; padding-inline: 2px; color: var(--ink-3); font-size: 12px; line-height: 1.6; }
+.cover-from a { color: inherit; }
+@media (prefers-color-scheme: dark) { .cover-subject::before { background: #a487ff; } }
+@media (max-width: 559px) {
+  .cover { padding: 8px 8px 10px; gap: 8px; }
+  .cover-subject { font-size: 15px; }
+  .cover-topic { font-size: 13px; }
+  .cover-from { font-size: 11px; }
 }
-.post-count { position: absolute; top: 10px; inset-inline-end: 10px; padding: 3px 9px; border-radius: 99px; background: rgba(0, 0, 0, 0.55); color: #fff; font: 600 12px/1.4 var(--text); font-variant-numeric: tabular-nums; direction: ltr; }
-.post-dots { display: flex; justify-content: center; gap: 5px; }
-.post-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-2); transition: background-color 0.2s ease, transform 0.2s ease; }
-.post-dots i.on { background: var(--teder); transform: scale(1.15); }
-.post-topic { margin: 0; padding-inline: 2px; color: var(--ink); font-size: 15px; line-height: 1.4; }
-.post-credit { margin: -4px 0 0; padding-inline: 2px; color: var(--ink-3); font-size: 12px; }
-.post-credit a { color: inherit; }
-@media (prefers-color-scheme: dark) { .post-dots i.on { background: #a487ff; } }
 
 /* ------------------------------------------------------------ the price, very large */
 
