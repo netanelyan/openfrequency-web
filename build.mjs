@@ -77,6 +77,7 @@ for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/showcase'), { recur
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/clients'))) copy('assets/clients/' + f, 'clients/' + f);
 // The page a store gets from Toran, for a made-up store, as Toran rendered it (assets/toran-example/README.md).
 copy('assets/toran-example/index.html', 'toran/example/index.html');
+for (const f of fs.readdirSync(path.join(ROOT, 'assets/toran-example/demo'))) copy('assets/toran-example/demo/' + f, 'toran/example/demo/' + f);
 
 const kb = (n) => (n / 1024).toFixed(1) + ' KB';
 console.log(`${draft ? 'Draft' : 'Built'}: ${files.size} page${files.size === 1 ? '' : 's'} in dist/ (CSS ${kb(css.length)} inlined)`);

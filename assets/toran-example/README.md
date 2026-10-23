@@ -9,7 +9,8 @@ openfrequency-toran for its made-up store, kli-cheres.example ("כלי חרס ש
 - Then, for this site: a strip on top says it is an example for a store that doesn't exist; the green WhatsApp
   buttons lead to /toran#demo (there is no demo WhatsApp number yet); the price sentence and the "לכתוב לנו"
   button are out (no price and no OpenFrequency number are set yet), and so is the line offering to take the page down; the styles are inlined, the fonts and icons
-  are this site's, and the script keeps only the docked button (no tracking).
+  are this site's, the product pictures are the ones Toran draws for the made-up store (demo/), and the script keeps only
+  the docked button (no tracking).
 
 It is not indexed (the page's own robots meta) and not linked from the menu. To redo it after Toran's page
 changes, render the store again and repeat the same edits.
