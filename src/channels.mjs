@@ -56,8 +56,8 @@ const live = (cfg) => new Set(cfg.get('toran.channels') || []);
 const soon = '<span class="soon">בקרוב</span>';
 
 // Tabs over one window, for Toran's channels and Teder's platforms alike: each item is { key, name (HTML), window
-// (HTML) }. The tab list is hidden until the script makes it work (site.js, [data-channels]); until then the windows
-// are a stacked list, each under its own name.
+// (HTML), bare } (bare: the window brings its own stage, instead of the glass one). The tab list is hidden until the
+// script makes it work (site.js, [data-channels]); until then the windows are a stacked list, each under its name.
 export function tabBox(items, { label, note }) {
   return `<div class="ch-box" data-channels>
 <div class="ch-tabs" role="tablist" aria-label="${label}" hidden>
@@ -65,7 +65,7 @@ ${items.map((t, i) => `<button type="button" role="tab" id="tab-${t.key}" aria-c
 </div>
 ${items.map((t) => `<div class="ch-panel" id="ch-${t.key}">
 <h3 class="ch-name">${t.name}</h3>
-<div class="stage glass">${t.window}</div>
+${t.bare ? t.window : `<div class="stage glass">${t.window}</div>`}
 </div>`).join('\n')}
 <p class="ch-note">${note}</p>
 </div>`;

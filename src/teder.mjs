@@ -22,8 +22,8 @@ export const reel = `<div class="phone-sit reel-sit" aria-hidden="true">
 <p class="pop" data-pop><span class="wave">${glyphOnly('teder')}</span><span class="pop-h"><b>תדר</b><small>מצגת חדשה מוכנה</small></span><span class="pop-t">מחכה לאישור לפני שהיא עולה.</span></p>
 </div>`;
 
-// Teder's page: one slideshow, as each platform shows it. The same cover, from the made-up houseplant account (demo),
-// in TikTok's tall frame and in an Instagram post, under tabs like Toran's channels (channels.mjs, tabBox).
+// Teder's page: its slideshows as each platform shows them, under tabs like Toran's channels (channels.mjs, tabBox):
+// on TikTok the phone playing the covers like stories, on Instagram a post of the made-up houseplant account's cover.
 const SAMPLE = COVERS.find((c) => c.pack === 'demo');
 const SHOW = { account: 'עציץ ושמש', handle: 'demo.atzitz', slides: 7 };
 const icon = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
@@ -33,18 +33,15 @@ const ICONS = {
   send: icon('M21 4 3 11l7 2 2 7 9-16zM10 13l11-9'),
 };
 export const platformWindow = () => tabBox([
-  { key: 'tiktok', name: named('tiktok'), window: `<figure class="tt" data-ui aria-label="${esc(`${SHOW.account}, טיקטוק`)}">
-${img(SAMPLE, 'tt', true)}
-<figcaption class="tt-over" aria-hidden="true"><b dir="ltr">@${SHOW.handle}</b><span>${esc(SAMPLE.topic)}</span></figcaption>
-<span class="tt-rail" aria-hidden="true">${ICONS.heart}${ICONS.comment}${ICONS.send}</span>
-</figure>` },
+  // TikTok: the phone playing the covers like stories, on Teder's violet, as it stands on the home page.
+  { key: 'tiktok', name: named('tiktok'), bare: true, window: `<div class="tt-stage">${reel}</div>` },
   { key: 'instagram', name: named('instagram'), window: `<figure class="igp" data-ui aria-label="${esc(`${SHOW.account}, אינסטגרם`)}">
 <div class="chat-top"><span class="ava" aria-hidden="true">ע</span><span><b dir="ltr">${SHOW.handle}</b><small>${esc(SHOW.account)}</small></span></div>
 ${img(SAMPLE, 'ig', true)}
 <div class="igp-act" aria-hidden="true">${ICONS.heart}${ICONS.comment}${ICONS.send}<span class="igp-dots">${Array.from({ length: SHOW.slides }, (_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</span></div>
 <figcaption><b dir="ltr">${SHOW.handle}</b> ${esc(SAMPLE.topic)}</figcaption>
 </figure>` },
-], { label: 'איפה המצגת עולה', note: 'מצגת לדוגמה, מחשבון בדיוני על צמחי בית. אותה מצגת, בגודל של כל פלטפורמה.' });
+], { label: 'איפה המצגת עולה', note: 'מצגות שתדר הכין, כמו שהן נראות בכל פלטפורמה. הפוסט באינסטגרם הוא מחשבון בדיוני על צמחי בית.' });
 
 // The approval screen: the slideshows of the day, each with where it goes out and what happened to it.
 const STATUS = { yours: 'מחכה לאישור', fixed: 'אושרה, תעלה ב-19:40', alone: 'עלתה' };
