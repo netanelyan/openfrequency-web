@@ -16,11 +16,8 @@ const PRODUCTS = [
   ['/toran', 'toran', 'תורן', 'עונה ללקוחות בוואטסאפ'],
   ['/teder', 'teder', 'תדר', 'מצגות לטיקטוק ולאינסטגרם'],
 ];
-// The price link goes only where there is a price: the public draft leaves the price out until it is set.
-const LINKS = (cfg) => [
-  ...(cfg.has('price.monthly') || cfg.banner ? [['/toran#price', 'מחיר']] : []),
-  ['/faq', 'שאלות'],
-];
+// The pages about both products. Each price is on its product's page, so there is no price link of its own.
+const LINKS = () => [['/faq', 'שאלות']];
 
 // The way to a demo: the form on Toran's page.
 const DEMO = (current) => (current === '/toran' ? '#demo' : '/toran#demo');
