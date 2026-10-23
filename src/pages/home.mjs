@@ -26,7 +26,7 @@ const hero = `
 <div class="doors">
 <article class="door toran-door glass" aria-labelledby="door-toran">
 <div class="door-top">${mark('toran', 48)}<div><h2 id="door-toran">תורן</h2><p>עונה ללקוחות של החנות בוואטסאפ, מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.</p></div></div>
-<div class="door-act"><a class="btn primary" href="/toran#demo">לבנות דמו לחנות</a><a class="btn" href="/toran">עוד על תורן</a></div>
+<div class="door-act"><a class="btn primary" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn" href="/toran">עוד על תורן</a></div>
 <div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
 <p class="pop" data-pop>${mark('toran', 28)}<span class="pop-h"><b>תורן</b><small>בטלפון שלכם, 02:16</small></span><span class="pop-t">לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?</span></p>

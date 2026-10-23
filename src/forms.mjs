@@ -26,7 +26,7 @@ export function demoForm(cfg, page, id = 'demo') {
   return `${open(cfg, 'demo', page, 'demo', id)}
 <label class="f">הכתובת של החנות<input name="store" type="text" inputmode="url" autocomplete="url" dir="ltr" placeholder="shop.co.il" required></label>
 <label class="f">הוואטסאפ שלכם<input name="contact" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="050-0000000" required></label>
-<button class="btn primary" type="submit">לבנות דמו</button>
+<button class="btn primary" type="submit">לנסות את תורן</button>
 <p class="when">${within(cfg) ? `הדמו מוכן ${within(cfg)}, ונשלח אותו למספר הזה.` : 'כשהדמו מוכן, נשלח אותו למספר הזה.'}</p>
 ${status(id)}
 </form>`;

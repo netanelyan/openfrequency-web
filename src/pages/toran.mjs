@@ -80,7 +80,7 @@ export default (cfg) => {
 <div class="hero-head">${mark('toran', 72, 'תורן')}<h1 id="hero-h"><span class="hl">תורן אחד</span> עונה ללקוחות שלכם ${where}</h1></div>
 <div class="hero-text">
 <p class="lede">תורן קורא את האתר של החנות ועונה ללקוחות <span class="hl" dir="ltr">24/7</span>, מתוך מה שכתוב בו. בכל מקום שכותבים לו, הוא עונה אותו דבר, כי זו אותה חנות.</p>
-<a class="btn primary hero-cta" href="#demo">לבנות דמו לחנות</a>
+<a class="btn primary hero-cta" href="#demo">לנסות את תורן על החנות שלכם</a>
 </div>
 ${channelWindow(cfg)}
 </div>
@@ -110,7 +110,7 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 ${price(cfg)}
 <section class="sec close-sec" aria-labelledby="demo-h">
 <div class="wrap narrow">
-<h2 id="demo-h">לבנות דמו לחנות שלכם</h2>
+<h2 id="demo-h">לנסות את תורן על החנות שלכם</h2>
 <p class="lede">שולחים לנו את הכתובת של החנות, ואנחנו בונים דמו מהמוצרים ומדפי המדיניות שבאתר. כותבים לו כמו לקוח, ורואים מה הוא עונה.</p>
 ${demoForm(cfg, '/toran')}
 </div>

@@ -72,7 +72,7 @@ ${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}
 <nav aria-labelledby="f-site"><h2 id="f-site">באתר</h2><ul>
 ${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('')}<li><a href="/privacy">פרטיות</a></li><li><a href="/terms">תנאי שימוש</a></li>
 </ul></nav>
-<div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<a class="btn primary sm" href="${DEMO(current)}">לבנות דמו לחנות</a></div>
+<div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<a class="btn primary sm" href="${DEMO(current)}">לנסות את תורן</a></div>
 </div>
 <p class="foot-legal">© 2026 OpenFrequency</p>
 <p class="foot-word" aria-hidden="true">OpenFrequency</p>
@@ -109,7 +109,7 @@ ${missing}${header(cfg, path)}
 <main id="main">
 ${body}
 </main>
-${dock ? `<div class="dock" data-dock><a class="btn primary" href="${DEMO(path)}">לבנות דמו לחנות</a></div>` : ''}
+${dock ? `<div class="dock" data-dock><a class="btn primary" href="${DEMO(path)}">לנסות את תורן על החנות שלכם</a></div>` : ''}
 ${footer(cfg, path)}
 <script>
 ${siteJs}
