@@ -13,16 +13,22 @@
 //   TRUST_PROXY          1 behind Caddy: the client's address is the last X-Forwarded-For entry
 //   TELEGRAM_API         default https://api.telegram.org (the tests point it at a fake)
 //   TORAN_INTAKE_URL     Toran's /internal/lead on this machine (http://127.0.0.1:4710/internal/lead); without it a
-//                        demo lead only goes to Telegram
+//                        demo request only goes to Telegram
 //   OF_INTERNAL_TOKEN    the token Toran checks, the same value as in Toran's and accounts' private/.env
+//   DEMO_WA_NUMBER       Toran's demo number, international digits (9725XXXXXXXX). Without it a demo request can't be
+//                        confirmed, so the form is answered "down" and offers our WhatsApp instead
 //
-// What a lead holds: the store's address (demo only), a WhatsApp number or an email, the source form, the page, and
-// the time. The client's IP address is used for the rate limit, in memory only, and never written down.
+// What a lead holds: for a demo, the store's address and a request code; for Teder, a WhatsApp number or an email; and
+// the source form, the page and the time. The client's IP address is used for the rate limit, in memory only, and
+// never written down.
 //
-// One demo per WhatsApp number: a second ask from a number that already asked is answered "we have it" and saved
-// nowhere, so the form can't be used to queue store after store. A demo lead is handed to Toran, which adds the store
-// to its dashboard; like Telegram, a handover that fails is retried.
+// A demo request is confirmed on WhatsApp, not here: the form takes only the store's address, gets back a code
+// (REQ-XXXXXX) and a link that opens WhatsApp to the demo number with the code already written. Toran adds the store
+// only when that message arrives, for the number it came from, and one number gets one demo (Toran's
+// src/channels/request.ts). So the request is handed to Toran with its code, and, like Telegram, a handover that fails
+// is retried.
 import http from 'node:http';
+import { randomInt } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,7 +56,7 @@ CREATE TABLE IF NOT EXISTS leads (
   created_at  TEXT NOT NULL,              -- ISO time, UTC
   source      TEXT NOT NULL,              -- demo | teder
   store       TEXT,                       -- the store's host name, for a demo
-  contact     TEXT NOT NULL,              -- 9725XXXXXXXX, or an email (Teder only)
+  contact     TEXT NOT NULL,              -- Teder: 9725XXXXXXXX or an email; a demo: '' (its number comes on WhatsApp)
   page        TEXT,                       -- the page the form was on
   notified_at TEXT,                       -- when Telegram took it; NULL until then
   tries       INTEGER NOT NULL DEFAULT 0  -- Telegram attempts
@@ -59,9 +65,25 @@ CREATE TABLE IF NOT EXISTS leads (
   const cols = new Set(db.prepare('PRAGMA table_info(leads)').all().map((c) => c.name));
   if (!cols.has('forwarded_at')) db.exec('ALTER TABLE leads ADD COLUMN forwarded_at TEXT'); // when Toran took it
   if (!cols.has('forward_tries')) db.exec('ALTER TABLE leads ADD COLUMN forward_tries INTEGER NOT NULL DEFAULT 0');
-  db.exec("CREATE INDEX IF NOT EXISTS leads_demo_contact ON leads (contact) WHERE source = 'demo'");
+  if (!cols.has('code')) db.exec('ALTER TABLE leads ADD COLUMN code TEXT'); // a demo's REQ-XXXXXX
+  db.exec('DROP INDEX IF EXISTS leads_demo_contact');
+  db.exec('CREATE UNIQUE INDEX IF NOT EXISTS leads_code ON leads (code) WHERE code IS NOT NULL');
   return db;
 }
+
+// A demo request's code: six characters with no lookalikes (no 0/O, 1/I/L), new for each request.
+const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+export function newCode(db) {
+  for (;;) {
+    const code = 'REQ-' + Array.from({ length: 6 }, () => CODE_CHARS[randomInt(CODE_CHARS.length)]).join('');
+    if (!db.prepare('SELECT 1 FROM leads WHERE code = ?').get(code)) return code;
+  }
+}
+
+// The link the form's button opens: WhatsApp, to the demo number, with the request's message already written.
+export const waText = (code, store) => `${code} היי, אשמח לדמו של תורן לחנות ${store}`;
+const demoNumber = () => (/^9725\d{8}$/.test(String(env.DEMO_WA_NUMBER || '')) ? env.DEMO_WA_NUMBER : null);
+const waLink = (code, store) => `https://wa.me/${demoNumber()}?text=${encodeURIComponent(waText(code, store))}`;
 
 // ---------------------------------------------------------------- what a lead may contain
 
@@ -100,9 +122,7 @@ export function validate(f) {
   if (source === 'demo') {
     const store = storeHost(f.store);
     if (!store) return { error: 'store' };
-    const contact = mobile(f.contact);
-    if (!contact) return { error: 'contact' };
-    return { lead: { source, store, contact, page } };
+    return { lead: { source, store, contact: '', page } };
   }
   const contact = mobile(f.contact) || email(f.contact);
   if (!contact) return { error: 'contact' };
@@ -138,7 +158,7 @@ const when = (iso) => new Date(iso).toLocaleString('he-IL', { timeZone: 'Asia/Je
 function message(row) {
   const who = /^\d+$/.test(row.contact) ? `וואטסאפ: https://wa.me/${row.contact}` : `מייל: ${row.contact}`;
   return row.source === 'demo'
-    ? `ליד חדש, דמו לתורן\nחנות: ${row.store}\n${who}\nמהעמוד ${row.page || '?'}, ${when(row.created_at)}`
+    ? `בקשה לדמו של תורן\nחנות: ${row.store}\nקוד: ${row.code} (נחשבת רק כשמגיעה הודעה בוואטסאפ)\nמהעמוד ${row.page || '?'}, ${when(row.created_at)}`
     : `ליד חדש, רשימת ההמתנה של תדר\n${who}\nמהעמוד ${row.page || '?'}, ${when(row.created_at)}`;
 }
 
@@ -164,13 +184,13 @@ async function notify(db, row) {
 // ---------------------------------------------------------------- Toran
 
 async function forward(db, row) {
-  if (row.source !== 'demo' || !env.TORAN_INTAKE_URL || !env.OF_INTERNAL_TOKEN) return false;
+  if (row.source !== 'demo' || !row.code || !env.TORAN_INTAKE_URL || !env.OF_INTERNAL_TOKEN) return false;
   db.prepare('UPDATE leads SET forward_tries = forward_tries + 1 WHERE id = ?').run(row.id);
   try {
     const res = await fetch(env.TORAN_INTAKE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.OF_INTERNAL_TOKEN}` },
-      body: JSON.stringify({ url: `https://${row.store}/`, whatsapp: row.contact }),
+      body: JSON.stringify({ url: `https://${row.store}/`, code: row.code }),
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) throw new Error(`Toran ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -185,7 +205,7 @@ async function forward(db, row) {
 async function retry(db) {
   const rows = db.prepare('SELECT * FROM leads WHERE notified_at IS NULL AND tries < ? ORDER BY id LIMIT 20').all(LIMITS.telegramTries);
   for (const row of rows) await notify(db, row);
-  const toToran = db.prepare("SELECT * FROM leads WHERE source = 'demo' AND forwarded_at IS NULL AND forward_tries < ? ORDER BY id LIMIT 20").all(LIMITS.telegramTries);
+  const toToran = db.prepare("SELECT * FROM leads WHERE source = 'demo' AND code IS NOT NULL AND forwarded_at IS NULL AND forward_tries < ? ORDER BY id LIMIT 20").all(LIMITS.telegramTries);
   for (const row of toToran) await forward(db, row);
 }
 
@@ -227,14 +247,15 @@ function parse(req, body) {
   return Object.fromEntries(new URLSearchParams(body));
 }
 
-// A browser with JS asks for JSON and gets JSON; a plain form post gets a redirect to a page that says what happened.
+// A browser with JS asks for JSON and gets JSON; a plain form post gets a redirect: a demo request straight to its
+// WhatsApp message, the waitlist to its thank-you, and anything that went wrong to the page that says so.
 function reply(req, res, status, body) {
   if (String(req.headers.accept || '').includes('application/json')) {
     res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end(JSON.stringify(body));
     return;
   }
-  const to = body.ok ? (body.source === 'teder' ? '/thanks/teder' : '/thanks') : body.error === 'dup' ? '/thanks/already' : '/try-again';
+  const to = !body.ok ? '/try-again' : body.source === 'teder' ? '/thanks/teder' : body.wa || '/try-again';
   res.writeHead(303, { Location: to, 'Cache-Control': 'no-store' });
   res.end();
 }
@@ -267,19 +288,16 @@ export function createServer(db) {
     const { lead, error } = validate(fields);
     if (error) return reply(req, res, 400, { ok: false, error });
 
-    // One demo per number. The check and the insert below run with no await between them, so two posts at once
-    // can't both get through.
-    if (lead.source === 'demo' && db.prepare("SELECT 1 FROM leads WHERE source = 'demo' AND contact = ?").get(lead.contact)) {
-      count(ip);
-      return reply(req, res, 409, { ok: false, error: 'dup' });
-    }
+    // A demo is confirmed on WhatsApp; with no demo number there is nowhere to confirm it, so it counts as down.
+    if (lead.source === 'demo' && !demoNumber()) return reply(req, res, 503, { ok: false, error: 'down' });
 
     const created_at = new Date().toISOString();
-    const { lastInsertRowid } = db.prepare('INSERT INTO leads (created_at, source, store, contact, page) VALUES (?, ?, ?, ?, ?)')
-      .run(created_at, lead.source, lead.store, lead.contact, lead.page);
+    const code = lead.source === 'demo' ? newCode(db) : null;
+    const { lastInsertRowid } = db.prepare('INSERT INTO leads (created_at, source, store, contact, page, code) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(created_at, lead.source, lead.store, lead.contact, lead.page, code);
     count(ip);
-    reply(req, res, 200, { ok: true, source: lead.source, ...(lead.store ? { store: lead.store } : {}) });
-    const row = { id: Number(lastInsertRowid), created_at, ...lead };
+    reply(req, res, 200, { ok: true, source: lead.source, ...(code ? { store: lead.store, code, wa: waLink(code, lead.store) } : {}) });
+    const row = { id: Number(lastInsertRowid), created_at, ...lead, code };
     notify(db, row);
     forward(db, row);
   });
@@ -291,9 +309,9 @@ const main = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(
 if (main && process.argv[2] === 'list') {
   const db = open();
   const n = Number(process.argv[3]) || 20;
-  const rows = db.prepare('SELECT id, created_at, source, store, contact, page, notified_at, forwarded_at FROM leads ORDER BY id DESC LIMIT ?').all(n);
+  const rows = db.prepare('SELECT id, created_at, source, store, contact, code, page, notified_at, forwarded_at FROM leads ORDER BY id DESC LIMIT ?').all(n);
   for (const r of rows.reverse()) {
-    console.log([r.id, when(r.created_at), r.source, r.store || '-', r.contact, r.page || '-', r.notified_at ? 'sent' : 'NOT SENT', r.source === 'demo' ? (r.forwarded_at ? 'in toran' : 'NOT IN TORAN') : ''].join('  ').trim());
+    console.log([r.id, when(r.created_at), r.source, r.store || '-', r.code || r.contact || '-', r.page || '-', r.notified_at ? 'sent' : 'NOT SENT', r.source === 'demo' ? (r.forwarded_at ? 'in toran' : 'NOT IN TORAN') : ''].join('  ').trim());
   }
   db.close();
 } else if (main) {

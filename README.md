@@ -20,14 +20,22 @@ npm run shots        # docs/screenshots: every page at 390px and 1440px, light a
 ## Leads
 
 The demo form and the Teder waitlist post to `server/lead.mjs`, a small Node server with no dependencies
-(`node:sqlite`), behind Caddy at `/api/lead`. Each lead (the store's host name, a WhatsApp number or an email, the
-form, the page, the time) is saved to SQLite first, then sent to Telegram; unsent ones are retried every 5 minutes.
+(`node:sqlite`), behind Caddy at `/api/lead`. Each lead (the store's host name and a request code for a demo, a
+WhatsApp number or an email for the waitlist, the form, the page, the time) is saved to SQLite first, then sent to
+Telegram; unsent ones are retried every 5 minutes.
 One address gets 5 leads an hour, everyone together 200 a day, and a hidden honeypot field catches form-filling
 scripts. A post from another origin is refused. IP addresses are used for the limit in memory only.
 
-With JS the form sends itself and shows the thank-you in place; if the endpoint doesn't answer in 8 seconds, it offers
-a WhatsApp link with the store's address already typed. Without JS the form posts normally and lands on `/thanks`,
-`/thanks/teder` or `/try-again` (which Caddy also serves when the endpoint is down).
+A demo request is confirmed on WhatsApp, not by a typed number. The form asks only for the store's address; the
+endpoint saves it with a code (`REQ-XXXXXX`), hands it to Toran (`TORAN_INTAKE_URL`, retried like Telegram), and
+answers with a link that opens WhatsApp to Toran's demo number (`DEMO_WA_NUMBER`) with the code already written.
+Toran adds the store only when that message arrives, for the number it came from, one demo per number. Without a demo
+number a demo request is answered as down.
+
+With JS the form sends itself and shows the thank-you in place, with the WhatsApp button; if the endpoint doesn't
+answer in 8 seconds, it offers our own WhatsApp link with the store's address already typed. Without JS the form posts
+normally: a demo goes straight to the WhatsApp message, the waitlist to `/thanks/teder`, and a failure to `/try-again`
+(which Caddy also serves when the endpoint is down).
 
 ```sh
 npm test                                        # the endpoint: saving, Telegram, limits, honeypot, origin, Telegram down

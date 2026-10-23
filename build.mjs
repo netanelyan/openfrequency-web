@@ -13,12 +13,12 @@ import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
 import teder from './src/pages/teder.mjs';
 import faq from './src/pages/faq.mjs';
-import { thanks, thanksAgain, thanksTeder, tryAgain } from './src/pages/after.mjs';
+import { thanksTeder, tryAgain } from './src/pages/after.mjs';
 
 const draft = process.argv.includes('--draft');
 const OUT = path.join(ROOT, 'dist');
 
-const PAGES = [home, toran, teder, faq, thanks, thanksAgain, thanksTeder, tryAgain];
+const PAGES = [home, toran, teder, faq, thanksTeder, tryAgain];
 const DRAFT_PAGES = [];
 
 const cfg = readConfig(draft);
@@ -46,7 +46,9 @@ for (const [file, html] of files) {
     "img-src 'self' data:",
     "font-src 'self'",
     "connect-src 'self'",
-    "form-action 'self'",
+    // A demo form posted without JS is sent on to WhatsApp, to the message that confirms it (server/lead.mjs), and
+    // the browser checks every step of that redirect against this.
+    /data-form="demo"/.test(html) ? "form-action 'self' https://wa.me https://api.whatsapp.com" : "form-action 'self'",
     "base-uri 'self'",
     "object-src 'none'",
   ].join('; ');

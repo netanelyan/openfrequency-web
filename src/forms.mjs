@@ -19,13 +19,13 @@ ${honeypot}`;
 
 const status = (id) => `<div class="form-msg" id="msg-${id}" role="status" aria-live="polite" hidden></div>`;
 
-// The demo form. A page can hold it twice (the first screen and the close), so each copy has its own id.
+// The demo form. A page can hold it twice (the first screen and the close), so each copy has its own id. It asks only
+// for the store's address: the number comes from the WhatsApp message that confirms the request (server/lead.mjs).
 export function demoForm(cfg, page, id = 'demo') {
   return `${open(cfg, 'demo', page, 'demo', id)}
 <label class="f">הכתובת של החנות<input name="store" type="text" inputmode="url" autocomplete="url" dir="ltr" placeholder="shop.co.il" required></label>
-<label class="f">הוואטסאפ שלכם<input name="contact" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="050-0000000" required></label>
 <button class="btn primary" type="submit">לבנות דמו</button>
-<p class="when">הדמו מוכן תוך ${cfg.t('demo.time')}, ונשלח אותו למספר הזה.</p>
+<p class="when">אחרי הטופס שולחים לנו הודעה אחת בוואטסאפ, והדמו מוכן תוך ${cfg.t('demo.time')}.</p>
 ${status(id)}
 </form>`;
 }
@@ -41,12 +41,10 @@ ${status('teder')}
 // Once per page that has a form.
 export function formCopy(cfg) {
   const wa = '<a class="btn sm primary" data-wa href="#">לשלוח בוואטסאפ</a>';
-  return `<template id="done-demo"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>תוך ${cfg.t('demo.time')} נשלח לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p></div></template>
+  return `<template id="done-demo"><div class="done" tabindex="-1"><h3>נשארה הודעה אחת בוואטסאפ</h3><p>ככה נדע שהבקשה שלכם. ההודעה כבר כתובה, עם הקוד של הבקשה, ונשאר רק לשלוח אותה. אחרי שהיא מגיעה, הדמו של <bdi data-store></bdi> מוכן תוך ${cfg.t('demo.time')}, והלינק מגיע לאותה שיחה.</p><a class="btn primary" data-req-wa href="#">לשלוח את ההודעה בוואטסאפ</a></div></template>
 <template id="done-teder"><div class="done" tabindex="-1"><h3>רשמנו אתכם</h3><p>נכתוב לכם כשתדר ייפתח לחנויות.</p></div></template>
 <template id="msg-store"><p>הכתובת של החנות לא נראית לנו נכונה. אפשר לכתוב אותה כמו בדפדפן, למשל shop.co.il.</p></template>
-<template id="msg-contact-demo"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את הדמו.</p></template>
 <template id="msg-contact-teder"><p>צריך מספר וואטסאפ או כתובת מייל, כדי שנוכל לכתוב לכם.</p></template>
-<template id="msg-dup"><p>כבר קיבלנו בקשה לדמו מהמספר הזה, והלינק יגיע לוואטסאפ הזה. לדמו לחנות נוספת, אפשר לכתוב לנו בוואטסאפ.</p>${wa}</template>
 <template id="msg-rate"><p>קיבלנו כבר כמה פניות מהחיבור הזה בשעה האחרונה. אפשר לנסות שוב בעוד שעה, או לשלוח לנו בוואטסאפ.</p>${wa}</template>
 <template id="msg-down"><p>משהו אצלנו לא עובד כרגע, והפרטים לא הגיעו אלינו. אפשר לשלוח לנו אותם בוואטסאפ.</p>${wa}</template>
 <template id="msg-bad"><p>הטופס לא נשלח. אפשר לנסות שוב, או לשלוח לנו בוואטסאפ.</p>${wa}</template>`;

@@ -1,6 +1,6 @@
 // The site's one script beyond the header: it sends a form without leaving the page. Without it the forms still
-// work, as plain posts that land on /thanks or /try-again. Every word it shows is in the page, in a <template>, so
-// the copy lint reads it like the rest.
+// work, as plain posts: a demo lands on WhatsApp with its message written, the waitlist on /thanks/teder, a failure
+// on /try-again. Every word it shows is in the page, in a <template>, so the copy lint reads it like the rest.
 //   form[data-form="demo" | "teder"]: data-wa is our WhatsApp number (empty in a draft), data-wa-text the message
 //   it starts with, where {store} is the address they typed.
 (function () {
@@ -24,7 +24,7 @@
     })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { status: r.status, body: b }; }); })
       .then(function (x) {
-        if (x.body.ok) return done(f, kind, x.body.store || data.store);
+        if (x.body.ok) return done(f, kind, x.body.store || data.store, x.body.wa);
         if (x.status >= 500 || !x.body.error) return say(f, msg, 'down', data);
         say(f, msg, x.body.error === 'contact' ? 'contact-' + kind : x.body.error, data);
       })
@@ -64,11 +64,17 @@
     });
   }
 
-  // The thank-you takes the form's place and gets the focus, so a screen reader reads it.
-  function done(f, kind, store) {
+  // The thank-you takes the form's place and gets the focus, so a screen reader reads it. A demo's has the button that
+  // opens WhatsApp with the request's message written; the endpoint sends the link, code and all.
+  function done(f, kind, store, wa) {
     var node = copy('done-' + kind);
     var s = node.querySelector('[data-store]');
     if (s) s.textContent = store || '';
+    var b = node.querySelector('[data-req-wa]');
+    if (b) {
+      if (/^https:\/\/wa\.me\//.test(wa || '')) b.href = wa;
+      else b.remove();
+    }
     f.replaceChildren(node);
     f.classList.add('sent');
     var d = f.querySelector('.done');

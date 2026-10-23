@@ -1,19 +1,10 @@
-// Where a form lands without JS: a thank-you for each form, one for a number that already asked for a demo, and a
-// page for when it didn't go through (an invalid field, the rate limit, or the endpoint down, which Caddy sends here
-// too). None of them is indexed.
+// Where a form lands without JS: the waitlist's thank-you, and a page for when it didn't go through (an invalid field,
+// the rate limit, or the endpoint down, which Caddy sends here too). A demo request needs no page of its own: the
+// endpoint sends it straight to WhatsApp, to the message that confirms it. None of them is indexed.
 import { esc } from '../lib.mjs';
 import { WA_TEXT } from '../forms.mjs';
 
 const plain = (path, title, body) => (cfg) => ({ path, title: `${title} | OpenFrequency`, description: title, noindex: true, body: body(cfg) });
-
-export const thanks = plain('/thanks', 'קיבלנו את הכתובת של החנות', (cfg) => `
-<section class="sec after">
-<div class="wrap narrow" data-rise>
-<h1>קיבלנו את הכתובת של החנות</h1>
-<p class="lede">תוך ${cfg.t('demo.time')} נשלח לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p>
-<div class="actions"><a class="btn" href="/">לעמוד הבית</a></div>
-</div>
-</section>`);
 
 export const thanksTeder = plain('/thanks/teder', 'רשמנו אתכם לרשימת ההמתנה של תדר', () => `
 <section class="sec after">
@@ -31,15 +22,6 @@ const waButton = (cfg, label) => {
     ? `<a class="btn primary" href="https://wa.me/${wa}?text=${esc(encodeURIComponent(WA_TEXT.any))}">${label}</a>`
     : `<span class="btn primary">${label} ${cfg.ph('whatsapp')}</span>`;
 };
-
-export const thanksAgain = plain('/thanks/already', 'כבר קיבלנו בקשה מהמספר הזה', (cfg) => `
-<section class="sec after">
-<div class="wrap narrow" data-rise>
-<h1>כבר קיבלנו בקשה מהמספר הזה</h1>
-<p class="lede">יש לנו כבר בקשה לדמו מהמספר הזה, והלינק יגיע לוואטסאפ שלו. לדמו לחנות נוספת, אפשר לכתוב לנו בוואטסאפ.</p>
-<div class="actions">${waButton(cfg, 'לכתוב לנו בוואטסאפ')}<a class="btn" href="/">לעמוד הבית</a></div>
-</div>
-</section>`);
 
 export const tryAgain = plain('/try-again', 'הפרטים לא הגיעו אלינו', (cfg) => {
   const button = waButton(cfg, 'לשלוח בוואטסאפ');
