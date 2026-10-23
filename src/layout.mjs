@@ -25,6 +25,9 @@ const LINKS = (cfg) => [
 // The way to a demo: the form on Toran's page.
 const DEMO = (current) => (current === '/toran' ? '#demo' : '/toran#demo');
 
+// Where a customer manages their tools: openfrequency-accounts, which sends anyone not signed in to its login.
+const TOOLS = 'https://accounts.openfrequency.co.il/';
+
 const menuIcon = `<svg class="i open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg><svg class="i close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 
 function header(cfg, current) {
@@ -32,17 +35,18 @@ function header(cfg, current) {
   const nav = [
     ...PRODUCTS.map(([href, name, label]) => `<a href="${href}"${here(href)}>${mark(name, 20)}${label}</a>`),
     ...LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`),
+    `<a href="${DEMO(current)}">הצטרפות</a>`,
   ].join('');
-  // On a phone the menu opens on the products, each with what it does, then the rest and the demo.
+  // On a phone the menu opens on the products, each with what it does, then the rest, joining, and the tools.
   const sheet = `<div class="sheet-products">${PRODUCTS.map(([href, name, label, what]) =>
     `<a class="prod" href="${href}"${here(href)}>${mark(name, 40)}<span><b>${label}</b><small>${what}</small></span></a>`).join('')}</div>
-<div class="sheet-links">${LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`).join('')}</div>
-<a class="btn primary" href="${DEMO(current)}">לבנות דמו לחנות</a>`;
+<div class="sheet-links">${LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`).join('')}<a href="${DEMO(current)}">הצטרפות</a></div>
+<a class="btn primary" href="${TOOLS}">לניהול הכלים</a>`;
   return `<header class="top">
 <div class="bar">
 <a class="brand" href="/"${current === '/' ? ' aria-current="page"' : ''}>${mark('openfrequency', 32)}<b>OpenFrequency</b></a>
 <nav class="nav" aria-label="ראשי">${nav}</nav>
-<a class="btn primary sm cta" href="${DEMO(current)}">לבנות דמו לחנות</a>
+<a class="btn primary sm cta" href="${TOOLS}">לניהול הכלים</a>
 <details class="menu"><summary aria-label="תפריט">${menuIcon}</summary><nav aria-label="ראשי">${sheet}</nav></details>
 </div>
 </header>`;
