@@ -37,14 +37,16 @@ export const askBox = `
 
 // ---------------------------------------------------------------- the price
 
-// A product's price, in the serious register: the figure, VAT and the setup fee, and, once the terms are set, how to
-// stop. monthly and setup are the facts' keys (price.monthly for Toran, teder.monthly for Teder). Left out of the
-// public draft until the monthly price is set; a terms line waits for its own facts the same way.
-export function priceSection(cfg, { monthly, setup, id = 'price' }) {
+// A product's price, in the serious register, on one card: the product, the monthly figure, VAT and the setup fee,
+// the way to try it, and beside them what the price includes. Once the terms are set, how to stop goes under the card.
+// monthly and setup are the facts' keys (price.monthly for Toran, teder.monthly for Teder); product is
+// { name: 'toran' | 'teder', label, includes: [html], cta: [href, text] }. Left out of the public draft until the
+// monthly price is set; the terms line waits for its own facts the same way.
+export function priceSection(cfg, { monthly, setup, product, id = 'price' }) {
   if (!cfg.has(monthly) && !cfg.banner) return '';
   const vat = cfg.get('price.vat');
   const fee = cfg.get(setup);
-  const vatLine = vat === 'included' ? 'המחיר כולל מע״מ.' : vat === 'excluded' ? 'המחיר לא כולל מע״מ.' : cfg.ph('price.vat');
+  const vatLine = vat === 'included' ? 'כולל מע״מ.' : vat === 'excluded' ? 'לא כולל מע״מ.' : cfg.ph('price.vat');
   const setupLine = fee == null ? cfg.ph(setup) : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת.`;
   const months = cfg.get('price.commitmentMonths');
   const stops = cfg.get('price.stops');
@@ -60,13 +62,22 @@ export function priceSection(cfg, { monthly, setup, id = 'price' }) {
   }
   const figure = cfg.get(monthly) == null ? cfg.ph(monthly) : esc(cfg.get(monthly).toLocaleString('he-IL'));
   return `
-<section class="sec price-sec" id="${id}" aria-labelledby="${id}-h">
+<section class="sec price-sec ${product.name}" id="${id}" aria-labelledby="${id}-h">
 <div class="wrap">
-<div class="sec-head"><h2 id="${id}-h">כמה זה עולה</h2><p>${vatLine} ${setupLine}</p></div>
-<div>
+<div class="sec-head"><h2 id="${id}-h">כמה זה עולה</h2></div>
+<div class="price-card glass">
+<div class="price-main">
+<p class="price-name">${mark(product.name, 36)}<b>${product.label}</b></p>
 <p class="figure"><span class="num">${figure}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
-${terms ? `<p class="terms-line">${terms}</p>` : ''}
+<p class="price-notes">${vatLine} ${setupLine}</p>
+<a class="btn primary" href="${product.cta[0]}">${product.cta[1]}</a>
 </div>
+<div class="price-incl">
+<h3>מה כלול במחיר</h3>
+<ul class="checks">${product.includes.map((x) => `<li>${x}</li>`).join('')}</ul>
+</div>
+</div>
+${terms ? `<p class="terms-line">${terms}</p>` : ''}
 </div>
 </section>`;
 }

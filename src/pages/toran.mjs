@@ -76,7 +76,12 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
-${priceSection(cfg, { monthly: 'price.monthly', setup: 'price.setup' })}
+${priceSection(cfg, { monthly: 'price.monthly', setup: 'price.setup', product: { name: 'toran', label: 'תורן', cta: ['#demo', 'לנסות את תורן על החנות שלכם'], includes: [
+  `עונה ללקוחות 24/7 ${inList(live)}, מתוך מה שכתוב באתר שלכם`,
+  'כל השיחות בתיבה אחת, עם מה שקרה בכל אחת',
+  'שאלה שאין עליה תשובה באתר מגיעה אליכם, ומה שתענו הוא זוכר',
+  'בשבועיים הראשונים אנחנו קוראים איתכם את השיחות ומתקנים מה שצריך',
+] } })}
 <section class="sec close-sec" aria-labelledby="demo-h">
 <div class="wrap narrow">
 <h2 id="demo-h">לנסות את תורן על החנות שלכם</h2>

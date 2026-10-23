@@ -790,21 +790,32 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
   .cover-from { font-size: 11px; }
 }
 
-/* ------------------------------------------------------------ the price, very large */
+/* ------------------------------------------------------------ the price: one card */
 
-.price-sec .wrap { display: grid; gap: 32px; }
-.price-sec .sec-head { margin-bottom: 0; }
-.figure { position: relative; display: flex; align-items: baseline; gap: 0.06em; flex-wrap: wrap; font: 700 var(--fs-huge)/0.86 var(--display); letter-spacing: -0.035em; font-variant-numeric: tabular-nums; }
-.figure .cur { font-size: var(--fs-display); align-self: baseline; }
-.figure .per { font: 600 var(--fs-lead)/1.2 var(--text); letter-spacing: 0; margin-inline-start: 0.4em; }
-.figure .ph { font-size: var(--fs-display); line-height: 0.86; letter-spacing: 0; }
-.terms { display: grid; gap: 18px; margin: 28px 0 0; padding: 0; list-style: none; max-width: 62ch; }
-.terms li { font-size: var(--fs-body); }
-.terms b { display: block; margin-bottom: 2px; font-weight: 700; }
-.price-sec .btn { margin-top: 28px; }
-@media (min-width: 900px) {
-  .price-sec .wrap { grid-template-columns: minmax(0, 0.38fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+/* The product and its monthly figure, VAT and the setup fee under it, the way to try it; beside them, what the price
+   includes. The checks are in the product's colour. Side by side from a tablet, stacked on a phone. */
+.price-sec { --pc: var(--toran); }
+.price-sec.teder { --pc: var(--teder); }
+.price-card { display: grid; gap: 28px; padding: clamp(22px, 3.4vw, 40px); }
+.price-main { display: grid; align-content: start; gap: 12px; }
+.price-name { display: flex; align-items: center; gap: 10px; margin: 0; font-size: var(--fs-lead); }
+.figure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.08em; margin: 6px 0 0; font: 800 clamp(48px, 5.4vw, 72px)/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.figure .cur { font-size: 0.55em; }
+.figure .per { margin-inline-start: 0.35em; font: 600 var(--fs-body)/1.2 var(--text); letter-spacing: 0; color: var(--ink-2); }
+.figure .ph { font-size: 0.5em; letter-spacing: 0; }
+.price-notes { margin: 0; color: var(--ink-2); max-width: 36ch; }
+.price-main .btn { justify-self: start; margin-top: 10px; }
+.price-incl h3 { margin: 0 0 14px; font-size: var(--fs-body); color: var(--ink-2); }
+.checks { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.checks li { position: relative; padding-inline-start: 34px; line-height: 1.5; }
+.checks li::before { content: ''; position: absolute; inset-inline-start: 0; top: 0.05em; width: 24px; height: 24px; border-radius: 50%; background: color-mix(in srgb, var(--pc) 16%, transparent); }
+.checks li::after { content: ''; position: absolute; inset-inline-start: 9px; top: calc(0.05em + 5px); width: 5px; height: 10px; border-right: 2.4px solid var(--pc); border-bottom: 2.4px solid var(--pc); transform: rotate(45deg); }
+@media (prefers-color-scheme: dark) { .price-sec.teder { --pc: #a487ff; } .price-sec.toran { --pc: #3fcf95; } }
+@media (min-width: 800px) {
+  .price-card { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 48px; align-items: start; }
+  .price-incl { padding-inline-start: 40px; border-inline-start: 1px solid var(--line); }
 }
+.price-sec .terms-line { margin-top: 18px; color: var(--ink-2); }
 
 /* ------------------------------------------------------------ the questions: filled tiles */
 

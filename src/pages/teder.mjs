@@ -57,7 +57,12 @@ ${platformWindow()}
 </div>
 </section>
 
-${priceSection(cfg, { monthly: 'teder.monthly', setup: 'teder.setup' })}
+${priceSection(cfg, { monthly: 'teder.monthly', setup: 'teder.setup', product: { name: 'teder', label: 'תדר', cta: ['#demo', 'לנסות את תדר על החנות שלכם'], includes: [
+  'מצגות בעברית שתדר כותב ומעצב בשבילכם',
+  'כל מצגת בגודל של טיקטוק ובגודל של אינסטגרם',
+  'כל מצגת מחכה לאישור שלכם לפני שהיא עולה',
+  'פרסום בשעה שנקבעה. בשבת ובחג הוא לא מפרסם',
+] } })}
 <section class="sec close-sec" aria-labelledby="demo-h">
 <div class="wrap narrow">
 <h2 id="demo-h">לנסות את תדר על החנות שלכם</h2>
