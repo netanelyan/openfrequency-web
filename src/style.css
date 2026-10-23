@@ -490,11 +490,18 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .ib-text { grid-area: text; overflow: hidden; font-size: 15px; white-space: nowrap; text-overflow: ellipsis; }
 .ib-time { grid-area: time; color: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
 .ch-tag { grid-area: ch; justify-self: start; display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--c) 14%, transparent); font-size: 12px; font-weight: 600; }
-.ch-tag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
 .ch-tag.whatsapp { --c: #25d366; }
-.ch-tag.instagram { --c: #d6249f; }
-.ch-tag.messenger { --c: #0866ff; }
+.ch-tag.instagram { --c: #ff0069; }
+.ch-tag.messenger { --c: #00b2ff; }
 .ch-tag.email { --c: #8e8e93; }
+/* Each channel's mark, in its brand colour, at the size of the text beside it. */
+.logo { flex: none; width: 1.1em; height: 1.1em; vertical-align: -0.18em; }
+.logo.whatsapp { color: #25d366; }
+.logo.instagram { color: #ff0069; }
+.logo.messenger { color: #00b2ff; }
+.logo.email { color: var(--ink-3); }
+.chat-top small .logo, .mail-subj small .logo { width: 13px; height: 13px; margin-inline-end: 4px; vertical-align: -2px; }
+.ch-tabs .logo { width: 18px; height: 18px; }
 
 /* The price on Toran's page, short, and the one form, at the end. */
 .terms-line { max-width: 62ch; margin-top: 20px; }

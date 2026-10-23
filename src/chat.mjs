@@ -7,7 +7,8 @@
 //   caption: optional; without one the chat is named by its header, and the page says it's made up nearby
 export function chat({ id, who, sub = 'וואטסאפ', face, tag = 'דוגמה', caption, msgs, names }) {
   const avatar = face.startsWith('<') ? face : `<span class="ava" aria-hidden="true">${face}</span>`;
-  const name = caption ? `aria-labelledby="${id}"` : `aria-label="${who}, ${sub}"`;
+  // The header may carry markup (a channel's mark); its label is the words alone.
+  const name = caption ? `aria-labelledby="${id}"` : `aria-label="${who}, ${sub.replace(/<[^>]+>/g, '')}"`;
   return `<figure class="chat" data-ui ${name}>
 <div class="chat-top">${avatar}<span><b>${who}</b><small>${sub}</small></span>${tag ? `<span class="tag">${tag}</span>` : ''}</div>
 <ol class="msgs">

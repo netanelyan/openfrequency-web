@@ -36,7 +36,10 @@
       "חנויות על WooCommerce ועל Wix."
     ],
     "channels": [
-      "whatsapp"
+      "whatsapp",
+      "instagram",
+      "messenger",
+      "email"
     ]
   }
 }
