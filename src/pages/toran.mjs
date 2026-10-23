@@ -1,6 +1,7 @@
 // Toran's page, built around where customers write: one agent and one inbox, whichever channel the customer picks.
-// The headline and the tabs, and the window that changes with the tab, the same question and answer in each; then the
-// demo form, once, straight after; the owner's one inbox; what it answers alone and what it leaves for you; the price.
+// The headline, a button down to the demo form, and the tabs with the window that changes with them, the same question
+// and answer in each; the owner's one inbox; what it answers alone and what it leaves for you; the price; and the demo
+// form at the end.
 // Which channels Toran answers in comes from Toran's /channels.json, or site.config.json (toran.channels) when Toran
 // doesn't answer (build.mjs); every sentence that names them is built from
 // it, so the page never says a channel works before it does. The owners' questions are on /faq.
@@ -79,16 +80,9 @@ export default (cfg) => {
 <div class="hero-head">${mark('toran', 72, 'תורן')}<h1 id="hero-h"><span class="hl">תורן אחד</span> עונה ללקוחות שלכם ${where}</h1></div>
 <div class="hero-text">
 <p class="lede">תורן קורא את האתר של החנות ועונה ללקוחות <span class="hl" dir="ltr">24/7</span>, מתוך מה שכתוב בו. בכל מקום שכותבים לו, הוא עונה אותו דבר, כי זו אותה חנות.</p>
+<a class="btn primary hero-cta" href="#demo">לבנות דמו לחנות</a>
 </div>
 ${channelWindow(cfg)}
-</div>
-</section>
-
-<section class="sec close-sec" aria-labelledby="demo-h">
-<div class="wrap narrow">
-<h2 id="demo-h">לבנות דמו לחנות שלכם</h2>
-<p class="lede">שולחים לנו את הכתובת של החנות, ואנחנו בונים דמו מהמוצרים ומדפי המדיניות שבאתר. כותבים לו כמו לקוח, ורואים מה הוא עונה.</p>
-${demoForm(cfg, '/toran')}
 </div>
 </section>
 
@@ -113,6 +107,13 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
-${price(cfg)}`,
+${price(cfg)}
+<section class="sec close-sec" aria-labelledby="demo-h">
+<div class="wrap narrow">
+<h2 id="demo-h">לבנות דמו לחנות שלכם</h2>
+<p class="lede">שולחים לנו את הכתובת של החנות, ואנחנו בונים דמו מהמוצרים ומדפי המדיניות שבאתר. כותבים לו כמו לקוח, ורואים מה הוא עונה.</p>
+${demoForm(cfg, '/toran')}
+</div>
+</section>`,
   };
 };

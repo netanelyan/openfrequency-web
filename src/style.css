@@ -415,6 +415,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .hero h1 { margin: 0; font-size: clamp(30px, 3.3vw, 46px); }
 .hero-text { grid-area: text; }
 .hero .lede { max-width: 36ch; }
+.hero-cta { margin-top: 24px; }
 .hero .ch-box { grid-area: box; min-width: 0; }
 @media (min-width: 1000px) {
   .hero { padding-block: 44px 40px; }
