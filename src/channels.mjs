@@ -2,7 +2,8 @@
 // inbox. Every window holds the same question and the same answer, so it reads as one agent that knows one store; only
 // the look of the channel changes. No channel's logo is drawn: its name and the shape of its chat are enough.
 //
-// Which channels are live comes from site.config.json (toran.channels); every other one carries "בקרוב". Without a
+// Which channels Toran answers in comes from Toran's /channels.json at build time, or site.config.json (toran.channels)
+// when Toran doesn't answer (build.mjs); every other one carries "בקרוב". Without a
 // script the windows stand one under the other, each under its own name; site.js turns them into tabs.
 import { CHANNELS, mark } from './lib.mjs';
 import { chat } from './chat.mjs';

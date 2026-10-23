@@ -1,7 +1,8 @@
 // Toran's page, built around where customers write: one agent and one inbox, whichever channel the customer picks.
 // The headline and the tabs; the window that changes with the tab, the same question and answer in each; the owner's
 // one inbox; what it answers alone and what it leaves for you; the price; and the demo form, once, at the end.
-// Which channels are live comes from site.config.json (toran.channels); every sentence that names them is built from
+// Which channels Toran answers in comes from Toran's /channels.json, or site.config.json (toran.channels) when Toran
+// doesn't answer (build.mjs); every sentence that names them is built from
 // it, so the page never says a channel works before it does. The owners' questions are on /faq.
 import { CHANNELS, esc, ils, mark } from '../lib.mjs';
 import { NAMES, channelWindow, inbox } from '../channels.mjs';

@@ -9,7 +9,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, readConfig, lint, minifyCss, markNames } from './src/lib.mjs';
+import { CHANNELS, ROOT, readConfig, lint, minifyCss, markNames } from './src/lib.mjs';
 import { page } from './src/layout.mjs';
 import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
@@ -26,6 +26,24 @@ const PAGES = [home, toran, teder, faq, thanks, thanksAgain, thanksTeder, tryAga
 const DRAFT_PAGES = [];
 
 const cfg = { ...readConfig(draft), banner };
+
+// Where Toran answers comes from Toran itself (openfrequency-toran, GET /channels.json, set on its /settings): a
+// channel in "demo" or "live" is one it answers in, an "off" one is shown as coming. When Toran doesn't answer, or
+// answers with something else, the build uses toran.channels from site.config.json and says so.
+const CHANNELS_URL = process.env.TORAN_CHANNELS_URL || 'https://toran.openfrequency.co.il/channels.json';
+const fromToran = await fetch(CHANNELS_URL, { signal: AbortSignal.timeout(5000) })
+  .then((r) => (r.ok ? r.json() : null))
+  .then((j) => {
+    const all = j && typeof j.channels === 'object' ? j.channels : null;
+    if (!all || !Object.values(all).every((s) => ['off', 'demo', 'live'].includes(s))) return null;
+    return CHANNELS.filter((c) => all[c] === 'demo' || all[c] === 'live');
+  })
+  .catch(() => null);
+console.log(fromToran ? `channels from Toran: ${fromToran.join(', ') || 'none'}` : `channels from site.config.json (Toran's ${CHANNELS_URL} did not answer with its list)`);
+if (fromToran) {
+  const get = cfg.get;
+  cfg.get = (key) => (key === 'toran.channels' ? fromToran : get(key));
+}
 const css = minifyCss(fs.readFileSync(path.join(ROOT, 'src/style.css'), 'utf8'));
 
 // Render everything first, so one run reports every missing fact and every lint error at once.
