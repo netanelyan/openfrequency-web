@@ -4,39 +4,55 @@
     "subject": "בינה מלאכותית",
     "account": "שאלה טובה",
     "handle": "@sheela.tova",
-    "topic": "Copilot ב-Windows: דרכים לפתוח אותו ומה הוא יודע לעשות",
+    "topic": "שלושה דברים שהטלפון כבר יודע לעשות",
     "fictional": false,
-    "photo": null,
-    "alt": "מה אפשר לבקש מ-Copilot ב-Windows? ארבע נקודות מדפי העזרה של Microsoft"
+    "photo": {
+      "by": "Kindel Media",
+      "provider": "Pexels",
+      "page": "https://www.pexels.com/photo/a-person-holding-a-smartphone-7054532/"
+    },
+    "alt": "3 דברים שהטלפון שלכם כבר יודע לעשות. בלי להתקין שום אפליקציה"
   },
   {
     "pack": "football",
     "subject": "כדורגל",
     "account": "קו אמצע",
     "handle": "@kav.emtza",
-    "topic": "שיאים של ליגת העל בכדורגל",
+    "topic": "מרקנזו: אורוגוואי נגד ברזיל, 1950",
     "fictional": false,
-    "photo": null,
-    "alt": "ארבעה שיאים של ליגת העל. מחיפה ועד פתח תקווה ותל אביב"
+    "photo": {
+      "by": "Elaine - A Brasileira",
+      "provider": "Pexels",
+      "page": "https://www.pexels.com/photo/panoramic-view-of-maracana-stadium-28649105/"
+    },
+    "alt": "הגמר ששתק את המרקנה. ברזיל הייתה צריכה רק תיקו"
   },
   {
     "pack": "money",
     "subject": "כסף",
     "account": "שקל לשקל",
     "handle": "@shekel.leshekel",
-    "topic": "מחירים מרביים למוצרים בפיקוח",
+    "topic": "השקל שאיבד אפסים: מהלירה ועד השקל החדש",
     "fictional": false,
-    "photo": null,
-    "alt": "כמה מותר לגבות על חלב, ביצים וגבינה? המחירים המרביים בפיקוח, וגם מחיר אילת"
+    "photo": {
+      "by": "Nataliya Vaitkevich",
+      "provider": "Pexels",
+      "page": "https://www.pexels.com/photo/coins-in-a-jar-6863247/"
+    },
+    "alt": "לאן נעלמו האפסים של השקל? מהלירה, דרך השקל הישן, ועד השקל החדש"
   },
   {
     "pack": "demo",
     "subject": "צמחי בית",
     "account": "עציץ ושמש",
     "handle": "@demo.atzitz",
-    "topic": "נענע במרפסת קטנה",
+    "topic": "מתושלח, עץ התמר שנבט מזרע בן 2,000 שנה",
     "fictional": true,
-    "photo": null,
-    "alt": "מה נענע צריכה במרפסת קטנה? נענע ובזיליקום רוצים כמעט הפכים בשמש, במים ובעציץ"
+    "photo": {
+      "by": "Samet Burak Dağlıoğlu",
+      "provider": "Pexels",
+      "page": "https://www.pexels.com/photo/lush-date-palm-tree-in-a-desert-oasis-28613482/"
+    },
+    "alt": "התמר שחזר לחיים אחרי 2,000 שנה. זרע אחד מקנקן שנמצא במצדה"
   }
 ]
