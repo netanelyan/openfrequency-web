@@ -244,12 +244,14 @@ p:last-child { margin-bottom: 0; }
 .mark.toran { background: var(--toran); }
 .mark.teder { background: var(--teder); }
 /* Toran and Teder inside a sentence, set as names (markNames in lib.mjs), so nobody reads them as the plain words.
-   Quietly: the sentence's own ink, a step heavier, over a thin line in the product's colour. */
-.pn { font-weight: 600; text-decoration: underline 2px color-mix(in srgb, var(--pn) 55%, transparent); text-underline-offset: 0.28em; text-decoration-skip-ink: none; }
+   In running text the name is bold, nothing more; in a heading, already bold, it sits on a thin line in the
+   product's colour. */
+.pn { font-weight: 700; }
+:is(h1, h2, h3) .pn { text-decoration: underline 0.07em color-mix(in srgb, var(--pn) 60%, transparent); text-underline-offset: 0.2em; text-decoration-skip-ink: none; }
 .pn.toran { --pn: var(--toran-name); }
 .pn.teder { --pn: var(--teder-name); }
-/* on Teder's violet and the dark footer, the line is white */
-.teder-door .pn, .teder-field .pn, .foot .pn { --pn: #fff; }
+/* on Teder's violet the line is white */
+.teder-field .pn, .teder-door .pn { --pn: #fff; }
 .mark.inline { display: inline-block; vertical-align: -0.18em; margin-inline-end: 0.3em; --s: 1.05em; }
 
 /* ------------------------------------------------------------ buttons and fields */
@@ -450,12 +452,23 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
    by one list's width, so the loop has no seam; it stops under the pointer or on focus, and stands still for anyone
    who asked for less motion, as a row they can scroll. */
 .clients-sec { padding-top: clamp(48px, 6vw, 80px); }
-.clients-sec h2 { font-size: var(--fs-lead); line-height: 1.25; }
-.clients { margin-top: 18px; overflow: hidden; direction: ltr; -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
-.clients-row { display: flex; width: max-content; animation: clients calc(var(--n) * 5s) linear infinite; }
+/* the title sits centred between two hairlines that fade out, our name in its own type with the mark */
+.clients-h { display: flex; align-items: center; justify-content: center; gap: 18px; color: var(--ink-2); font-size: var(--fs-lead); font-weight: 600; line-height: 1.3; text-align: center; }
+.clients-h > span:first-child { flex: none; }
+.clients-of { display: inline-flex; flex: none; align-items: center; gap: 9px; color: var(--ink); }
+.clients-of b { direction: ltr; font: 700 0.92em/1 var(--wordmark); letter-spacing: -0.04em; }
+.clients-h::before, .clients-h::after { content: ""; flex: 1 1 0; max-width: 220px; height: 1px; }
+.clients-h::before { background: linear-gradient(to left, transparent, color-mix(in srgb, var(--ink) 22%, transparent)); }
+.clients-h::after { background: linear-gradient(to right, transparent, color-mix(in srgb, var(--ink) 22%, transparent)); }
+@media (max-width: 699px) { .clients-h { flex-wrap: wrap; gap: 6px 10px; } .clients-h::before, .clients-h::after { display: none; } }
+/* room above and below the cards for their shadow, which overflow: hidden would cut; the negative margin gives
+   the room back to the page */
+.clients { --fade: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent); margin: 6px 0 -34px; overflow: hidden; direction: ltr; -webkit-mask-image: var(--fade); mask-image: var(--fade); }
+@media (max-width: 699px) { .clients { --fade: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); } }
+.clients-row { display: flex; width: max-content; animation: clients calc(var(--n) * 8s) linear infinite; }
 .clients:hover .clients-row, .clients:focus-within .clients-row { animation-play-state: paused; }
 @keyframes clients { to { transform: translateX(-50%); } }
-.clients-list { display: flex; gap: 14px; margin: 0; padding: 6px 7px 10px; list-style: none; }
+.clients-list { display: flex; gap: 14px; margin: 0; padding: 16px 7px 44px; list-style: none; }
 .client { direction: rtl; display: flex; align-items: center; gap: 12px; width: 290px; height: 100%; padding: 14px 16px; border-radius: var(--r); color: var(--ink); text-decoration: none; transition: transform 0.25s var(--ease-out); }
 @media (hover: hover) { .client:hover { transform: translateY(-2px); } }
 .client-logo { display: grid; place-items: center; width: 44px; height: 44px; flex: none; overflow: hidden; border-radius: 24%; background: #fff; box-shadow: 0 0 0 1px var(--edge); }

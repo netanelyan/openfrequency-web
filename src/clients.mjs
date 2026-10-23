@@ -22,7 +22,7 @@ export function clients() {
   const list = (hidden) => Array.from({ length: reps }, (_, r) => CLIENTS.map((c) => card(c, hidden || r > 0)).join('')).join('');
   return `
 <section class="clients-sec" aria-labelledby="clients-h">
-<div class="wrap"><h2 id="clients-h">עסקים שעובדים עם OpenFrequency</h2></div>
+<div class="wrap"><h2 id="clients-h" class="clients-h"><span>עסקים שעובדים עם</span> <span class="clients-of">${mark('openfrequency', 28)}<b>OpenFrequency</b></span></h2></div>
 <div class="clients" style="--n:${CLIENTS.length * reps}">
 <div class="clients-row">
 <ul class="clients-list">${list(false)}</ul>
