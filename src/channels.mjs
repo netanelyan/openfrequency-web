@@ -9,9 +9,9 @@ import { CHANNELS, mark } from './lib.mjs';
 import { chat } from './chat.mjs';
 import { LOGOS } from './logos.mjs';
 
-export const NAMES = { whatsapp: 'וואטסאפ', instagram: 'אינסטגרם', messenger: 'מסנג׳ר', email: 'מייל' };
+export const NAMES = { whatsapp: 'וואטסאפ', instagram: 'אינסטגרם', messenger: 'מסנג׳ר', email: 'מייל', tiktok: 'טיקטוק' };
 // A channel's name with its mark in front.
-const named = (c) => `${LOGOS[c]}${NAMES[c]}`;
+export const named = (c) => `${LOGOS[c]}${NAMES[c]}`;
 
 // The sample: one store, one dress, one price, all made up, and the caption says so.
 const Q = 'היי, יש את שמלת הפשתן הירוקה במידה M?';
@@ -55,20 +55,28 @@ ${top('ח', 'החנות שלכם', named('messenger'))}
 const live = (cfg) => new Set(cfg.get('toran.channels') || []);
 const soon = '<span class="soon">בקרוב</span>';
 
-// The tabs and the window. The tab list is hidden until the script makes it work; the windows are a stacked list
-// until then, each under its own name.
+// Tabs over one window, for Toran's channels and Teder's platforms alike: each item is { key, name (HTML), window
+// (HTML) }. The tab list is hidden until the script makes it work (site.js, [data-channels]); until then the windows
+// are a stacked list, each under its own name.
+export function tabBox(items, { label, note }) {
+  return `<div class="ch-box" data-channels>
+<div class="ch-tabs" role="tablist" aria-label="${label}" hidden>
+${items.map((t, i) => `<button type="button" role="tab" id="tab-${t.key}" aria-controls="ch-${t.key}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${t.name}</button>`).join('\n')}
+</div>
+${items.map((t) => `<div class="ch-panel" id="ch-${t.key}">
+<h3 class="ch-name">${t.name}</h3>
+<div class="stage glass">${t.window}</div>
+</div>`).join('\n')}
+<p class="ch-note">${note}</p>
+</div>`;
+}
+
 export function channelWindow(cfg) {
   const on = live(cfg);
-  return `<div class="ch-box" data-channels>
-<div class="ch-tabs" role="tablist" aria-label="איפה הלקוחה כותבת" hidden>
-${CHANNELS.map((c, i) => `<button type="button" role="tab" id="tab-${c}" aria-controls="ch-${c}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${named(c)}${on.has(c) ? '' : soon}</button>`).join('\n')}
-</div>
-${CHANNELS.map((c) => `<div class="ch-panel" id="ch-${c}">
-<h3 class="ch-name">${named(c)}${on.has(c) ? '' : soon}</h3>
-<div class="stage glass">${WINDOWS[c]()}</div>
-</div>`).join('\n')}
-<p class="ch-note">שיחה לדוגמה. החנות, השמלה והמחיר מומצאים. בכל ערוץ זו אותה שאלה ואותה תשובה, כי זה אותו תורן שמכיר את אותה חנות.</p>
-</div>`;
+  return tabBox(CHANNELS.map((c) => ({ key: c, name: `${named(c)}${on.has(c) ? '' : soon}`, window: WINDOWS[c]() })), {
+    label: 'איפה הלקוחה כותבת',
+    note: 'שיחה לדוגמה. החנות, השמלה והמחיר מומצאים. בכל ערוץ זו אותה שאלה ואותה תשובה, כי זה אותו תורן שמכיר את אותה חנות.',
+  });
 }
 
 // The owner's screen: every conversation in one list, whatever channel it came from, with what happened to it.

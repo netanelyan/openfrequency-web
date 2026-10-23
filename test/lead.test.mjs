@@ -98,8 +98,9 @@ test('an Israeli mobile is kept as 9725XXXXXXXX', () => {
   assert.equal(mobile('12345'), null);
 });
 
-test('a Teder lead takes a phone or an email; a demo lead needs a phone', () => {
-  assert.equal(validate({ source: 'teder', contact: 'a@b.co' }).lead.contact, 'a@b.co');
+test("both demos, Toran's and Teder's, take a store and a WhatsApp number", () => {
+  assert.deepEqual(validate({ source: 'teder', store: 'www.shop.co.il', contact: '050-1234567', page: '/teder' }).lead, { source: 'teder', store: 'shop.co.il', contact: '972501234567', page: '/teder' });
+  assert.equal(validate({ source: 'teder', contact: '0501234567' }).error, 'store');
   assert.equal(validate({ source: 'demo', store: 'shop.co.il', contact: 'a@b.co' }).error, 'contact');
   assert.equal(validate({ source: 'other', contact: 'a@b.co' }).error, 'bad');
 });
@@ -134,15 +135,19 @@ test('one demo per WhatsApp number: a second ask is answered, and nothing is sav
   await settle();
   assert.equal(rows().length, before);
   assert.equal(handed.length, toToran);
-  // The same number may still join Teder's waitlist.
-  assert.equal((await post({ source: 'teder', contact: '0501234567' })).status, 200);
+  // The same number may still ask for Teder's demo, once, and that one is not handed to Toran.
+  assert.equal((await post({ source: 'teder', store: 'shop.co.il', contact: '0501234567' })).status, 200);
+  assert.equal((await post({ source: 'teder', store: 'other.co.il', contact: '0501234567' })).status, 409);
+  await settle();
+  assert.equal(handed.length, toToran);
+  assert.match(sent.at(-1).body.text, /דמו לתדר/);
 });
 
 test('a plain form post is redirected to the thank-you page for its form', async () => {
   let res = await post({ source: 'demo', store: 'shop2.co.il', contact: '0521234567', page: '/' }, { json: false });
   assert.equal(res.status, 303);
   assert.equal(res.headers.get('location'), '/thanks');
-  res = await post({ source: 'teder', contact: 'me@example.com', page: '/' }, { json: false });
+  res = await post({ source: 'teder', store: 'shop2.co.il', contact: '0521234567', page: '/teder' }, { json: false });
   assert.equal(res.headers.get('location'), '/thanks/teder');
   res = await post({ source: 'demo', store: 'nope', contact: '0521234567' }, { json: false });
   assert.equal(res.headers.get('location'), '/try-again');
@@ -172,11 +177,12 @@ test('a post from another site is refused', async () => {
 
 test('one address gets 5 leads an hour', async () => {
   const ip = '10.9.9.9';
-  for (let i = 0; i < 5; i++) assert.equal((await post({ source: 'teder', contact: `p${i}@x.co` }, { ip })).status, 200);
-  const res = await post({ source: 'teder', contact: 'p6@x.co' }, { ip });
+  const ask = (n) => ({ source: 'teder', store: `s${n}.co.il`, contact: `05200000${String(n).padStart(2, '0')}` });
+  for (let i = 0; i < 5; i++) assert.equal((await post(ask(i), { ip })).status, 200);
+  const res = await post(ask(6), { ip });
   assert.equal(res.status, 429);
   assert.equal((await res.json()).error, 'rate');
-  assert.equal((await post({ source: 'teder', contact: 'other@x.co' })).status, 200, 'another address still gets in');
+  assert.equal((await post(ask(7))).status, 200, 'another address still gets in');
 });
 
 test('when Telegram is down the lead is still saved, marked unsent', async () => {

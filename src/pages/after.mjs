@@ -24,6 +24,15 @@ const waButton = (cfg, label) => {
     : hasWa(cfg) ? `<span class="btn primary">${label} ${cfg.ph('whatsapp')}</span>` : '';
 };
 
+export const thanksTeder = plain('/thanks/teder', 'קיבלנו את הכתובת של החנות', () => `
+<section class="sec after">
+<div class="wrap narrow" data-rise>
+<h1>קיבלנו את הכתובת של החנות</h1>
+<p class="lede">כשהמצגת לדוגמה מוכנה, נשלח לכם אותה לוואטסאפ, בגודל של טיקטוק ושל אינסטגרם.</p>
+<div class="actions"><a class="btn" href="/teder">חזרה לתדר</a></div>
+</div>
+</section>`);
+
 export const thanksAgain = plain('/thanks/already', 'כבר קיבלנו בקשה מהמספר הזה', (cfg) => `
 <section class="sec after">
 <div class="wrap narrow" data-rise>

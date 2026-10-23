@@ -1,7 +1,7 @@
 // The site's one script beyond the header: it sends a form without leaving the page. Without it the forms still
 // work, as plain posts that land on /thanks or /try-again. Every word it shows is in the page, in a <template>, so
 // the copy lint reads it like the rest.
-//   form[data-form="demo"]: data-wa is our WhatsApp number (empty in a draft), data-wa-text the message
+//   form[data-form="demo" | "teder"]: data-wa is our WhatsApp number (empty in a draft), data-wa-text the message
 //   it starts with, where {store} is the address they typed.
 (function () {
   var forms = document.querySelectorAll('form[data-form]');

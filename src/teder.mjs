@@ -2,7 +2,9 @@
 // subject, from assets/teder/showcase.json, which scripts/showcase.mjs writes from the slideshows Teder hands over.
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, esc, glyphOnly } from './lib.mjs';
+import { ROOT, esc, glyphOnly, mark } from './lib.mjs';
+import { named, tabBox } from './channels.mjs';
+import { LOGOS } from './logos.mjs';
 
 export const COVERS = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/teder/showcase.json'), 'utf8'));
 
@@ -18,6 +20,43 @@ export const reel = `<div class="phone-sit reel-sit" aria-hidden="true">
 <div class="fan">${FAN.map((c) => img(c, 'tt', false)).join('')}</div>
 <div class="phone"><div class="reel" data-reel><span class="bars">${COVERS.map(() => '<i></i>').join('')}</span>${COVERS.map((c) => img(c, 'tt', false)).join('')}</div></div>
 <p class="pop" data-pop><span class="wave">${glyphOnly('teder')}</span><span class="pop-h"><b>תדר</b><small>מצגת חדשה מוכנה</small></span><span class="pop-t">מחכה לאישור לפני שהיא עולה.</span></p>
+</div>`;
+
+// Teder's page: one slideshow, as each platform shows it. The same cover, from the made-up houseplant account (demo),
+// in TikTok's tall frame and in an Instagram post, under tabs like Toran's channels (channels.mjs, tabBox).
+const SAMPLE = COVERS.find((c) => c.pack === 'demo');
+const SHOW = { account: 'עציץ ושמש', handle: 'demo.atzitz', slides: 7 };
+const icon = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
+const ICONS = {
+  heart: icon('M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z'),
+  comment: icon('M20 12a8 8 0 0 1-11.6 7.1L4 20l.9-4.4A8 8 0 1 1 20 12z'),
+  send: icon('M21 4 3 11l7 2 2 7 9-16zM10 13l11-9'),
+};
+export const platformWindow = () => tabBox([
+  { key: 'tiktok', name: named('tiktok'), window: `<figure class="tt" data-ui aria-label="${esc(`${SHOW.account}, טיקטוק`)}">
+${img(SAMPLE, 'tt', true)}
+<figcaption class="tt-over" aria-hidden="true"><b dir="ltr">@${SHOW.handle}</b><span>${esc(SAMPLE.topic)}</span></figcaption>
+<span class="tt-rail" aria-hidden="true">${ICONS.heart}${ICONS.comment}${ICONS.send}</span>
+</figure>` },
+  { key: 'instagram', name: named('instagram'), window: `<figure class="igp" data-ui aria-label="${esc(`${SHOW.account}, אינסטגרם`)}">
+<div class="chat-top"><span class="ava" aria-hidden="true">ע</span><span><b dir="ltr">${SHOW.handle}</b><small>${esc(SHOW.account)}</small></span></div>
+${img(SAMPLE, 'ig', true)}
+<div class="igp-act" aria-hidden="true">${ICONS.heart}${ICONS.comment}${ICONS.send}<span class="igp-dots">${Array.from({ length: SHOW.slides }, (_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</span></div>
+<figcaption><b dir="ltr">${SHOW.handle}</b> ${esc(SAMPLE.topic)}</figcaption>
+</figure>` },
+], { label: 'איפה המצגת עולה', note: 'מצגת לדוגמה, מחשבון בדיוני על צמחי בית. אותה מצגת, בגודל של כל פלטפורמה.' });
+
+// The approval screen: the slideshows of the day, each with where it goes out and what happened to it.
+const STATUS = { yours: 'מחכה לאישור', fixed: 'אושרה, תעלה ב-19:40', alone: 'עלתה' };
+const DAY = [['money', 'yours'], ['football', 'fixed'], ['ai-tips', 'alone'], ['demo', 'yours']];
+export const approvals = () => `<div class="inbox approvals" data-ui role="group" aria-label="המצגות של היום, דוגמה">
+<div class="inbox-top">${mark('teder', 28)}<b>המצגות של היום</b><span class="tag">דוגמה</span></div>
+<ul>
+${DAY.map(([pack, s]) => {
+    const c = COVERS.find((x) => x.pack === pack);
+    return `<li><span class="ap-thumb" aria-hidden="true">${img(c, 'ig', true).replace(/ alt="[^"]*"/, ' alt=""')}</span><span class="ib-text">${esc(c.topic)}</span><span class="ap-where">${LOGOS.tiktok}${LOGOS.instagram}</span><span class="ui-s ${s}">${STATUS[s]}</span>${s === 'yours' ? '<span class="ap-ok">לאשר</span>' : ''}</li>`;
+  }).join('\n')}
+</ul>
 </div>`;
 
 // One cover per subject, named by its subject first, so a visitor finds the one they care about at a glance.

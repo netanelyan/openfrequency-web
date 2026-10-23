@@ -16,12 +16,12 @@
 //                        demo lead only goes to Telegram
 //   OF_INTERNAL_TOKEN    the token Toran checks, the same value as in Toran's and accounts' private/.env
 //
-// What a lead holds: the store's address (demo only), a WhatsApp number or an email, the source form, the page, and
-// the time. The client's IP address is used for the rate limit, in memory only, and never written down.
+// What a lead holds: which demo (Toran's or Teder's), the store's address, a WhatsApp number, the page, and the time.
+// The client's IP address is used for the rate limit, in memory only, and never written down.
 //
-// One demo per WhatsApp number: a second ask from a number that already asked is answered "we have it" and saved
-// nowhere, so the form can't be used to queue store after store. A demo lead is handed to Toran, which adds the store
-// to its dashboard; like Telegram, a handover that fails is retried.
+// One demo of each product per WhatsApp number: a second ask from a number that already asked is answered "we have
+// it" and saved nowhere, so the form can't be used to queue store after store. A Toran demo is handed to Toran, which
+// adds the store to its dashboard; like Telegram, a handover that fails is retried.
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -87,26 +87,18 @@ export function mobile(s) {
   return null;
 }
 
-const email = (s) => {
-  const t = String(s || '').trim().toLowerCase();
-  return t.length <= 200 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t) ? t : null;
-};
 
-// The form's fields, checked. Returns { lead } or { error }: 'store', 'contact' or 'bad'.
+// The form's fields, checked. Returns { lead } or { error }: 'store', 'contact' or 'bad'. Both forms ask for a demo:
+// 'demo' is Toran's, 'teder' a sample slideshow from Teder; each takes the store's address and a WhatsApp number.
 export function validate(f) {
   const source = f.source;
   if (source !== 'demo' && source !== 'teder') return { error: 'bad' };
   const page = typeof f.page === 'string' && /^\/[\w\-/]{0,60}$/.test(f.page) ? f.page : null;
-  if (source === 'demo') {
-    const store = storeHost(f.store);
-    if (!store) return { error: 'store' };
-    const contact = mobile(f.contact);
-    if (!contact) return { error: 'contact' };
-    return { lead: { source, store, contact, page } };
-  }
-  const contact = mobile(f.contact) || email(f.contact);
+  const store = storeHost(f.store);
+  if (!store) return { error: 'store' };
+  const contact = mobile(f.contact);
   if (!contact) return { error: 'contact' };
-  return { lead: { source, store: null, contact, page } };
+  return { lead: { source, store, contact, page } };
 }
 
 // ---------------------------------------------------------------- the rate limit, in memory
@@ -139,7 +131,7 @@ function message(row) {
   const who = /^\d+$/.test(row.contact) ? `וואטסאפ: https://wa.me/${row.contact}` : `מייל: ${row.contact}`;
   return row.source === 'demo'
     ? `ליד חדש, דמו לתורן\nחנות: ${row.store}\n${who}\nמהעמוד ${row.page || '?'}, ${when(row.created_at)}`
-    : `ליד חדש, רשימת ההמתנה של תדר\n${who}\nמהעמוד ${row.page || '?'}, ${when(row.created_at)}`;
+    : `ליד חדש, דמו לתדר\nחנות: ${row.store}\n${who}\nמהעמוד ${row.page || '?'}, ${when(row.created_at)}`;
 }
 
 async function notify(db, row) {
@@ -267,9 +259,9 @@ export function createServer(db) {
     const { lead, error } = validate(fields);
     if (error) return reply(req, res, 400, { ok: false, error });
 
-    // One demo per number. The check and the insert below run with no await between them, so two posts at once
-    // can't both get through.
-    if (lead.source === 'demo' && db.prepare("SELECT 1 FROM leads WHERE source = 'demo' AND contact = ?").get(lead.contact)) {
+    // One demo of each product per number. The check and the insert below run with no await between them, so two
+    // posts at once can't both get through.
+    if (db.prepare('SELECT 1 FROM leads WHERE source = ? AND contact = ?').get(lead.source, lead.contact)) {
       count(ip);
       return reply(req, res, 409, { ok: false, error: 'dup' });
     }

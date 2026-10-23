@@ -15,14 +15,14 @@ import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
 import teder from './src/pages/teder.mjs';
 import faq from './src/pages/faq.mjs';
-import { thanks, thanksAgain, tryAgain } from './src/pages/after.mjs';
+import { thanks, thanksAgain, thanksTeder, tryAgain } from './src/pages/after.mjs';
 
 const draft = process.argv.includes('--draft');
 // The draft banner, and the placeholders the public draft leaves out, only for us: npm run dev.
 const banner = draft && process.argv.includes('--banner');
 const OUT = path.join(ROOT, 'dist');
 
-const PAGES = [home, toran, teder, faq, thanks, thanksAgain, tryAgain];
+const PAGES = [home, toran, teder, faq, thanks, thanksAgain, thanksTeder, tryAgain];
 const DRAFT_PAGES = [];
 
 const cfg = { ...readConfig(draft), banner };
