@@ -4,55 +4,39 @@
     "subject": "בינה מלאכותית",
     "account": "שאלה טובה",
     "handle": "@sheela.tova",
-    "topic": "Circle to Search באנדרואיד",
+    "topic": "Copilot ב-Windows: דרכים לפתוח אותו ומה הוא יודע לעשות",
     "fictional": false,
-    "photo": {
-      "by": "Kindel Media",
-      "provider": "Pexels",
-      "page": "https://www.pexels.com/photo/a-person-holding-a-smartphone-7054532/"
-    },
-    "alt": "Circle to Search מחפש גם טקסט ומתרגם מסך שלם. ויש אפליקציות שבהן הוא לא עובד"
+    "photo": null,
+    "alt": "מה אפשר לבקש מ-Copilot ב-Windows? ארבע נקודות מדפי העזרה של Microsoft"
   },
   {
     "pack": "football",
     "subject": "כדורגל",
     "account": "קו אמצע",
     "handle": "@kav.emtza",
-    "topic": "מקרנזו: אורוגוואי נגד ברזיל, 1950",
+    "topic": "שיאים של ליגת העל בכדורגל",
     "fictional": false,
-    "photo": {
-      "by": "Elaine - A Brasileira",
-      "provider": "Pexels",
-      "page": "https://www.pexels.com/photo/panoramic-view-of-maracana-stadium-28649105/"
-    },
-    "alt": "שיר הניצחון של ברזיל היה מוכן לפני גמר 1950. ברזיל חגגה לפני שריקת הפתיחה"
+    "photo": null,
+    "alt": "ארבעה שיאים של ליגת העל. מחיפה ועד פתח תקווה ותל אביב"
   },
   {
     "pack": "money",
     "subject": "כסף",
     "account": "שקל לשקל",
     "handle": "@shekel.leshekel",
-    "topic": "השקל שאיבד אפסים: מהלירה ועד השקל החדש",
+    "topic": "מחירים מרביים למוצרים בפיקוח",
     "fictional": false,
-    "photo": {
-      "by": "Nataliya Vaitkevich",
-      "provider": "Pexels",
-      "page": "https://www.pexels.com/photo/coins-in-a-jar-6863247/"
-    },
-    "alt": "לפני שהיה שקל, הייתה לירה. מה קרה לה? מ-1952: לירה, שקל ישן ושקל חדש"
+    "photo": null,
+    "alt": "כמה מותר לגבות על חלב, ביצים וגבינה? המחירים המרביים בפיקוח, וגם מחיר אילת"
   },
   {
     "pack": "demo",
     "subject": "צמחי בית",
     "account": "עציץ ושמש",
     "handle": "@demo.atzitz",
-    "topic": "מתושלח, עץ התמר שנבט מזרע בן 2,000 שנה",
+    "topic": "נענע במרפסת קטנה",
     "fictional": true,
-    "photo": {
-      "by": "Samet Burak Dağlıoğlu",
-      "provider": "Pexels",
-      "page": "https://www.pexels.com/photo/lush-date-palm-tree-in-a-desert-oasis-28613482/"
-    },
-    "alt": "התמר שישן 2,000 שנה בקנקן ממצדה, ואיך הוא חזר. קנקן אחד, 40 שנה באחסון, ועץ אחד"
+    "photo": null,
+    "alt": "מה נענע צריכה במרפסת קטנה? נענע ובזיליקום רוצים כמעט הפכים בשמש, במים ובעציץ"
   }
 ]
