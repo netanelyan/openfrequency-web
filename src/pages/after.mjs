@@ -10,7 +10,7 @@ export const thanks = plain('/thanks', 'קיבלנו את הכתובת של הח
 <section class="sec after">
 <div class="wrap narrow" data-rise>
 <h1>קיבלנו את הכתובת של החנות</h1>
-<p class="lede">תוך ${cfg.t('demo.time')} נשלח לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p>
+<p class="lede">${cfg.has('demo.time') || cfg.banner ? `תוך ${cfg.t('demo.time')} נשלח` : 'כשהדמו מוכן, נשלח'} לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p>
 <div class="actions"><a class="btn" href="/">לעמוד הבית</a></div>
 </div>
 </section>`);
@@ -24,19 +24,20 @@ export const thanksTeder = plain('/thanks/teder', 'רשמנו אתכם לרשי�
 </div>
 </section>`);
 
-// Our WhatsApp, for when the form can't take it.
+// Our WhatsApp, for when the form can't take it; until we have a number, the public draft doesn't offer it.
+const hasWa = (cfg) => cfg.has('whatsapp') || cfg.banner;
 const waButton = (cfg, label) => {
   const wa = cfg.get('whatsapp');
   return wa
     ? `<a class="btn primary" href="https://wa.me/${wa}?text=${esc(encodeURIComponent(WA_TEXT.any))}">${label}</a>`
-    : `<span class="btn primary">${label} ${cfg.ph('whatsapp')}</span>`;
+    : hasWa(cfg) ? `<span class="btn primary">${label} ${cfg.ph('whatsapp')}</span>` : '';
 };
 
 export const thanksAgain = plain('/thanks/already', 'כבר קיבלנו בקשה מהמספר הזה', (cfg) => `
 <section class="sec after">
 <div class="wrap narrow" data-rise>
 <h1>כבר קיבלנו בקשה מהמספר הזה</h1>
-<p class="lede">יש לנו כבר בקשה לדמו מהמספר הזה, והלינק יגיע לוואטסאפ שלו. לדמו לחנות נוספת, אפשר לכתוב לנו בוואטסאפ.</p>
+<p class="lede">יש לנו כבר בקשה לדמו מהמספר הזה, והלינק יגיע לוואטסאפ שלו.${hasWa(cfg) ? ' לדמו לחנות נוספת, אפשר לכתוב לנו בוואטסאפ.' : ''}</p>
 <div class="actions">${waButton(cfg, 'לכתוב לנו בוואטסאפ')}<a class="btn" href="/">לעמוד הבית</a></div>
 </div>
 </section>`);
@@ -47,7 +48,7 @@ export const tryAgain = plain('/try-again', 'הפרטים לא הגיעו אלי
 <section class="sec after">
 <div class="wrap narrow" data-rise>
 <h1>הפרטים לא הגיעו אלינו</h1>
-<p class="lede">הטופס לא נשלח. אפשר לשלוח לנו את הכתובת של החנות בוואטסאפ, או לנסות שוב בעוד כמה דקות.</p>
+<p class="lede">${hasWa(cfg) ? 'הטופס לא נשלח. אפשר לשלוח לנו את הכתובת של החנות בוואטסאפ, או לנסות שוב בעוד כמה דקות.' : 'הטופס לא נשלח. אפשר לנסות שוב בעוד כמה דקות.'}</p>
 <div class="actions">${button}<a class="btn" href="/toran#demo">לנסות שוב</a></div>
 </div>
 </section>`;

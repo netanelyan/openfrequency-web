@@ -406,26 +406,100 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 
 /* ------------------------------------------------------------ the home page: the first screen */
 
-/* The headline across the top; under it what Toran does and the working form on one side, the product at work on
-   the other, large. On a phone the chat comes after the form. */
-.hero { padding-block: 28px 56px; }
-/* On a phone the chat comes straight after the headline, so the first screen shows Toran answering; the header
-   keeps the demo button in reach. */
-.hero > .wrap { display: grid; gap: 24px; grid-template-areas: 'head' 'stage' 'text'; }
-@media (max-width: 999px) { .hero .msg.later { display: none; } }
-/* The brief's headline is a whole sentence: two lines from a tablet up, three on a phone. */
+/* Toran's first screen: the headline and what it does on one side; on the other, the channel tabs over one window
+   that changes with them. On a phone the window comes after the text. */
+.hero { padding-block: 28px 40px; }
+.hero > .wrap { display: grid; gap: 24px; grid-template-areas: 'head' 'text' 'box'; }
 .hero-head { grid-area: head; }
-.hero-head .mark { margin-bottom: 20px; }
-.hero h1 { margin: 0; }
+.hero-head .mark { margin-bottom: 16px; }
+.hero h1 { margin: 0; font-size: clamp(30px, 3.3vw, 46px); }
 .hero-text { grid-area: text; }
-.hero .stage { grid-area: stage; padding: clamp(10px, 1.6vw, 18px); }
-.hero .stage .chat { max-width: none; }
-.hero .lede { max-width: 34ch; }
+.hero .lede { max-width: 36ch; }
+.hero .ch-box { grid-area: box; min-width: 0; }
 @media (min-width: 1000px) {
-  .hero { padding-block: 44px 24px; }
-  .hero > .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); grid-template-areas: 'head head' 'text stage'; gap: 36px 56px; align-items: start; }
-  .hero .stage { margin-top: 0; }
+  .hero { padding-block: 44px 40px; }
+  .hero > .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); grid-template-areas: 'head box' 'text box'; gap: 24px 56px; align-items: start; }
+  .hero-text { align-self: start; }
 }
+
+/* The channels: a row of tabs, each a channel's name and, until it is live, "בקרוב"; one window under them. Without
+   a script there are no tabs, and the windows stand one under the other, each under its name. */
+.ch-tabs { display: flex; gap: 4px; width: fit-content; max-width: 100%; margin-bottom: 12px; padding: 4px; overflow-x: auto; border-radius: 999px; background: var(--fill); scrollbar-width: none; }
+.ch-tabs::-webkit-scrollbar { display: none; }
+.ch-tabs[hidden] { display: none; }
+.ch-tabs button { display: inline-flex; flex: none; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 600 15px/1 var(--text); cursor: pointer; }
+.ch-tabs button[aria-selected="true"] { background: var(--sheet); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14); }
+.ch-tabs button:focus-visible, .ch-panel:focus-visible { outline: 3px solid var(--accent-fill); outline-offset: 2px; }
+.soon { display: inline-block; padding: 2px 7px; border-radius: 999px; background: var(--warn-bg); color: var(--warn); font-size: 11px; font-weight: 700; line-height: 1.4; }
+/* On a phone the four tabs share the width: the name, and "בקרוב" under it. */
+@media (max-width: 559px) {
+  .ch-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; width: 100%; }
+  .ch-tabs button { flex-direction: column; justify-content: center; gap: 3px; min-height: 52px; padding: 6px 4px; font-size: 14px; }
+  .ch-tabs .soon { padding: 0 6px; font-size: 10px; }
+}
+.ch-name { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 17px; }
+.ch-panel { border-radius: var(--r); }
+.ch-panel + .ch-panel { margin-top: 22px; }
+.tabbed .ch-panel + .ch-panel { margin-top: 0; }
+.tabbed .ch-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ch-panel .stage { padding: clamp(10px, 1.6vw, 18px); }
+.ch-panel .chat { max-width: none; }
+.tabbed .ch-panel .chat { min-height: 268px; }
+.ch-note { margin: 12px 0 0; color: var(--ink-3); font-size: 13px; }
+
+/* Each channel in its own chat look, never its logo. Instagram: round bubbles, the story the customer answered. */
+.chat.ig, .chat.fb, .chat.mail { background: var(--sheet); }
+.chat.ig .msgs, .chat.fb .msgs { background: none; }
+.chat.ig .chat-top .ava { box-shadow: 0 0 0 2px var(--sheet), 0 0 0 4px #d6249f; }
+.chat.ig .msg, .chat.fb .msg { padding: 9px 14px; border-radius: 22px; box-shadow: none; }
+.chat.ig .msg.me { background: #3797f0; color: #fff; }
+.chat.ig .msg.them, .chat.fb .msg.them > span:last-child { background: var(--fill); }
+.ig-story { display: grid; justify-items: end; gap: 4px; align-self: flex-end; color: var(--ink-3); font-size: 12px; }
+.ig-thumb { display: grid; align-items: end; width: 78px; height: 128px; padding: 8px; border-radius: 12px; background: linear-gradient(165deg, #9cc3a7, #3f6b52); color: #fff; font-size: 11px; font-weight: 700; }
+/* Messenger: a blue bubble for the customer, the store's beside its small round picture. */
+.chat.fb .msg.me { background: #0866ff; color: #fff; }
+.chat.fb .msg.them { display: flex; align-items: flex-end; gap: 8px; max-width: 92%; padding: 0; background: none; }
+.chat.fb .msg.them > span:last-child { padding: 9px 14px; border-radius: 22px; }
+.chat.fb .msg.them .ava { display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--fill-2); color: var(--ink-2); font-size: 12px; font-weight: 700; }
+.fb-time { align-self: center; color: var(--ink-3); font-size: 12px; }
+/* Email: a subject, then each message with who it is from and to, and the store's signature. */
+.mail-subj { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.mail-subj small { display: block; color: var(--ink-3); font-size: 12px; }
+.mail-subj b { font-size: 17px; }
+.mail-msg { padding: 14px 16px; }
+.mail-msg + .mail-msg { border-top: 1px solid var(--line); }
+.mail-from { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.mail-from b { display: block; font-size: 14px; }
+.mail-from small, .mail-from time { display: block; color: var(--ink-3); font-size: 12px; }
+.mail-from time { margin-inline-start: auto; }
+.mail .ava { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--fill-2); color: var(--ink-2); font-size: 13px; font-weight: 700; }
+.mail .ava.store { background: var(--toran); color: #fff; }
+.mail-msg p { margin: 0; font-size: 15px; line-height: 1.55; }
+.mail-msg .mail-sig { margin-top: 12px; color: var(--ink-3); font-size: 13px; }
+
+/* The owner's one inbox: each conversation with its channel, when, and what happened to it. */
+.inbox { width: 100%; max-width: 520px; overflow: hidden; border-radius: 14px; background: var(--sheet); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 12px 32px -18px rgba(0, 0, 0, 0.3); }
+.inbox-top { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 15px; }
+.inbox-top .tag { padding: 3px 10px; border-radius: 999px; background: var(--fill); color: var(--ink-2); font-size: 12px; font-weight: 600; }
+.inbox-top .tag:first-of-type { margin-inline-start: auto; }
+.inbox-top .tag.soon { background: var(--warn-bg); color: var(--warn); }
+.inbox ul { margin: 0; padding: 4px 6px 6px; list-style: none; }
+.inbox li { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'ch st' 'text time'; gap: 6px 12px; padding: 12px 10px; }
+.inbox li + li { border-top: 1px solid var(--line); }
+.inbox .ui-s { grid-area: st; justify-self: end; }
+.ib-text { grid-area: text; overflow: hidden; font-size: 15px; white-space: nowrap; text-overflow: ellipsis; }
+.ib-time { grid-area: time; color: var(--ink-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.ch-tag { grid-area: ch; justify-self: start; display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--c) 14%, transparent); font-size: 12px; font-weight: 600; }
+.ch-tag::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.ch-tag.whatsapp { --c: #25d366; }
+.ch-tag.instagram { --c: #d6249f; }
+.ch-tag.messenger { --c: #0866ff; }
+.ch-tag.email { --c: #8e8e93; }
+
+/* The price on Toran's page, short, and the one form, at the end. */
+.terms-line { max-width: 62ch; margin-top: 20px; }
+.close-sec h2 + .lede { margin-top: 14px; }
+.close-sec .more { margin-top: 28px; }
 
 .demo { display: grid; gap: 14px; margin-top: 28px; max-width: 520px; }
 .demo .btn { width: 100%; }
@@ -440,12 +514,14 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .co-hero { position: relative; isolation: isolate; overflow-x: clip; padding-block: 28px 16px; }
 .co-hero h1 { margin-top: 12px; max-width: 14em; font-size: clamp(32px, 4.3vw, 62px); }
 /* A marker stroke under the words a headline is about: the company's blue on the home page, Toran's green on its page. */
-h1 .hl { --hl: var(--of); padding-inline: 0.08em; background: linear-gradient(transparent 58%, color-mix(in srgb, var(--hl) 30%, transparent) 58%, color-mix(in srgb, var(--hl) 30%, transparent) 92%, transparent 92%); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-.hero h1 .hl { --hl: var(--toran); }
+/* A product name under the marker keeps the marker alone, without its own underline. */
+.hl .pn { text-decoration: none; }
+:is(h1, .lede) .hl { --hl: var(--of); padding-inline: 0.08em; background: linear-gradient(transparent 58%, color-mix(in srgb, var(--hl) 30%, transparent) 58%, color-mix(in srgb, var(--hl) 30%, transparent) 92%, transparent 92%); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.hero :is(h1, .lede) .hl { --hl: var(--toran); }
 .teder-field h1 .hl { --hl: #fff; }
 @media (prefers-color-scheme: dark) {
   .co-hero h1 .hl { background: linear-gradient(transparent 58%, rgb(110 135 255 / 0.42) 58%, rgb(110 135 255 / 0.42) 92%, transparent 92%); }
-  .hero h1 .hl { background: linear-gradient(transparent 58%, rgb(60 200 140 / 0.36) 58%, rgb(60 200 140 / 0.36) 92%, transparent 92%); }
+  .hero :is(h1, .lede) .hl { background: linear-gradient(transparent 58%, rgb(60 200 140 / 0.36) 58%, rgb(60 200 140 / 0.36) 92%, transparent 92%); }
 }
 .co-hero .lede { margin-top: 18px; max-width: 40ch; }
 /* The mark's dots alone, large, faint and turned 30 degrees behind the headline, pushed toward the left edge. The doors' glass blurs them. */
@@ -548,43 +624,6 @@ h1 .hl { --hl: var(--of); padding-inline: 0.08em; background: linear-gradient(tr
 
 /* ------------------------------------------------------------ how it goes: one fragment, held, changing state */
 
-/* Three statements scroll past a held stage; the fragment on it changes to match the statement in view. Without
-   script, or with reduced motion, nothing is held: each state sits under its statement. */
-.steps-sec .wrap { display: grid; gap: 0 56px; }
-.steps { margin: 0; padding: 0; list-style: none; }
-.step { padding-block: 8px 48px; }
-.step h3 { font-size: var(--fs-lead); }
-.step p { margin-top: 10px; max-width: 46ch; }
-.step .state { margin-top: 24px; }
-.held { display: none; }
-/* Between a phone and a desk, each state sits beside its statement. */
-@media (min-width: 700px) and (max-width: 899px) { .step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 28px; align-items: start; } .step .state { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; } }
-@media (min-width: 900px) {
-  .js .steps-sec .wrap { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); }
-  .js .step { min-height: 52vh; padding-block: 14vh 0; }
-  .js .step:first-child { padding-top: 6vh; }
-  .js .step h3, .js .step p { color: var(--ink-p); transition: color 0.3s ease; }
-  .js .step.on h3, .js .step.on p { color: var(--ink); }
-  .js .step .state { display: none; }
-  .js .held { display: block; position: sticky; top: calc(var(--top) + 24px); align-self: start; }
-  /* The fragment stands on the glass at the stage's full width; the three states share one cell. */
-  .held .stage { display: grid; place-items: stretch; padding: 16px; }
-  .held .ui-card { max-width: none; }
-  .held .state { grid-area: 1 / 1; opacity: 0; transform: translateY(16px) scale(0.98); transition: opacity 0.35s var(--ease-out), transform 0.5s var(--ease-out); pointer-events: none; }
-  .held .state.on { opacity: 1; transform: none; pointer-events: auto; }
-}
-
-/* The three states, each a crop of the real interface. */
-.ui-card { width: 100%; max-width: 400px; padding: 18px; border-radius: 14px; background: var(--sheet); color: var(--ink); font-size: 15px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06); }
-.ui-card .ui-t { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-weight: 600; }
-.ui-card .ui-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 10px; background: var(--fill); font-size: 14px; }
-.ui-card .ui-row + .ui-row { margin-top: 6px; }
-.ui-card .ui-row b { font-weight: 600; }
-.ui-card .ui-k { color: var(--ink-3); font-size: 13px; }
-.ui-card .ui-field { padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--field); direction: ltr; text-align: right; font-size: 15px; }
-.ui-card .ui-field + .ui-field { margin-top: 8px; }
-.ui-card .ui-btn { margin-top: 12px; padding: 12px; border-radius: 999px; background: var(--accent-fill); color: #fff; text-align: center; font-weight: 600; }
-.ui-card .ui-ok { margin-top: 12px; color: var(--ok); font-size: 14px; font-weight: 600; }
 .ui-s { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .ui-s.alone { background: color-mix(in srgb, var(--toran) 18%, transparent); color: var(--ink); }
 .ui-s.yours { background: color-mix(in srgb, var(--accent-fill) 18%, transparent); color: var(--ink); }
@@ -741,7 +780,6 @@ h1 .hl { --hl: var(--of); padding-inline: 0.08em; background: linear-gradient(tr
 
 /* ------------------------------------------------------------ the Toran page */
 
-.pair-note { margin-top: 14px; max-width: 60ch; }
 .side h2 + .lede { margin-top: 16px; }
 .more { margin-top: 32px; color: var(--ink-p); }
 
@@ -752,9 +790,6 @@ h1 .hl { --hl: var(--of); padding-inline: 0.08em; background: linear-gradient(tr
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 @media (min-width: 900px) { .phero { padding-top: 72px; } }
 
-.pair { display: grid; gap: 16px; max-width: 940px; margin-inline: auto; }
-.pair .chat { max-width: none; }
-@media (min-width: 800px) { .pair { grid-template-columns: 1fr 1fr; align-items: start; } }
 
 .rows { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
 .rows li { display: flex; gap: 12px; align-items: baseline; padding: 12px 16px; border-radius: var(--r-m); }

@@ -17,6 +17,9 @@ const open = (cfg, kind, page, cls, id = '') =>
 <input type="hidden" name="page" value="${page}">
 ${honeypot}`;
 
+// How long a demo takes, as the forms say it; until it is set, the public draft says only that it comes when ready.
+const within = (cfg) => (cfg.has('demo.time') || cfg.banner ? `תוך ${cfg.t('demo.time')}` : null);
+
 const status = (id) => `<div class="form-msg" id="msg-${id}" role="status" aria-live="polite" hidden></div>`;
 
 // The demo form. A page can hold it twice (the first screen and the close), so each copy has its own id.
@@ -25,7 +28,7 @@ export function demoForm(cfg, page, id = 'demo') {
 <label class="f">הכתובת של החנות<input name="store" type="text" inputmode="url" autocomplete="url" dir="ltr" placeholder="shop.co.il" required></label>
 <label class="f">הוואטסאפ שלכם<input name="contact" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="050-0000000" required></label>
 <button class="btn primary" type="submit">לבנות דמו</button>
-<p class="when">הדמו מוכן תוך ${cfg.t('demo.time')}, ונשלח אותו למספר הזה.</p>
+<p class="when">${within(cfg) ? `הדמו מוכן ${within(cfg)}, ונשלח אותו למספר הזה.` : 'כשהדמו מוכן, נשלח אותו למספר הזה.'}</p>
 ${status(id)}
 </form>`;
 }
@@ -41,7 +44,7 @@ ${status('teder')}
 // Once per page that has a form.
 export function formCopy(cfg) {
   const wa = '<a class="btn sm primary" data-wa href="#">לשלוח בוואטסאפ</a>';
-  return `<template id="done-demo"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>תוך ${cfg.t('demo.time')} נשלח לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p></div></template>
+  return `<template id="done-demo"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>${within(cfg) ? `${within(cfg)} נשלח` : 'כשהדמו מוכן, נשלח'} לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p></div></template>
 <template id="done-teder"><div class="done" tabindex="-1"><h3>רשמנו אתכם</h3><p>נכתוב לכם כשתדר ייפתח לחנויות.</p></div></template>
 <template id="msg-store"><p>הכתובת של החנות לא נראית לנו נכונה. אפשר לכתוב אותה כמו בדפדפן, למשל shop.co.il.</p></template>
 <template id="msg-contact-demo"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את הדמו.</p></template>

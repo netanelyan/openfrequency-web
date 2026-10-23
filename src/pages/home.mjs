@@ -67,5 +67,6 @@ export default (cfg) => ({
   dock: true,
   title: 'OpenFrequency, תורן ותדר',
   description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות בוואטסאפ 24/7, מתוך מה שכתוב באתר.',
-  body: [hero, clients(), ask, about(cfg)].join('\n'),
+  // "Who we are" waits for its two sentences in the public draft.
+  body: [hero, clients(), ask, cfg.has('about.who') || cfg.banner ? about(cfg) : ''].join('\n'),
 });

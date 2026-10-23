@@ -61,18 +61,40 @@
     once.observe(stage);
   });
 
-  // How it goes: the statement in the middle of the screen sets the state of the held fragment.
-  var steps = d.querySelectorAll('.step[data-step]'), states = d.querySelectorAll('.held [data-state]');
-  if (steps.length && states.length && 'IntersectionObserver' in window) {
-    var pick = function (n) {
-      each('.step[data-step]', function (s) { s.classList.toggle('on', s.getAttribute('data-step') === n); });
-      each('.held [data-state]', function (s) { s.classList.toggle('on', s.getAttribute('data-state') === n); });
+  // Toran's channels: the stacked windows become tabs. One window shows at a time; the arrow keys move between the
+  // tabs (in reading order, so in Hebrew the left arrow goes on), Home and End go to the ends.
+  each('[data-channels]', function (box) {
+    var list = box.querySelector('[role=tablist]'), tabs = box.querySelectorAll('[role=tab]');
+    var pick = function (tab, focus) {
+      Array.prototype.forEach.call(tabs, function (t) {
+        var on = t === tab, panel = d.getElementById(t.getAttribute('aria-controls'));
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        panel.hidden = !on;
+      });
+      if (focus) tab.focus();
     };
-    var mid = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.isIntersecting) pick(e.target.getAttribute('data-step')); });
-    }, { rootMargin: '-45% 0px -45% 0px' });
-    Array.prototype.forEach.call(steps, function (s) { mid.observe(s); });
-  }
+    Array.prototype.forEach.call(tabs, function (t, i) {
+      var panel = d.getElementById(t.getAttribute('aria-controls'));
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', t.id);
+      panel.tabIndex = 0;
+      t.addEventListener('click', function () { pick(t); });
+      t.addEventListener('keydown', function (e) {
+        var rtl = getComputedStyle(list).direction === 'rtl', n = tabs.length, k = e.key, to = null;
+        if (k === (rtl ? 'ArrowLeft' : 'ArrowRight')) to = (i + 1) % n;
+        else if (k === (rtl ? 'ArrowRight' : 'ArrowLeft')) to = (i - 1 + n) % n;
+        else if (k === 'Home') to = 0;
+        else if (k === 'End') to = n - 1;
+        if (to === null) return;
+        e.preventDefault();
+        pick(tabs[to], true);
+      });
+    });
+    list.hidden = false;
+    box.classList.add('tabbed');
+    pick(box.querySelector('[aria-selected=true]') || tabs[0]);
+  });
 
   // The question box: Toran answering for OpenFrequency, from what this site says. Every suggested question has an
   // answer; anything else gets Toran's real line for a question it can't answer.
@@ -84,7 +106,7 @@
       teder: ['תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, וכל מצגת עולה רק אחרי שמישהו אישר אותה.' + link('/teder', 'לעמוד של תדר'), 'מהעמוד של תדר'],
       demo: ['שולחים לנו את הכתובת של החנות ומספר וואטסאפ. אנחנו בונים דמו מהמוצרים ומדפי המדיניות שבאתר שלכם, ושולחים לכם לינק. כותבים לו כמו לקוח, ורואים מה הוא עונה.' + link('/toran#demo', 'לבנות דמו לחנות'), 'מהעמוד של תורן'],
       store: ['היום תורן עובד עם חנויות על Shopify. החיבור ל-WooCommerce ול-Wix בדרך.', 'מהעמוד של תורן'],
-      price: ['המחיר החודשי, ומה ש-Meta גובה על הודעות שהחנות שולחת ביוזמתה, כתובים בעמוד של תורן, עם דוגמה במספרים.' + link('/toran#price', 'כמה זה עולה'), 'מהעמוד של תורן'],
+      price: ['את המחיר עוד לא פרסמנו באתר. אפשר לבנות דמו לחנות, ולשאול אותנו עליו.' + link('/toran#demo', 'לבנות דמו לחנות'), 'מהעמוד של תורן'],
       wrong: ['תורן לא ממציא תשובות. הוא עונה רק ממה שכתוב באתר של החנות, וכשאין לו תשובה הוא שואל אתכם במקום לנחש. בשבועיים הראשונים אנחנו גם קוראים איתכם את השיחות ומתקנים.', 'מהשאלות באתר'],
       number: ['כן. הלקוחות ממשיכים לכתוב לאותו מספר, ואנחנו מחברים אותו ל-WhatsApp Business Platform של Meta יחד איתכם.', 'מהשאלות באתר'],
       install: ['לדמו לא צריך להתקין כלום. תורן קורא את מה שכבר מופיע באתר. כדי לחבר את המספר של החנות צריך חשבון עסקי ב-Meta, ואת החיבור עושים יחד.', 'מהשאלות באתר'],

@@ -16,8 +16,9 @@ const PRODUCTS = [
   ['/toran', 'toran', 'תורן', 'עונה ללקוחות בוואטסאפ'],
   ['/teder', 'teder', 'תדר', 'מצגות לטיקטוק ולאינסטגרם'],
 ];
-const LINKS = [
-  ['/toran#price', 'מחיר'],
+// The price link goes only where there is a price: the public draft leaves the price out until it is set.
+const LINKS = (cfg) => [
+  ...(cfg.has('price.monthly') || cfg.banner ? [['/toran#price', 'מחיר']] : []),
   ['/faq', 'שאלות'],
 ];
 
@@ -26,16 +27,16 @@ const DEMO = (current) => (current === '/toran' ? '#demo' : '/toran#demo');
 
 const menuIcon = `<svg class="i open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg><svg class="i close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 
-function header(current) {
+function header(cfg, current) {
   const here = (href) => (href === current ? ' aria-current="page"' : '');
   const nav = [
     ...PRODUCTS.map(([href, name, label]) => `<a href="${href}"${here(href)}>${mark(name, 20)}${label}</a>`),
-    ...LINKS.map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`),
+    ...LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`),
   ].join('');
   // On a phone the menu opens on the products, each with what it does, then the rest and the demo.
   const sheet = `<div class="sheet-products">${PRODUCTS.map(([href, name, label, what]) =>
     `<a class="prod" href="${href}"${here(href)}>${mark(name, 40)}<span><b>${label}</b><small>${what}</small></span></a>`).join('')}</div>
-<div class="sheet-links">${LINKS.map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`).join('')}</div>
+<div class="sheet-links">${LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`).join('')}</div>
 <a class="btn primary" href="${DEMO(current)}">לבנות דמו לחנות</a>`;
   return `<header class="top">
 <div class="bar">
@@ -53,7 +54,7 @@ function footer(cfg, current) {
   const wa = cfg.get('whatsapp');
   const waLink = wa
     ? `<a class="foot-wa" href="https://wa.me/${wa}">לכתוב לנו בוואטסאפ</a>`
-    : `<span class="foot-wa">לכתוב לנו בוואטסאפ <mark class="ph">[${esc(FACTS.whatsapp.label)}]</mark></span>`;
+    : cfg.banner ? `<span class="foot-wa">לכתוב לנו בוואטסאפ <mark class="ph">[${esc(FACTS.whatsapp.label)}]</mark></span>` : '';
   return `<footer class="foot">
 <div class="foot-in">
 <div class="foot-cols">
@@ -65,7 +66,7 @@ function footer(cfg, current) {
 ${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}">${mark(name, 28)}<span><b>${label}</b><small>${what}</small></span></a></li>`).join('\n')}
 </ul></nav>
 <nav aria-labelledby="f-site"><h2 id="f-site">באתר</h2><ul>
-<li><a href="/faq">שאלות</a></li><li><a href="/toran#price">מחיר</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/terms">תנאי שימוש</a></li>
+${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('')}<li><a href="/privacy">פרטיות</a></li><li><a href="/terms">תנאי שימוש</a></li>
 </ul></nav>
 <div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<a class="btn primary sm" href="${DEMO(current)}">לבנות דמו לחנות</a></div>
 </div>
@@ -80,7 +81,7 @@ ${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}
 const early = `<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.ofSite)document.documentElement.classList.remove('js')},3000)</script>`;
 
 export function page(cfg, css, { path, title, description, body, noindex = false, forms = false, dock = false }) {
-  const missing = cfg.draft && cfg.missing.size
+  const missing = cfg.banner && cfg.missing.size
     ? `<p class="draft" role="note">טיוטה. חסרים עוד ${cfg.missing.size} פרטים ב-site.config.json, והאתר לא ייבנה בלעדיהם.</p>`
     : '';
   return `<!doctype html>
@@ -100,7 +101,7 @@ ${early}
 </head>
 <body>
 <a class="skip" href="#main">לדלג לתוכן</a>
-${missing}${header(path)}
+${missing}${header(cfg, path)}
 <main id="main">
 ${body}
 </main>

@@ -2,8 +2,10 @@
 //
 //   node build.mjs           the real build: stops, and writes nothing, while any fact in site.config.json is empty
 //                            or a page fails the copy lint
-//   node build.mjs --draft   the same pages with each missing fact shown as a visible [placeholder], marked noindex,
-//                            for looking, never for shipping
+//   node build.mjs --draft   the same pages, marked noindex, with each missing fact shown as a visible [placeholder]
+//                            where a sentence needs it, and left out where a page can do without it
+//   node build.mjs --draft --banner   (npm run dev) also the banner that counts the missing facts, and every
+//                            placeholder; for us, never for the public
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -16,12 +18,14 @@ import faq from './src/pages/faq.mjs';
 import { thanks, thanksAgain, thanksTeder, tryAgain } from './src/pages/after.mjs';
 
 const draft = process.argv.includes('--draft');
+// The draft banner, and the placeholders the public draft leaves out, only for us: npm run dev.
+const banner = draft && process.argv.includes('--banner');
 const OUT = path.join(ROOT, 'dist');
 
 const PAGES = [home, toran, teder, faq, thanks, thanksAgain, thanksTeder, tryAgain];
 const DRAFT_PAGES = [];
 
-const cfg = readConfig(draft);
+const cfg = { ...readConfig(draft), banner };
 const css = minifyCss(fs.readFileSync(path.join(ROOT, 'src/style.css'), 'utf8'));
 
 // Render everything first, so one run reports every missing fact and every lint error at once.

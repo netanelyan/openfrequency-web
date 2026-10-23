@@ -9,9 +9,12 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 
 // Each fact the site states: the words a draft shows in its place, and what a value must look like. A key in
 // site.config.json that is not here is a build error, so a new fact gets a label before it gets a page.
-//   kind: 'text', 'number' (0 or more), 'lines' (a list of sentences), or the list of allowed values
+//   kind: 'text', 'number' (0 or more), 'lines' (a list of sentences), 'channels' (a list of CHANNELS), or the list of
+//         allowed values
 //   unless: the fact is not needed when this is true (the build then lets it stay empty)
 const metaIncluded = (raw) => raw.price?.metaFees === 'included';
+// Where a customer can write to a store; the ones in toran.channels are live, the rest are shown as coming.
+export const CHANNELS = ['whatsapp', 'instagram', 'messenger', 'email'];
 export const FACTS = {
   domain: { label: 'הדומיין', kind: 'text' },
   whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
@@ -30,6 +33,7 @@ export const FACTS = {
   'price.stops': { label: 'מתי החיוב נעצר', kind: ['period-end', 'immediately'] },
   'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
   'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },
+  'toran.channels': { label: 'הערוצים שתורן עונה בהם היום', kind: 'channels' },
 };
 
 // The config, read so that nothing missing can be shown as a guess. An empty value ('' or null) is missing.
@@ -50,7 +54,8 @@ export function readConfig(draft) {
       if (empty(v)) { if (!f.unless?.(raw)) missing.set(key, f.label); continue; }
       if (f.kind === 'number' && !(typeof v === 'number' && v >= 0)) throw new Error(`site.config.json: "${key}" must be a number, 0 or more (got ${JSON.stringify(v)})`);
       if (f.kind === 'lines' && !(Array.isArray(v) && v.every((x) => typeof x === 'string' && x.trim()))) throw new Error(`site.config.json: "${key}" must be a list of sentences`);
-      if (f.kind !== 'lines' && Array.isArray(v)) throw new Error(`site.config.json: "${key}" must not be a list`);
+      if (f.kind === 'channels' && !(Array.isArray(v) && v.every((x) => CHANNELS.includes(x)))) throw new Error(`site.config.json: "${key}" must be a list of ${CHANNELS.join(', ')}`);
+      if (f.kind !== 'lines' && f.kind !== 'channels' && Array.isArray(v)) throw new Error(`site.config.json: "${key}" must not be a list`);
       if (Array.isArray(f.kind) && !f.kind.includes(v)) throw new Error(`site.config.json: "${key}" must be one of ${f.kind.join(', ')} (got ${JSON.stringify(v)})`);
     }
   };
@@ -73,7 +78,10 @@ export function readConfig(draft) {
   const wa = get('whatsapp');
   if (wa != null && !/^972[1-9]\d{7,8}$/.test(String(wa))) throw new Error(`site.config.json: whatsapp must be digits in international form, like 9725XXXXXXXX (got "${wa}")`);
 
-  return { get, t, ph, missing, draft };
+  // Whether a fact is there. A draft with the banner (dev) shows a missing one as a placeholder; the public draft leaves
+  // out what it can't say yet.
+  const has = (key) => !empty(at(key));
+  return { get, t, ph, has, missing, draft, banner: false };
 }
 
 // Shekels the way the site writes them: 1,290 ₪, and 0.15 ₪ for a fraction.

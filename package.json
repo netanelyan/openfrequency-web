@@ -9,6 +9,7 @@
   "scripts": {
     "build": "node build.mjs",
     "draft": "node build.mjs --draft",
+    "dev": "node build.mjs --draft --banner && node scripts/serve.mjs",
     "serve": "node scripts/serve.mjs",
     "shots": "node scripts/shots.mjs",
     "leads": "node server/lead.mjs",
