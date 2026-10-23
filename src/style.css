@@ -442,6 +442,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 /* A marker stroke under the words a headline is about: the company's blue on the home page, Toran's green on its page. */
 h1 .hl { --hl: var(--of); padding-inline: 0.08em; background: linear-gradient(transparent 58%, color-mix(in srgb, var(--hl) 30%, transparent) 58%, color-mix(in srgb, var(--hl) 30%, transparent) 92%, transparent 92%); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .hero h1 .hl { --hl: var(--toran); }
+.teder-field h1 .hl { --hl: #fff; }
 @media (prefers-color-scheme: dark) {
   .co-hero h1 .hl { background: linear-gradient(transparent 58%, rgb(110 135 255 / 0.42) 58%, rgb(110 135 255 / 0.42) 92%, transparent 92%); }
   .hero h1 .hl { background: linear-gradient(transparent 58%, rgb(60 200 140 / 0.36) 58%, rgb(60 200 140 / 0.36) 92%, transparent 92%); }
