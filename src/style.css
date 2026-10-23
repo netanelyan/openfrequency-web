@@ -243,15 +243,13 @@ p:last-child { margin-bottom: 0; }
 .mark.openfrequency { background: var(--of); }
 .mark.toran { background: var(--toran); }
 .mark.teder { background: var(--teder); }
-/* Toran and Teder inside a sentence, set as names (markNames in lib.mjs), so nobody reads them as the plain words:
-   the product's colour and a heavier weight, nothing more. On Teder's violet the weight alone carries it. */
-.pn { font-weight: 600; color: var(--pn); }
+/* Toran and Teder inside a sentence, set as names (markNames in lib.mjs), so nobody reads them as the plain words.
+   Quietly: the sentence's own ink, a step heavier, over a thin line in the product's colour. */
+.pn { font-weight: 600; text-decoration: underline 2px color-mix(in srgb, var(--pn) 55%, transparent); text-underline-offset: 0.28em; text-decoration-skip-ink: none; }
 .pn.toran { --pn: var(--toran-name); }
 .pn.teder { --pn: var(--teder-name); }
-.teder-door .pn, .teder-field .pn { color: inherit; }
-/* the footer is dark in both themes, so it takes the dark theme's names */
-.foot .pn.toran { color: #5fd6a6; }
-.foot .pn.teder { color: #b9a2ff; }
+/* on Teder's violet and the dark footer, the line is white */
+.teder-door .pn, .teder-field .pn, .foot .pn { --pn: #fff; }
 .mark.inline { display: inline-block; vertical-align: -0.18em; margin-inline-end: 0.3em; --s: 1.05em; }
 
 /* ------------------------------------------------------------ buttons and fields */

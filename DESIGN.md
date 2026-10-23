@@ -188,7 +188,7 @@ A hue-less silver and ink system with one action blue, three brand-mark colours,
 - **OK Green** (ok-green) is for success lines. **Warn** on **Warn Ground** is for form errors, "fixed" status and the draft banner.
 
 ### Product names
-Toran and Teder are Hebrew words, so in a sentence they are set as names: the product's colour at weight 600 (`.pn`). The build does it (`markNames` in `src/lib.mjs`), so new copy needs nothing. A name standing alone, the nav, buttons, links and the product fragments are left as they are.
+Toran and Teder are Hebrew words, so in a sentence they are set as names, quietly: the sentence's own ink at weight 600 over a thin underline in the product's colour (`.pn`). The build does it (`markNames` in `src/lib.mjs`), so new copy needs nothing. A name standing alone, the nav, buttons, links and the product fragments are left as they are.
 
 ### Named Rules
 **The No Hue Wallpaper Rule.** The wallpaper and every tile are hue-less silver. Colour arrives only with the product's fragments, the brand marks, the action blue and the one violet field.
