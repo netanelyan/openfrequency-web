@@ -25,5 +25,5 @@ export const cover = (c) => `<article class="cover glass" aria-labelledby="cover
 <h3 id="cover-${c.pack}" class="cover-subject">${esc(c.subject)}</h3>
 ${img(c, 'ig', true)}
 <p class="cover-topic">${esc(c.topic)}</p>
-<p class="cover-from"><bdi dir="ltr">${esc(c.handle)}</bdi>${c.fictional ? ', חשבון לדוגמה' : ''}${c.photo ? `<br>צילום <a href="${esc(c.photo.page)}" rel="noopener"><bdi dir="ltr">${esc(c.photo.by)}, ${esc(c.photo.provider)}</bdi></a>` : ''}</p>
+${c.photo ? `<p class="cover-from">צילום <a href="${esc(c.photo.page)}" rel="noopener"><bdi dir="ltr">${esc(c.photo.by)}, ${esc(c.photo.provider)}</bdi></a></p>` : ''}
 </article>`;

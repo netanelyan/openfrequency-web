@@ -24,7 +24,6 @@ export default (cfg) => ({
 ${mark('teder', 72)}
 <h1 id="hero-h"><span class="hl">מצגות אוטומטיות</span> בעברית לטיקטוק ולאינסטגרם</h1>
 <p class="lede">תדר כותב ומעצב את המצגות, ומפרסם כל אחת רק אחרי שמישהו אישר אותה.</p>
-<p>כרגע הוא עובד על שלושה חשבונות שלנו, בבינה מלאכותית, בכדורגל ובכסף. כשיהיו לנו תוצאות להראות, נפתח אותו גם לחנויות.</p>
 <div id="wait">
 ${tederForm(cfg, '/teder')}
 <p class="small">נכתוב לכם כשתדר ייפתח לחנויות.</p>
@@ -36,7 +35,7 @@ ${reel}
 
 <section class="sec slides-sec" aria-labelledby="slides-h">
 <div class="wrap">
-<div class="sec-head"><h2 id="slides-h">מצגות שתדר הכין</h2><p class="quiet">שקופית הפתיחה של מצגת אחת בכל נושא. שלושה נושאים מהחשבונות שלנו, ואחד מחשבון בדיוני שבנינו כדי להדגים.</p></div>
+<div class="sec-head"><h2 id="slides-h">מצגות שתדר הכין</h2><p class="quiet">שקופית הפתיחה של מצגת אחת בכל נושא.</p></div>
 <div class="covers">
 ${COVERS.map(cover).join('\n')}
 </div>
