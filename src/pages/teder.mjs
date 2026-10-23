@@ -5,6 +5,7 @@
 import { mark } from '../lib.mjs';
 import { approvals, platformWindow } from '../teder.mjs';
 import { demoForm } from '../forms.mjs';
+import { priceSection } from '../sections.mjs';
 
 const ALONE = [
   'כותב את המצגת בקול של החשבון, לפי מדריך הכתיבה שלו',
@@ -56,6 +57,7 @@ ${platformWindow()}
 </div>
 </section>
 
+${priceSection(cfg, { monthly: 'teder.monthly', setup: 'teder.setup' })}
 <section class="sec close-sec" aria-labelledby="demo-h">
 <div class="wrap narrow">
 <h2 id="demo-h">לנסות את תדר על החנות שלכם</h2>

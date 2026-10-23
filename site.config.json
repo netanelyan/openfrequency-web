@@ -9,9 +9,9 @@
     "why": ""
   },
   "price": {
-    "monthly": null,
-    "vat": "",
-    "setup": null,
+    "monthly": 449,
+    "vat": "included",
+    "setup": 990,
     "metaFees": "",
     "metaMarketing": null,
     "metaUtility": null,
@@ -41,5 +41,9 @@
       "messenger",
       "email"
     ]
+  },
+  "teder": {
+    "monthly": 790,
+    "setup": 1490
   }
 }

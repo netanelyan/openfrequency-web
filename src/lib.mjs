@@ -33,6 +33,8 @@ export const FACTS = {
   'price.stops': { label: 'מתי החיוב נעצר', kind: ['period-end', 'immediately'] },
   'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
   'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },
+  'teder.monthly': { label: 'המחיר החודשי של תדר', kind: 'number' },
+  'teder.setup': { label: 'דמי ההקמה של תדר, 0 אם אין', kind: 'number' },
   'toran.channels': { label: 'הערוצים שתורן עונה בהם היום', kind: 'channels' },
 };
 

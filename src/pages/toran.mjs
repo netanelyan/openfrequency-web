@@ -5,10 +5,10 @@
 // Which channels Toran answers in comes from Toran's /channels.json, or site.config.json (toran.channels) when Toran
 // doesn't answer (build.mjs); every sentence that names them is built from
 // it, so the page never says a channel works before it does. The owners' questions are on /faq.
-import { CHANNELS, esc, ils, mark } from '../lib.mjs';
+import { CHANNELS, mark } from '../lib.mjs';
 import { NAMES, channelWindow, inbox } from '../channels.mjs';
 import { demoForm } from '../forms.mjs';
-import { waWords } from '../sections.mjs';
+import { priceSection } from '../sections.mjs';
 
 // "בוואטסאפ, באינסטגרם ובמייל": each name after ב, the last one after ו.
 const inList = (ids) => {
@@ -31,37 +31,6 @@ const YOURS = [
   'איפה הזמנה מסוימת נמצאת',
 ];
 const rows = (items, cls = '') => `<ul class="rows${cls ? ' ' + cls : ''}">${items.map((s) => `<li><span class="dot" aria-hidden="true"></span><span>${s}</span></li>`).join('')}</ul>`;
-
-// The price, short: the figure, VAT and setup, and how to stop. Left out of the public draft until the price is set;
-// a draft with the banner shows it with its placeholders.
-function price(cfg) {
-  if (!cfg.has('price.monthly') && !cfg.banner) return '';
-  const n = (key) => cfg.get(key);
-  const vat = n('price.vat');
-  const setup = n('price.setup');
-  const months = n('price.commitmentMonths');
-  const stops = n('price.stops');
-  const vatLine = vat === 'included' ? 'המחיר כולל מע״מ.' : vat === 'excluded' ? 'המחיר לא כולל מע״מ.' : cfg.ph('price.vat');
-  const setupLine = setup == null ? cfg.ph('price.setup') : setup === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(setup))} דמי הקמה, פעם אחת.`;
-  const stopWords = stops === 'period-end' ? 'החיוב נעצר בסוף החודש שכבר שולם' : stops === 'immediately' ? 'החיוב נעצר מאותו יום' : cfg.ph('price.stops');
-  const write = waWords(cfg, 'כותבים לנו');
-  const cancel = months == null
-    ? `${cfg.ph('price.commitmentMonths')} כדי להפסיק, ${write}, ו${stopWords}.`
-    : months === 0
-      ? `אין התחייבות. כדי להפסיק, ${write}, ו${stopWords}.`
-      : `ההתחייבות היא ל-${months} חודשים מהיום שהמספר של החנות מחובר. אחרי זה, כדי להפסיק, ${write}, ו${stopWords}.`;
-  const figure = n('price.monthly') == null ? cfg.ph('price.monthly') : esc(n('price.monthly').toLocaleString('he-IL'));
-  return `
-<section class="sec price-sec" id="price" aria-labelledby="price-h">
-<div class="wrap">
-<div class="sec-head"><h2 id="price-h">כמה זה עולה</h2><p>${vatLine} ${setupLine}</p></div>
-<div>
-<p class="figure"><span class="num">${figure}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
-<p class="terms-line">${cancel}</p>
-</div>
-</div>
-</section>`;
-}
 
 export default (cfg) => {
   const on = new Set(cfg.get('toran.channels') || []);
@@ -107,7 +76,7 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
-${price(cfg)}
+${priceSection(cfg, { monthly: 'price.monthly', setup: 'price.setup' })}
 <section class="sec close-sec" aria-labelledby="demo-h">
 <div class="wrap narrow">
 <h2 id="demo-h">לנסות את תורן על החנות שלכם</h2>

@@ -1,5 +1,5 @@
 // What more than one page uses: words that open WhatsApp to us, and the question box on the home page.
-import { mark } from './lib.mjs';
+import { esc, ils, mark } from './lib.mjs';
 
 // Words that open WhatsApp to us; plain words in a draft without the number.
 export const waWords = (cfg, words) => {
@@ -34,3 +34,39 @@ export const askBox = `
 </form>
 </figure>
 `;
+
+// ---------------------------------------------------------------- the price
+
+// A product's price, in the serious register: the figure, VAT and the setup fee, and, once the terms are set, how to
+// stop. monthly and setup are the facts' keys (price.monthly for Toran, teder.monthly for Teder). Left out of the
+// public draft until the monthly price is set; a terms line waits for its own facts the same way.
+export function priceSection(cfg, { monthly, setup, id = 'price' }) {
+  if (!cfg.has(monthly) && !cfg.banner) return '';
+  const vat = cfg.get('price.vat');
+  const fee = cfg.get(setup);
+  const vatLine = vat === 'included' ? 'המחיר כולל מע״מ.' : vat === 'excluded' ? 'המחיר לא כולל מע״מ.' : cfg.ph('price.vat');
+  const setupLine = fee == null ? cfg.ph(setup) : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת.`;
+  const months = cfg.get('price.commitmentMonths');
+  const stops = cfg.get('price.stops');
+  let terms = '';
+  if ((months != null && stops) || cfg.banner) {
+    const stopWords = stops === 'period-end' ? 'החיוב נעצר בסוף החודש שכבר שולם' : stops === 'immediately' ? 'החיוב נעצר מאותו יום' : cfg.ph('price.stops');
+    const write = waWords(cfg, 'כותבים לנו');
+    terms = months == null
+      ? `${cfg.ph('price.commitmentMonths')} כדי להפסיק, ${write}, ו${stopWords}.`
+      : months === 0
+        ? `אין התחייבות. כדי להפסיק, ${write}, ו${stopWords}.`
+        : `ההתחייבות היא ל-${months} חודשים. אחרי זה, כדי להפסיק, ${write}, ו${stopWords}.`;
+  }
+  const figure = cfg.get(monthly) == null ? cfg.ph(monthly) : esc(cfg.get(monthly).toLocaleString('he-IL'));
+  return `
+<section class="sec price-sec" id="${id}" aria-labelledby="${id}-h">
+<div class="wrap">
+<div class="sec-head"><h2 id="${id}-h">כמה זה עולה</h2><p>${vatLine} ${setupLine}</p></div>
+<div>
+<p class="figure"><span class="num">${figure}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
+${terms ? `<p class="terms-line">${terms}</p>` : ''}
+</div>
+</div>
+</section>`;
+}

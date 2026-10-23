@@ -1,7 +1,7 @@
 // The join page, for a store that hasn't picked a product yet: Toran, Teder or both on one form; what happens after it
 // is sent; three of the owners' questions; the price, once it is set; and the way in for stores already with us. The
 // forms at the end of /toran and /teder stay, for a visitor already on a product's page.
-import { esc, ils } from '../lib.mjs';
+import { esc, ils, mark } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
 import { TORAN } from './faq.mjs';
 
@@ -15,17 +15,24 @@ const AFTER = [
 
 const ASKED = ['הלקוחות שלי יראו את הדמו?', 'צריך להתקין משהו בחנות?', 'החנות שלי על Wix. זה יעבוד?'];
 
-// Toran's monthly price, once it is set; Teder's isn't a fact on the site yet, so it isn't named.
+// Each product's price, a tile each: the monthly figure and the setup fee, VAT as the config says. A product whose price
+// isn't set is left out of the public draft.
+export function priceLine(cfg, monthly, setup) {
+  const m = cfg.get(monthly), s = cfg.get(setup);
+  const vat = cfg.get('price.vat') === 'included' ? 'כולל מע״מ' : cfg.get('price.vat') === 'excluded' ? 'לא כולל מע״מ' : cfg.ph('price.vat');
+  return `${m == null ? cfg.ph(monthly) : esc(ils(m))} לחודש, ${vat}${s == null ? `, ${cfg.ph(setup)}` : s > 0 ? `, ועוד ${esc(ils(s))} דמי הקמה, פעם אחת` : ''}.`;
+}
 function price(cfg) {
-  if (!cfg.has('price.monthly') && !cfg.banner) return '';
-  const vat = cfg.get('price.vat');
-  const vatWords = vat === 'included' ? 'כולל מע״מ' : vat === 'excluded' ? 'לא כולל מע״מ' : cfg.ph('price.vat');
-  const monthly = cfg.get('price.monthly');
+  const items = [['toran', 'תורן', 'price.monthly', 'price.setup', '/toran#price'], ['teder', 'תדר', 'teder.monthly', 'teder.setup', '/teder#price']]
+    .filter(([, , m]) => cfg.has(m) || cfg.banner);
+  if (!items.length) return '';
   return `
 <section class="sec" aria-labelledby="join-price-h">
 <div class="wrap narrow">
 <h2 id="join-price-h">כמה זה עולה</h2>
-<p class="lede">תורן עולה ${monthly == null ? cfg.ph('price.monthly') : esc(ils(monthly))} לחודש, ${vatWords}. מה שכלול במחיר, ואיך מפסיקים, כתובים <a href="/toran#price">בעמוד של תורן</a>.</p>
+<ul class="join-prices">
+${items.map(([name, label, m, s, href]) => `<li>${mark(name, 40)}<span><b>${label}</b><span>${priceLine(cfg, m, s)}</span></span><a href="${href}">פרטים</a></li>`).join('\n')}
+</ul>
 </div>
 </section>`;
 }

@@ -5,6 +5,7 @@
 import { mark, glyphOnly } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { askBox } from '../sections.mjs';
+import { priceLine } from './join.mjs';
 import { reel } from '../teder.mjs';
 import { clients } from '../clients.mjs';
 
@@ -41,7 +42,7 @@ ${reel}
 </div>
 </section>`;
 
-const ask = `
+const ask = (cfg) => `
 <section class="sec ask-sec" id="ask" aria-labelledby="ask-h">
 <div class="wrap">
 <div class="try-text">
@@ -51,6 +52,7 @@ const ask = `
 <p class="ask-note">זו הדגמה בדפדפן, עם תשובות שכתבנו מראש מתוך האתר הזה.</p>
 </div>
 ${askBox}
+${cfg.has('price.monthly') && cfg.has('teder.monthly') ? `<template id="ask-price">תורן עולה ${priceLine(cfg, 'price.monthly', 'price.setup')} תדר עולה ${priceLine(cfg, 'teder.monthly', 'teder.setup')}</template>` : ''}
 </div>
 </section>`;
 
@@ -68,5 +70,5 @@ export default (cfg) => ({
   title: 'OpenFrequency, תורן ותדר',
   description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות בוואטסאפ 24/7, מתוך מה שכתוב באתר.',
   // "Who we are" waits for its two sentences in the public draft.
-  body: [hero, clients(), ask, cfg.has('about.who') || cfg.banner ? about(cfg) : ''].join('\n'),
+  body: [hero, clients(), ask(cfg), cfg.has('about.who') || cfg.banner ? about(cfg) : ''].join('\n'),
 });

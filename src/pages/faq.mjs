@@ -1,6 +1,7 @@
 // The questions, in the owner's own words, one group per product.
 import { ils, mark } from '../lib.mjs';
 import { waWords } from '../sections.mjs';
+import { priceLine } from './join.mjs';
 
 export const TORAN = (cfg) => [
   ['אפשר להשאיר את המספר שכבר יש לחנות?',
@@ -17,10 +18,12 @@ export const TORAN = (cfg) => [
   ['החנות שלי על Wix. זה יעבוד?',
     'עוד לא. היום תורן עובד עם חנויות על Shopify, והחיבור ל-WooCommerce ול-Wix בדרך. אם תשלחו לנו את הכתובת, נכתוב לכם ונגיד מה אפשר.'],
   (cfg.has('price.monthly') || cfg.banner) && ['כמה זה עולה?',
-    `${cfg.t('price.monthly', ils)} לחודש. מה שכלול בו, ואיך מפסיקים, כתובים <a href="/toran#price">בעמוד של תורן</a>.`],
+    `${priceLine(cfg, 'price.monthly', 'price.setup')} הפרטים <a href="/toran#price">בעמוד של תורן</a>.`],
 ];
 
-const TEDER = [
+const TEDER = (cfg) => [
+  (cfg.has('teder.monthly') || cfg.banner) && ['כמה עולה תדר?',
+    `${priceLine(cfg, 'teder.monthly', 'teder.setup')} הפרטים <a href="/teder#price">בעמוד של תדר</a>.`],
   ['תדר יכול לפרסם משהו בלי שאישרתי?',
     'לא. כל מצגת יוצאת רק אחרי שמישהו אישר אותה, ובשבת ובחג הוא לא מפרסם בכלל.'],
   ['מאיפה הוא לוקח את העובדות?',
@@ -49,5 +52,5 @@ export default (cfg) => ({
 </div>
 </section>
 ${group('faq-toran', 'toran', 'תורן', TORAN(cfg).filter(Boolean))}
-${group('faq-teder', 'teder', 'תדר', TEDER)}`,
+${group('faq-teder', 'teder', 'תדר', TEDER(cfg).filter(Boolean))}`,
 });
