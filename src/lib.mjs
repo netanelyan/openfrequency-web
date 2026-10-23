@@ -122,7 +122,7 @@ export function markNames(html) {
     }
     if (skip || ALONE.test(part)) return part;
     return part.replace(NAME, (_, pre, prefix, name) =>
-      `${pre}${prefix}<span class="pn ${name === 'תורן' ? 'toran' : 'teder'}${prefix ? ' after' : ''}">${name}</span>`);
+      `${pre}${prefix}<span class="pn ${name === 'תורן' ? 'toran' : 'teder'}">${name}</span>`);
   }).join('');
 }
 

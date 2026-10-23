@@ -6,6 +6,7 @@ import { mark, glyphOnly } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { askBox } from '../sections.mjs';
 import { reel } from '../teder.mjs';
+import { clients } from '../clients.mjs';
 
 // Toran's door: the sample chat on the customer's phone. The first question it answers from the site; the second
 // isn't there, so it tells the customer it's checking, and the question pops up on the owner's phone.
@@ -66,5 +67,5 @@ export default (cfg) => ({
   dock: true,
   title: 'OpenFrequency, תורן ותדר',
   description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות בוואטסאפ, מתוך מה שכתוב באתר, גם בלילה.',
-  body: [hero, ask, about(cfg)].join('\n'),
+  body: [hero, clients(), ask, about(cfg)].join('\n'),
 });
