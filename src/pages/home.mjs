@@ -20,7 +20,7 @@ const hero = `
 <section class="co-hero" aria-labelledby="hero-h">
 <div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
 <div class="wrap">
-<h1 id="hero-h">פלטפורמות יצירת התוכן ושירות הלקוחות המובילות בארץ</h1>
+<h1 id="hero-h">פלטפורמות יצירת התוכן ושירות הלקוחות <span class="hl">המובילות בארץ</span></h1>
 <p class="lede">תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות שלכם בוואטסאפ, מתוך מה שכתוב באתר, גם בשתיים בלילה.</p>
 <div class="doors">
 <article class="door toran-door glass" aria-labelledby="door-toran">
