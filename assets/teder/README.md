@@ -1,10 +1,15 @@
 # Teder slides
 
-Opening slides (tiktok-01) that Teder rendered for our three accounts, resized to 540px wide from
-openfrequency-teder/private/data/dry-media/<account>/posts/<post>/tiktok-01.jpg on 2026-10-22:
+Whole slideshows Teder rendered, one per account, written here by `node scripts/showcase.mjs` from the handover in
+private/showcase/<pack>/<post>/ (2026-10-23):
 
-- sheela-tova-*: @sheela.tova (ai-tips)
-- kav-emtza-*: @kav.emtza (football)
-- shekel-leshekel-*: @shekel.leshekel (money)
+- ai-tips: @sheela.tova, ours
+- football: @kav.emtza, ours
+- money: @shekel.leshekel, ours
+- demo: @demo.atzitz, a made-up account that shows what Teder does (openfrequency-teder, examples/packs/demo)
 
-Our own output; no third-party credit applies.
+Each pack has `ig-NN.jpg` (Instagram, 640x800) and `tt-NN.jpg` (TikTok, 540x960). `showcase.json` holds each
+account, topic, the text of every slide (the alt text) and who took the cover photo.
+
+The slides are our own output. Each cover photo is from Pexels under the Pexels License, which the script checks
+before it writes anything; the page credits the photographer anyway.

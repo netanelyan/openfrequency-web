@@ -1,8 +1,8 @@
-// Teder's page: what it makes, on its own violet, with the waitlist in reach; the slides it made for our three
-// accounts; and how a slideshow gets made, from openfrequency-teder's README ("What it does").
+// Teder's page: what it makes, on its own violet, with the waitlist in reach; whole slideshows it made, as they look
+// in a feed; and how a slideshow gets made, from openfrequency-teder's README ("What it does").
 import { mark } from '../lib.mjs';
 import { tederForm } from '../forms.mjs';
-import { SLIDES, slide, reel } from '../teder.mjs';
+import { DECKS, post, reel } from '../teder.mjs';
 
 const MAKING = [
   ['קורא רק ממקורות שאישרנו', 'אתרים, פידים, ויקיפדיה ו-data.gov.il. ליד כל מקור כתוב למה סומכים עליו ומה מותר לקחת ממנו.'],
@@ -36,10 +36,10 @@ ${reel}
 
 <section class="sec slides-sec" aria-labelledby="slides-h">
 <div class="wrap">
-<div class="sec-head"><h2 id="slides-h">מה תדר הכין לחשבונות שלנו</h2><p class="quiet">שקופיות הפתיחה של מצגות שתדר הכין לשלושת החשבונות. גוללים הצידה.</p></div>
+<div class="sec-head"><h2 id="slides-h">מצגות שתדר הכין</h2><p class="quiet">ככה הן נראות באינסטגרם, מהשער ועד השקופית האחרונה. שלוש לחשבונות שלנו, ואחת לחשבון בדיוני על צמחי בית שבנינו כדי להדגים.</p></div>
+<div class="posts">
+${DECKS.map(post).join('\n')}
 </div>
-<div class="slides" tabindex="0" aria-label="שקופיות פתיחה שתדר הכין לשלושת החשבונות שלנו">
-${SLIDES.map((s) => `<figure>${slide(s)}</figure>`).join('\n')}
 </div>
 </section>
 

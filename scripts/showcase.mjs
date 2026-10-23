@@ -1,0 +1,71 @@
+// Brings Teder's showcase slideshows into the site: private/showcase/<pack>/<post>/ (as Teder hands them over) into
+// assets/teder/showcase/<pack>/, resized, with assets/teder/showcase.json for the pages to read.
+//   node scripts/showcase.mjs
+// Every photo on a slide must be under the Pexels or Unsplash licence, or nothing is written. Uses the installed
+// Chrome through playwright-core to resize; nothing is downloaded.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { chromium } from 'playwright-core';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const FROM = path.join(ROOT, 'private/showcase');
+const TO = path.join(ROOT, 'assets/teder/showcase');
+// The order on the page: our three accounts, then the made-up one.
+const ORDER = ['ai-tips', 'football', 'money', 'demo'];
+// Twice the largest size each one is shown at.
+const SIZE = { instagram: [640, 800], tiktok: [540, 960] };
+const LICENCES = { Pexels: 'Pexels License', Unsplash: 'Unsplash License' };
+
+const packs = fs.readdirSync(FROM).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
+const decks = [];
+const problems = [];
+for (const pack of packs) {
+  const posts = fs.readdirSync(path.join(FROM, pack));
+  if (posts.length !== 1) { problems.push(`${pack}: expected one post, found ${posts.length}`); continue; }
+  const dir = path.join(FROM, pack, posts[0]);
+  const m = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
+  for (const p of [m.background, ...m.slides.map((s) => s.photo)].filter(Boolean)) {
+    if (LICENCES[p.provider] !== p.licence) problems.push(`${pack}: a photo from ${p.provider} under "${p.licence}" (${p.page})`);
+  }
+  const cover = m.slides.find((s) => s.photo)?.photo ?? m.background;
+  decks.push({
+    pack,
+    dir,
+    account: m.account,
+    handle: m.handle,
+    topic: m.topic,
+    fictional: m.handle.startsWith('@demo.'),
+    photo: cover && { by: cover.photographer.replace(/\s+/g, ' ').trim(), provider: cover.provider, page: cover.page },
+    slides: m.slides.map((s) => ({ n: s.n, files: s.files, alt: s.text.filter((t) => !t.startsWith('@')).map((t) => t.replace(/\s*\n\s*/g, ' ').trim()).join('. ').replace(/([.?!])\./g, '$1') })),
+  });
+}
+if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
+
+fs.rmSync(TO, { recursive: true, force: true });
+const browser = await chromium.launch({ channel: 'chrome' });
+const page = await browser.newPage();
+for (const d of decks) {
+  fs.mkdirSync(path.join(TO, d.pack), { recursive: true });
+  for (const s of d.slides) {
+    for (const [kind, [w, h]] of Object.entries(SIZE)) {
+      const src = 'data:image/jpeg;base64,' + fs.readFileSync(path.join(d.dir, s.files[kind])).toString('base64');
+      const data = await page.evaluate(async ([src, w, h]) => {
+        const im = new Image();
+        im.src = src;
+        await im.decode();
+        const c = Object.assign(document.createElement('canvas'), { width: w, height: h });
+        const x = c.getContext('2d');
+        x.imageSmoothingQuality = 'high';
+        x.drawImage(im, 0, 0, w, h);
+        return c.toDataURL('image/jpeg', 0.84);
+      }, [src, w, h]);
+      fs.writeFileSync(path.join(TO, d.pack, `${kind === 'instagram' ? 'ig' : 'tt'}-${String(s.n).padStart(2, '0')}.jpg`), Buffer.from(data.split(',')[1], 'base64'));
+    }
+  }
+}
+await browser.close();
+
+const out = decks.map(({ dir, slides, ...d }) => ({ ...d, slides: slides.map(({ n, alt }) => ({ n, alt })) }));
+fs.writeFileSync(path.join(ROOT, 'assets/teder/showcase.json'), JSON.stringify(out, null, 2) + '\n');
+console.log(decks.map((d) => `${d.pack}: ${d.slides.length} slides`).join('\n'));

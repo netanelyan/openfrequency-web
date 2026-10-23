@@ -75,7 +75,8 @@ em and en dashes, a colon in a heading, `!!`, gendered slashes, bureaucratic phr
 | `src/layout.mjs` | the head, the sticky glass header, the footer |
 | `src/style.css` | Teder's tokens (light, dark, Increase Contrast, Reduce Transparency) and the site's components |
 | `src/pages/` | one module per page: home, `/toran`, `/teder`, `/faq`, and where a form lands without JS |
-| `src/teder.mjs` | Teder's real slides and its phone, shared by the home page and `/teder` |
+| `src/teder.mjs` | Teder's real slideshows and its phone, shared by the home page and `/teder` |
+| `scripts/showcase.mjs` | Brings Teder's slideshows in from `private/showcase` into `assets/teder/showcase`, checking each photo's licence |
 | `assets/brand/` | the marks, copied from openfrequency-toran; never redrawn |
 | `assets/fonts/` | Heebo (OFL), self-hosted, so no visitor's address goes to Google |
 | `src/site.js` | the motion, and the question box (Toran answering about OpenFrequency) |
