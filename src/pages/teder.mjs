@@ -5,7 +5,7 @@
 import { mark } from '../lib.mjs';
 import { approvals, platformWindow } from '../teder.mjs';
 import { demoForm } from '../forms.mjs';
-import { priceSection } from '../sections.mjs';
+import { priceSection, waWords } from '../sections.mjs';
 
 const ALONE = [
   'כותב את המצגת בקול של החשבון, לפי מדריך הכתיבה שלו',
@@ -14,7 +14,7 @@ const ALONE = [
   'מכין כל מצגת בגודל של טיקטוק ובגודל של אינסטגרם',
   'מפרסם בשעה שנקבעה, ובשבת ובחג לא מפרסם',
 ];
-const YOURS = ['לאשר כל מצגת לפני שהיא עולה. לחיצה אחת מאשרת אותה'];
+const YOURS = ['לאשר כל מצגת לפני שהיא עולה. לחיצה אחת מאשרת אותה', 'לדחות מצגת שלא מתאימה, לכתוב למה, ולקבל גרסה חדשה'];
 const rows = (items, cls = '') => `<ul class="rows${cls ? ' ' + cls : ''}">${items.map((s) => `<li><span class="dot" aria-hidden="true"></span><span>${s}</span></li>`).join('')}</ul>`;
 
 export default (cfg) => ({
@@ -58,10 +58,15 @@ ${platformWindow()}
 </section>
 
 ${priceSection(cfg, { monthly: 'teder.monthly', setup: 'teder.setup', product: { name: 'teder', label: 'תדר', cta: ['#demo', 'לנסות את תדר על החנות שלכם'], includes: [
-  'מצגות בעברית שתדר כותב ומעצב בשבילכם',
-  'כל מצגת בגודל של טיקטוק ובגודל של אינסטגרם',
-  'כל מצגת מחכה לאישור שלכם לפני שהיא עולה',
-  'פרסום בשעה שנקבעה. בשבת ובחג הוא לא מפרסם',
+  `${cfg.t('teder.slideshows')} מצגות מוצעות בחודש לטיקטוק ולאינסטגרם, מוכנות לפרסום`,
+  'בסגנון של העסק שלכם, וכל עובדה בהן נבדקת מול המקור',
+  'כל מצגת עולה רק אחרי שאישרתם אותה',
+  `עד ${cfg.t('teder.redos')} החלפות בחודש, כשמצגת לא יצאה כמו שצריך`,
+  'דוח תוצאות בכל חודש',
+], notes: [
+  'החלפה היא מצגת שדחיתם עם סיבה, ובמקומה מקבלים גרסה חדשה. תיקון קטן בטקסט או בתמונה לא נחשב החלפה, ואין עליו הגבלה.',
+  `צריכים יותר? ${waWords(cfg, 'דברו איתנו')}.`,
+  'אנחנו מתחייבים לתהליך ולמצגות. כמה צפיות, עוקבים או מכירות הן יביאו, את זה אנחנו לא יכולים להבטיח.',
 ] } })}
 <section class="sec close-sec" aria-labelledby="demo-h">
 <div class="wrap narrow">

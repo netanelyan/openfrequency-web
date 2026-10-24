@@ -40,25 +40,29 @@ export const askBox = `
 // A product's price, in the serious register, on one card: the product, the monthly figure, VAT and the setup fee,
 // the way to try it, and beside them what the price includes. Once the terms are set, how to stop goes under the card.
 // monthly and setup are the facts' keys (price.monthly for Toran, teder.monthly for Teder); product is
-// { name: 'toran' | 'teder', label, includes: [html], cta: [href, text] }. Left out of the public draft until the
+// { name: 'toran' | 'teder', label, includes: [html], notes?: [html], cta: [href, text] }. Left out of the public draft until the
 // monthly price is set; the terms line waits for its own facts the same way.
-export function priceSection(cfg, { monthly, setup, product, id = 'price' }) {
+// Toran only (toran: true) adds the founding offer, the free demo, what Meta charges with a worked example, and what
+// happens to the number and the conversations when a store stops.
+export function priceSection(cfg, { monthly, setup, product, id = 'price', toran = false }) {
   if (!cfg.has(monthly) && !cfg.banner) return '';
   const vat = cfg.get('price.vat');
   const fee = cfg.get(setup);
   const vatLine = vat === 'included' ? 'כולל מע״מ.' : vat === 'excluded' ? 'לא כולל מע״מ.' : cfg.ph('price.vat');
-  const setupLine = fee == null ? cfg.ph(setup) : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת.`;
+  const setupLine = fee == null ? cfg.ph(setup) : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת.${toran ? founding(cfg) : ''}`;
   const months = cfg.get('price.commitmentMonths');
   const stops = cfg.get('price.stops');
   let terms = '';
   if ((months != null && stops) || cfg.banner) {
     const stopWords = stops === 'period-end' ? 'החיוב נעצר בסוף החודש שכבר שולם' : stops === 'immediately' ? 'החיוב נעצר מאותו יום' : cfg.ph('price.stops');
     const write = waWords(cfg, 'כותבים לנו');
-    terms = months == null
-      ? `${cfg.ph('price.commitmentMonths')} כדי להפסיק, ${write}, ו${stopWords}.`
-      : months === 0
-        ? `אין התחייבות. כדי להפסיק, ${write}, ו${stopWords}.`
-        : `ההתחייבות היא ל-${months} חודשים. אחרי זה, כדי להפסיק, ${write}, ו${stopWords}.`;
+    const commit = months == null
+      ? cfg.ph('price.commitmentMonths')
+      : months === 0 ? 'אין התחייבות, משלמים חודש בחודש.' : `ההתחייבות היא ל-${months} חודשים.`;
+    const stop = months > 0 ? 'אחרי זה, כדי להפסיק' : 'כדי להפסיק';
+    terms = toran && stops === 'period-end'
+      ? `${commit} ${stop}, ${write}. תורן עונה עד סוף החודש האחרון ששילמתם. ${afterStop(cfg)}`
+      : `${commit} ${stop}, ${write}, ו${stopWords}.`;
   }
   const figure = cfg.get(monthly) == null ? cfg.ph(monthly) : esc(cfg.get(monthly).toLocaleString('he-IL'));
   return `
@@ -69,15 +73,60 @@ export function priceSection(cfg, { monthly, setup, product, id = 'price' }) {
 <div class="price-main">
 <p class="price-name">${mark(product.name, 36)}<b>${product.label}</b></p>
 <p class="figure"><span class="num">${figure}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
-<p class="price-notes">${vatLine} ${setupLine}</p>
+<p class="price-notes">${vatLine} ${setupLine}${toran ? ' הדמו בחינם.' : ''}</p>
 <a class="btn primary" href="${product.cta[0]}">${product.cta[1]}</a>
 </div>
 <div class="price-incl">
 <h3>מה כלול במחיר</h3>
 <ul class="checks">${product.includes.map((x) => `<li>${x}</li>`).join('')}</ul>
+${(product.notes || []).map((x) => `<p class="incl-note">${x}</p>`).join('')}
 </div>
 </div>
+${toran ? metaFees(cfg, monthly) : ''}
 ${terms ? `<p class="terms-line">${terms}</p>` : ''}
 </div>
 </section>`;
+}
+
+// The founding offer, while price.founding.on is true: the first stores pay no setup fee. A sentence that starts with a
+// space, to follow the setup fee; product names the product where the sentence stands without it (the price line).
+export function founding(cfg, product = '') {
+  if (cfg.get('price.founding.on') !== true) return '';
+  const n = cfg.get('price.founding.stores');
+  return n == null ? ` ${cfg.ph('price.founding.stores')}` : ` ל-${esc(n)} החנויות הראשונות שמצטרפות${product} אין דמי הקמה.`;
+}
+
+// What happens after the last paid month: the number, and how long the conversations are kept.
+function afterStop(cfg) {
+  const days = cfg.get('price.keepDays');
+  return `מספר הוואטסאפ של החנות נשאר שלכם, ואנחנו מנתקים אותו מהצד שלנו. את השיחות אנחנו שומרים עוד ${days == null ? cfg.ph('price.keepDays') : esc(days)} יום, כדי שתוכלו לייצא אותן, ואחר כך מוחקים אותן.`;
+}
+
+// What Meta charges for the messages, and a month worked out from the config's own numbers. Left out of the public
+// draft until every number it needs is set.
+const META = ['price.metaFees', 'price.conversationCap', 'price.metaMarketing', 'price.metaUtility', 'price.exampleCarts', 'price.exampleUpdates'];
+function metaFees(cfg, monthly) {
+  if (!cfg.banner && ![...META, monthly].every((k) => cfg.has(k))) return '';
+  const how = cfg.get('price.metaFees');
+  const cap = cfg.get('price.conversationCap');
+  const capWords = cap == null ? cfg.ph('price.conversationCap') : `${esc(cap.toLocaleString('he-IL'))} שיחות`;
+  if (how === 'included') {
+    return `<div class="price-meta"><h3>מה ש-Meta גובה על ההודעות</h3><p>כל ההודעות כלולות במחיר החודשי, עד ${capWords} בחודש. את מה ש-Meta גובה עליהן אנחנו משלמים.</p></div>`;
+  }
+  if (how !== 'marketing-at-cost') return `<div class="price-meta"><p>${cfg.ph('price.metaFees')}</p></div>`;
+  const n = (key) => cfg.get(key);
+  // An amount, rounded to the agora, or the placeholder of the first fact it is missing.
+  const money = (keys, f) => {
+    const gap = keys.find((k) => n(k) == null);
+    return gap ? cfg.ph(gap) : esc(ils(Math.round(f() * 100) / 100));
+  };
+  const count = (key) => (n(key) == null ? cfg.ph(key) : esc(n(key).toLocaleString('he-IL')));
+  const carts = ['price.exampleCarts', 'price.metaMarketing'];
+  const updates = ['price.exampleUpdates', 'price.metaUtility'];
+  return `
+<div class="price-meta">
+<h3>מה ש-Meta גובה על ההודעות</h3>
+<p>תשובות ללקוחות ועדכונים על הזמנות כלולים במחיר החודשי, עד ${capWords} בחודש. תזכורות על עגלה נטושה הן הודעות שיווק, ו-Meta גובה על כל אחת מהן בערך ${money(['price.metaMarketing'], () => n('price.metaMarketing'))}. את זה אנחנו מעבירים אליכם במחיר של Meta, בלי תוספת. בחודש הראשון התזכורות עלינו.</p>
+<p>לדוגמה, חנות ששולחת בחודש ${count('price.exampleCarts')} תזכורות על עגלה ו-${count('price.exampleUpdates')} עדכונים על הזמנות תשלם בערך ${money([monthly, ...carts], () => n(monthly) + n('price.exampleCarts') * n('price.metaMarketing'))} לאותו חודש${cfg.get('price.vat') === 'excluded' ? ', לפני מע״מ' : ''}: ${money([monthly], () => n(monthly))} המחיר החודשי, ועוד בערך ${money(carts, () => n('price.exampleCarts') * n('price.metaMarketing'))} על התזכורות. העדכונים עולים ב-Meta בערך ${money(updates, () => n('price.exampleUpdates') * n('price.metaUtility'))}, והם כלולים במחיר.</p>
+</div>`;
 }

@@ -67,7 +67,7 @@ function footer(cfg, current) {
 ${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}">${mark(name, 28)}<span><b>${label}</b><small>${what}</small></span></a></li>`).join('\n')}
 </ul></nav>
 <nav aria-labelledby="f-site"><h2 id="f-site">באתר</h2><ul>
-${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('')}<li><a href="/privacy">פרטיות</a></li><li><a href="/terms">תנאי שימוש</a></li>
+${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('')}<li><a href="/terms">תנאי שימוש</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/security">אבטחת מידע</a></li><li><a href="/accessibility">נגישות</a></li>
 </ul></nav>
 <div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<a class="btn primary sm" href="${DEMO(current)}">לנסות את תורן</a></div>
 </div>
@@ -79,7 +79,21 @@ ${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a
 
 // In the head, before anything paints: the page is told script runs, so the parts that rise in wait for it. If
 // site.js never arrives, the flag comes off after three seconds and everything simply shows.
-const early = `<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.ofSite)document.documentElement.classList.remove('js')},3000)</script>`;
+// The accessibility switches this browser saved (the panel, in site.js) go on here too, so the page never paints
+// without them.
+const early = `<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.ofSite)document.documentElement.classList.remove('js')},3000);try{var a=JSON.parse(localStorage.getItem('of-a11y'))||{};['big','contrast','links','still'].forEach(function(k){if(a[k]===true)document.documentElement.classList.add('a-'+k)})}catch(e){}</script>`;
+
+// The accessibility panel: four switches and the way to the statement. It waits for site.js, which shows it; without
+// script the page is the same page, and the statement is in the footer.
+const A11Y = [['big', 'טקסט גדול יותר'], ['contrast', 'ניגודיות גבוהה'], ['links', 'קו מתחת לקישורים'], ['still', 'לעצור תנועה']];
+const a11y = `<div class="a11y" data-a11y hidden>
+<div class="a11y-p" id="a11y-p" role="group" aria-labelledby="a11y-h" hidden>
+<h2 id="a11y-h">נגישות</h2>
+${A11Y.map(([k, label]) => `<button type="button" data-a="${k}" aria-pressed="false">${label}</button>`).join('\n')}
+<div class="a11y-end"><button type="button" class="a11y-reset" data-a11y-reset>לאפס</button><a href="/accessibility">הצהרת הנגישות</a></div>
+</div>
+<button class="a11y-btn" type="button" aria-expanded="false" aria-controls="a11y-p"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="1.8"/><path d="M5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5l-3 6M12 14.5l3 6"/></svg><span class="sr">נגישות</span></button>
+</div>`;
 
 export function page(cfg, css, { path, title, description, body, noindex = false, forms = false, dock = false }) {
   const missing = cfg.banner && cfg.missing.size
@@ -108,6 +122,7 @@ ${body}
 </main>
 ${dock ? `<div class="dock" data-dock><a class="btn primary" href="${DEMO(path)}">לנסות את תורן על החנות שלכם</a></div>` : ''}
 ${footer(cfg, path)}
+${a11y}
 <script>
 ${siteJs}
 </script>

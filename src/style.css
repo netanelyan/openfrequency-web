@@ -816,6 +816,9 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
   .price-incl { padding-inline-start: 40px; border-inline-start: 1px solid var(--line); }
 }
 .price-sec .terms-line { margin-top: 18px; color: var(--ink-2); }
+.price-meta { max-width: 62ch; margin-top: 28px; }
+.price-meta h3 { margin: 0 0 10px; font-size: var(--fs-body); }
+.price-meta p { margin: 0 0 10px; color: var(--ink-2); }
 
 /* ------------------------------------------------------------ the questions: filled tiles */
 
@@ -942,3 +945,42 @@ input[aria-invalid='true'] { border-color: var(--warn); }
 /* A fact that is not in site.config.json yet. Only a draft build can show one; the real build stops instead. */
 .ph { padding: 0 4px; border-radius: 6px; background: color-mix(in srgb, #ff9f0a 24%, transparent); outline: 1px dashed var(--warn); color: inherit; font: inherit; }
 .draft { margin: 0; padding: 8px var(--gut); background: var(--warn-bg); color: var(--warn); font-size: 13px; text-align: center; }
+
+/* The accessibility panel: a round button at the bottom corner, above the phone's dock when the dock is up. */
+.a11y { position: fixed; z-index: 45; bottom: calc(16px + env(safe-area-inset-bottom)); inset-inline-end: 16px; }
+.a11y[hidden], .a11y-p[hidden] { display: none; }
+.dock.on ~ .a11y { bottom: calc(88px + env(safe-area-inset-bottom)); }
+.a11y-btn { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 1px solid var(--edge); border-radius: 50%; background: var(--surface-hi); -webkit-backdrop-filter: var(--glass); backdrop-filter: var(--glass); color: var(--ink); cursor: pointer; }
+.a11y-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.a11y-btn svg circle { fill: currentColor; stroke: none; }
+.a11y-p { position: absolute; bottom: 60px; inset-inline-end: 0; display: grid; gap: 8px; width: min(280px, calc(100vw - 32px)); padding: 16px; border: 1px solid var(--edge); border-radius: var(--r); background: var(--surface-hi); -webkit-backdrop-filter: var(--glass); backdrop-filter: var(--glass); }
+.a11y-p h2 { margin: 0 0 4px; font-size: var(--fs-body); }
+.a11y-p [data-a] { min-height: 44px; padding: 10px 14px; border: 1px solid var(--line-2); border-radius: var(--r-m); background: transparent; color: var(--ink); font: inherit; text-align: start; cursor: pointer; }
+.a11y-p [data-a][aria-pressed="true"] { border-color: var(--accent-fill); background: var(--accent-fill); color: var(--accent-ink); }
+.a11y-end { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; font-size: var(--fs-small); }
+.a11y-reset { min-height: 44px; padding: 0; border: 0; background: none; color: var(--ink-2); font: inherit; text-decoration: underline; cursor: pointer; }
+.a11y-end a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); }
+@media print { .a11y { display: none; } }
+
+/* The switches. Bigger text zooms the page, so the sizes written in px grow with it. */
+html.a-big body { zoom: 1.2; }
+html.a-links a { text-decoration: underline !important; text-decoration-thickness: 2px !important; text-underline-offset: 3px; }
+html.a-still *, html.a-still *::before, html.a-still *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+html.a-contrast { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: #8e8e93; --line-2: #424245; --bar-float: #ffffff; --bar-edge: #424245; --surface: #ffffff; --surface-hi: #ffffff; --edge: #424245; --tile: #ffffff; }
+@media (prefers-color-scheme: dark) {
+  html.a-contrast { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p: #f5f5f7; --line: #8e8e93; --line-2: #d2d2d7; --bar-float: #000000; --bar-edge: #d2d2d7; --surface: #000000; --surface-hi: #000000; --edge: #d2d2d7; --tile: #000000; }
+}
+
+/* The legal pages: one column of reading, the sections listed at the top. */
+.legal h1 { font-size: var(--fs-display); }
+.legal .lede { margin-top: 18px; }
+.legal-date { margin-top: 10px; color: var(--ink-2); font-size: var(--fs-small); }
+.legal-toc { margin-top: 28px; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--r); }
+.legal-toc ol { display: grid; gap: 6px; margin: 0; padding-inline-start: 22px; }
+.legal-toc a { color: var(--ink); }
+.legal-part { margin-top: 44px; scroll-margin-top: calc(var(--top) + 16px); }
+.legal-part h2 { font-size: var(--fs-lead); line-height: 1.25; }
+.legal-part p, .legal-part ul { max-width: 68ch; margin: 12px 0 0; line-height: 1.65; }
+.legal-part ul { padding-inline-start: 22px; }
+.legal-part li + li { margin-top: 6px; }
+.price-incl .incl-note { margin: 14px 0 0; color: var(--ink-2); font-size: var(--fs-small); max-width: 52ch; }

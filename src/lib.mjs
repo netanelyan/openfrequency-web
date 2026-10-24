@@ -9,7 +9,7 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 
 // Each fact the site states: the words a draft shows in its place, and what a value must look like. A key in
 // site.config.json that is not here is a build error, so a new fact gets a label before it gets a page.
-//   kind: 'text', 'number' (0 or more), 'lines' (a list of sentences), 'channels' (a list of CHANNELS), or the list of
+//   kind: 'text', 'number' (0 or more), 'flag' (true or false), 'lines' (a list of sentences), 'channels' (a list of CHANNELS), or the list of
 //         allowed values
 //   unless: the fact is not needed when this is true (the build then lets it stay empty)
 const metaIncluded = (raw) => raw.price?.metaFees === 'included';
@@ -24,16 +24,32 @@ export const FACTS = {
   'price.monthly': { label: 'המחיר החודשי', kind: 'number' },
   'price.vat': { label: 'כולל או לא כולל מע״מ', kind: ['included', 'excluded'] },
   'price.setup': { label: 'דמי הקמה, 0 אם אין', kind: 'number' },
-  'price.metaFees': { label: 'איך משלמים ל-Meta', kind: ['direct', 'billed', 'included'] },
-  'price.metaMarketing': { label: 'מחיר הודעת שיווק של Meta', kind: 'number', unless: metaIncluded },
-  'price.metaUtility': { label: 'מחיר הודעת עדכון של Meta', kind: 'number', unless: metaIncluded },
+  'price.founding.on': { label: 'הצעת המייסדים פעילה', kind: 'flag' },
+  'price.founding.stores': { label: 'לכמה חנויות ראשונות אין דמי הקמה', kind: 'number', unless: (raw) => raw.price?.founding?.on === false },
+  'price.conversationCap': { label: 'כמה שיחות בחודש כלולות במחיר', kind: 'number' },
+  // included: Meta's fees are all ours. marketing-at-cost: replies and order updates are ours, up to the cap, and
+  // the cart reminders (marketing messages) are passed on at Meta's price, free in the first month.
+  'price.metaFees': { label: 'איך משלמים ל-Meta', kind: ['included', 'marketing-at-cost'] },
+  'price.metaMarketing': { label: 'מחיר הודעת שיווק של Meta, בשקלים', kind: 'number', unless: metaIncluded },
+  'price.metaUtility': { label: 'מחיר הודעת עדכון של Meta, בשקלים', kind: 'number', unless: metaIncluded },
   'price.exampleCarts': { label: 'מספר תזכורות בדוגמה', kind: 'number' },
   'price.exampleUpdates': { label: 'מספר עדכוני משלוח בדוגמה', kind: 'number' },
   'price.commitmentMonths': { label: 'חודשי התחייבות, 0 אם אין', kind: 'number' },
   'price.stops': { label: 'מתי החיוב נעצר', kind: ['period-end', 'immediately'] },
+  'price.keepDays': { label: 'כמה ימים שומרים את השיחות אחרי שמפסיקים', kind: 'number' },
+  // For the privacy and terms pages, and nowhere else.
+  'legal.name': { label: 'השם המשפטי', kind: 'text' },
+  'legal.number': { label: 'מספר העוסק', kind: 'text' },
+  'legal.email': { label: 'מייל ליצירת קשר', kind: 'text' },
+  'legal.court': { label: 'העיר של בית המשפט המוסמך', kind: 'text' },
+  'legal.host': { label: 'באיזו מדינה השרת', kind: 'text' },
+  'legal.leadMonths': { label: 'כמה חודשים שומרים פניות מהטופס', kind: 'number' },
+  'legal.updated': { label: 'תאריך העדכון של העמודים המשפטיים, YYYY-MM-DD', kind: 'text' },
   'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
   'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },
-  'teder.monthly': { label: 'המחיר החודשי של תדר', kind: 'number' },
+  'teder.monthly': { label: 'מחיר', kind: 'number' },
+  'teder.slideshows': { label: 'כמה מצגות מוצעות בחודש', kind: 'number' },
+  'teder.redos': { label: 'כמה החלפות בחודש', kind: 'number' },
   'teder.setup': { label: 'דמי ההקמה של תדר, 0 אם אין', kind: 'number' },
   'toran.channels': { label: 'הערוצים שתורן עונה בהם היום', kind: 'channels' },
 };
@@ -55,6 +71,7 @@ export function readConfig(draft) {
       if (!f) throw new Error(`site.config.json: "${key}" has no entry in FACTS (src/lib.mjs)`);
       if (empty(v)) { if (!f.unless?.(raw)) missing.set(key, f.label); continue; }
       if (f.kind === 'number' && !(typeof v === 'number' && v >= 0)) throw new Error(`site.config.json: "${key}" must be a number, 0 or more (got ${JSON.stringify(v)})`);
+      if (f.kind === 'flag' && typeof v !== 'boolean') throw new Error(`site.config.json: "${key}" must be true or false (got ${JSON.stringify(v)})`);
       if (f.kind === 'lines' && !(Array.isArray(v) && v.every((x) => typeof x === 'string' && x.trim()))) throw new Error(`site.config.json: "${key}" must be a list of sentences`);
       if (f.kind === 'channels' && !(Array.isArray(v) && v.every((x) => CHANNELS.includes(x)))) throw new Error(`site.config.json: "${key}" must be a list of ${CHANNELS.join(', ')}`);
       if (f.kind !== 'lines' && f.kind !== 'channels' && Array.isArray(v)) throw new Error(`site.config.json: "${key}" must not be a list`);

@@ -5,20 +5,26 @@
     "time": ""
   },
   "about": {
-    "who": "",
-    "why": ""
+    "who": "אנחנו OpenFrequency מאשדוד. אנחנו מריצים חנויות אונליין בעצמנו, אז את מה שתורן ותדר פותרים הכרנו קודם אצלנו.",
+    "why": "רוב ההודעות בוואטסאפ של חנות הן אותן שאלות: מידות, משלוח, מתי זה מגיע. בנינו את תורן כדי שיענה עליהן מהמוצרים והמחירים של החנות, 24/7, ויעביר אליכם רק את מה שצריך בן אדם."
   },
   "price": {
     "monthly": 449,
     "vat": "excluded",
     "setup": 990,
-    "metaFees": "",
+    "founding": {
+      "on": true,
+      "stores": 5
+    },
+    "conversationCap": null,
+    "metaFees": "marketing-at-cost",
     "metaMarketing": null,
     "metaUtility": null,
-    "exampleCarts": null,
-    "exampleUpdates": null,
-    "commitmentMonths": null,
-    "stops": ""
+    "exampleCarts": 100,
+    "exampleUpdates": 200,
+    "commitmentMonths": 0,
+    "stops": "period-end",
+    "keepDays": 30
   },
   "toran": {
     "today": [
@@ -44,6 +50,17 @@
   },
   "teder": {
     "monthly": 790,
-    "setup": 1490
+    "setup": 1490,
+    "slideshows": 40,
+    "redos": 10
+  },
+  "legal": {
+    "name": "Netanel Yanchevsky",
+    "number": "327727525",
+    "email": "natikyan153@gmail.com",
+    "court": "אשדוד",
+    "host": "גרמניה",
+    "leadMonths": 6,
+    "updated": "2026-10-24"
   }
 }

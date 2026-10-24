@@ -4,7 +4,7 @@
 (function () {
   var d = document, root = d.documentElement;
   window.ofSite = true;
-  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches || root.classList.contains('a-still');
   var each = function (sel, fn, scope) { Array.prototype.forEach.call((scope || d).querySelectorAll(sel), fn); };
 
   // The header lifts once the page scrolls under it; the phone menu closes on a tap outside, a link, or Escape.
@@ -15,6 +15,34 @@
   if (menu) {
     d.addEventListener('click', function (e) { if (menu.open && (!menu.contains(e.target) || e.target.closest('nav a'))) menu.open = false; });
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); } });
+  }
+
+  // The accessibility panel: each switch is a class on <html> (a-big, a-contrast, a-links, a-still), kept in this
+  // browser for the next visit; the head puts them back before paint. It closes on Escape or a click outside.
+  var a11y = d.querySelector('[data-a11y]');
+  if (a11y) {
+    var KEY = 'of-a11y', on = {};
+    try { on = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { on = {}; }
+    var aBtn = a11y.querySelector('.a11y-btn'), aPanel = a11y.querySelector('.a11y-p');
+    var aSave = function () { try { localStorage.setItem(KEY, JSON.stringify(on)); } catch (e) {} };
+    var aApply = function () {
+      each('[data-a]', function (b) {
+        var k = b.getAttribute('data-a');
+        root.classList.toggle('a-' + k, on[k] === true);
+        b.setAttribute('aria-pressed', on[k] === true ? 'true' : 'false');
+      }, a11y);
+    };
+    var aShow = function (open) { aPanel.hidden = !open; aBtn.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    a11y.hidden = false;
+    aApply();
+    aBtn.addEventListener('click', function () { aShow(aPanel.hidden); });
+    a11y.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-a]');
+      if (b) { var k = b.getAttribute('data-a'); on[k] = on[k] !== true; aApply(); aSave(); }
+      if (e.target.closest('[data-a11y-reset]')) { on = {}; aApply(); aSave(); }
+    });
+    d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !aPanel.hidden) { aShow(false); aBtn.focus(); } });
+    d.addEventListener('click', function (e) { if (!aPanel.hidden && !a11y.contains(e.target)) aShow(false); });
   }
 
   // Each part of a section rises once as the section arrives, 80ms after the one before it.
@@ -108,7 +136,7 @@
       store: ['היום תורן עובד עם חנויות על Shopify. החיבור ל-WooCommerce ול-Wix בדרך.', 'מהעמוד של תורן'],
       // The prices come from the page (home.mjs, #ask-price), which the build writes from the config.
       price: [(d.getElementById('ask-price') || { innerHTML: '' }).innerHTML.trim() + link('/join', 'להצטרף'), 'מהעמודים של תורן ושל תדר'],
-      wrong: ['תורן לא ממציא תשובות. הוא עונה רק ממה שכתוב באתר של החנות, וכשאין לו תשובה הוא שואל אתכם במקום לנחש. בשבועיים הראשונים אנחנו גם קוראים איתכם את השיחות ומתקנים.', 'מהשאלות באתר'],
+      wrong: ['תורן לא ממציא תשובות. הוא עונה רק ממה שכתוב באתר של החנות, וכשאין לו תשובה הוא שואל אתכם במקום לנחש. בשבועיים הראשונים אנחנו גם עוברים איתכם על כל שיחה ומתקנים מה שצריך.', 'מהשאלות באתר'],
       number: ['כן. הלקוחות ממשיכים לכתוב לאותו מספר, ואנחנו מחברים אותו ל-WhatsApp Business Platform של Meta יחד איתכם.', 'מהשאלות באתר'],
       install: ['לדמו לא צריך להתקין כלום. תורן קורא את מה שכבר מופיע באתר. כדי לחבר את המספר של החנות צריך חשבון עסקי ב-Meta, ואת החיבור עושים יחד.', 'מהשאלות באתר'],
       night: ['כן. תורן עונה 24/7, ומה שהוא לא יודע מחכה לכם לבוקר.', 'מהעמוד של תורן'],

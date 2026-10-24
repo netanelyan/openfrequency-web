@@ -17,13 +17,14 @@ import teder from './src/pages/teder.mjs';
 import faq from './src/pages/faq.mjs';
 import join from './src/pages/join.mjs';
 import { thanks, thanksAgain, thanksTeder, tryAgain } from './src/pages/after.mjs';
+import { terms, privacy, security, accessibility } from './src/pages/legal.mjs';
 
 const draft = process.argv.includes('--draft');
 // The draft banner, and the placeholders the public draft leaves out, only for us: npm run dev.
 const banner = draft && process.argv.includes('--banner');
 const OUT = path.join(ROOT, 'dist');
 
-const PAGES = [home, toran, teder, faq, join, thanks, thanksAgain, thanksTeder, tryAgain];
+const PAGES = [home, toran, teder, faq, join, terms, privacy, security, accessibility, thanks, thanksAgain, thanksTeder, tryAgain];
 const DRAFT_PAGES = [];
 
 const cfg = { ...readConfig(draft), banner };
