@@ -19,15 +19,20 @@ npm run shots        # docs/screenshots: every page at 390px and 1440px, light a
 
 ## Leads
 
-The demo form and the Teder waitlist post to `server/lead.mjs`, a small Node server with no dependencies
-(`node:sqlite`), behind Caddy at `/api/lead`. Each lead (the store's host name, a WhatsApp number or an email, the
-form, the page, the time) is saved to SQLite first, then sent to Telegram; unsent ones are retried every 5 minutes.
-One address gets 5 leads an hour, everyone together 200 a day, and a hidden honeypot field catches form-filling
-scripts. A post from another origin is refused. IP addresses are used for the limit in memory only.
+The demo forms post to `server/lead.mjs`, a small Node server with no dependencies (`node:sqlite`), behind Caddy at
+`/api/lead`. Each lead (the store's host name, the form, the page, the time, and a WhatsApp number for Teder or a
+code for Toran) is saved to SQLite first, then sent to Telegram and handed to Toran or Teder; what fails is retried
+every 5 minutes. One address gets 5 leads an hour, everyone together 200 a day, and a hidden honeypot field catches
+form-filling scripts. A post from another origin is refused. IP addresses are used for the limit in memory only.
+
+Toran's demo form takes the store's address only. It answers with a code (`REQ-XXXXXX`) and a button that opens
+WhatsApp to Toran's demo number (`TORAN_DEMO_WA`) with a message holding the code; Toran counts the demo when that
+message arrives, from the number that sent it, one per number (openfrequency-toran, `docs/operator.md`, section 3).
 
 With JS the form sends itself and shows the thank-you in place; if the endpoint doesn't answer in 8 seconds, it offers
-a WhatsApp link with the store's address already typed. Without JS the form posts normally and lands on `/thanks`,
-`/thanks/teder` or `/try-again` (which Caddy also serves when the endpoint is down).
+a WhatsApp link with the store's address already typed. Without JS the form posts normally: a Toran demo goes straight
+to WhatsApp with its message, a Teder one lands on `/thanks/teder`, and a failure on `/try-again` (which Caddy also
+serves when the endpoint is down).
 
 ```sh
 npm test                                        # the endpoint: saving, Telegram, limits, honeypot, origin, Telegram down

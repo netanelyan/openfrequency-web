@@ -1,5 +1,5 @@
 // The lead endpoint, run as it runs on the server: a real process, a real SQLite file, a fake Telegram and a fake
-// Toran intake.
+// Toran and Teder intake (Toran's checks the body as Toran does: {url, code}, or a 400).
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
-import { storeHost, mobile, validate } from '../server/lead.mjs';
+import { storeHost, mobile, validate, newCode, toranWaLink } from '../server/lead.mjs';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'of-leads-'));
 const DB = path.join(dir, 'leads.db');
@@ -22,6 +22,27 @@ let proc;
 let toran; // the fake intake, Toran's and Teder's by path: records what it is handed
 const handed = [];
 const TOKEN = 'x'.repeat(40);
+const DEMO_WA = '972500000099';
+const CODE = /^REQ-[A-Z0-9]{6}$/;
+const intakeEnv = () => ({
+  TORAN_INTAKE_URL: `http://127.0.0.1:${toran.address().port}/toran/internal/lead`, OF_INTERNAL_TOKEN: TOKEN,
+  TEDER_INTAKE_URL: `http://127.0.0.1:${toran.address().port}/teder/internal/lead`,
+});
+// The lead server as a process, on its own port and database; resolves once it listens.
+function start(port, db, extra = {}) {
+  const p = spawn(process.execPath, ['server/lead.mjs'], {
+    env: {
+      ...process.env, PORT: String(port), LEADS_DB: db, TRUST_PROXY: '1', SITE_ORIGIN: 'https://example.co.il',
+      TELEGRAM_BOT_TOKEN: 'T', TELEGRAM_CHAT_ID: 'C', TELEGRAM_API: `http://127.0.0.1:${telegram.address().port}`,
+      ...intakeEnv(), TORAN_DEMO_WA: DEMO_WA, ...extra,
+    },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  return new Promise((ok, fail) => {
+    p.stdout.on('data', (d) => String(d).includes('leads on') && ok(p));
+    p.on('exit', (c) => fail(new Error('lead server exited ' + c)));
+  });
+}
 
 before(async () => {
   telegram = http.createServer((req, res) => {
@@ -39,25 +60,15 @@ before(async () => {
     let b = '';
     req.on('data', (c) => (b += c));
     req.on('end', () => {
-      handed.push({ path: req.url, auth: req.headers.authorization, body: JSON.parse(b) });
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end('{"ok":true}');
+      const body = JSON.parse(b);
+      handed.push({ path: req.url, auth: req.headers.authorization, body });
+      const bad = req.url.startsWith('/toran/') && (Object.keys(body).sort().join() !== 'code,url' || !CODE.test(body.code));
+      res.writeHead(bad ? 400 : 200, { 'Content-Type': 'application/json' });
+      res.end(bad ? '{"ok":false,"error":"bad"}' : '{"ok":true}');
     });
   });
   await new Promise((ok) => toran.listen(0, '127.0.0.1', ok));
-  proc = spawn(process.execPath, ['server/lead.mjs'], {
-    env: {
-      ...process.env, PORT: String(PORT), LEADS_DB: DB, TRUST_PROXY: '1', SITE_ORIGIN: 'https://example.co.il',
-      TELEGRAM_BOT_TOKEN: 'T', TELEGRAM_CHAT_ID: 'C', TELEGRAM_API: `http://127.0.0.1:${telegram.address().port}`,
-      TORAN_INTAKE_URL: `http://127.0.0.1:${toran.address().port}/toran/internal/lead`, OF_INTERNAL_TOKEN: TOKEN,
-      TEDER_INTAKE_URL: `http://127.0.0.1:${toran.address().port}/teder/internal/lead`,
-    },
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
-  await new Promise((ok, fail) => {
-    proc.stdout.on('data', (d) => String(d).includes('leads on') && ok());
-    proc.on('exit', (c) => fail(new Error('lead server exited ' + c)));
-  });
+  proc = await start(PORT, DB);
 });
 
 after(async () => {
@@ -67,8 +78,8 @@ after(async () => {
 });
 
 let ipN = 0;
-const post = (fields, { json = true, ip = `10.0.0.${++ipN}`, origin = 'https://example.co.il' } = {}) =>
-  fetch(base + '/api/lead', {
+const post = (fields, { json = true, ip = `10.0.0.${++ipN}`, origin = 'https://example.co.il', to = base } = {}) =>
+  fetch(to + '/api/lead', {
     method: 'POST',
     redirect: 'manual',
     headers: {
@@ -79,7 +90,9 @@ const post = (fields, { json = true, ip = `10.0.0.${++ipN}`, origin = 'https://e
     },
     body: json ? JSON.stringify(fields) : new URLSearchParams(fields).toString(),
   });
-const rows = () => new DatabaseSync(DB, { readOnly: true }).prepare('SELECT * FROM leads ORDER BY id').all();
+const rows = (db = DB) => new DatabaseSync(db, { readOnly: true }).prepare('SELECT * FROM leads ORDER BY id').all();
+// The message a Toran demo's link writes, read back out of the link.
+const waText = (wa) => new URL(wa).searchParams.get('text');
 const settle = () => new Promise((ok) => setTimeout(ok, 300));
 
 test('a store address is kept as its host name', () => {
@@ -99,66 +112,104 @@ test('an Israeli mobile is kept as 9725XXXXXXXX', () => {
   assert.equal(mobile('12345'), null);
 });
 
-test("both demos, Toran's and Teder's, take a store and a WhatsApp number", () => {
+test("Toran's demo takes the store's address only, and Teder's a WhatsApp number too", () => {
+  assert.deepEqual(validate({ source: 'demo', store: 'www.shop.co.il', page: '/toran' }).lead, { source: 'demo', store: 'shop.co.il', contact: null, page: '/toran' });
+  assert.equal(validate({ source: 'demo', store: 'shop.co.il', contact: 'a@b.co' }).lead.contact, null, "a number sent to Toran's form is not kept");
   assert.deepEqual(validate({ source: 'teder', store: 'www.shop.co.il', contact: '050-1234567', page: '/teder' }).lead, { source: 'teder', store: 'shop.co.il', contact: '972501234567', page: '/teder' });
   assert.equal(validate({ source: 'teder', contact: '0501234567' }).error, 'store');
-  assert.equal(validate({ source: 'demo', store: 'shop.co.il', contact: 'a@b.co' }).error, 'contact');
+  assert.equal(validate({ source: 'teder', store: 'shop.co.il', contact: 'a@b.co' }).error, 'contact');
+  assert.equal(validate({ source: 'join', toran: '1', store: 'shop.co.il' }).error, undefined, 'the join page asks for the number only with Teder');
+  assert.equal(validate({ source: 'join', toran: '1', teder: '1', store: 'shop.co.il' }).error, 'contact');
   assert.equal(validate({ source: 'other', contact: 'a@b.co' }).error, 'bad');
 });
 
-test('a demo lead is saved, then sent to Telegram', async () => {
-  const res = await post({ source: 'demo', store: 'https://www.shop.co.il', contact: '050-1234567', page: '/' });
+test("a Toran demo's code and link: REQ- and 6 of A-Z0-9, and a message to the demo number that holds it", () => {
+  const codes = new Set(Array.from({ length: 500 }, newCode));
+  for (const c of codes) assert.match(c, CODE);
+  assert.ok(codes.size > 495, 'random');
+  const wa = toranWaLink('shop.co.il', 'REQ-AB12CD', '+972-50-000-0099');
+  assert.equal(new URL(wa).origin + new URL(wa).pathname, 'https://wa.me/972500000099');
+  assert.equal(waText(wa), 'היי, אשמח לדמו של תורן לחנות shop.co.il.\nהקוד מהאתר: REQ-AB12CD');
+  assert.equal(toranWaLink('shop.co.il', 'REQ-AB12CD', ''), null, 'no demo number, no link');
+});
+
+test('a Toran demo is saved with its code, sent to Telegram, handed to Toran as {url, code}, and answered with the code and the link', async () => {
+  const res = await post({ source: 'demo', store: 'https://www.shop.co.il', page: '/' });
   assert.equal(res.status, 200);
-  assert.deepEqual(await res.json(), { ok: true, source: 'demo', store: 'shop.co.il', saved: ['demo'] });
+  const body = await res.json();
+  assert.match(body.code, CODE);
+  assert.deepEqual(body, { ok: true, source: 'demo', store: 'shop.co.il', saved: ['demo'], code: body.code, wa: toranWaLink('shop.co.il', body.code, DEMO_WA) });
+  assert.ok(body.wa.startsWith(`https://wa.me/${DEMO_WA}?text=`));
+  assert.ok(waText(body.wa).includes(body.code), 'the message holds the code');
   await settle();
   const r = rows().at(-1);
+  assert.equal(r.source, 'demo');
   assert.equal(r.store, 'shop.co.il');
-  assert.equal(r.contact, '972501234567');
+  assert.equal(r.code, body.code, 'the code is kept with the lead');
+  assert.equal(r.contact, '', 'no number: Toran learns it from the message');
   assert.equal(r.page, '/');
   assert.ok(r.notified_at, 'marked as sent');
   const m = sent.at(-1);
   assert.equal(m.url, '/botT/sendMessage');
   assert.equal(m.body.chat_id, 'C');
+  assert.match(m.body.text, /דמו לתורן/);
   assert.match(m.body.text, /shop\.co\.il/);
-  assert.match(m.body.text, /wa\.me\/972501234567/);
-  // and handed to Toran, which adds the store to its dashboard
-  assert.ok(r.forwarded_at, 'marked as handed over');
-  assert.deepEqual(handed.at(-1), { path: '/toran/internal/lead', auth: `Bearer ${TOKEN}`, body: { url: 'https://shop.co.il/', whatsapp: '972501234567' } });
+  assert.ok(m.body.text.includes(body.code), 'Telegram gets the code');
+  assert.ok(r.forwarded_at, 'Toran took it');
+  assert.deepEqual(handed.at(-1), { path: '/toran/internal/lead', auth: `Bearer ${TOKEN}`, body: { url: 'https://shop.co.il/', code: body.code } });
 });
 
-test('one demo per WhatsApp number: a second ask is answered, and nothing is saved or handed over', async () => {
-  const before = rows().length, toToran = handed.length;
-  let res = await post({ source: 'demo', store: 'another-shop.co.il', contact: '+972 50-123-4567', page: '/toran' });
+test("Toran's one demo per number is Toran's: the site saves every Toran demo, each with its own code", async () => {
+  const toToran = handed.length;
+  const a = await (await post({ source: 'demo', store: 'another-shop.co.il', contact: '0501234567', page: '/toran' })).json();
+  const b = await (await post({ source: 'demo', store: 'another-shop.co.il', page: '/toran' })).json();
+  assert.equal(a.ok, true);
+  assert.equal(b.ok, true);
+  assert.notEqual(a.code, b.code);
+  await settle();
+  assert.deepEqual(handed.slice(toToran).map((h) => h.body.code), [a.code, b.code]);
+  assert.equal(rows().find((r) => r.code === a.code).contact, '', 'a stale number field is not kept');
+});
+
+test("Teder's demo is as before: one per WhatsApp number, handed to Teder as {url, whatsapp}", async () => {
+  const before = rows().length, toTeder = handed.length;
+  let res = await post({ source: 'teder', store: 'shop.co.il', contact: '0501234567', page: '/teder' });
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.deepEqual(body, { ok: true, source: 'teder', store: 'shop.co.il', saved: ['teder'] }, 'no code for Teder');
+  res = await post({ source: 'teder', store: 'other.co.il', contact: '+972 50-123-4567' });
   assert.equal(res.status, 409);
   assert.equal((await res.json()).error, 'dup');
-  res = await post({ source: 'demo', store: 'third-shop.co.il', contact: '0501234567' }, { json: false });
+  res = await post({ source: 'teder', store: 'third-shop.co.il', contact: '0501234567' }, { json: false });
   assert.equal(res.headers.get('location'), '/thanks/already');
   await settle();
-  assert.equal(rows().length, before);
-  assert.equal(handed.length, toToran);
-  // The same number may still ask for Teder's demo, once, and that one is handed to Teder, not to Toran.
-  assert.equal((await post({ source: 'teder', store: 'shop.co.il', contact: '0501234567' })).status, 200);
-  assert.equal((await post({ source: 'teder', store: 'other.co.il', contact: '0501234567' })).status, 409);
-  await settle();
-  assert.equal(handed.length, toToran + 1);
+  assert.equal(rows().length, before + 1);
+  const r = rows().at(-1);
+  assert.equal(r.contact, '972501234567');
+  assert.equal(r.code, null);
+  assert.ok(r.forwarded_at, 'marked as handed over to Teder');
+  assert.equal(handed.length, toTeder + 1);
   assert.deepEqual(handed.at(-1), { path: '/teder/internal/lead', auth: `Bearer ${TOKEN}`, body: { url: 'https://shop.co.il/', whatsapp: '972501234567' } });
-  assert.ok(rows().at(-1).forwarded_at, 'marked as handed over to Teder');
   assert.match(sent.at(-1).body.text, /דמו לתדר/);
+  assert.match(sent.at(-1).body.text, /wa\.me\/972501234567/);
 });
 
-test('a plain form post is redirected to the thank-you page for its form', async () => {
-  let res = await post({ source: 'demo', store: 'shop2.co.il', contact: '0521234567', page: '/' }, { json: false });
+test('a plain form post: a Toran demo goes on to WhatsApp, a Teder one to its thank-you, a bad one to try-again', async () => {
+  let res = await post({ source: 'demo', store: 'shop2.co.il', page: '/' }, { json: false });
   assert.equal(res.status, 303);
-  assert.equal(res.headers.get('location'), '/thanks');
+  const to = res.headers.get('location');
+  assert.ok(to.startsWith(`https://wa.me/${DEMO_WA}?text=`));
+  await settle();
+  assert.ok(waText(to).includes(rows().at(-1).code));
   res = await post({ source: 'teder', store: 'shop2.co.il', contact: '0521234567', page: '/teder' }, { json: false });
   assert.equal(res.headers.get('location'), '/thanks/teder');
-  res = await post({ source: 'demo', store: 'nope', contact: '0521234567' }, { json: false });
+  res = await post({ source: 'demo', store: 'nope' }, { json: false });
   assert.equal(res.headers.get('location'), '/try-again');
 });
 
 test('the honeypot gets a thank-you and nothing is saved', async () => {
   const before = rows().length;
-  const res = await post({ source: 'demo', store: 'spam.co.il', contact: '0501234567', company: 'Spam Ltd' });
+  const res = await post({ source: 'demo', store: 'spam.co.il', company: 'Spam Ltd' });
   assert.equal(res.status, 200);
   assert.equal((await res.json()).ok, true);
   await settle();
@@ -166,31 +217,34 @@ test('the honeypot gets a thank-you and nothing is saved', async () => {
 });
 
 test('a bad address or number says which field', async () => {
-  let res = await post({ source: 'demo', store: 'not a store', contact: '0501234567' });
+  let res = await post({ source: 'demo', store: 'not a store' });
   assert.equal(res.status, 400);
   assert.equal((await res.json()).error, 'store');
-  res = await post({ source: 'demo', store: 'shop.co.il', contact: '123' });
+  res = await post({ source: 'teder', store: 'shop.co.il', contact: '123' });
   assert.equal((await res.json()).error, 'contact');
 });
 
 test('a post from another site is refused', async () => {
-  const res = await post({ source: 'teder', contact: 'x@y.co' }, { origin: 'https://evil.example' });
+  const res = await post({ source: 'demo', store: 'shop.co.il' }, { origin: 'https://evil.example' });
   assert.equal(res.status, 403);
 });
 
-test('one address gets 5 leads an hour', async () => {
+test('one address gets 5 leads an hour, Toran demos too', async () => {
   const ip = '10.9.9.9';
-  const ask = (n) => ({ source: 'teder', store: `s${n}.co.il`, contact: `05200000${String(n).padStart(2, '0')}` });
-  for (let i = 0; i < 5; i++) assert.equal((await post(ask(i), { ip })).status, 200);
-  const res = await post(ask(6), { ip });
+  for (let i = 0; i < 3; i++) assert.equal((await post({ source: 'demo', store: `s${i}.co.il` }, { ip })).status, 200);
+  for (let i = 3; i < 5; i++) assert.equal((await post({ source: 'teder', store: `s${i}.co.il`, contact: `05200000${i}0` }, { ip })).status, 200);
+  const before = rows().length;
+  const res = await post({ source: 'demo', store: 's6.co.il' }, { ip });
   assert.equal(res.status, 429);
   assert.equal((await res.json()).error, 'rate');
-  assert.equal((await post(ask(7))).status, 200, 'another address still gets in');
+  await settle();
+  assert.equal(rows().length, before, 'nothing saved');
+  assert.equal((await post({ source: 'demo', store: 's7.co.il' })).status, 200, 'another address still gets in');
 });
 
 test('when Telegram is down the lead is still saved, marked unsent', async () => {
   telegramDown = true;
-  const res = await post({ source: 'demo', store: 'down.co.il', contact: '0541234567', page: '/' });
+  const res = await post({ source: 'demo', store: 'down.co.il', page: '/' });
   assert.equal(res.status, 200);
   await settle();
   telegramDown = false;
@@ -205,18 +259,89 @@ test('too big a body is refused', async () => {
   assert.equal(res.status, 413);
 });
 
-test('the join page asks for one or both demos: a row for each, and only the ones this number has not asked for yet', async () => {
+test('the join page asks for one or both demos: Toran by its code, Teder by its number', async () => {
   assert.equal(validate({ source: 'join', store: 'a.co.il', contact: '0530000001' }).error, 'products', 'nothing ticked');
-  const before = rows().length, toToran = handed.length;
+  const before = rows().length, toIntake = handed.length;
   let res = await post({ source: 'join', toran: '1', teder: '1', store: 'both.co.il', contact: '0530000001', page: '/join' });
   assert.equal(res.status, 200);
-  assert.deepEqual((await res.json()).saved, ['demo', 'teder']);
+  let body = await res.json();
+  assert.deepEqual(body.saved, ['demo', 'teder']);
+  assert.match(body.code, CODE);
+  assert.ok(waText(body.wa).includes(body.code));
   await settle();
-  assert.deepEqual(rows().slice(before).map((r) => [r.source, r.store, r.contact]), [['demo', 'both.co.il', '972530000001'], ['teder', 'both.co.il', '972530000001']]);
-  assert.deepEqual(handed.slice(toToran).map((h) => h.path).sort(), ['/teder/internal/lead', '/toran/internal/lead'], 'each to its own product');
-  // Asking again for both: Toran's is already there, so nothing new; Teder alone from a new number is saved alone.
+  assert.deepEqual(rows().slice(before).map((r) => [r.source, r.store, r.contact, r.code]), [['demo', 'both.co.il', '', body.code], ['teder', 'both.co.il', '972530000001', null]]);
+  assert.deepEqual(handed.slice(toIntake).map((h) => [h.path, h.body]).sort(), [
+    ['/teder/internal/lead', { url: 'https://both.co.il/', whatsapp: '972530000001' }],
+    ['/toran/internal/lead', { url: 'https://both.co.il/', code: body.code }],
+  ], 'each to its own product, as it takes it');
+  // Asking again for both: Teder's is already there for this number, so only Toran's is saved, with a new code.
   res = await post({ source: 'join', toran: '1', teder: '1', store: 'both.co.il', contact: '0530000001' });
-  assert.equal(res.status, 409);
+  assert.equal(res.status, 200);
+  const again = await res.json();
+  assert.deepEqual(again.saved, ['demo']);
+  assert.notEqual(again.code, body.code);
+  // Teder again alone from that number is "we have it"; Toran alone needs no number.
+  assert.equal((await post({ source: 'join', teder: '1', store: 'both.co.il', contact: '0530000001' })).status, 409);
+  body = await (await post({ source: 'join', toran: '1', store: 'toran-only.co.il', page: '/join' })).json();
+  assert.deepEqual([body.saved, CODE.test(body.code)], [['demo'], true]);
   res = await post({ source: 'join', teder: '1', store: 'teder-only.co.il', contact: '0530000002', page: '/join' }, { json: false });
   assert.equal(res.headers.get('location'), '/thanks/teder');
+});
+
+test("without TORAN_DEMO_WA a Toran demo still gets its code, with no link", async () => {
+  const port = PORT + 100;
+  const db = path.join(dir, 'no-wa.db');
+  const p = await start(port, db, { TORAN_DEMO_WA: '' });
+  try {
+    const body = await (await post({ source: 'demo', store: 'nowa.co.il' }, { to: `http://127.0.0.1:${port}` })).json();
+    assert.match(body.code, CODE);
+    assert.equal(body.wa, null);
+    const res = await post({ source: 'demo', store: 'nowa2.co.il' }, { to: `http://127.0.0.1:${port}`, json: false });
+    assert.equal(res.headers.get('location'), '/thanks');
+  } finally {
+    p.kill();
+  }
+});
+
+test('a database from before the codes gets the column; its Toran leads are not handed to Toran again, its Teder ones are', async () => {
+  const db = path.join(dir, 'old.db');
+  const old = new DatabaseSync(db);
+  old.exec(`CREATE TABLE leads (id INTEGER PRIMARY KEY, created_at TEXT NOT NULL, source TEXT NOT NULL, store TEXT, contact TEXT NOT NULL,
+    page TEXT, notified_at TEXT, tries INTEGER NOT NULL DEFAULT 0, forwarded_at TEXT, forward_tries INTEGER NOT NULL DEFAULT 0);
+    INSERT INTO leads (created_at, source, store, contact, notified_at) VALUES ('2026-10-20T10:00:00.000Z', 'demo', 'old-toran.co.il', '972541111111', '2026-10-20T10:00:01.000Z');
+    INSERT INTO leads (created_at, source, store, contact, notified_at) VALUES ('2026-10-20T10:00:00.000Z', 'teder', 'old-teder.co.il', '972542222222', '2026-10-20T10:00:01.000Z');`);
+  old.close();
+  const toIntake = handed.length;
+  const port = PORT + 200;
+  const p = await start(port, db);
+  try {
+    await settle(); // the retry at start
+    const cols = new DatabaseSync(db, { readOnly: true }).prepare('PRAGMA table_info(leads)').all().map((c) => c.name);
+    assert.ok(cols.includes('code'));
+    assert.deepEqual(handed.slice(toIntake).map((h) => [h.path, h.body]), [['/teder/internal/lead', { url: 'https://old-teder.co.il/', whatsapp: '972542222222' }]]);
+    const [t, d] = [rows(db).find((r) => r.source === 'demo'), rows(db).find((r) => r.source === 'teder')];
+    assert.deepEqual([t.forward_tries, t.forwarded_at], [0, null], 'the old Toran lead is left alone');
+    assert.ok(d.forwarded_at);
+    // and the database takes new Toran demos with their codes
+    const body = await (await post({ source: 'demo', store: 'new.co.il' }, { to: `http://127.0.0.1:${port}` })).json();
+    await settle();
+    assert.equal(rows(db).at(-1).code, body.code);
+  } finally {
+    p.kill();
+  }
+});
+
+test('everyone together gets 200 leads a day', async () => {
+  const port = PORT + 300;
+  const p = await start(port, path.join(dir, 'day.db'), { TELEGRAM_BOT_TOKEN: '', TORAN_INTAKE_URL: '', TEDER_INTAKE_URL: '' });
+  try {
+    for (let i = 0; i < 200; i++) {
+      const res = await post({ source: 'demo', store: `day${i}.co.il` }, { to: `http://127.0.0.1:${port}`, ip: `10.8.${i >> 2}.${i & 3}` });
+      assert.equal(res.status, 200, `lead ${i}`);
+    }
+    const res = await post({ source: 'demo', store: 'day-over.co.il' }, { to: `http://127.0.0.1:${port}`, ip: '10.7.0.1' });
+    assert.equal(res.status, 429);
+  } finally {
+    p.kill();
+  }
 });
