@@ -10,7 +10,7 @@ export const thanks = plain('/thanks', 'קיבלנו את הכתובת של הח
 <section class="sec after">
 <div class="wrap narrow" data-rise>
 <h1>קיבלנו את הכתובת של החנות</h1>
-<p class="lede">${cfg.has('demo.time') || cfg.banner ? `תוך ${cfg.t('demo.time')} נשלח` : 'כשהדמו מוכן, נשלח'} לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, נכתוב לכם ונגיד מה אפשר.</p>
+<p class="lede">${cfg.has('demo.time') || cfg.banner ? `תוך ${cfg.t('demo.time')} נשלח` : 'כשהדמו מוכן, נשלח'} לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, WooCommerce או Wix, נכתוב לכם ונגיד מה אפשר.</p>
 <div class="actions"><a class="btn" href="/">לעמוד הבית</a></div>
 </div>
 </section>`);
