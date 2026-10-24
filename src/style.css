@@ -1044,11 +1044,25 @@ html.a-contrast { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: 
 #niche-fashion:checked ~ .niche-list [for='niche-fashion'], #niche-beauty:checked ~ .niche-list [for='niche-beauty'],
 #niche-home:checked ~ .niche-list [for='niche-home'], #niche-tech:checked ~ .niche-list [for='niche-tech'],
 #niche-kids:checked ~ .niche-list [for='niche-kids'], #niche-food:checked ~ .niche-list [for='niche-food'],
-#niche-sport:checked ~ .niche-list [for='niche-sport'], #niche-pets:checked ~ .niche-list [for='niche-pets'] { background: color-mix(in srgb, var(--toran) 9%, transparent); }
+#niche-sport:checked ~ .niche-list [for='niche-sport'], #niche-pets:checked ~ .niche-list [for='niche-pets'] { background: color-mix(in srgb, var(--toran) var(--pick-tint, 9%), transparent); box-shadow: inset 0 0 0 var(--pick-ring, 0) color-mix(in srgb, var(--toran) 55%, transparent); color: var(--ink); }
 .niche-pick:focus-visible + .niche-pick, .niches:has(.niche-pick:focus-visible) .niche-list { outline: 3px solid color-mix(in srgb, var(--accent-fill) 50%, transparent); outline-offset: 2px; }
+/* Up to 820px it is one glass panel: the kinds as two rows of chips that scroll sideways together, a hairline, and the
+   card of the one picked right under it. */
 @media (max-width: 820px) {
-  .niches { grid-template-columns: minmax(0, 1fr); }
-  .niche-cards { order: -1; }
+  .niches { --pick-tint: 14%; --pick-ring: 1.5px; grid-template-columns: minmax(0, 1fr); gap: 0; overflow: hidden; border-radius: 26px; background: linear-gradient(180deg, var(--surface-hi), var(--surface)); -webkit-backdrop-filter: var(--glass); backdrop-filter: var(--glass); box-shadow: var(--shadow-tile), inset 0 0 0 1px var(--edge), inset 0 1px 0 var(--rim); }
+  .niches .glass { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; border-radius: 0; }
+  .niche-list { display: grid; grid-auto-flow: column; grid-template-rows: auto auto; grid-auto-columns: max-content; gap: 8px; padding: 14px 14px 13px; overflow-x: auto; overscroll-behavior-x: contain; scroll-padding-inline: 14px; scrollbar-width: none; border-bottom: 1px solid var(--line); -webkit-mask-image: linear-gradient(to right, transparent, #000 18px); mask-image: linear-gradient(to right, transparent, #000 18px); }
+  .niche-list::-webkit-scrollbar { display: none; }
+  .niche-search, .niche-none { display: none !important; }
+  .niche-row { gap: 7px; min-height: 42px; padding: 4px 5px 4px 14px; border-top: 0; border-radius: 999px; background: var(--fill); color: var(--ink-2); }
+  .niche-row:hover { background: var(--fill-2); }
+  .niche-ava { width: 32px; height: 32px; font-size: 18px; }
+  .niche-t b { font-size: 15px; font-weight: 600; white-space: nowrap; }
+  .niche-t small, .niche-meta { display: none; }
+  .niche-card { border: 0; padding: 20px 18px 22px; }
+  .niche-card .niche-ava.big { display: none; }
+  .niche-card h3 { margin: 0 0 16px; }
+  .niches:has(.niche-pick:focus-visible) .niche-list { outline-offset: -3px; }
 }
 
 /* ---- trust badges, before the businesses that work with us (home.mjs trust) */

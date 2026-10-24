@@ -5,7 +5,8 @@
 // Teder writes slideshows about the store's field.
 //
 // No script needed: each row is the label of a radio button, and the stylesheet shows the card of the one checked
-// (style.css, .niche-sec). site.js adds the search box and, on a phone, brings the card into view.
+// (style.css, .niche-sec). Up to 820px the list and the card are one panel: the kinds a row of chips on top, the card
+// under them. site.js adds the search box (from 821px) and keeps the picked chip in view.
 
 export const NICHES = [
   {

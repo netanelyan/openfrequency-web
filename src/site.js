@@ -220,8 +220,8 @@
     if (!still) setInterval(function () { i = (i + 1) % imgs.length; show(); }, 3200);
   });
 
-  // The kinds of store (niches.mjs): a search over them, and on a phone, where the card sits above the list, the card
-  // brought into view when one is picked.
+  // The kinds of store (niches.mjs): a search over them, and up to 820px, where they are a row of chips that scrolls
+  // sideways, the one picked brought fully into the row.
   var nsearch = d.querySelector('[data-niche-search]');
   if (nsearch) {
     var nin = nsearch.querySelector('input'), nnone = d.querySelector('[data-niche-none]');
@@ -231,10 +231,10 @@
       each('[data-niche-row]', function (r) { var hit = !q || r.getAttribute('data-words').indexOf(q) >= 0; r.hidden = !hit; if (hit) shown++; });
       nnone.hidden = shown > 0;
     });
-    var ncards = d.querySelector('[data-niche-cards]');
     each('.niche-pick', function (r) {
       r.addEventListener('change', function () {
-        if (window.matchMedia('(max-width: 820px)').matches) ncards.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var chip = d.querySelector('[for="' + r.id + '"]');
+        if (chip && window.matchMedia('(max-width: 820px)').matches) chip.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'nearest', inline: 'nearest' });
       });
     });
   }
