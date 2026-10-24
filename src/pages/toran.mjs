@@ -2,19 +2,13 @@
 // The headline, a button down to the demo form, and the tabs with the window that changes with them, the same question
 // and answer in each; the owner's one inbox; what it answers alone and what it leaves for you; the price; and the demo
 // form at the end.
-// Which channels Toran answers in comes from Toran's /channels.json, or site.config.json (toran.channels) when Toran
-// doesn't answer (build.mjs); every sentence that names them is built from
-// it, so the page never says a channel works before it does. The owners' questions are on /faq.
+// Which channels Toran answers in is toran.channels in site.config.json, or Toran's own /channels.json when
+// toran.channelsFrom is "toran" (build.mjs); every sentence that names them is built from it, so the page never says
+// a channel works before it does. The owners' questions are on /faq.
 import { CHANNELS, mark } from '../lib.mjs';
-import { NAMES, channelWindow, inbox } from '../channels.mjs';
+import { channelWindow, inList, inbox, liveChannels } from '../channels.mjs';
 import { demoForm } from '../forms.mjs';
 import { toranPricing } from '../sections.mjs';
-
-// "בוואטסאפ, באינסטגרם ובמייל": each name after ב, the last one after ו.
-const inList = (ids) => {
-  const b = ids.map((c) => 'ב' + NAMES[c]);
-  return b.length < 2 ? b.join('') : `${b.slice(0, -1).join(', ')} ו${b.at(-1)}`;
-};
 
 // What it answers alone comes from the shapes of question in Toran's eval (openfrequency-toran, docs/milestones.md,
 // milestone 3); what it leaves to the owner is what that eval checks it hands off.
@@ -33,9 +27,8 @@ const YOURS = [
 const rows = (items, cls = '') => `<ul class="rows${cls ? ' ' + cls : ''}">${items.map((s) => `<li><span class="dot" aria-hidden="true"></span><span>${s}</span></li>`).join('')}</ul>`;
 
 export default (cfg) => {
-  const on = new Set(cfg.get('toran.channels') || []);
-  const live = CHANNELS.filter((c) => on.has(c));
-  const soon = CHANNELS.filter((c) => !on.has(c));
+  const live = liveChannels(cfg);
+  const soon = CHANNELS.filter((c) => !live.includes(c));
   const where = `${inList(live)}${soon.length ? `, ובקרוב גם ${inList(soon)}` : ''}`;
   return {
     path: '/toran',
@@ -77,7 +70,7 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 </div>
 </section>
 ${toranPricing(cfg, { cta: ['#demo', 'לנסות את תורן על החנות שלכם'], includes: [
-  `עונה ללקוחות 24/7 בכל הערוצים הפעילים, ${inList(live)}, מתוך מה שכתוב באתר שלכם`,
+  `עונה ללקוחות 24/7 ${soon.length ? `בכל הערוצים הפעילים, ${inList(live)}` : inList(live)}, מתוך מה שכתוב באתר שלכם`,
   'תזכורות על עגלה נטושה, למי שהסכים לקבל מכם הודעות, כלולות במחיר',
   'כל השיחות בתיבה אחת, ושאלה שאין עליה תשובה באתר מגיעה אליכם',
   'בשבועיים הראשונים אנחנו עוברים איתכם על השיחות ומתקנים מה שצריך',

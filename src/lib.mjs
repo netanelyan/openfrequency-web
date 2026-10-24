@@ -56,6 +56,9 @@ export const FACTS = {
   'teder.redos': { label: 'כמה החלפות בחודש', kind: 'number' },
   'teder.setup': { label: 'דמי ההקמה של תדר, 0 אם אין', kind: 'number' },
   'toran.channels': { label: 'הערוצים שתורן עונה בהם היום', kind: 'channels' },
+  // Where the list of live channels comes from: 'config' (toran.channels above, whatever Toran says), or 'toran'
+  // (Toran's own /channels.json at build time, with toran.channels only when Toran doesn't answer). build.mjs.
+  'toran.channelsFrom': { label: 'מאיפה רשימת הערוצים, config או toran', kind: ['config', 'toran'] },
 };
 
 // The config, read so that nothing missing can be shown as a guess. An empty value ('' or null) is missing.

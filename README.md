@@ -66,6 +66,11 @@ Every price, number and time the site states lives in `site.config.json`, never 
 (`""` or `null`) means "not decided yet": the real build refuses to run and lists each one, so the site can't ship
 with a guess. Each key has a Hebrew label in `FACTS` (`src/lib.mjs`), which is what a draft shows in its place.
 
+Where Toran answers is `toran.channels`. With `toran.channelsFrom` set to `"config"` that list is final: every channel
+in it is shown as live on every page, and the build doesn't ask Toran. With `"toran"` the build takes the list from
+Toran's own `/channels.json` (its /settings page), shows the rest as "בקרוב", and falls back to `toran.channels` when
+Toran doesn't answer.
+
 ## Copy
 
 All Hebrew follows the hebrew-voice skill. OpenFrequency speaks as "we"; FAQ questions are in the customer's own

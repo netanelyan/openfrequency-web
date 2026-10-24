@@ -2,8 +2,8 @@
 // inbox. Every window holds the same question and the same answer, so it reads as one agent that knows one store; only
 // the look of the channel changes. Each channel's name goes with its own mark (logos.mjs).
 //
-// Which channels Toran answers in comes from Toran's /channels.json at build time, or site.config.json (toran.channels)
-// when Toran doesn't answer (build.mjs); every other one carries "בקרוב". Without a
+// Which channels Toran answers in is toran.channels in site.config.json, or Toran's own /channels.json at build time
+// when toran.channelsFrom is "toran" (build.mjs); every other one carries "בקרוב". Without a
 // script the windows stand one under the other, each under its own name; site.js turns them into tabs.
 import { CHANNELS, mark } from './lib.mjs';
 import { chat } from './chat.mjs';
@@ -53,6 +53,14 @@ ${top('ח', 'החנות שלכם', named('messenger'))}
 };
 
 const live = (cfg) => new Set(cfg.get('toran.channels') || []);
+// The live channels, in the site's order.
+export const liveChannels = (cfg) => CHANNELS.filter((c) => live(cfg).has(c));
+
+// "בוואטסאפ, באינסטגרם ובמייל": each name after ב, the last one after ו.
+export const inList = (ids) => {
+  const b = ids.map((c) => 'ב' + NAMES[c]);
+  return b.length < 2 ? b.join('') : `${b.slice(0, -1).join(', ')} ו${b.at(-1)}`;
+};
 const soon = '<span class="soon">בקרוב</span>';
 
 // Tabs over one window, for Toran's channels and Teder's platforms alike: each item is { key, name (HTML), window

@@ -29,11 +29,14 @@ const DRAFT_PAGES = [];
 
 const cfg = { ...readConfig(draft), banner };
 
-// Where Toran answers comes from Toran itself (openfrequency-toran, GET /channels.json, set on its /settings): a
-// channel in "demo" or "live" is one it answers in, an "off" one is shown as coming. When Toran doesn't answer, or
-// answers with something else, the build uses toran.channels from site.config.json and says so.
+// Where Toran answers. With toran.channelsFrom "config" in site.config.json, the list is toran.channels there, and
+// Toran isn't asked: that's for when we know better than Toran's settings (every channel in it is live, and no
+// "בקרוב" shows for it anywhere). With "toran", it comes from Toran itself (openfrequency-toran, GET /channels.json,
+// set on its /settings): a channel in "demo" or "live" is one it answers in, an "off" one is shown as coming. When
+// Toran doesn't answer, or answers with something else, the build uses toran.channels and says so.
 const CHANNELS_URL = process.env.TORAN_CHANNELS_URL || 'https://toran.openfrequency.co.il/channels.json';
-const fromToran = await fetch(CHANNELS_URL, { signal: AbortSignal.timeout(5000) })
+const pinned = cfg.get('toran.channelsFrom') === 'config';
+const fromToran = pinned ? null : await fetch(CHANNELS_URL, { signal: AbortSignal.timeout(5000) })
   .then((r) => (r.ok ? r.json() : null))
   .then((j) => {
     const all = j && typeof j.channels === 'object' ? j.channels : null;
@@ -41,7 +44,8 @@ const fromToran = await fetch(CHANNELS_URL, { signal: AbortSignal.timeout(5000) 
     return CHANNELS.filter((c) => all[c] === 'demo' || all[c] === 'live');
   })
   .catch(() => null);
-console.log(fromToran ? `channels from Toran: ${fromToran.join(', ') || 'none'}` : `channels from site.config.json (Toran's ${CHANNELS_URL} did not answer with its list)`);
+console.log(pinned ? `channels from site.config.json (toran.channelsFrom is config): ${(cfg.get('toran.channels') || []).join(', ') || 'none'}`
+  : fromToran ? `channels from Toran: ${fromToran.join(', ') || 'none'}` : `channels from site.config.json (Toran's ${CHANNELS_URL} did not answer with its list)`);
 if (fromToran) {
   const get = cfg.get;
   cfg.get = (key) => (key === 'toran.channels' ? fromToran : get(key));

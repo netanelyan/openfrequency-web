@@ -56,7 +56,8 @@
       "instagram",
       "messenger",
       "email"
-    ]
+    ],
+    "channelsFrom": "config"
   },
   "teder": {
     "monthly": 790,
