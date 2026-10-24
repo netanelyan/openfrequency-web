@@ -22,7 +22,7 @@
       }
     },
     "founding": {
-      "on": true,
+      "on": false,
       "stores": 5,
       "monthly": 390,
       "months": 12
