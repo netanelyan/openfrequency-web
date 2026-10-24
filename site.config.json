@@ -10,7 +10,7 @@
   },
   "price": {
     "monthly": 449,
-    "vat": "included",
+    "vat": "excluded",
     "setup": 990,
     "metaFees": "",
     "metaMarketing": null,
