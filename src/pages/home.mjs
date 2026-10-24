@@ -8,6 +8,7 @@ import { askBox } from '../sections.mjs';
 import { priceLine } from './join.mjs';
 import { reel } from '../teder.mjs';
 import { clients } from '../clients.mjs';
+import { niches } from '../niches.mjs';
 
 // Toran's door: the sample chat on the customer's phone. The first question it answers from the site; the second
 // isn't there, so it tells the customer it's checking, and the question pops up on the owner's phone.
@@ -70,5 +71,5 @@ export default (cfg) => ({
   title: 'OpenFrequency, תורן ותדר',
   description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות בוואטסאפ 24/7, מתוך מה שכתוב באתר.',
   // "Who we are" waits for its two sentences in the public draft.
-  body: [hero, clients(), ask(cfg), cfg.has('about.who') || cfg.banner ? about(cfg) : ''].join('\n'),
+  body: [hero, clients(), niches(), ask(cfg), cfg.has('about.who') || cfg.banner ? about(cfg) : ''].join('\n'),
 });

@@ -223,4 +223,23 @@
     });
     each('.demo, .wait, .close-sec, .foot', function (el) { io.observe(el); });
   }
+
+  // The kinds of store (niches.mjs): a search over them, and on a phone, where the card sits above the list, the card
+  // brought into view when one is picked.
+  var nsearch = d.querySelector('[data-niche-search]');
+  if (nsearch) {
+    var nin = nsearch.querySelector('input'), nnone = d.querySelector('[data-niche-none]');
+    nsearch.hidden = false;
+    nin.addEventListener('input', function () {
+      var q = nin.value.trim(), shown = 0;
+      each('[data-niche-row]', function (r) { var hit = !q || r.getAttribute('data-words').indexOf(q) >= 0; r.hidden = !hit; if (hit) shown++; });
+      nnone.hidden = shown > 0;
+    });
+    var ncards = d.querySelector('[data-niche-cards]');
+    each('.niche-pick', function (r) {
+      r.addEventListener('change', function () {
+        if (window.matchMedia('(max-width: 820px)').matches) ncards.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
 })();
