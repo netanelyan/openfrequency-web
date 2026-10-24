@@ -62,6 +62,7 @@ function footer(cfg, current) {
 <div class="foot-who">
 <a class="brand" href="/">${mark('openfrequency', 40)}<b>OpenFrequency</b></a>
 <p>בנינו שני מוצרים לחנויות אונליין. תורן עונה ללקוחות בוואטסאפ, ותדר כותב ומעצב מצגות לטיקטוק ולאינסטגרם.</p>
+${cfg.has('about.who') || cfg.banner ? `<h2 id="f-who">מי אנחנו</h2><p>${cfg.t('about.who')}</p><p class="foot-why">${cfg.t('about.why')}</p>` : ''}
 </div>
 <nav aria-labelledby="f-prod"><h2 id="f-prod">המוצרים</h2><ul>
 ${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}">${mark(name, 28)}<span><b>${label}</b><small>${what}</small></span></a></li>`).join('\n')}
@@ -69,7 +70,7 @@ ${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}
 <nav aria-labelledby="f-site"><h2 id="f-site">באתר</h2><ul>
 ${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('')}<li><a href="/terms">תנאי שימוש</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/security">אבטחת מידע</a></li><li><a href="/accessibility">נגישות</a></li>
 </ul></nav>
-<div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<a class="btn primary sm" href="${DEMO(current)}">לנסות את תורן</a></div>
+<div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<p class="foot-cta-t">רוצים לראות את זה על החנות שלכם?</p><a class="foot-cta" href="/join">דמו חינם לחנות שלכם<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></a></div>
 </div>
 <p class="foot-legal">© 2026 OpenFrequency</p>
 <p class="foot-word" aria-hidden="true">OpenFrequency</p>
