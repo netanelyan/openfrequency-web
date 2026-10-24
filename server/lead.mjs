@@ -14,14 +14,17 @@
 //   TELEGRAM_API         default https://api.telegram.org (the tests point it at a fake)
 //   TORAN_INTAKE_URL     Toran's /internal/lead on this machine (http://127.0.0.1:4710/internal/lead); without it a
 //                        demo lead only goes to Telegram
-//   OF_INTERNAL_TOKEN    the token Toran checks, the same value as in Toran's and accounts' private/.env
+//   TEDER_INTAKE_URL     Teder's /internal/lead on this machine (http://127.0.0.1:4700/internal/lead); without it a
+//                        Teder lead only goes to Telegram
+//   OF_INTERNAL_TOKEN    the token Toran and Teder check, the same value as in their and accounts' private/.env
 //
 // What a lead holds: which demo (Toran's or Teder's), the store's address, a WhatsApp number, the page, and the time.
 // The client's IP address is used for the rate limit, in memory only, and never written down.
 //
 // One demo of each product per WhatsApp number: a second ask from a number that already asked is answered "we have
 // it" and saved nowhere, so the form can't be used to queue store after store. A Toran demo is handed to Toran, which
-// adds the store to its dashboard; like Telegram, a handover that fails is retried.
+// adds the store to its dashboard, and a Teder demo to Teder, which builds the store's slideshow for the operator to
+// approve; like Telegram, a handover that fails is retried.
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -57,7 +60,7 @@ CREATE TABLE IF NOT EXISTS leads (
 );`);
   // Added with the handover to Toran; a database from before gets them here.
   const cols = new Set(db.prepare('PRAGMA table_info(leads)').all().map((c) => c.name));
-  if (!cols.has('forwarded_at')) db.exec('ALTER TABLE leads ADD COLUMN forwarded_at TEXT'); // when Toran took it
+  if (!cols.has('forwarded_at')) db.exec('ALTER TABLE leads ADD COLUMN forwarded_at TEXT'); // when Toran or Teder took it
   if (!cols.has('forward_tries')) db.exec('ALTER TABLE leads ADD COLUMN forward_tries INTEGER NOT NULL DEFAULT 0');
   db.exec("CREATE INDEX IF NOT EXISTS leads_demo_contact ON leads (contact) WHERE source = 'demo'");
   return db;
@@ -157,23 +160,27 @@ async function notify(db, row) {
   }
 }
 
-// ---------------------------------------------------------------- Toran
+// ---------------------------------------------------------------- Toran and Teder
+
+// Which product takes a lead of each source, and where it listens on this machine.
+const INTAKE = { demo: ['Toran', () => env.TORAN_INTAKE_URL], teder: ['Teder', () => env.TEDER_INTAKE_URL] };
 
 async function forward(db, row) {
-  if (row.source !== 'demo' || !env.TORAN_INTAKE_URL || !env.OF_INTERNAL_TOKEN) return false;
+  const [product, url] = INTAKE[row.source] || [];
+  if (!product || !url() || !env.OF_INTERNAL_TOKEN) return false;
   db.prepare('UPDATE leads SET forward_tries = forward_tries + 1 WHERE id = ?').run(row.id);
   try {
-    const res = await fetch(env.TORAN_INTAKE_URL, {
+    const res = await fetch(url(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.OF_INTERNAL_TOKEN}` },
       body: JSON.stringify({ url: `https://${row.store}/`, whatsapp: row.contact }),
       signal: AbortSignal.timeout(8000),
     });
-    if (!res.ok) throw new Error(`Toran ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    if (!res.ok) throw new Error(`${product} ${res.status}: ${(await res.text()).slice(0, 200)}`);
     db.prepare('UPDATE leads SET forwarded_at = ? WHERE id = ?').run(new Date().toISOString(), row.id);
     return true;
   } catch (e) {
-    console.error(`lead ${row.id}: not handed to Toran (${e.message}); it is saved and will be retried`);
+    console.error(`lead ${row.id}: not handed to ${product} (${e.message}); it is saved and will be retried`);
     return false;
   }
 }
@@ -181,8 +188,8 @@ async function forward(db, row) {
 async function retry(db) {
   const rows = db.prepare('SELECT * FROM leads WHERE notified_at IS NULL AND tries < ? ORDER BY id LIMIT 20').all(LIMITS.telegramTries);
   for (const row of rows) await notify(db, row);
-  const toToran = db.prepare("SELECT * FROM leads WHERE source = 'demo' AND forwarded_at IS NULL AND forward_tries < ? ORDER BY id LIMIT 20").all(LIMITS.telegramTries);
-  for (const row of toToran) await forward(db, row);
+  const toHand = db.prepare("SELECT * FROM leads WHERE source IN ('demo', 'teder') AND forwarded_at IS NULL AND forward_tries < ? ORDER BY id LIMIT 20").all(LIMITS.telegramTries);
+  for (const row of toHand) await forward(db, row);
 }
 
 // ---------------------------------------------------------------- HTTP
@@ -293,7 +300,7 @@ if (main && process.argv[2] === 'list') {
   const n = Number(process.argv[3]) || 20;
   const rows = db.prepare('SELECT id, created_at, source, store, contact, page, notified_at, forwarded_at FROM leads ORDER BY id DESC LIMIT ?').all(n);
   for (const r of rows.reverse()) {
-    console.log([r.id, when(r.created_at), r.source, r.store || '-', r.contact, r.page || '-', r.notified_at ? 'sent' : 'NOT SENT', r.source === 'demo' ? (r.forwarded_at ? 'in toran' : 'NOT IN TORAN') : ''].join('  ').trim());
+    console.log([r.id, when(r.created_at), r.source, r.store || '-', r.contact, r.page || '-', r.notified_at ? 'sent' : 'NOT SENT', r.source === 'demo' ? (r.forwarded_at ? 'in toran' : 'NOT IN TORAN') : r.source === 'teder' ? (r.forwarded_at ? 'in teder' : 'NOT IN TEDER') : ''].join('  ').trim());
   }
   db.close();
 } else if (main) {

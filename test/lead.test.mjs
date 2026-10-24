@@ -19,7 +19,7 @@ let telegram; // the fake: records what it is sent, and can be told to fail
 const sent = [];
 let telegramDown = false;
 let proc;
-let toran; // the fake intake: records what it is handed
+let toran; // the fake intake, Toran's and Teder's by path: records what it is handed
 const handed = [];
 const TOKEN = 'x'.repeat(40);
 
@@ -49,7 +49,8 @@ before(async () => {
     env: {
       ...process.env, PORT: String(PORT), LEADS_DB: DB, TRUST_PROXY: '1', SITE_ORIGIN: 'https://example.co.il',
       TELEGRAM_BOT_TOKEN: 'T', TELEGRAM_CHAT_ID: 'C', TELEGRAM_API: `http://127.0.0.1:${telegram.address().port}`,
-      TORAN_INTAKE_URL: `http://127.0.0.1:${toran.address().port}/internal/lead`, OF_INTERNAL_TOKEN: TOKEN,
+      TORAN_INTAKE_URL: `http://127.0.0.1:${toran.address().port}/toran/internal/lead`, OF_INTERNAL_TOKEN: TOKEN,
+      TEDER_INTAKE_URL: `http://127.0.0.1:${toran.address().port}/teder/internal/lead`,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -122,7 +123,7 @@ test('a demo lead is saved, then sent to Telegram', async () => {
   assert.match(m.body.text, /wa\.me\/972501234567/);
   // and handed to Toran, which adds the store to its dashboard
   assert.ok(r.forwarded_at, 'marked as handed over');
-  assert.deepEqual(handed.at(-1), { path: '/internal/lead', auth: `Bearer ${TOKEN}`, body: { url: 'https://shop.co.il/', whatsapp: '972501234567' } });
+  assert.deepEqual(handed.at(-1), { path: '/toran/internal/lead', auth: `Bearer ${TOKEN}`, body: { url: 'https://shop.co.il/', whatsapp: '972501234567' } });
 });
 
 test('one demo per WhatsApp number: a second ask is answered, and nothing is saved or handed over', async () => {
@@ -135,11 +136,13 @@ test('one demo per WhatsApp number: a second ask is answered, and nothing is sav
   await settle();
   assert.equal(rows().length, before);
   assert.equal(handed.length, toToran);
-  // The same number may still ask for Teder's demo, once, and that one is not handed to Toran.
+  // The same number may still ask for Teder's demo, once, and that one is handed to Teder, not to Toran.
   assert.equal((await post({ source: 'teder', store: 'shop.co.il', contact: '0501234567' })).status, 200);
   assert.equal((await post({ source: 'teder', store: 'other.co.il', contact: '0501234567' })).status, 409);
   await settle();
-  assert.equal(handed.length, toToran);
+  assert.equal(handed.length, toToran + 1);
+  assert.deepEqual(handed.at(-1), { path: '/teder/internal/lead', auth: `Bearer ${TOKEN}`, body: { url: 'https://shop.co.il/', whatsapp: '972501234567' } });
+  assert.ok(rows().at(-1).forwarded_at, 'marked as handed over to Teder');
   assert.match(sent.at(-1).body.text, /דמו לתדר/);
 });
 
@@ -210,7 +213,7 @@ test('the join page asks for one or both demos: a row for each, and only the one
   assert.deepEqual((await res.json()).saved, ['demo', 'teder']);
   await settle();
   assert.deepEqual(rows().slice(before).map((r) => [r.source, r.store, r.contact]), [['demo', 'both.co.il', '972530000001'], ['teder', 'both.co.il', '972530000001']]);
-  assert.equal(handed.length, toToran + 1, 'only the Toran one goes to Toran');
+  assert.deepEqual(handed.slice(toToran).map((h) => h.path).sort(), ['/teder/internal/lead', '/toran/internal/lead'], 'each to its own product');
   // Asking again for both: Toran's is already there, so nothing new; Teder alone from a new number is saved alone.
   res = await post({ source: 'join', toran: '1', teder: '1', store: 'both.co.il', contact: '0530000001' });
   assert.equal(res.status, 409);
