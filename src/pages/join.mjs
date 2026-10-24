@@ -3,7 +3,7 @@
 // forms at the end of /toran and /teder stay, for a visitor already on a product's page.
 import { esc, ils, mark } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
-import { founding } from '../sections.mjs';
+import { toranPriceLine } from '../sections.mjs';
 import { TORAN } from './faq.mjs';
 
 const TOOLS = 'https://accounts.openfrequency.co.il/';
@@ -21,10 +21,10 @@ const ASKED = ['הלקוחות שלי יראו את הדמו?', 'צריך להת
 export function priceLine(cfg, monthly, setup) {
   const m = cfg.get(monthly), s = cfg.get(setup);
   const vat = cfg.get('price.vat') === 'included' ? 'כולל מע״מ' : cfg.get('price.vat') === 'excluded' ? 'לא כולל מע״מ' : cfg.ph('price.vat');
-  return `${m == null ? cfg.ph(monthly) : esc(ils(m))} לחודש, ${vat}${s == null ? `, ${cfg.ph(setup)}` : s > 0 ? `, ועוד ${esc(ils(s))} דמי הקמה, פעם אחת` : ''}.${s > 0 && setup === 'price.setup' ? founding(cfg, ' לתורן') : ''}`;
+  return `${m == null ? cfg.ph(monthly) : esc(ils(m))} לחודש, ${vat}${s == null ? `, ${cfg.ph(setup)}` : s > 0 ? `, ועוד ${esc(ils(s))} דמי הקמה, פעם אחת` : ''}.`;
 }
 function price(cfg) {
-  const items = [['toran', 'תורן', 'price.monthly', 'price.setup', '/toran#price'], ['teder', 'תדר', 'teder.monthly', 'teder.setup', '/teder#price']]
+  const items = [['toran', 'תורן', 'price.plans.store.monthly', null, '/toran#price'], ['teder', 'תדר', 'teder.monthly', 'teder.setup', '/teder#price']]
     .filter(([, , m]) => cfg.has(m) || cfg.banner);
   if (!items.length) return '';
   return `
@@ -32,7 +32,7 @@ function price(cfg) {
 <div class="wrap narrow">
 <h2 id="join-price-h">כמה זה עולה</h2>
 <ul class="join-prices">
-${items.map(([name, label, m, s, href]) => `<li>${mark(name, 40)}<span><b>${label}</b><span>${priceLine(cfg, m, s)}</span></span><a href="${href}">פרטים</a></li>`).join('\n')}
+${items.map(([name, label, m, s, href]) => `<li>${mark(name, 40)}<span><b>${label}</b><span>${name === 'toran' ? toranPriceLine(cfg) : priceLine(cfg, m, s)}</span></span><a href="${href}">פרטים</a></li>`).join('\n')}
 </ul>
 </div>
 </section>`;

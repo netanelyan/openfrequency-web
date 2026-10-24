@@ -1,6 +1,6 @@
 // The questions, in the owner's own words, one group per product.
 import { ils, mark } from '../lib.mjs';
-import { waWords } from '../sections.mjs';
+import { toranPriceLine, waWords } from '../sections.mjs';
 import { priceLine } from './join.mjs';
 
 export const TORAN = (cfg) => [
@@ -27,8 +27,8 @@ export const TORAN = (cfg) => [
     `תוך ${cfg.t('demo.time')} מהרגע ששלחתם את הכתובת. הלינק לעמוד מגיע אליכם בוואטסאפ, ובעמוד יש מספר שכותבים אליו כמו לקוח.`],
   ['החנות שלי על Wix. זה יעבוד?',
     'עוד לא. היום תורן עובד עם חנויות על Shopify, והחיבור ל-WooCommerce ול-Wix בדרך. אם תשלחו לנו את הכתובת, נכתוב לכם ונגיד מה אפשר.'],
-  (cfg.has('price.monthly') || cfg.banner) && ['כמה זה עולה?',
-    `${priceLine(cfg, 'price.monthly', 'price.setup')} הדמו בחינם. הפרטים <a href="/toran#price">בעמוד של תורן</a>.`],
+  (cfg.has('price.plans.store.monthly') || cfg.banner) && ['כמה זה עולה?',
+    `שתי חבילות, לפי מספר השיחות בחודש: ${toranPriceLine(cfg)} הדמו בחינם. הפרטים <a href="/toran#price">בעמוד של תורן</a>.`],
 ];
 
 const TEDER = (cfg) => [

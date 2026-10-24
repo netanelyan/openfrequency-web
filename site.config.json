@@ -9,19 +9,29 @@
     "why": "רוב ההודעות בוואטסאפ של חנות הן אותן שאלות: מידות, משלוח, מתי זה מגיע. בנינו את תורן כדי שיענה עליהן מהמוצרים והמחירים של החנות, 24/7, ויעביר אליכם רק את מה שצריך בן אדם."
   },
   "price": {
-    "monthly": 449,
     "vat": "excluded",
     "setup": 990,
+    "plans": {
+      "store": {
+        "monthly": 590,
+        "conversations": 300
+      },
+      "big": {
+        "monthly": 1190,
+        "conversations": 1500
+      }
+    },
     "founding": {
       "on": true,
-      "stores": 5
+      "stores": 5,
+      "monthly": 390,
+      "months": 12
     },
-    "conversationCap": null,
-    "metaFees": "marketing-at-cost",
-    "metaMarketing": null,
-    "metaUtility": null,
-    "exampleCarts": 100,
-    "exampleUpdates": 200,
+    "fair": {
+      "upMonths": 2,
+      "noticeDays": 7,
+      "downMonths": 2
+    },
     "commitmentMonths": 0,
     "stops": "period-end",
     "keepDays": 30

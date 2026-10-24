@@ -3,9 +3,11 @@
 // real slides playing on its violet. Then what holds for every store, the businesses that work with us, what we do in a
 // store like yours, Toran as the owner's assistant, and Toran answering questions about us. Each product has its own
 // page (/toran, /teder), and the questions have theirs (/faq).
-import { mark, glyphOnly } from '../lib.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { ROOT, esc, mark, glyphOnly } from '../lib.mjs';
 import { chat } from '../chat.mjs';
-import { askBox } from '../sections.mjs';
+import { askBox, toranPriceLine } from '../sections.mjs';
 import { priceLine } from './join.mjs';
 import { reel } from '../teder.mjs';
 import { clients } from '../clients.mjs';
@@ -54,7 +56,7 @@ const ask = (cfg) => `
 <p class="ask-note">זו הדגמה בדפדפן, עם תשובות שכתבנו מראש מתוך האתר הזה.</p>
 </div>
 ${askBox}
-${cfg.has('price.monthly') && cfg.has('teder.monthly') ? `<template id="ask-price">תורן עולה ${priceLine(cfg, 'price.monthly', 'price.setup')} תדר עולה ${priceLine(cfg, 'teder.monthly', 'teder.setup')}</template>` : ''}
+${cfg.has('price.plans.store.monthly') && cfg.has('teder.monthly') ? `<template id="ask-price">תורן עולה ${toranPriceLine(cfg)} תדר עולה ${priceLine(cfg, 'teder.monthly', 'teder.setup')}</template>` : ''}
 </div>
 </section>`;
 
@@ -108,11 +110,42 @@ const assistant = () => `
 </div>
 </section>`;
 
+// The same assistant for Teder: the slideshows that are ready come to the owner's WhatsApp, and the owner approves or
+// asks for a fix in a message. The three covers are Teder's own, from its made-up demo account (assets/teder/assistant,
+// written by scripts/showcase.mjs from what Teder hands over); no store's slideshow, and nothing about views or sales.
+const THUMBS = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/teder/assistant.json'), 'utf8'));
+const thumbs = `<span class="thumbs">${THUMBS.map((t) => `<span class="thumb"><img src="/teder/assistant/${t.n}.jpg" width="90" height="160" alt="מצגת ${t.n}: ${esc(t.alt)}" loading="lazy"><b aria-hidden="true">${t.n}</b></span>`).join('')}</span>`;
+const TEDER_CHAT = [
+  ['them', '09:02', `3 מצגות חדשות מוכנות. איזו לאשר?${thumbs}`],
+  ['me', '09:15', 'אשר את 1 ו-3, את 2 תעשה קצר יותר'],
+  ['them', '09:15', 'אישרתי את 1 ו-3. את 2 אקצר ואשלח לכם שוב לאישור.'],
+  ['them', '18:30', 'המצגת על השרך מחכה בטיוטות של טיקטוק. מוסיפים סאונד ומפרסמים.'],
+  ['me', '21:04', 'איך היה השבוע?'],
+  ['them', '21:04', 'השבוע עלו 4 מצגות לטיקטוק ולאינסטגרם, ואחת עוד מחכה לכם בטיוטות. ביום ראשון אשלח לכם 3 חדשות לאישור.'],
+];
+const tederAssistant = () => `
+<section class="sec owner-sec teder-owner" id="owner-teder" aria-labelledby="owner-teder-h">
+<div class="wrap owner-grid">
+<div class="owner-text">
+<p class="kicker">אותו עוזר, גם לתדר</p>
+<h2 id="owner-teder-h">את המצגות של תדר מאשרים <span class="hl">בוואטסאפ</span></h2>
+<p class="lede">העוזר שכותב לכם על החנות עובד גם עם תדר. כשמצגות מוכנות, הוא שולח לכם אותן לוואטסאפ, ושם מאשרים, מבקשים תיקון ומקבלים תזכורת לפרסם. אין אפליקציה חדשה ללמוד.</p>
+<ul class="checks">
+<li><b>מאשרים לפי מספר.</b> כותבים לו "אשר את 1 ו-3", ורק מה שאישרתם עולה.</li>
+<li><b>מבקשים תיקון במילים שלכם.</b> "את 2 תעשה קצר יותר", ותדר מכין גרסה חדשה ושולח לכם אותה שוב לאישור.</li>
+<li><b>תזכורת כשמצגת מחכה.</b> המצגת עולה לטיוטות של טיקטוק, והוא כותב לכם כשנשאר רק להוסיף סאונד ולפרסם.</li>
+<li><b>מה היה השבוע.</b> כמה מצגות עלו, מה מחכה לכם, ומתי יגיעו החדשות.</li>
+</ul>
+</div>
+<div class="phone owner-phone">${chat({ id: 'teder-chat', who: 'תורן', sub: 'העוזר שלכם', face: mark('toran', 38), msgs: TEDER_CHAT, names: { me: 'אתם', them: 'העוזר' } })}</div>
+</div>
+</section>`;
+
 export default (cfg) => ({
   path: '/',
   dock: true,
   title: 'OpenFrequency, תורן ותדר',
   description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות בוואטסאפ 24/7, מתוך מה שכתוב באתר.',
   // "Who we are" is in the footer (layout.mjs), on every page.
-  body: [hero, trust(), clients(), niches(), assistant(), ask(cfg)].join('\n'),
+  body: [hero, trust(), clients(), niches(), assistant(), tederAssistant(), ask(cfg)].join('\n'),
 });

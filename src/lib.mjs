@@ -12,7 +12,7 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 //   kind: 'text', 'number' (0 or more), 'flag' (true or false), 'lines' (a list of sentences), 'channels' (a list of CHANNELS), or the list of
 //         allowed values
 //   unless: the fact is not needed when this is true (the build then lets it stay empty)
-const metaIncluded = (raw) => raw.price?.metaFees === 'included';
+const foundingOff = (raw) => raw.price?.founding?.on === false;
 // Where a customer can write to a store; the ones in toran.channels are live, the rest are shown as coming.
 export const CHANNELS = ['whatsapp', 'instagram', 'messenger', 'email'];
 export const FACTS = {
@@ -21,19 +21,23 @@ export const FACTS = {
   'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
   'about.who': { label: 'משפט על מי אנחנו', kind: 'text' },
   'about.why': { label: 'משפט על למה בנינו את תורן', kind: 'text' },
-  'price.monthly': { label: 'המחיר החודשי', kind: 'number' },
   'price.vat': { label: 'כולל או לא כולל מע״מ', kind: ['included', 'excluded'] },
-  'price.setup': { label: 'דמי הקמה, 0 אם אין', kind: 'number' },
+  'price.setup': { label: 'דמי הקמה של תורן, 0 אם אין', kind: 'number' },
+  // Toran's two plans: a monthly price and the conversations a month it covers. Bigger stores talk to us.
+  'price.plans.store.monthly': { label: 'המחיר החודשי של חבילת חנות', kind: 'number' },
+  'price.plans.store.conversations': { label: 'כמה שיחות בחודש בחבילת חנות', kind: 'number' },
+  'price.plans.big.monthly': { label: 'המחיר החודשי של חבילת חנות גדולה', kind: 'number' },
+  'price.plans.big.conversations': { label: 'כמה שיחות בחודש בחבילת חנות גדולה', kind: 'number' },
+  // The founding offer, while on: the first stores get the Store plan at a lower price for their first months.
   'price.founding.on': { label: 'הצעת המייסדים פעילה', kind: 'flag' },
-  'price.founding.stores': { label: 'לכמה חנויות ראשונות אין דמי הקמה', kind: 'number', unless: (raw) => raw.price?.founding?.on === false },
-  'price.conversationCap': { label: 'כמה שיחות בחודש כלולות במחיר', kind: 'number' },
-  // included: Meta's fees are all ours. marketing-at-cost: replies and order updates are ours, up to the cap, and
-  // the cart reminders (marketing messages) are passed on at Meta's price, free in the first month.
-  'price.metaFees': { label: 'איך משלמים ל-Meta', kind: ['included', 'marketing-at-cost'] },
-  'price.metaMarketing': { label: 'מחיר הודעת שיווק של Meta, בשקלים', kind: 'number', unless: metaIncluded },
-  'price.metaUtility': { label: 'מחיר הודעת עדכון של Meta, בשקלים', kind: 'number', unless: metaIncluded },
-  'price.exampleCarts': { label: 'מספר תזכורות בדוגמה', kind: 'number' },
-  'price.exampleUpdates': { label: 'מספר עדכוני משלוח בדוגמה', kind: 'number' },
+  'price.founding.stores': { label: 'לכמה חנויות ראשונות הצעת המייסדים', kind: 'number', unless: foundingOff },
+  'price.founding.monthly': { label: 'המחיר החודשי בהצעת המייסדים', kind: 'number', unless: foundingOff },
+  'price.founding.months': { label: 'לכמה חודשים הצעת המייסדים', kind: 'number', unless: foundingOff },
+  // How a store moves between the plans: up after this many months in a row above its plan, with notice this many
+  // days ahead; down after this many months in a row under the smaller plan's conversations.
+  'price.fair.upMonths': { label: 'אחרי כמה חודשים ברצף מעל החבילה עוברים למעלה', kind: 'number' },
+  'price.fair.noticeDays': { label: 'כמה ימים לפני המעבר מודיעים', kind: 'number' },
+  'price.fair.downMonths': { label: 'אחרי כמה חודשים ברצף מתחת לחבילה הקטנה יורדים', kind: 'number' },
   'price.commitmentMonths': { label: 'חודשי התחייבות, 0 אם אין', kind: 'number' },
   'price.stops': { label: 'מתי החיוב נעצר', kind: ['period-end', 'immediately'] },
   'price.keepDays': { label: 'כמה ימים שומרים את השיחות אחרי שמפסיקים', kind: 'number' },

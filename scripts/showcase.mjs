@@ -1,6 +1,9 @@
 // Brings the covers of Teder's showcase slideshows into the site: the first slide of private/showcase/<pack>/<post>/
 // (as Teder hands them over) into assets/teder/showcase/<pack>/, resized, with assets/teder/showcase.json for the
 // pages to read. Only covers: a visitor looks for the topic they care about, not through a whole slideshow.
+// And the three covers in the home page's WhatsApp example: private/assistant/<n>-<kind>/, which Teder writes from its
+// fictional demo account (openfrequency-teder, node scripts/showcase.js), into assets/teder/assistant/<n>.jpg with
+// assets/teder/assistant.json. Those come only from a made-up account (@demo.), never a store's or one of ours.
 //   node scripts/showcase.mjs
 // Every photo on a slide must be under the Pexels or Unsplash licence, or a free Wikimedia Commons one (public domain,
 // CC0, CC BY, CC BY-SA: the list Teder searches by, never NC or ND) with a name to credit, or nothing is written.
@@ -52,26 +55,53 @@ for (const pack of packs) {
     slides: [first].map((s) => ({ n: s.n, files: s.files, alt: s.text.filter((t) => !t.startsWith('@')).map((t) => t.replace(/\s*\n\s*/g, ' ').trim()).join('. ').replace(/([.?!])\./g, '$1') })),
   });
 }
+// The WhatsApp example's three, in the order Teder numbered them.
+const AFROM = path.join(ROOT, 'private/assistant');
+const ATO = path.join(ROOT, 'assets/teder/assistant');
+const thumbs = fs.readdirSync(AFROM).sort((a, b) => parseInt(a) - parseInt(b)).map((post) => {
+  const dir = path.join(AFROM, post);
+  const m = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
+  const s = m.slides.find((x) => x.n === 1);
+  if (!m.handle.startsWith('@demo.')) problems.push(`assistant/${post}: ${m.handle} is not a made-up account`);
+  if (s.photo && !licenceOk(s.photo)) problems.push(`assistant/${post}: a photo from ${s.photo.provider} under "${s.photo.licence}" (${s.photo.page})`);
+  return {
+    dir,
+    file: s.files.tiktok,
+    topic: m.topic,
+    alt: s.text.map((t) => t.replace(/\s*\n\s*/g, ' ').trim()).join('. ').replace(/([.?!])\./g, '$1'),
+    photo: s.photo ? { by: String(s.photo.photographer || '').trim(), provider: s.photo.provider, page: s.photo.page } : null,
+  };
+});
+if (thumbs.length !== 3) problems.push(`assistant: expected 3 covers, found ${thumbs.length}`);
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 
 fs.rmSync(TO, { recursive: true, force: true });
+fs.rmSync(ATO, { recursive: true, force: true });
 const browser = await chromium.launch({ channel: 'chrome' });
 const page = await browser.newPage();
+const jpeg = (file) => 'data:image/jpeg;base64,' + fs.readFileSync(file).toString('base64');
+const resize = (src, w, h) => page.evaluate(async ([src, w, h]) => {
+  const im = new Image();
+  im.src = src;
+  await im.decode();
+  const c = Object.assign(document.createElement('canvas'), { width: w, height: h });
+  const x = c.getContext('2d');
+  x.imageSmoothingQuality = 'high';
+  x.drawImage(im, 0, 0, w, h);
+  return c.toDataURL('image/jpeg', 0.84);
+}, [src, w, h]);
+// Shown about 90px wide in a chat bubble: twice that.
+fs.mkdirSync(ATO, { recursive: true });
+for (const [i, t] of thumbs.entries()) {
+  const data = await resize(jpeg(path.join(t.dir, t.file)), 180, 320);
+  fs.writeFileSync(path.join(ATO, `${i + 1}.jpg`), Buffer.from(data.split(',')[1], 'base64'));
+}
+fs.writeFileSync(path.join(ROOT, 'assets/teder/assistant.json'), JSON.stringify(thumbs.map(({ dir, file, ...t }, i) => ({ n: i + 1, ...t })), null, 2) + '\n');
 for (const d of decks) {
   fs.mkdirSync(path.join(TO, d.pack), { recursive: true });
   for (const s of d.slides) {
     for (const [kind, [w, h]] of Object.entries(SIZE)) {
-      const src = 'data:image/jpeg;base64,' + fs.readFileSync(path.join(d.dir, s.files[kind])).toString('base64');
-      const data = await page.evaluate(async ([src, w, h]) => {
-        const im = new Image();
-        im.src = src;
-        await im.decode();
-        const c = Object.assign(document.createElement('canvas'), { width: w, height: h });
-        const x = c.getContext('2d');
-        x.imageSmoothingQuality = 'high';
-        x.drawImage(im, 0, 0, w, h);
-        return c.toDataURL('image/jpeg', 0.84);
-      }, [src, w, h]);
+      const data = await resize(jpeg(path.join(d.dir, s.files[kind])), w, h);
       fs.writeFileSync(path.join(TO, d.pack, `${kind === 'instagram' ? 'ig' : 'tt'}-${String(s.n).padStart(2, '0')}.jpg`), Buffer.from(data.split(',')[1], 'base64'));
     }
   }
@@ -80,4 +110,4 @@ await browser.close();
 
 const out = decks.map(({ dir, slides: [s], ...d }) => ({ ...d, alt: s.alt }));
 fs.writeFileSync(path.join(ROOT, 'assets/teder/showcase.json'), JSON.stringify(out, null, 2) + '\n');
-console.log(decks.map((d) => `${d.pack}: the cover`).join('\n'));
+console.log([...decks.map((d) => `${d.pack}: the cover`), ...thumbs.map((t, i) => `assistant ${i + 1}: ${t.topic}`)].join('\n'));

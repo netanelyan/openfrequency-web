@@ -98,9 +98,25 @@ copy('assets/brand/svg/openfrequency-small.svg', 'favicon.svg');
 copy('assets/brand/png/openfrequency-180.png', 'apple-touch-icon.png');
 copy('assets/brand/png/openfrequency-512.png', 'icon-512.png');
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/showcase'), { recursive: true })) if (f.endsWith('.jpg')) copy('assets/teder/showcase/' + f, 'teder/showcase/' + f);
+for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/assistant'))) copy('assets/teder/assistant/' + f, 'teder/assistant/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/clients'))) copy('assets/clients/' + f, 'clients/' + f);
-// The page a store gets from Toran, for a made-up store, as Toran rendered it (assets/toran-example/README.md).
-copy('assets/toran-example/index.html', 'toran/example/index.html');
+// The page a store gets from Toran, for a made-up store, as Toran rendered it (assets/toran-example/README.md). Its
+// price card is written here from site.config.json (the Store plan, VAT, the setup fee), so the example never shows
+// a price the site no longer has; a page whose card can't be found stops the build rather than ship an old one.
+{
+  const html = fs.readFileSync(path.join(ROOT, 'assets/toran-example/index.html'), 'utf8');
+  const card = /<p class="figure">[\s\S]*?<\/p>\s*<p class="price-notes">[\s\S]*?<\/p>/;
+  if (!card.test(html)) throw new Error('assets/toran-example/index.html: no price card to write the price into');
+  const n = (key) => cfg.get(key);
+  const fee = n('price.setup');
+  const vat = n('price.vat') === 'included' ? 'כולל מע״מ' : 'לא כולל מע״מ';
+  const priced = ['price.plans.store.monthly', 'price.plans.store.conversations', 'price.setup', 'price.vat'].every((k) => cfg.has(k));
+  const out = priced
+    ? html.replace(card, `<p class="figure"><span class="num">${n('price.plans.store.monthly').toLocaleString('he-IL')}</span><span class="cur">₪</span><span class="per">לחודש</span></p>\n        <p class="price-notes">${vat}, עד ${n('price.plans.store.conversations').toLocaleString('he-IL')} שיחות בחודש. ${fee > 0 ? `בחודש הראשון יש גם ${fee.toLocaleString('he-IL')} ₪ דמי הקמה, פעם אחת.` : 'אין דמי הקמה.'}</p>`)
+    : html.replace(card, '');
+  fs.mkdirSync(path.join(OUT, 'toran/example'), { recursive: true });
+  fs.writeFileSync(path.join(OUT, 'toran/example/index.html'), out);
+}
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/toran-example/demo'))) copy('assets/toran-example/demo/' + f, 'toran/example/demo/' + f);
 
 const kb = (n) => (n / 1024).toFixed(1) + ' KB';
