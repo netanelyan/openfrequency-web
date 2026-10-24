@@ -23,6 +23,11 @@ const DOOR_CHAT = [
   ['them', '02:16', 'את זה אני לא יודע. אני בודק עם החנות, ואחזור אליך כאן.'],
 ];
 
+// A door's top row: the mark, the name, and what it does. On a phone the door starts shut (site.js), showing the name
+// and one short line, and the round button at the row's end (the whole row is its target) opens it; without script, or
+// from 700px, the door is open and the button isn't there.
+const doorTop = (id, face, name, short, say) => `<div class="door-top">${face}<div><h2 id="door-${id}">${name}</h2><p class="door-sum">${short}</p><p class="door-say">${say}</p></div><button type="button" class="door-open" aria-expanded="true" aria-controls="door-${id}-in" aria-labelledby="door-${id}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg></button></div>`;
+
 const hero = (cfg) => `
 <section class="co-hero" aria-labelledby="hero-h">
 <div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
@@ -30,18 +35,22 @@ const hero = (cfg) => `
 <h1 id="hero-h">פלטפורמות יצירת התוכן ושירות הלקוחות <span class="hl">המובילות בארץ</span></h1>
 <p class="lede">תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.</p>
 <div class="doors">
-<article class="door toran-door glass" aria-labelledby="door-toran">
-<div class="door-top">${mark('toran', 48)}<div><h2 id="door-toran">תורן</h2><p>עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.</p></div></div>
+<article class="door toran-door glass" aria-labelledby="door-toran" data-door>
+${doorTop('toran', mark('toran', 48), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
+<div class="door-in" id="door-toran-in">
 <div class="door-act"><a class="btn primary" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn" href="/toran">עוד על תורן</a></div>
 <div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
 <p class="pop" data-pop>${mark('toran', 28)}<span class="pop-h"><b>תורן</b><small>בטלפון שלכם, 02:16</small></span><span class="pop-t">לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?</span></p>
 </div>
+</div>
 </article>
-<article class="door teder-door" aria-labelledby="door-teder">
-<div class="door-top"><span class="wave" aria-hidden="true">${glyphOnly('teder')}</span><div><h2 id="door-teder">תדר</h2><p>כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.</p></div></div>
+<article class="door teder-door" aria-labelledby="door-teder" data-door>
+${doorTop('teder', `<span class="wave" aria-hidden="true">${glyphOnly('teder')}</span>`, 'תדר', 'מצגות לטיקטוק ולאינסטגרם', 'כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.')}
+<div class="door-in" id="door-teder-in">
 <div class="door-act"><a class="btn light" href="/teder#demo">לנסות את תדר על החנות שלכם</a><a class="btn on-color" href="/teder">עוד על תדר</a></div>
 ${reel}
+</div>
 </article>
 </div>
 </div>
@@ -144,7 +153,6 @@ const tederAssistant = () => `
 
 export default (cfg) => ({
   path: '/',
-  dock: true,
   title: 'OpenFrequency, תורן ותדר',
   description: `תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,
   // "Who we are" is in the footer (layout.mjs), on every page.

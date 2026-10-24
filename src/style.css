@@ -654,6 +654,24 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .door-top h2 { font-size: var(--fs-lead); line-height: 1.2; }
 .door-top p { margin: 2px 0 0; color: var(--ink-2); }
 .door-act { display: flex; flex-wrap: wrap; gap: 10px; }
+/* The door's inside is laid out as part of the door; on a phone a shut door shows only its top row, with a short line
+   in place of the long one, and opens under a tap anywhere on that row (home.mjs doorTop, site.js). */
+.door-in { display: contents; }
+.door-sum, .door-open { display: none; }
+@media (max-width: 699px) {
+  .door-top { position: relative; }
+  .door-top > div { flex: 1; min-width: 0; }
+  .door-open:not([hidden]) { display: grid; place-items: center; flex: none; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: var(--fill); color: var(--ink); cursor: pointer; }
+  .door-open::after { content: ''; position: absolute; inset: -8px; border-radius: 14px; }
+  .door-open svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s var(--ease-out); }
+  .door-open[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .door-open:focus-visible { outline: 3px solid var(--accent-fill); outline-offset: 2px; }
+  .teder-door .door-open { background: rgba(255, 255, 255, 0.18); color: #fff; }
+  .teder-door .door-open:focus-visible { outline-color: #fff; }
+  .door.shut { padding-bottom: var(--pad); }
+  .door.shut .door-in, .door.shut .door-say { display: none; }
+  .door.shut .door-sum { display: block; }
+}
 .teder-door { background: var(--teder); color: #fff; }
 .teder-door h2, .teder-door p { color: #fff; }
 .wave { display: block; flex: none; color: #fff; }
@@ -694,6 +712,13 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .teder-door .pop, .teder-door .pop b { color: var(--ink); }
 .teder-door .pop small { color: var(--ink-3); }
 .reel-sit .fan { position: absolute; inset: 0; }
+/* On a phone the slides' words sit where the card would cover them, so the card waits above the phone instead, and the
+   phone keeps its full height under it. */
+@media (max-width: 699px) {
+  .reel-sit { --lift: 80px; box-sizing: content-box; padding-top: var(--lift); }
+  .reel-sit .pop { top: 0; bottom: auto; inset-inline: 0; width: min(260px, calc(100vw - 2 * var(--gut) - 24px)); margin-inline: auto; }
+  .reel-sit .fan { top: var(--lift); }
+}
 .fan img { position: absolute; top: 46%; left: 50%; width: 74%; height: auto; border-radius: 12px; box-shadow: 0 22px 40px -18px rgba(0, 0, 0, 0.6); transform: translate(-50%, -50%) translateX(var(--x, 0)) rotate(var(--rot, 0deg)); transition: transform 0.9s var(--ease-out); }
 .fan img:nth-child(1) { --x: 52%; --rot: 8deg; }
 .fan img:nth-child(2) { --x: -52%; --rot: -8deg; }
@@ -738,13 +763,6 @@ label.f[hidden], .demo .when[hidden] { display: none; }
   .ask-sec .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 64px; align-items: center; }
 }
 
-/* On a phone, the demo button waits at the bottom of the screen once the first screen is behind. */
-.dock { display: none; }
-@media (max-width: 699px) {
-  .dock { position: fixed; z-index: 40; inset: auto 0 0; display: block; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--surface-hi); -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6); border-top: 1px solid var(--line); transform: translateY(110%); visibility: hidden; transition: transform 0.35s var(--ease-out), visibility 0s linear 0.35s; }
-  .dock.on { transform: none; visibility: visible; transition: transform 0.35s var(--ease-out); }
-  .dock .btn { width: 100%; }
-}
 
 /* ------------------------------------------------------------ Teder's page: its own field of colour */
 
@@ -950,10 +968,9 @@ input[aria-invalid='true'] { border-color: var(--warn); }
 .ph { padding: 0 4px; border-radius: 6px; background: color-mix(in srgb, #ff9f0a 24%, transparent); outline: 1px dashed var(--warn); color: inherit; font: inherit; }
 .draft { margin: 0; padding: 8px var(--gut); background: var(--warn-bg); color: var(--warn); font-size: 13px; text-align: center; }
 
-/* The accessibility panel: a round button at the bottom corner, above the phone's dock when the dock is up. */
+/* The accessibility panel: a round button at the bottom corner. */
 .a11y { position: fixed; z-index: 45; bottom: calc(16px + env(safe-area-inset-bottom)); inset-inline-end: 16px; }
 .a11y[hidden], .a11y-p[hidden] { display: none; }
-.dock.on ~ .a11y { bottom: calc(88px + env(safe-area-inset-bottom)); }
 .a11y-btn { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 1px solid var(--edge); border-radius: 50%; background: var(--surface-hi); -webkit-backdrop-filter: var(--glass); backdrop-filter: var(--glass); color: var(--ink); cursor: pointer; }
 .a11y-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .a11y-btn svg circle { fill: currentColor; stroke: none; }
@@ -1039,6 +1056,14 @@ html.a-contrast { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: 
 .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 12px; margin: 0 auto; padding: 0 var(--gut, 16px); list-style: none; }
 .trust li { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px 8px 14px; border-radius: 999px; background: var(--surface, rgba(255, 255, 255, 0.7)); box-shadow: inset 0 0 0 1px var(--line); font-size: 15px; font-weight: 600; color: var(--ink); }
 .trust svg { width: 22px; height: 22px; flex: none; fill: none; stroke: var(--toran); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* On a phone the five sit two to a row, small, the odd one out across the row. */
+@media (max-width: 699px) {
+  .trust-sec { padding-top: 28px; }
+  .trust { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .trust li { gap: 8px; min-height: 48px; padding: 7px 10px; border-radius: 12px; font-size: 14px; line-height: 1.3; }
+  .trust li:last-child:nth-child(odd) { grid-column: 1 / -1; justify-content: center; }
+  .trust svg { width: 18px; height: 18px; }
+}
 
 /* ---- Toran for the owner (home.mjs assistant) */
 .owner-sec { --pc: var(--toran); }

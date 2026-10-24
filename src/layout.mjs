@@ -19,9 +19,6 @@ const PRODUCTS = [
 // The pages about both products. Each price is on its product's page, so there is no price link of its own.
 const LINKS = () => [['/faq', 'שאלות']];
 
-// The way to a demo: the form on Toran's page.
-const DEMO = (current) => (current === '/toran' ? '#demo' : '/toran#demo');
-
 // Where a customer manages their tools: openfrequency-accounts, which sends anyone not signed in to its login.
 const TOOLS = 'https://accounts.openfrequency.co.il/';
 
@@ -96,7 +93,7 @@ ${A11Y.map(([k, label]) => `<button type="button" data-a="${k}" aria-pressed="fa
 <button class="a11y-btn" type="button" aria-expanded="false" aria-controls="a11y-p"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="1.8"/><path d="M5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5l-3 6M12 14.5l3 6"/></svg><span class="sr">נגישות</span></button>
 </div>`;
 
-export function page(cfg, css, { path, title, description, body, noindex = false, forms = false, dock = false }) {
+export function page(cfg, css, { path, title, description, body, noindex = false, forms = false }) {
   const missing = cfg.banner && cfg.missing.size
     ? `<p class="draft" role="note">טיוטה. חסרים עוד ${cfg.missing.size} פרטים ב-site.config.json, והאתר לא ייבנה בלעדיהם.</p>`
     : '';
@@ -121,7 +118,6 @@ ${missing}${header(cfg, path)}
 <main id="main">
 ${body}
 </main>
-${dock ? `<div class="dock" data-dock><a class="btn primary" href="${DEMO(path)}">לנסות את תורן על החנות שלכם</a></div>` : ''}
 ${footer(cfg, path)}
 ${a11y}
 <script>

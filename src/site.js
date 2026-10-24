@@ -55,6 +55,17 @@
   });
   each('.fan', function (el) { if (seen) seen.observe(el); else el.classList.add('in'); });
 
+  // On a phone each door on the home page starts shut, its name and a short line; the button on its top row opens it.
+  // From 700px the stylesheet shows the door whole whatever the button says.
+  each('[data-door]', function (door) {
+    var btn = door.querySelector('.door-open');
+    if (!btn) return;
+    var set = function (open) { door.classList.toggle('shut', !open); btn.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    btn.hidden = false;
+    set(false);
+    btn.addEventListener('click', function () { set(door.classList.contains('shut')); });
+  });
+
   // A chat stage marked data-play plays once as it comes into view: messages arrive in their order, and each answer
   // is preceded by Toran's three typing dots. Messages the layout hides (the second exchange on a phone) sit out.
   var play = function (stage) {
@@ -208,21 +219,6 @@
     show();
     if (!still) setInterval(function () { i = (i + 1) % imgs.length; show(); }, 3200);
   });
-
-  // On a phone, the way to a demo stays at the bottom of the screen once the first screen is behind, and steps aside
-  // while a form or the footer is in view.
-  var dock = d.querySelector('[data-dock]');
-  if (dock && 'IntersectionObserver' in window) {
-    var past = false, near = new Set();
-    var set = function () { dock.classList.toggle('on', past && !near.size); };
-    new IntersectionObserver(function (es) {
-      past = !es[0].isIntersecting && es[0].boundingClientRect.top < 0; set();
-    }).observe(d.querySelector('main > section'));
-    var io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.isIntersecting) near.add(e.target); else near.delete(e.target); }); set();
-    });
-    each('.demo, .wait, .close-sec, .foot', function (el) { io.observe(el); });
-  }
 
   // The kinds of store (niches.mjs): a search over them, and on a phone, where the card sits above the list, the card
   // brought into view when one is picked.

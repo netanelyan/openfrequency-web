@@ -33,7 +33,6 @@ export default (cfg) => {
   return {
     path: '/toran',
     forms: true,
-    dock: true,
     title: 'תורן, עונה ללקוחות של החנות שלכם | OpenFrequency',
     description: `תורן עונה ללקוחות של החנות 24/7, מתוך מה שכתוב באתר. היום ${where}.`,
     body: `
