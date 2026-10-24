@@ -17,7 +17,7 @@ export const askBox = `
 <div class="chat-top">${mark('openfrequency', 38)}<span><b>OpenFrequency</b><small>תורן עונה</small></span><span class="tag">דוגמה</span></div>
 <ol class="msgs" data-ask-out aria-live="polite">
 <li class="msg me">מה תורן עושה?<time aria-hidden="true">עכשיו</time></li>
-<li class="msg them">תורן עונה ללקוחות של החנות בוואטסאפ, מתוך מה שכתוב באתר שלה: מוצרים, מחירים, מלאי ודפי המדיניות. מה שלא כתוב שם, הוא שואל אתכם ומעביר את התשובה ללקוח. <a class="lnk" href="/toran">לעמוד של תורן</a><time aria-hidden="true">עכשיו</time></li>
+<li class="msg them">תורן עונה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל, מתוך מה שכתוב באתר שלה: מוצרים, מחירים, מלאי ודפי המדיניות. מה שלא כתוב שם, הוא שואל אתכם ומעביר את התשובה ללקוח. <a class="lnk" href="/toran">לעמוד של תורן</a><time aria-hidden="true">עכשיו</time></li>
 <li class="sys"><span class="ui-s alone">ענה לבד</span>מהעמוד של תורן</li>
 </ol>
 <div class="ask-ex" data-ask-ex hidden>

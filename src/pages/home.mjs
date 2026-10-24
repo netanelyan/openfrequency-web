@@ -10,6 +10,7 @@ import { chat } from '../chat.mjs';
 import { askBox, toranPriceLine } from '../sections.mjs';
 import { priceLine } from './join.mjs';
 import { reel } from '../teder.mjs';
+import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
 import { niches } from '../niches.mjs';
 
@@ -22,15 +23,15 @@ const DOOR_CHAT = [
   ['them', '02:16', 'את זה אני לא יודע. אני בודק עם החנות, ואחזור אליך כאן.'],
 ];
 
-const hero = `
+const hero = (cfg) => `
 <section class="co-hero" aria-labelledby="hero-h">
 <div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
 <div class="wrap">
 <h1 id="hero-h">פלטפורמות יצירת התוכן ושירות הלקוחות <span class="hl">המובילות בארץ</span></h1>
-<p class="lede">תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות שלכם בוואטסאפ 24/7, מתוך מה שכתוב באתר.</p>
+<p class="lede">תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.</p>
 <div class="doors">
 <article class="door toran-door glass" aria-labelledby="door-toran">
-<div class="door-top">${mark('toran', 48)}<div><h2 id="door-toran">תורן</h2><p>עונה ללקוחות של החנות בוואטסאפ, מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.</p></div></div>
+<div class="door-top">${mark('toran', 48)}<div><h2 id="door-toran">תורן</h2><p>עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.</p></div></div>
 <div class="door-act"><a class="btn primary" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn" href="/toran">עוד על תורן</a></div>
 <div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
@@ -145,7 +146,7 @@ export default (cfg) => ({
   path: '/',
   dock: true,
   title: 'OpenFrequency, תורן ותדר',
-  description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות בוואטסאפ 24/7, מתוך מה שכתוב באתר.',
+  description: `תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,
   // "Who we are" is in the footer (layout.mjs), on every page.
-  body: [hero, trust(), clients(), niches(), assistant(), tederAssistant(), ask(cfg)].join('\n'),
+  body: [hero(cfg), trust(), clients(), niches(), assistant(), tederAssistant(), ask(cfg)].join('\n'),
 });

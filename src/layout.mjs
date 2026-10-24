@@ -13,7 +13,7 @@ const formJs = squeeze('src/form.js');
 
 // The two products, each behind its own mark, then the pages that are about both.
 const PRODUCTS = [
-  ['/toran', 'toran', 'תורן', 'עונה ללקוחות בוואטסאפ'],
+  ['/toran', 'toran', 'תורן', 'עונה ללקוחות של החנות'],
   ['/teder', 'teder', 'תדר', 'מצגות לטיקטוק ולאינסטגרם'],
 ];
 // The pages about both products. Each price is on its product's page, so there is no price link of its own.
@@ -61,7 +61,7 @@ function footer(cfg, current) {
 <div class="foot-cols">
 <div class="foot-who">
 <a class="brand" href="/">${mark('openfrequency', 40)}<b>OpenFrequency</b></a>
-<p>בנינו שני מוצרים לחנויות אונליין. תורן עונה ללקוחות בוואטסאפ, ותדר כותב ומעצב מצגות לטיקטוק ולאינסטגרם.</p>
+<p>בנינו שני מוצרים לחנויות אונליין. תורן עונה ללקוחות של החנות, ותדר כותב ומעצב מצגות לטיקטוק ולאינסטגרם.</p>
 ${cfg.has('about.who') || cfg.banner ? `<h2 id="f-who">מי אנחנו</h2><p>${cfg.t('about.who')}</p><p class="foot-why">${cfg.t('about.why')}</p>` : ''}
 </div>
 <nav aria-labelledby="f-prod"><h2 id="f-prod">המוצרים</h2><ul>
