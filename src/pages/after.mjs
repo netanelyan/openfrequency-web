@@ -53,3 +53,13 @@ export const tryAgain = plain('/try-again', 'הפרטים לא הגיעו אלי
 </div>
 </section>`;
 });
+
+// The 404 page: Caddy answers any address that isn't there with it, with its 404 status (handle_errors).
+export const notFound = (cfg) => ({ ...plain('/404', 'הדף הזה לא קיים', () => `
+<section class="sec after">
+<div class="wrap narrow" data-rise>
+<h1>הדף הזה לא קיים</h1>
+<p class="lede">אולי הקישור השתנה, ואולי משהו אצלנו נשבר. מכאן אפשר להמשיך:</p>
+<div class="actions"><a class="btn primary" href="/">לעמוד הבית</a><a class="btn" href="/toran">תורן</a><a class="btn" href="/teder">תדר</a><a class="btn" href="/faq">שאלות</a></div>
+</div>
+</section>`)(cfg), file: '404.html' });

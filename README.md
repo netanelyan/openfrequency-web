@@ -15,6 +15,7 @@ npm run build        # dist/; stops while any fact in site.config.json is empty,
 npm run draft        # the same, with each missing fact shown as a visible [placeholder]
 npm run serve        # dist/ on http://127.0.0.1:4730
 npm run shots        # docs/screenshots: every page at 390px and 1440px, light and dark (add --menu for the phone menu)
+npm run og           # assets/og: the share images a sent link shows (OpenFrequency, Toran, Teder), 1200x630
 ```
 
 ## Leads

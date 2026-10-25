@@ -93,7 +93,28 @@ ${A11Y.map(([k, label]) => `<button type="button" data-a="${k}" aria-pressed="fa
 <button class="a11y-btn" type="button" aria-expanded="false" aria-controls="a11y-p"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="1.8"/><path d="M5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5l-3 6M12 14.5l3 6"/></svg><span class="sr">נגישות</span></button>
 </div>`;
 
-export function page(cfg, css, { path, title, description, body, noindex = false, forms = false }) {
+// What a link to the page shows where it is sent (WhatsApp, Facebook, LinkedIn, X): the page's own title and line, and
+// its share image from assets/og (scripts/og.mjs draws them). Every address is absolute, on the site's domain.
+const OG_ALT = { openfrequency: 'OpenFrequency: תורן ותדר', toran: 'תורן, עונה ללקוחות של החנות', teder: 'תדר, מצגות בעברית לטיקטוק ולאינסטגרם' };
+function share(cfg, path, title, description, image) {
+  const origin = `https://${cfg.get('domain') || 'openfrequency.co.il'}`;
+  const url = origin + path;
+  return `<link rel="canonical" href="${esc(url)}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OpenFrequency">
+<meta property="og:locale" content="he_IL">
+<meta property="og:url" content="${esc(url)}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:image" content="${origin}/og/${image}.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${esc(OG_ALT[image])}">
+<meta name="twitter:card" content="summary_large_image">
+`;
+}
+
+export function page(cfg, css, { path, title, description, body, noindex = false, forms = false, image = 'openfrequency' }) {
   const missing = cfg.banner && cfg.missing.size
     ? `<p class="draft" role="note">טיוטה. חסרים עוד ${cfg.missing.size} פרטים ב-site.config.json, והאתר לא ייבנה בלעדיהם.</p>`
     : '';
@@ -104,7 +125,7 @@ export function page(cfg, css, { path, title, description, body, noindex = false
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
-${noindex || cfg.draft ? '<meta name="robots" content="noindex">\n' : ''}<meta name="color-scheme" content="light dark">
+${share(cfg, path, title, description, image)}${noindex || cfg.draft ? '<meta name="robots" content="noindex">\n' : ''}<meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eeeff2">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111113">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">

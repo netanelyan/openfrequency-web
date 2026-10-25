@@ -19,6 +19,7 @@ const rows = (items, cls = '') => `<ul class="rows${cls ? ' ' + cls : ''}">${ite
 
 export default (cfg) => ({
   path: '/teder',
+    image: 'teder',
   forms: true,
   title: 'תדר, מצגות אוטומטיות בעברית לטיקטוק ולאינסטגרם | OpenFrequency',
   description: 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, וכל מצגת עולה רק אחרי שמישהו אישר אותה.',

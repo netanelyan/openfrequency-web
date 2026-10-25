@@ -12,6 +12,7 @@
     "dev": "node build.mjs --draft --banner && node scripts/serve.mjs",
     "serve": "node scripts/serve.mjs",
     "shots": "node scripts/shots.mjs",
+    "og": "node scripts/og.mjs",
     "leads": "node server/lead.mjs",
     "test": "node --test test/*.test.mjs",
     "support": "node scripts/support-export.mjs"

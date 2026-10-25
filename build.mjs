@@ -16,7 +16,7 @@ import toran from './src/pages/toran.mjs';
 import teder from './src/pages/teder.mjs';
 import faq from './src/pages/faq.mjs';
 import join from './src/pages/join.mjs';
-import { thanks, thanksAgain, thanksTeder, tryAgain } from './src/pages/after.mjs';
+import { thanks, thanksAgain, thanksTeder, tryAgain, notFound } from './src/pages/after.mjs';
 import { terms, privacy, security, accessibility } from './src/pages/legal.mjs';
 
 const draft = process.argv.includes('--draft');
@@ -24,7 +24,7 @@ const draft = process.argv.includes('--draft');
 const banner = draft && process.argv.includes('--banner');
 const OUT = path.join(ROOT, 'dist');
 
-const PAGES = [home, toran, teder, faq, join, terms, privacy, security, accessibility, thanks, thanksAgain, thanksTeder, tryAgain];
+const PAGES = [home, toran, teder, faq, join, terms, privacy, security, accessibility, thanks, thanksAgain, thanksTeder, tryAgain, notFound];
 const DRAFT_PAGES = [];
 
 const cfg = { ...readConfig(draft), banner };
@@ -103,6 +103,7 @@ for (const f of ['heebo-hebrew.woff2', 'heebo-latin.woff2', 'HEEBO-LICENSE.txt',
 copy('assets/brand/svg/openfrequency-small.svg', 'favicon.svg');
 copy('assets/brand/png/openfrequency-180.png', 'apple-touch-icon.png');
 copy('assets/brand/png/openfrequency-512.png', 'icon-512.png');
+for (const f of fs.readdirSync(path.join(ROOT, 'assets/og'))) if (f.endsWith('.png')) copy('assets/og/' + f, 'og/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/showcase'), { recursive: true })) if (f.endsWith('.jpg')) copy('assets/teder/showcase/' + f, 'teder/showcase/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/assistant'))) copy('assets/teder/assistant/' + f, 'teder/assistant/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/clients'))) copy('assets/clients/' + f, 'clients/' + f);

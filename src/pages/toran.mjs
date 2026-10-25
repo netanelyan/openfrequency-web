@@ -32,6 +32,7 @@ export default (cfg) => {
   const where = `${inList(live)}${soon.length ? `, ובקרוב גם ${inList(soon)}` : ''}`;
   return {
     path: '/toran',
+    image: 'toran',
     forms: true,
     title: 'תורן, עונה ללקוחות של החנות שלכם | OpenFrequency',
     description: `תורן עונה ללקוחות של החנות 24/7, מתוך מה שכתוב באתר. היום ${where}.`,
