@@ -393,3 +393,38 @@ test('turning the sender on sends the recent unsent leads, never the old ones', 
     p.kill();
   }
 });
+
+test('with Resend set and no Twilio, each lead is emailed to the owner and marked sent', async () => {
+  const mails = [];
+  const resend = http.createServer((req, res) => {
+    let b = '';
+    req.on('data', (c) => (b += c));
+    req.on('end', () => {
+      mails.push({ url: req.url, auth: req.headers.authorization, body: JSON.parse(b) });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end('{"id":"e1"}');
+    });
+  });
+  await new Promise((ok) => resend.listen(0, '127.0.0.1', ok));
+  const port = PORT + 200;
+  const db = path.join(dir, 'mail.db');
+  const p = await start(port, db, {
+    TWILIO_ACCOUNT_SID: '', RESEND_API_KEY: 're_test', RESEND_API: `http://127.0.0.1:${resend.address().port}`,
+    LEAD_EMAIL_FROM: 'OpenFrequency <leads@example.co.il>', LEAD_EMAIL_TO: 'owner@example.co.il, partner@example.co.il',
+  });
+  try {
+    const body = await (await post({ source: 'demo', store: 'mailshop.co.il', page: '/toran' }, { to: `http://127.0.0.1:${port}` })).json();
+    await settle();
+    const m = mails.at(-1);
+    assert.equal(m.url, '/emails');
+    assert.equal(m.auth, 'Bearer re_test');
+    assert.equal(m.body.from, 'OpenFrequency <leads@example.co.il>');
+    assert.deepEqual(m.body.to, ['owner@example.co.il', 'partner@example.co.il']);
+    assert.match(m.body.subject, /דמו לתורן: mailshop\.co\.il/);
+    assert.ok(m.body.text.includes(body.code), 'the email has the code');
+    assert.ok(rows(db).at(-1).notified_at, 'marked as sent');
+  } finally {
+    p.kill();
+    resend.close();
+  }
+});

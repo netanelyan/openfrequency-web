@@ -1,6 +1,6 @@
 // The lead endpoint: the only moving part of the site. The demo form and the Teder waitlist post here; each lead is
-// saved to SQLite first and then sent to the owner's own WhatsApp from the business number (through Twilio), so an
-// outage never loses one (unsent leads are retried).
+// saved to SQLite first and then sent to the owner: to their own WhatsApp from the business number (through Twilio),
+// to their email (through Resend), or both, so an outage never loses one (unsent leads are retried).
 //
 //   node server/lead.mjs            listen on 127.0.0.1:$PORT (Caddy proxies /api/* to it)
 //   node server/lead.mjs list [n]   print the last n leads (default 20)
@@ -18,6 +18,10 @@
 //   SITE_ORIGIN          https://<domain>; a browser post from any other origin is refused
 //   TRUST_PROXY          1 behind Caddy: the client's address is the last X-Forwarded-For entry
 //   TWILIO_API           default https://api.twilio.com (the tests point it at a fake)
+//   RESEND_API_KEY       a Resend key that can send; with LEAD_EMAIL_FROM and LEAD_EMAIL_TO each lead is emailed too
+//   LEAD_EMAIL_FROM      a sender on a domain verified in Resend, e.g. OpenFrequency <leads@openfrequency.co.il>
+//   LEAD_EMAIL_TO        the owner's address (several, comma-separated)
+//   RESEND_API           default https://api.resend.com (the tests point it at a fake)
 //   TORAN_INTAKE_URL     Toran's /internal/lead on this machine (http://127.0.0.1:4710/internal/lead); without it a
 //                        demo lead only goes to WhatsApp
 //   TEDER_INTAKE_URL     Teder's /internal/lead on this machine (http://127.0.0.1:4700/internal/lead); without it a
@@ -193,24 +197,57 @@ export function waRequest(row) {
   return new URLSearchParams(form);
 }
 
+// The owner's email, beside the WhatsApp message or instead of it: the same lead, through Resend.
+const mailReady = () => Boolean(env.RESEND_API_KEY && env.LEAD_EMAIL_FROM && env.LEAD_EMAIL_TO);
+
+export function mailRequest(row) {
+  const text = message(row);
+  return {
+    from: env.LEAD_EMAIL_FROM,
+    to: String(env.LEAD_EMAIL_TO).split(',').map((a) => a.trim()).filter(Boolean),
+    subject: `${text.split('\n')[0]}: ${row.store || row.contact}`,
+    text,
+  };
+}
+
+async function sendWa(row) {
+  const sid = encodeURIComponent(env.TWILIO_ACCOUNT_SID);
+  const res = await fetch(`${env.TWILIO_API || 'https://api.twilio.com'}/2010-04-01/Accounts/${sid}/Messages.json`, {
+    method: 'POST',
+    headers: { Authorization: `Basic ${Buffer.from(`${env.TWILIO_ACCOUNT_SID}:${env.TWILIO_AUTH_TOKEN}`).toString('base64')}` },
+    body: waRequest(row),
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!res.ok) throw new Error(`Twilio ${res.status}: ${(await res.text()).slice(0, 200)}`);
+}
+
+async function sendMail(row) {
+  const res = await fetch(`${env.RESEND_API || 'https://api.resend.com'}/emails`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(mailRequest(row)),
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!res.ok) throw new Error(`Resend ${res.status}: ${(await res.text()).slice(0, 200)}`);
+}
+
+// A lead counts as sent once any of the owner's channels took it; each one that failed is logged.
 async function notify(db, row) {
-  if (!waReady()) return false;
+  const channels = [[waReady(), 'WhatsApp', sendWa], [mailReady(), 'email', sendMail]].filter(([on]) => on);
+  if (!channels.length) return false;
   db.prepare('UPDATE leads SET tries = tries + 1 WHERE id = ?').run(row.id);
-  try {
-    const sid = encodeURIComponent(env.TWILIO_ACCOUNT_SID);
-    const res = await fetch(`${env.TWILIO_API || 'https://api.twilio.com'}/2010-04-01/Accounts/${sid}/Messages.json`, {
-      method: 'POST',
-      headers: { Authorization: `Basic ${Buffer.from(`${env.TWILIO_ACCOUNT_SID}:${env.TWILIO_AUTH_TOKEN}`).toString('base64')}` },
-      body: waRequest(row),
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) throw new Error(`Twilio ${res.status}: ${(await res.text()).slice(0, 200)}`);
-    db.prepare('UPDATE leads SET notified_at = ? WHERE id = ?').run(new Date().toISOString(), row.id);
-    return true;
-  } catch (e) {
-    console.error(`lead ${row.id}: not sent to WhatsApp (${e.message}); it is saved and will be retried`);
-    return false;
+  let sent = false;
+  for (const [, name, send] of channels) {
+    try {
+      await send(row);
+      sent = true;
+    } catch (e) {
+      console.error(`lead ${row.id}: not sent by ${name} (${e.message})`);
+    }
   }
+  if (sent) db.prepare('UPDATE leads SET notified_at = ? WHERE id = ?').run(new Date().toISOString(), row.id);
+  else console.error(`lead ${row.id}: saved, and will be retried`);
+  return sent;
 }
 
 // ---------------------------------------------------------------- Toran and Teder
@@ -374,7 +411,7 @@ if (main && process.argv[2] === 'list') {
   const db = open();
   const port = Number(env.PORT || 4720);
   const server = createServer(db);
-  server.listen(port, '127.0.0.1', () => console.log(`leads on 127.0.0.1:${port}, saved to ${DB_PATH}${waReady() ? '' : ' (no Twilio WhatsApp sender: saving only)'}${toranWaLink('x', 'x') ? '' : " (no TORAN_DEMO_WA: a Toran demo's form shows its code with no WhatsApp button)"}`));
+  server.listen(port, '127.0.0.1', () => console.log(`leads on 127.0.0.1:${port}, saved to ${DB_PATH}${waReady() || mailReady() ? `, sent by ${[waReady() && 'WhatsApp', mailReady() && 'email'].filter(Boolean).join(' and ')}` : ' (no WhatsApp sender and no email: saving only)'}${toranWaLink('x', 'x') ? '' : " (no TORAN_DEMO_WA: a Toran demo's form shows its code with no WhatsApp button)"}`));
   const timer = setInterval(() => retry(db), 300_000);
   retry(db);
   const stop = () => { clearInterval(timer); server.close(() => { db.close(); process.exit(0); }); };

@@ -22,8 +22,9 @@ npm run og           # assets/og: the share images a sent link shows (OpenFreque
 
 The demo forms post to `server/lead.mjs`, a small Node server with no dependencies (`node:sqlite`), behind Caddy at
 `/api/lead`. Each lead (the store's host name, the form, the page, the time, and a WhatsApp number for Teder or a
-code for Toran) is saved to SQLite first, then sent from the business number to the owner's own WhatsApp (through
-Twilio) and handed to Toran or Teder; what fails is retried every 5 minutes, and a lead more than 2 days old is not
+code for Toran) is saved to SQLite first, then sent to the owner, from the business number to their own WhatsApp
+(through Twilio), to their email (through Resend: `RESEND_API_KEY`, `LEAD_EMAIL_FROM`, `LEAD_EMAIL_TO`), or both, and
+handed to Toran or Teder; what fails is retried every 5 minutes, and a lead more than 2 days old is not
 sent any more, so turning the sender on never sends a backlog. One address gets 5 leads an hour, everyone together 200 a day, and a hidden honeypot field catches
 form-filling scripts. A post from another origin is refused. IP addresses are used for the limit in memory only.
 
