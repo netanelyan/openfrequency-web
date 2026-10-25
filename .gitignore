@@ -6,3 +6,9 @@ private/
 .taste-skill/
 .impeccable/review/
 .impeccable/config.local.json
+
+# AI coding tools: their settings, skills and worktrees, local to this machine
+.agents/
+.claude/
+.codex/
+skills-lock.json
