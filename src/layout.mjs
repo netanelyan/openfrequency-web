@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { FACTS, ROOT, esc, mark } from './lib.mjs';
 import { formCopy } from './forms.mjs';
+import { details } from './business.mjs';
 
 // The two scripts, comments and indentation out: site.js on every page (motion and the question box), form.js only
 // where there is a form.
@@ -16,8 +17,9 @@ const PRODUCTS = [
   ['/toran', 'toran', 'תורן', 'עונה ללקוחות של החנות'],
   ['/teder', 'teder', 'תדר', 'מצגות לטיקטוק ולאינסטגרם'],
 ];
-// The pages about both products. Each price is on its product's page, so there is no price link of its own.
-const LINKS = () => [['/faq', 'שאלות']];
+// The pages about both products, and how to reach us. Each price is on its product's page, so there is no price link
+// of its own.
+const LINKS = () => [['/faq', 'שאלות'], ['/contact', 'יצירת קשר']];
 
 // Where a customer manages their tools: openfrequency-accounts, which sends anyone not signed in to its login.
 const TOOLS = 'https://accounts.openfrequency.co.il/';
@@ -46,13 +48,18 @@ function header(cfg, current) {
 </header>`;
 }
 
-// The footer: one dark panel. Who we are, the two products, the site's pages, how to reach us, and the name set
-// large along the bottom edge.
+// The footer: one dark panel. Who we are, the two products, the site's pages, how to reach us, the business's details,
+// and the name set large along the bottom edge.
 function footer(cfg, current) {
   const wa = cfg.get('whatsapp');
   const waLink = wa
     ? `<a class="foot-wa" href="https://wa.me/${wa}">לכתוב לנו בוואטסאפ</a>`
     : cfg.banner ? `<span class="foot-wa">לכתוב לנו בוואטסאפ <mark class="ph">[${esc(FACTS.whatsapp.label)}]</mark></span>` : '';
+  // The business, along the bottom: the legal name, ע.מ, phone, email and address (src/business.mjs). The real build
+  // has them all; the public draft leaves out the ones not set yet.
+  const biz = details(cfg)
+    .filter(([key]) => cfg.banner || (cfg.has(key) && (key !== 'business.address.street' || cfg.has('business.address.city'))))
+    .map(([key, label, html]) => `<span>${key === 'business.legalName' ? '' : `<small>${label}</small> `}${html}</span>`).join('');
   return `<footer class="foot">
 <div class="foot-in">
 <div class="foot-cols">
@@ -65,11 +72,14 @@ ${cfg.has('about.who') || cfg.banner ? `<h2 id="f-who">מי אנחנו</h2><p>${
 ${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}">${mark(name, 28)}<span><b>${label}</b><small>${what}</small></span></a></li>`).join('\n')}
 </ul></nav>
 <nav aria-labelledby="f-site"><h2 id="f-site">באתר</h2><ul>
-${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('')}<li><a href="/terms">תנאי שימוש</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/security">אבטחת מידע</a></li><li><a href="/accessibility">נגישות</a></li>
+${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('')}<li><a href="/terms">תקנון ותנאי שימוש</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/security">אבטחת מידע</a></li><li><a href="/accessibility">נגישות</a></li>
 </ul></nav>
 <div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<p class="foot-cta-t">רוצים לראות את זה על החנות שלכם?</p><a class="foot-cta" href="/join">דמו חינם לחנות שלכם<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></a></div>
 </div>
-<p class="foot-legal">© 2026 OpenFrequency</p>
+<div class="foot-legal">
+${biz ? `<address class="foot-biz">${biz}</address>` : ''}
+<p>© 2026 OpenFrequency</p>
+</div>
 <p class="foot-word" aria-hidden="true">OpenFrequency</p>
 </div>
 </footer>`;

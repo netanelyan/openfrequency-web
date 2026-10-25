@@ -7,10 +7,17 @@
       `/etc/openfrequency-web/lead.env` on the VPS. Until then leads are saved, not sent (`node server/lead.mjs list` shows them).
 - [ ] **Pick the Caddy.** Teder uses the host's Caddy; Toran's `docker-compose.yml` starts its own on 80 and 443. On
       one VPS only one of them can have those ports. `deploy/Caddyfile.example` is written for the host's.
-- [ ] **For privacy and terms:** the legal name, the business number (ח.פ or ע.מ), a contact email, and how long
-      leads are kept.
-- [ ] **Step 6, still to build:** privacy and terms (as "טיוטה לבדיקה"), the 404 page, titles and descriptions, the
-      share image, sitemap.xml and robots.txt (with /s/ disallowed). Until then the footer's two links are 404s.
+- [ ] **The business, for Grow's payment check (through Morning).** Fill `business` in `site.config.json`: the legal
+      name, the ע.מ, the phone, the email, the street and city, and how long we take to reply (`replyTime`, said on
+      /contact). They show in every page's footer, on /contact and in the legal pages; `npm run build` lists the empty ones.
+- [ ] **The setup fee when a store cancels.** Write the policy, one sentence, in `price.setupRefund`. The terms show it
+      under "ביטול" as written; nothing else on the site says it.
+- [ ] **Review the legal pages.** /terms (תקנון ותנאי שימוש), /privacy, /security and /accessibility, then set
+      `legal.draft` to `false` to take the "טיוטה לבדיקה" label off them, and set `legal.updated` to that day.
+- [x] **Step 6, the legal pages:** terms, privacy, security and accessibility, labelled "טיוטה לבדיקה" while
+      `legal.draft` is true, and /contact with the business's details; the footer links to all of them.
+- [ ] **Step 6, still to build:** the 404 page, the share image, sitemap.xml (with /contact, /terms and /privacy in it)
+      and robots.txt (with /s/ disallowed).
 - [ ] **First deploy:** the one-time steps at the top of `deploy/deploy.sh`, then
       `DEPLOY_HOST=user@vps ./deploy/deploy.sh`.
 - [ ] **As Toran ships:** move lines from `toran.notYet` to `toran.today` in `site.config.json`.

@@ -1,6 +1,17 @@
 {
   "domain": "openfrequency.co.il",
   "whatsapp": "972552536259",
+  "business": {
+    "legalName": "",
+    "businessId": "",
+    "phone": "",
+    "email": "",
+    "address": {
+      "street": "",
+      "city": ""
+    },
+    "replyTime": ""
+  },
   "demo": {
     "time": "שעה"
   },
@@ -11,6 +22,7 @@
   "price": {
     "vat": "excluded",
     "setup": 990,
+    "setupRefund": "",
     "plans": {
       "store": {
         "monthly": 590,
@@ -65,12 +77,10 @@
     "redos": 10
   },
   "legal": {
-    "name": "Netanel Yanchevsky",
-    "number": "327727525",
-    "email": "natikyan153@gmail.com",
+    "draft": true,
     "court": "אשדוד",
     "host": "גרמניה",
     "leadMonths": 6,
-    "updated": "2026-10-24"
+    "updated": "2026-10-25"
   }
 }

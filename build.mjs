@@ -16,18 +16,20 @@ import toran from './src/pages/toran.mjs';
 import teder from './src/pages/teder.mjs';
 import faq from './src/pages/faq.mjs';
 import join from './src/pages/join.mjs';
+import contact from './src/pages/contact.mjs';
 import { thanks, thanksAgain, thanksTeder, tryAgain } from './src/pages/after.mjs';
 import { terms, privacy, security, accessibility } from './src/pages/legal.mjs';
 
 const draft = process.argv.includes('--draft');
 // The draft banner, and the placeholders the public draft leaves out, only for us: npm run dev.
 const banner = draft && process.argv.includes('--banner');
-const OUT = path.join(ROOT, 'dist');
+// OUT_DIR and SITE_CONFIG are for the tests: another folder to build into, and another config to build from.
+const OUT = process.env.OUT_DIR ? path.resolve(process.env.OUT_DIR) : path.join(ROOT, 'dist');
 
-const PAGES = [home, toran, teder, faq, join, terms, privacy, security, accessibility, thanks, thanksAgain, thanksTeder, tryAgain];
+const PAGES = [home, toran, teder, faq, join, contact, terms, privacy, security, accessibility, thanks, thanksAgain, thanksTeder, tryAgain];
 const DRAFT_PAGES = [];
 
-const cfg = { ...readConfig(draft), banner };
+const cfg = { ...readConfig(draft, process.env.SITE_CONFIG), banner };
 
 // Where Toran answers. With toran.channelsFrom "config" in site.config.json, the list is toran.channels there, and
 // Toran isn't asked: that's for when we know better than Toran's settings (every channel in it is live, and no

@@ -37,8 +37,8 @@ export const askBox = `
 
 // ---------------------------------------------------------------- the price
 
-const vatOf = (cfg) => (cfg.get('price.vat') === 'included' ? 'כולל מע״מ' : cfg.get('price.vat') === 'excluded' ? 'לא כולל מע״מ' : cfg.ph('price.vat'));
-const amount = (cfg, key) => (cfg.get(key) == null ? cfg.ph(key) : esc(ils(cfg.get(key))));
+export const vatOf = (cfg) => (cfg.get('price.vat') === 'included' ? 'כולל מע״מ' : cfg.get('price.vat') === 'excluded' ? 'לא כולל מע״מ' : cfg.ph('price.vat'));
+export const amount = (cfg, key) => (cfg.get(key) == null ? cfg.ph(key) : esc(ils(cfg.get(key))));
 const count = (cfg, key) => (cfg.get(key) == null ? cfg.ph(key) : esc(cfg.get(key).toLocaleString('he-IL')));
 const months = (n) => (n === 1 ? 'חודש' : n === 2 ? 'חודשיים' : `${n} חודשים`);
 const days = (n) => (n === 7 ? 'שבוע' : n === 14 ? 'שבועיים' : n === 1 ? 'יום' : `${n} ימים`);

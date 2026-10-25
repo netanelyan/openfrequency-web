@@ -1,19 +1,16 @@
 // The four legal pages: terms, privacy, information security and accessibility. In the serious register, and each
 // says only what the code does today (what is collected, where it goes, how long it stays). A fact that isn't set yet
-// is a [placeholder] in a draft and a build error for real. The legal name and number appear here and nowhere else.
+// is a [placeholder] in a draft and a build error for real. The business's details come from src/business.mjs, and
+// while legal.draft is true each page carries the "טיוטה לבדיקה" label.
 import { esc } from '../lib.mjs';
-import { waWords } from '../sections.mjs';
+import { waWords, vatOf, amount } from '../sections.mjs';
+import { mail, phone, who } from '../business.mjs';
 
 const updated = (cfg) => {
   const v = cfg.get('legal.updated');
   if (v == null) return cfg.ph('legal.updated');
   return esc(new Date(`${v}T12:00:00Z`).toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' }));
 };
-const mail = (cfg) => {
-  const v = cfg.get('legal.email');
-  return v == null ? cfg.ph('legal.email') : `<a href="mailto:${esc(v)}" dir="ltr">${esc(v)}</a>`;
-};
-const who = (cfg) => `OpenFrequency, עסק של <bdi>${cfg.t('legal.name')}</bdi>, עוסק מספר ${cfg.t('legal.number')}, מאשדוד`;
 
 // A page: the heading, the date, the sections listed at the top, then the sections. sections: [id, heading, html].
 function doc(cfg, { path, title, description, lede, sections }) {
@@ -25,7 +22,7 @@ function doc(cfg, { path, title, description, lede, sections }) {
 <section class="sec legal" aria-labelledby="legal-h">
 <div class="wrap narrow">
 <h1 id="legal-h">${title}</h1>
-<p class="lede">${lede}</p>
+${cfg.get('legal.draft') === true ? '<p class="legal-draft">טיוטה לבדיקה</p>\n' : ''}<p class="lede">${lede}</p>
 <p class="legal-date">עודכן לאחרונה ב-${updated(cfg)}</p>
 <nav class="legal-toc" aria-label="בעמוד הזה"><ol>${sections.map(([id, h]) => `<li><a href="#${id}">${h}</a></li>`).join('')}</ol></nav>
 ${sections.map(([id, h, html]) => `<section class="legal-part" aria-labelledby="${id}"><h2 id="${id}">${h}</h2>${html}</section>`).join('\n')}
@@ -35,12 +32,40 @@ ${sections.map(([id, h, html]) => `<section class="legal-part" aria-labelledby="
 }
 const ul = (items) => `<ul>${items.map((x) => `<li>${x}</li>`).join('')}</ul>`;
 
+// What we sell and for how much, every number from site.config.json: Toran's two plans and its setup fee, Teder's
+// monthly price and setup fee, and the founding offer while it is on.
+const fee = (cfg, key, name) => (cfg.get(key) === 0 ? `ל${name} אין דמי הקמה.` : `דמי ההקמה של ${name}: ${amount(cfg, key)}, פעם אחת.`);
+function prices(cfg) {
+  const vat = cfg.get('price.vat');
+  const founding = cfg.get('price.founding.on') === true
+    ? [`הצעת מייסדים לחנויות הראשונות שמצטרפות לתורן: חבילת חנות ב-${amount(cfg, 'price.founding.monthly')} לחודש, ב-${cfg.t('price.founding.months')} החודשים הראשונים. מי שהצטרף בזמן ההצעה שומר עליה לכל התקופה הזאת.`]
+    : [];
+  return `<p>תורן ותדר הם מנויים חודשיים. בחודש הראשון משלמים גם דמי הקמה, פעם אחת. אלה המחירים היום, ${vatOf(cfg)}:</p>
+${ul([
+  `תורן, חבילת חנות: ${amount(cfg, 'price.plans.store.monthly')} לחודש, עד ${cfg.t('price.plans.store.conversations', (n) => n.toLocaleString('he-IL'))} שיחות בחודש.`,
+  `תורן, חבילת חנות גדולה: ${amount(cfg, 'price.plans.big.monthly')} לחודש, עד ${cfg.t('price.plans.big.conversations', (n) => n.toLocaleString('he-IL'))} שיחות בחודש.`,
+  fee(cfg, 'price.setup', 'תורן'),
+  `תדר: ${amount(cfg, 'teder.monthly')} לחודש.`,
+  fee(cfg, 'teder.setup', 'תדר'),
+  ...founding,
+])}
+<p>${vat === 'excluded' ? 'המע״מ מתווסף למחיר ומופיע בחשבונית.' : vat === 'included' ? 'המע״מ כבר בתוך המחיר.' : cfg.ph('price.vat')} מה כל מוצר כולל כתוב <a href="/toran">בעמוד של תורן</a> <a href="/teder">ובעמוד של תדר</a>.</p>`;
+}
+
 // ---------------------------------------------------------------- terms
 
-export const terms = (cfg) => doc(cfg, {
+// The cancellation section says the deal as it is: month to month and stopped at the end of the paid month. If the
+// config ever says otherwise, the terms have to be rewritten first, so the build stops.
+export const terms = (cfg) => {
+  if (cfg.get('price.commitmentMonths') > 0 || cfg.get('price.stops') === 'immediately') {
+    throw new Error('src/pages/legal.mjs: the terms say there is no commitment and billing stops at the end of the paid month; rewrite "t-stop" before changing price.commitmentMonths or price.stops');
+  }
+  return termsDoc(cfg);
+};
+const termsDoc = (cfg) => doc(cfg, {
   path: '/terms',
-  title: 'תנאי שימוש',
-  description: 'התנאים של OpenFrequency לשימוש באתר, בתורן ובתדר: מחיר, ביטול, התשובות של תורן, האחריות שלכם כלפי הלקוחות שלכם, והגבלת האחריות שלנו.',
+  title: 'תקנון ותנאי שימוש',
+  description: 'התקנון של OpenFrequency לאתר, לתורן ולתדר: מי אנחנו, המחירים, התשלום, ביטול, התשובות של תורן, האחריות שלכם כלפי הלקוחות שלכם, והגבלת האחריות שלנו.',
   lede: 'התנאים האלה חלים על האתר הזה, על תורן ועל תדר. כשאתם מצטרפים לאחד מהם, אתם מסכימים להם.',
   sections: [
     ['t-who', 'מי אנחנו', `<p>אנחנו ${who(cfg)}. בתנאים האלה "אנחנו" זה OpenFrequency, ו"אתם" זה העסק שמשתמש בשירות, וכל מי שעובד בו ונכנס לשירות בשמו.</p>
@@ -51,11 +76,15 @@ export const terms = (cfg) => doc(cfg, {
 <p><b>תדר</b> כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, ומפרסם אותן בחשבונות שלכם רק אחרי שאישרתם כל אחת.</p>
 <p>הדמו בחינם, ואין חובה להצטרף אחריו.</p>`],
     ['t-account', 'הגישה שלכם', `<p>נכנסים לשירות עם המייל שלכם. אתם אחראים למי שנתתם לו גישה, ולשמור על המייל שלכם מפני אחרים. אם אתם חושבים שמישהו נכנס בלי רשות, כתבו לנו מיד ונסגור את הגישה.</p>`],
-    ['t-price', 'מחיר ותשלום', `<p>המחיר החודשי, דמי ההקמה ומה שהם כוללים כתובים בעמוד של כל מוצר. משלמים מראש, בתחילת כל חודש.${cfg.get('price.vat') === 'excluded' ? ' המחירים לא כוללים מע״מ, והוא מתווסף לחשבונית.' : ''} דמי הקמה משלמים פעם אחת, בחודש הראשון. כשיש הצעה לחנויות הראשונות, היא כתובה באותו עמוד, ואנחנו יכולים לסיים אותה בכל זמן. מי שהצטרף בזמן ההצעה שומר עליה לכל התקופה שכתובה בה.</p>
+    ['t-price', 'מחיר', `${prices(cfg)}
 <p>בתורן, המחיר החודשי נקבע לפי החבילה, וכל חבילה מכסה מספר שיחות בחודש. אין חיוב נוסף על שיחה, ואת מה ש-Meta גובה על ההודעות אנחנו משלמים. מתי חנות עוברת חבילה, ואיך אנחנו מודיעים על זה מראש, כתוב בעמוד של תורן.</p>
-<p>אם נשנה את המחיר, נודיע לכם לפחות 30 יום מראש. אם לא מתאים לכם, אפשר להפסיק לפני שהשינוי מתחיל.</p>
+<p>אם נשנה את המחיר, נודיע לכם לפחות 30 יום מראש. אם לא מתאים לכם, אפשר להפסיק לפני שהשינוי מתחיל.</p>`],
+    ['t-pay', 'תשלום', `<p>משלמים מראש, בתחילת כל חודש, בכרטיס אשראי. התשלום עובר דרך Grow, באמצעות Morning. את פרטי הכרטיס אנחנו לא שומרים.</p>
 <p>אם תשלום לא עבר, נכתוב לכם. אם הוא לא הוסדר תוך 14 יום מההודעה, אנחנו יכולים לעצור את השירות עד שישולם. ביטול חיוב מול חברת האשראי על שירות שקיבלתם הוא הפרה של ההסכם, ואנחנו יכולים לגבות את הסכום ואת ההוצאות שנגרמו לנו בגללו.</p>`],
-    ['t-stop', 'הפסקה וביטול', `<p>אין התחייבות. כדי להפסיק, ${waWords(cfg, 'כותבים לנו')} או שולחים מייל ל-${mail(cfg)}. השירות ממשיך עד סוף החודש האחרון ששילמתם, ואז נעצר. על חלק מחודש לא מחזירים כסף. דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם.</p>
+    ['t-stop', 'ביטול', `<p>החיוב הוא חודש בחודש, ואין תקופת התחייבות. אפשר לבטל בכל זמן, במייל ל-${mail(cfg)} או ${waWords(cfg, 'בוואטסאפ')}.</p>
+<p>הביטול נכנס לתוקף בסוף החודש ששילמתם עליו. עד אז השירות ממשיך לעבוד, ואחרי זה לא נחייב אתכם יותר. על חלק מחודש לא מחזירים כסף. לדוגמה, אם החודש ששילמתם עליו נגמר ב-30 בנובמבר וביטלתם ב-10 בנובמבר, השירות עובד עד 30 בנובמבר, ועל דצמבר לא נחייב אתכם.</p>
+<p>על כל ביטול נשלח לכם אישור בכתב, במייל או בוואטסאפ.</p>
+<p>${cfg.t('price.setupRefund')}</p>
 <p>גם אנחנו יכולים להפסיק את השירות, בהודעה של 30 יום מראש. אם השתמשתם בשירות בניגוד לחוק או לתנאים האלה, אנחנו יכולים לעצור אותו מיד ולהגיד לכם למה.</p>
 <p>בתורן, מספר הוואטסאפ של החנות נשאר שלכם, ואנחנו מנתקים אותו מהצד שלנו. את השיחות אנחנו שומרים עוד ${cfg.t('price.keepDays')} יום אחרי שהשירות נעצר, כדי שתוכלו לבקש עותק שלהן, ואחר כך מוחקים אותן. חשבוניות אנחנו שומרים כמה שחוק המס מחייב.</p>`],
     ['t-answers', 'התשובות של תורן', `<p>תורן הוא עוזר דיגיטלי שעונה לבד, מתוך מה שכתוב באתר שלכם. הוא יכול לטעות, למשל כשמשהו באתר לא מעודכן או כתוב בצורה שאפשר להבין בשתי דרכים. בשבועיים הראשונים אנחנו עוברים איתכם על כל שיחה ומתקנים מה שצריך, ואחר כך כל השיחות מחכות לכם בתיבה אחת.</p>
@@ -89,7 +118,8 @@ ${ul([
     ['t-changes', 'שינויים בתנאים', `<p>אנחנו יכולים לעדכן את התנאים האלה. על שינוי מהותי נודיע לכם לפחות 30 יום מראש, בוואטסאפ או במייל. אם תמשיכו להשתמש בשירות אחרי שהשינוי התחיל, זה אומר שאתם מסכימים לו. אם לא, אפשר להפסיק לפני כן. התאריך בראש העמוד הוא תאריך העדכון האחרון.</p>`],
     ['t-law', 'דין וסמכות שיפוט', `<p>על התנאים האלה חל הדין הישראלי. בכל מחלוקת, הסמכות היא רק לבתי המשפט המוסמכים ב${cfg.t('legal.court')}. לפני שפונים לבית משפט, בואו ננסה לפתור את זה בשיחה.</p>
 <p>אם סעיף אחד כאן לא תקף, שאר התנאים נשארים בתוקף. ויתור שלנו על משהו פעם אחת לא אומר שוויתרנו עליו בפעם הבאה. אתם לא יכולים להעביר את ההסכם לאחר בלי הסכמה שלנו בכתב.</p>`],
-    ['t-contact', 'יצירת קשר', `<p>${who(cfg)}. מייל ${mail(cfg)}, או ${waWords(cfg, 'בוואטסאפ')}.</p>`],
+    ['t-contact', 'יצירת קשר', `<p>${who(cfg)}.</p>
+<p>טלפון ${phone(cfg)}, מייל ${mail(cfg)}, או ${waWords(cfg, 'בוואטסאפ')}. כל הפרטים <a href="/contact">בעמוד יצירת קשר</a>.</p>`],
   ],
 });
 
@@ -115,6 +145,7 @@ ${ul([
   'יומן פעולות: מי שינה מה ומתי. ביומן אין סיסמאות, קודים או טוקנים.',
   'את פרטי החנות: הכתובת, השם, ומה שתורן קרא באתר שלכם.',
   'פרטים לחשבונית: שם העסק, מספר עוסק וכתובת.',
+  'על כל תשלום, את הסכום ואת התאריך. את פרטי כרטיס האשראי אנחנו לא שומרים.',
 ])}`],
     ['p-end', 'הלקוחות שכותבים לחנות', `<p>כשלקוח כותב לחנות ותורן עונה, נשמרים מספר הטלפון או המייל שלו, ההודעות בשיחה, ושם, סוג וגודל של קובץ שצירף. את הקובץ עצמו תורן לא שומר.</p>
 <p>כדי לנסח תשובה, תורן שולח ל-Anthropic את המידע של החנות ואת ההודעות האחרונות בשיחה. אנחנו לא משתמשים בשיחות כדי לאמן מודלים, ולא מוכרים אותן.</p>
@@ -126,6 +157,7 @@ ${ul([
     ['p-share', 'עם מי אנחנו משתפים', `<p>אנחנו לא מוכרים מידע ולא משתפים אותו לפרסום. אנחנו מעבירים אותו רק לשירותים שבלעדיהם השירות לא עובד, ורק את מה שכל אחד מהם צריך:</p>
 ${ul([
   `<b>השרת שלנו</b>, ב${cfg.t('legal.host')}. שם נשמר כל המידע.`,
+  '<b>Grow</b>, באמצעות <b>Morning</b>: התשלום בכרטיס אשראי והחשבוניות. הם מקבלים את פרטי החשבונית ואת הסכום, ופרטי הכרטיס עוברים אליהם. אנחנו לא שומרים אותם.',
   '<b>Anthropic</b>, ארצות הברית: ניסוח התשובות של תורן והמצגות של תדר.',
   '<b>Twilio</b>, ארצות הברית: הודעות הוואטסאפ במספר הדמו, וההודעה שמגיעה אלינו על כל טופס.',
   '<b>Meta</b>: הודעות הוואטסאפ כשמספר החנות מחובר, והפרסום והנתונים ב-Instagram.',
@@ -143,6 +175,7 @@ ${ul([
       'חשבוניות ורישומי תשלום: 7 שנים, כמו שחוק המס מחייב.',
     ])],
     ['p-rights', 'הזכויות שלכם', `<p>לפי חוק הגנת הפרטיות, אתם יכולים לבקש לראות את המידע שיש לנו עליכם, לתקן מידע לא נכון, ולבקש שנמחק מידע שאנחנו לא חייבים לשמור. שולחים את הבקשה ל-${mail(cfg)}, ואנחנו עונים תוך 30 יום.</p>
+<p>כדי שנמחק את המידע שלכם, כותבים לנו ל-${mail(cfg)} או ${waWords(cfg, 'בוואטסאפ')}, ואומרים מה למחוק. אפשר לבקש למחוק הכול. נמחק את כל מה שאנחנו לא חייבים לשמור, ונכתוב לכם כשסיימנו. חשבוניות ורישומי תשלום נשארים 7 שנים, כי חוק המס מחייב.</p>
 <p>אם לא טיפלנו בבקשה כמו שצריך, אפשר להתלונן לרשות להגנת הפרטיות.</p>`],
     ['p-cookies', 'עוגיות', `<p>באתר הזה אין עוגיות. בשירות עצמו יש רק עוגיות שהוא צריך כדי לעבוד:</p>
 ${ul([
@@ -154,7 +187,7 @@ ${ul([
     ['p-security', 'אבטחה', `<p>איך אנחנו שומרים על המידע כתוב <a href="/security">בעמוד אבטחת המידע</a>. אם יהיה אירוע אבטחה שפוגע במידע שלכם או של הלקוחות שלכם, נודיע לכם מהר ונגיד מה קרה ומה עשינו, ונדווח לרשות להגנת הפרטיות כשהחוק מחייב.</p>`],
     ['p-kids', 'ילדים', `<p>השירות מיועד לעסקים, לא לילדים. אנחנו לא אוספים ביודעין מידע על ילדים. אם לקוח קטין כותב לחנות, המידע שלו מטופל כמו של כל לקוח של החנות.</p>`],
     ['p-changes', 'שינויים במדיניות', `<p>כשנשנה משהו מהותי, נעדכן את התאריך בראש העמוד ונודיע לעסקים שמשתמשים בשירות, בוואטסאפ או במייל, לפני שהשינוי מתחיל.</p>`],
-    ['p-contact', 'יצירת קשר', `<p>על כל דבר שקשור לפרטיות: ${mail(cfg)}.</p>`],
+    ['p-contact', 'יצירת קשר', `<p>על כל דבר שקשור לפרטיות: ${mail(cfg)}, או בטלפון ${phone(cfg)}. כל הפרטים <a href="/contact">בעמוד יצירת קשר</a>.</p>`],
   ],
 });
 
@@ -217,8 +250,9 @@ export const accessibility = (cfg) => doc(cfg, {
     ])],
     ['a-contact', 'משהו לא עובד?', `<p>אם נתקלתם בחלק שקשה להשתמש בו, ספרו לנו מה ניסיתם לעשות, באיזה עמוד, ועם איזה דפדפן או טכנולוגיה מסייעת. אנחנו עונים תוך 7 ימי עסקים.</p>
 ${ul([
-  `רכז הנגישות: <bdi>${cfg.t('legal.name')}</bdi>`,
+  `רכז הנגישות: <bdi>${cfg.t('business.legalName')}</bdi>`,
   `מייל: ${mail(cfg)}`,
+  `טלפון: ${phone(cfg)}`,
   `וואטסאפ: ${waWords(cfg, 'לכתוב לנו')}`,
 ])}`],
     ['a-date', 'עדכון ההצהרה', `<p>ההצהרה עודכנה ב-${updated(cfg)}.</p>`],

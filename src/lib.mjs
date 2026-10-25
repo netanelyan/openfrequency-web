@@ -18,11 +18,21 @@ export const CHANNELS = ['whatsapp', 'instagram', 'messenger', 'email'];
 export const FACTS = {
   domain: { label: 'הדומיין', kind: 'text' },
   whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
+  // Who we are, for Grow's payment check (through Morning): on every page's footer, on /contact and in the legal pages.
+  'business.legalName': { label: 'השם המשפטי של העסק', kind: 'text' },
+  'business.businessId': { label: 'מספר העוסק המורשה, ע.מ', kind: 'text' },
+  'business.phone': { label: 'הטלפון של העסק', kind: 'text' },
+  'business.email': { label: 'המייל של העסק', kind: 'text' },
+  'business.address.street': { label: 'הרחוב ומספר הבית של העסק', kind: 'text' },
+  'business.address.city': { label: 'העיר של העסק', kind: 'text' },
+  'business.replyTime': { label: 'תוך כמה זמן אנחנו עונים, למשל יום עסקים', kind: 'text' },
   'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
   'about.who': { label: 'משפט על מי אנחנו', kind: 'text' },
   'about.why': { label: 'משפט על למה בנינו את תורן', kind: 'text' },
   'price.vat': { label: 'כולל או לא כולל מע״מ', kind: ['included', 'excluded'] },
   'price.setup': { label: 'דמי הקמה של תורן, 0 אם אין', kind: 'number' },
+  // What happens to a setup fee (Toran's or Teder's) when a store cancels: one sentence, as the terms will say it.
+  'price.setupRefund': { label: 'מה קורה לדמי ההקמה כשמבטלים, במשפט אחד', kind: 'text' },
   // Toran's two plans: a monthly price and the conversations a month it covers. Bigger stores talk to us.
   'price.plans.store.monthly': { label: 'המחיר החודשי של חבילת חנות', kind: 'number' },
   'price.plans.store.conversations': { label: 'כמה שיחות בחודש בחבילת חנות', kind: 'number' },
@@ -41,10 +51,8 @@ export const FACTS = {
   'price.commitmentMonths': { label: 'חודשי התחייבות, 0 אם אין', kind: 'number' },
   'price.stops': { label: 'מתי החיוב נעצר', kind: ['period-end', 'immediately'] },
   'price.keepDays': { label: 'כמה ימים שומרים את השיחות אחרי שמפסיקים', kind: 'number' },
-  // For the privacy and terms pages, and nowhere else.
-  'legal.name': { label: 'השם המשפטי', kind: 'text' },
-  'legal.number': { label: 'מספר העוסק', kind: 'text' },
-  'legal.email': { label: 'מייל ליצירת קשר', kind: 'text' },
+  // For the legal pages, and nowhere else. While draft is true they carry the "טיוטה לבדיקה" label.
+  'legal.draft': { label: 'העמודים המשפטיים עדיין טיוטה לבדיקה', kind: 'flag' },
   'legal.court': { label: 'העיר של בית המשפט המוסמך', kind: 'text' },
   'legal.host': { label: 'באיזו מדינה השרת', kind: 'text' },
   'legal.leadMonths': { label: 'כמה חודשים שומרים פניות מהטופס', kind: 'number' },
@@ -63,8 +71,8 @@ export const FACTS = {
 
 // The config, read so that nothing missing can be shown as a guess. An empty value ('' or null) is missing.
 // The real build fails on any missing key, used or not; a draft shows each one as a visible [placeholder].
-export function readConfig(draft) {
-  const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf8'));
+export function readConfig(draft, file = path.join(ROOT, 'site.config.json')) {
+  const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
   const missing = new Map();
   const empty = (v) => v === null || v === '' || v === undefined || (Array.isArray(v) && v.length === 0);
   const at = (key) => key.split('.').reduce((o, k) => (o == null ? undefined : o[k]), raw);
