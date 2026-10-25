@@ -1,5 +1,6 @@
 // The lead endpoint: the only moving part of the site. The demo form and the Teder waitlist post here; each lead is
-// saved to SQLite first and then sent to Telegram, so a Telegram outage never loses one (unsent leads are retried).
+// saved to SQLite first and then sent to the owner's own WhatsApp from the business number (through Twilio), so an
+// outage never loses one (unsent leads are retried).
 //
 //   node server/lead.mjs            listen on 127.0.0.1:$PORT (Caddy proxies /api/* to it)
 //   node server/lead.mjs list [n]   print the last n leads (default 20)
@@ -7,15 +8,20 @@
 // Environment (on the server, in /etc/openfrequency-web/lead.env, never in the repo):
 //   PORT                 default 4720
 //   LEADS_DB             default private/leads.db
-//   TELEGRAM_BOT_TOKEN   the bot that pings you; without it leads are only saved
-//   TELEGRAM_CHAT_ID     your chat with the bot
+//   TWILIO_ACCOUNT_SID   the Twilio account that sends the WhatsApp message (AC...); without it leads are only saved
+//   TWILIO_AUTH_TOKEN    its auth token
+//   LEAD_WA_FROM         the business number, a WhatsApp sender on that Twilio account (0552536259 or 972552536259)
+//   LEAD_WA_TO           the owner's own WhatsApp number, where each lead is sent
+//   LEAD_WA_CONTENT_SID  the approved WhatsApp template (HX...), its {{1}} the lead in one line. Without it the message
+//                        goes as plain text, which WhatsApp only delivers within 24 hours of the owner's last message
+//                        to the business number
 //   SITE_ORIGIN          https://<domain>; a browser post from any other origin is refused
 //   TRUST_PROXY          1 behind Caddy: the client's address is the last X-Forwarded-For entry
-//   TELEGRAM_API         default https://api.telegram.org (the tests point it at a fake)
+//   TWILIO_API           default https://api.twilio.com (the tests point it at a fake)
 //   TORAN_INTAKE_URL     Toran's /internal/lead on this machine (http://127.0.0.1:4710/internal/lead); without it a
-//                        demo lead only goes to Telegram
+//                        demo lead only goes to WhatsApp
 //   TEDER_INTAKE_URL     Teder's /internal/lead on this machine (http://127.0.0.1:4700/internal/lead); without it a
-//                        Teder lead only goes to Telegram
+//                        Teder lead only goes to WhatsApp
 //   OF_INTERNAL_TOKEN    the token Toran and Teder check, the same value as in their and accounts' private/.env
 //   TORAN_DEMO_WA        Toran's demo WhatsApp number, digits with the country code (972...): a Toran demo's form
 //                        answers with a wa.me link to it, holding the request's code; without it, the code alone
@@ -31,7 +37,7 @@
 //
 // A Teder demo takes a WhatsApp number too, and Teder gets one per number: a second ask from a number that already
 // asked is answered "we have it" and saved nowhere. It is handed to Teder as {url, whatsapp}, and Teder builds the
-// store's slideshow for the operator to approve. Like Telegram, a handover that fails is retried.
+// store's slideshow for the operator to approve. Like the WhatsApp message, a handover that fails is retried.
 import crypto from 'node:crypto';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -46,8 +52,9 @@ const DB_PATH = env.LEADS_DB || path.join(ROOT, 'private/leads.db');
 const LIMITS = {
   body: 4096, // bytes
   perIp: 5, // leads an hour from one address
-  perDay: 200, // leads a day from everyone, so a flood can't fill the disk or the Telegram chat
-  telegramTries: 10,
+  perDay: 200, // leads a day from everyone, so a flood can't fill the disk or the owner's WhatsApp
+  tries: 10, // attempts at the WhatsApp message, and at each handover
+  notifyWithin: 2 * 86_400_000, // a lead older than this is not sent any more: turning the sender on never floods
 };
 
 // ---------------------------------------------------------------- storage
@@ -63,8 +70,8 @@ CREATE TABLE IF NOT EXISTS leads (
   store       TEXT,                       -- the store's host name, for a demo
   contact     TEXT NOT NULL,              -- 9725XXXXXXXX; '' for a Toran demo, whose number Toran learns from its message
   page        TEXT,                       -- the page the form was on
-  notified_at TEXT,                       -- when Telegram took it; NULL until then
-  tries       INTEGER NOT NULL DEFAULT 0  -- Telegram attempts
+  notified_at TEXT,                       -- when the WhatsApp message to the owner went; NULL until then
+  tries       INTEGER NOT NULL DEFAULT 0  -- attempts at it
 );`);
   // Added with the handover to Toran; a database from before gets them here.
   const cols = new Set(db.prepare('PRAGMA table_info(leads)').all().map((c) => c.name));
@@ -152,7 +159,7 @@ setInterval(() => {
   for (const [ip, t] of hits) if (!t.some((x) => now - x < 3_600_000)) hits.delete(ip);
 }, 600_000).unref();
 
-// ---------------------------------------------------------------- Telegram
+// ---------------------------------------------------------------- the owner's WhatsApp
 
 const when = (iso) => new Date(iso).toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', dateStyle: 'short', timeStyle: 'short' });
 
@@ -167,21 +174,41 @@ function message(row) {
     : `ליד חדש, דמו לתדר\nחנות: ${row.store}\n${who}\nמהעמוד ${row.page || '?'}, ${when(row.created_at)}`;
 }
 
+// A number as Twilio takes it: an Israeli mobile in any spelling, or digits with the country code.
+export function waAddress(s) {
+  const d = mobile(s) || String(s || '').replace(/\D/g, '');
+  return /^\d{10,15}$/.test(d) ? `whatsapp:+${d}` : null;
+}
+
+const waReady = () => Boolean(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && waAddress(env.LEAD_WA_FROM) && waAddress(env.LEAD_WA_TO));
+
+// The business number writes to the owner first, so WhatsApp wants an approved template: its one variable holds the
+// lead on one line (a template's variable takes no line breaks). Without a template it goes as the plain message.
+export function waRequest(row) {
+  const form = { From: waAddress(env.LEAD_WA_FROM), To: waAddress(env.LEAD_WA_TO) };
+  if (env.LEAD_WA_CONTENT_SID) {
+    form.ContentSid = env.LEAD_WA_CONTENT_SID;
+    form.ContentVariables = JSON.stringify({ 1: message(row).split('\n').join(' · ') });
+  } else form.Body = message(row);
+  return new URLSearchParams(form);
+}
+
 async function notify(db, row) {
-  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return false;
+  if (!waReady()) return false;
   db.prepare('UPDATE leads SET tries = tries + 1 WHERE id = ?').run(row.id);
   try {
-    const res = await fetch(`${env.TELEGRAM_API || 'https://api.telegram.org'}/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    const sid = encodeURIComponent(env.TWILIO_ACCOUNT_SID);
+    const res = await fetch(`${env.TWILIO_API || 'https://api.twilio.com'}/2010-04-01/Accounts/${sid}/Messages.json`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, text: message(row), disable_web_page_preview: true }),
+      headers: { Authorization: `Basic ${Buffer.from(`${env.TWILIO_ACCOUNT_SID}:${env.TWILIO_AUTH_TOKEN}`).toString('base64')}` },
+      body: waRequest(row),
       signal: AbortSignal.timeout(8000),
     });
-    if (!res.ok) throw new Error(`Telegram ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    if (!res.ok) throw new Error(`Twilio ${res.status}: ${(await res.text()).slice(0, 200)}`);
     db.prepare('UPDATE leads SET notified_at = ? WHERE id = ?').run(new Date().toISOString(), row.id);
     return true;
   } catch (e) {
-    console.error(`lead ${row.id}: not sent to Telegram (${e.message}); it is saved and will be retried`);
+    console.error(`lead ${row.id}: not sent to WhatsApp (${e.message}); it is saved and will be retried`);
     return false;
   }
 }
@@ -216,9 +243,10 @@ async function forward(db, row) {
 }
 
 async function retry(db) {
-  const rows = db.prepare('SELECT * FROM leads WHERE notified_at IS NULL AND tries < ? ORDER BY id LIMIT 20').all(LIMITS.telegramTries);
+  const since = new Date(Date.now() - LIMITS.notifyWithin).toISOString();
+  const rows = db.prepare('SELECT * FROM leads WHERE notified_at IS NULL AND tries < ? AND created_at > ? ORDER BY id LIMIT 20').all(LIMITS.tries, since);
   for (const row of rows) await notify(db, row);
-  const toHand = db.prepare("SELECT * FROM leads WHERE (source = 'teder' OR (source = 'demo' AND code IS NOT NULL)) AND forwarded_at IS NULL AND forward_tries < ? ORDER BY id LIMIT 20").all(LIMITS.telegramTries);
+  const toHand = db.prepare("SELECT * FROM leads WHERE (source = 'teder' OR (source = 'demo' AND code IS NOT NULL)) AND forwarded_at IS NULL AND forward_tries < ? ORDER BY id LIMIT 20").all(LIMITS.tries);
   for (const row of toHand) await forward(db, row);
 }
 
@@ -346,7 +374,7 @@ if (main && process.argv[2] === 'list') {
   const db = open();
   const port = Number(env.PORT || 4720);
   const server = createServer(db);
-  server.listen(port, '127.0.0.1', () => console.log(`leads on 127.0.0.1:${port}, saved to ${DB_PATH}${env.TELEGRAM_BOT_TOKEN ? '' : ' (no Telegram token: saving only)'}${toranWaLink('x', 'x') ? '' : " (no TORAN_DEMO_WA: a Toran demo's form shows its code with no WhatsApp button)"}`));
+  server.listen(port, '127.0.0.1', () => console.log(`leads on 127.0.0.1:${port}, saved to ${DB_PATH}${waReady() ? '' : ' (no Twilio WhatsApp sender: saving only)'}${toranWaLink('x', 'x') ? '' : " (no TORAN_DEMO_WA: a Toran demo's form shows its code with no WhatsApp button)"}`));
   const timer = setInterval(() => retry(db), 300_000);
   retry(db);
   const stop = () => { clearInterval(timer); server.close(() => { db.close(); process.exit(0); }); };

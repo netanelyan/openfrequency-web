@@ -1,4 +1,4 @@
-// The lead endpoint, run as it runs on the server: a real process, a real SQLite file, a fake Telegram and a fake
+// The lead endpoint, run as it runs on the server: a real process, a real SQLite file, a fake Twilio and a fake
 // Toran and Teder intake (Toran's checks the body as Toran does: {url, code}, or a 400).
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -8,16 +8,16 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
-import { storeHost, mobile, validate, newCode, toranWaLink } from '../server/lead.mjs';
+import { storeHost, mobile, validate, newCode, toranWaLink, waAddress } from '../server/lead.mjs';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'of-leads-'));
 const DB = path.join(dir, 'leads.db');
 const PORT = 4790 + Math.floor(Math.random() * 100);
 const base = `http://127.0.0.1:${PORT}`;
 
-let telegram; // the fake: records what it is sent, and can be told to fail
+let twilio; // the fake: records each WhatsApp message it is asked to send, and can be told to fail
 const sent = [];
-let telegramDown = false;
+let twilioDown = false;
 let proc;
 let toran; // the fake intake, Toran's and Teder's by path: records what it is handed
 const handed = [];
@@ -33,7 +33,8 @@ function start(port, db, extra = {}) {
   const p = spawn(process.execPath, ['server/lead.mjs'], {
     env: {
       ...process.env, PORT: String(port), LEADS_DB: db, TRUST_PROXY: '1', SITE_ORIGIN: 'https://example.co.il',
-      TELEGRAM_BOT_TOKEN: 'T', TELEGRAM_CHAT_ID: 'C', TELEGRAM_API: `http://127.0.0.1:${telegram.address().port}`,
+      TWILIO_ACCOUNT_SID: 'AC1', TWILIO_AUTH_TOKEN: 'T', TWILIO_API: `http://127.0.0.1:${twilio.address().port}`,
+      LEAD_WA_FROM: '055-253-6259', LEAD_WA_TO: '0501112233', LEAD_WA_CONTENT_SID: '',
       ...intakeEnv(), TORAN_DEMO_WA: DEMO_WA, ...extra,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -45,17 +46,17 @@ function start(port, db, extra = {}) {
 }
 
 before(async () => {
-  telegram = http.createServer((req, res) => {
+  twilio = http.createServer((req, res) => {
     let b = '';
     req.on('data', (c) => (b += c));
     req.on('end', () => {
-      if (telegramDown) { res.writeHead(502); res.end('down'); return; }
-      sent.push({ url: req.url, body: JSON.parse(b) });
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end('{"ok":true}');
+      if (twilioDown) { res.writeHead(503); res.end('down'); return; }
+      sent.push({ url: req.url, auth: req.headers.authorization, form: Object.fromEntries(new URLSearchParams(b)) });
+      res.writeHead(201, { 'Content-Type': 'application/json' });
+      res.end('{"sid":"SM1","status":"queued"}');
     });
   });
-  await new Promise((ok) => telegram.listen(0, '127.0.0.1', ok));
+  await new Promise((ok) => twilio.listen(0, '127.0.0.1', ok));
   toran = http.createServer((req, res) => {
     let b = '';
     req.on('data', (c) => (b += c));
@@ -73,7 +74,7 @@ before(async () => {
 
 after(async () => {
   proc.kill();
-  telegram.close();
+  twilio.close();
   toran.close();
 });
 
@@ -133,7 +134,7 @@ test("a Toran demo's code and link: REQ- and 6 of A-Z0-9, and a message to the d
   assert.equal(toranWaLink('shop.co.il', 'REQ-AB12CD', ''), null, 'no demo number, no link');
 });
 
-test('a Toran demo is saved with its code, sent to Telegram, handed to Toran as {url, code}, and answered with the code and the link', async () => {
+test('a Toran demo is saved with its code, sent to the owner on WhatsApp, handed to Toran as {url, code}, and answered with the code and the link', async () => {
   const res = await post({ source: 'demo', store: 'https://www.shop.co.il', page: '/' });
   assert.equal(res.status, 200);
   const body = await res.json();
@@ -150,11 +151,13 @@ test('a Toran demo is saved with its code, sent to Telegram, handed to Toran as 
   assert.equal(r.page, '/');
   assert.ok(r.notified_at, 'marked as sent');
   const m = sent.at(-1);
-  assert.equal(m.url, '/botT/sendMessage');
-  assert.equal(m.body.chat_id, 'C');
-  assert.match(m.body.text, /דמו לתורן/);
-  assert.match(m.body.text, /shop\.co\.il/);
-  assert.ok(m.body.text.includes(body.code), 'Telegram gets the code');
+  assert.equal(m.url, '/2010-04-01/Accounts/AC1/Messages.json');
+  assert.equal(m.auth, `Basic ${Buffer.from('AC1:T').toString('base64')}`);
+  assert.equal(m.form.From, 'whatsapp:+972552536259', 'from the business number');
+  assert.equal(m.form.To, 'whatsapp:+972501112233', "to the owner's own");
+  assert.match(m.form.Body, /דמו לתורן/);
+  assert.match(m.form.Body, /shop\.co\.il/);
+  assert.ok(m.form.Body.includes(body.code), 'the message has the code');
   assert.ok(r.forwarded_at, 'Toran took it');
   assert.deepEqual(handed.at(-1), { path: '/toran/internal/lead', auth: `Bearer ${TOKEN}`, body: { url: 'https://shop.co.il/', code: body.code } });
 });
@@ -190,8 +193,8 @@ test("Teder's demo is as before: one per WhatsApp number, handed to Teder as {ur
   assert.ok(r.forwarded_at, 'marked as handed over to Teder');
   assert.equal(handed.length, toTeder + 1);
   assert.deepEqual(handed.at(-1), { path: '/teder/internal/lead', auth: `Bearer ${TOKEN}`, body: { url: 'https://shop.co.il/', whatsapp: '972501234567' } });
-  assert.match(sent.at(-1).body.text, /דמו לתדר/);
-  assert.match(sent.at(-1).body.text, /wa\.me\/972501234567/);
+  assert.match(sent.at(-1).form.Body, /דמו לתדר/);
+  assert.match(sent.at(-1).form.Body, /wa\.me\/972501234567/);
 });
 
 test('a plain form post: a Toran demo goes on to WhatsApp, a Teder one to its thank-you, a bad one to try-again', async () => {
@@ -242,12 +245,12 @@ test('one address gets 5 leads an hour, Toran demos too', async () => {
   assert.equal((await post({ source: 'demo', store: 's7.co.il' })).status, 200, 'another address still gets in');
 });
 
-test('when Telegram is down the lead is still saved, marked unsent', async () => {
-  telegramDown = true;
+test('when Twilio is down the lead is still saved, marked unsent', async () => {
+  twilioDown = true;
   const res = await post({ source: 'demo', store: 'down.co.il', page: '/' });
   assert.equal(res.status, 200);
   await settle();
-  telegramDown = false;
+  twilioDown = false;
   const r = rows().find((x) => x.store === 'down.co.il');
   assert.ok(r);
   assert.equal(r.notified_at, null);
@@ -333,7 +336,7 @@ test('a database from before the codes gets the column; its Toran leads are not 
 
 test('everyone together gets 200 leads a day', async () => {
   const port = PORT + 300;
-  const p = await start(port, path.join(dir, 'day.db'), { TELEGRAM_BOT_TOKEN: '', TORAN_INTAKE_URL: '', TEDER_INTAKE_URL: '' });
+  const p = await start(port, path.join(dir, 'day.db'), { TWILIO_ACCOUNT_SID: '', TORAN_INTAKE_URL: '', TEDER_INTAKE_URL: '' });
   try {
     for (let i = 0; i < 200; i++) {
       const res = await post({ source: 'demo', store: `day${i}.co.il` }, { to: `http://127.0.0.1:${port}`, ip: `10.8.${i >> 2}.${i & 3}` });
@@ -341,6 +344,51 @@ test('everyone together gets 200 leads a day', async () => {
     }
     const res = await post({ source: 'demo', store: 'day-over.co.il' }, { to: `http://127.0.0.1:${port}`, ip: '10.7.0.1' });
     assert.equal(res.status, 429);
+  } finally {
+    p.kill();
+  }
+});
+
+test('a number as Twilio takes it', () => {
+  assert.equal(waAddress('055-253-6259'), 'whatsapp:+972552536259');
+  assert.equal(waAddress('+972 50 111 2233'), 'whatsapp:+972501112233');
+  assert.equal(waAddress('12'), null);
+  assert.equal(waAddress(''), null);
+});
+
+test('with an approved template the lead goes as its one variable, on one line', async () => {
+  const port = PORT + 400;
+  const p = await start(port, path.join(dir, 'template.db'), { LEAD_WA_CONTENT_SID: 'HX123' });
+  try {
+    const n = sent.length;
+    await post({ source: 'teder', store: 'tmpl.co.il', contact: '0547777777', page: '/teder' }, { to: `http://127.0.0.1:${port}` });
+    await settle();
+    const m = sent.slice(n).at(-1);
+    assert.equal(m.form.ContentSid, 'HX123');
+    assert.equal(m.form.Body, undefined, 'no plain text beside the template');
+    const v = JSON.parse(m.form.ContentVariables)['1'];
+    assert.ok(!v.includes('\n'), 'a variable takes no line breaks');
+    assert.match(v, /דמו לתדר · חנות: tmpl\.co\.il · וואטסאפ: https:\/\/wa\.me\/972547777777/);
+  } finally {
+    p.kill();
+  }
+});
+
+test('turning the sender on sends the recent unsent leads, never the old ones', async () => {
+  const db = path.join(dir, 'backlog.db');
+  const old = new DatabaseSync(db);
+  old.exec(`CREATE TABLE leads (id INTEGER PRIMARY KEY, created_at TEXT NOT NULL, source TEXT NOT NULL, store TEXT, contact TEXT NOT NULL,
+    page TEXT, notified_at TEXT, tries INTEGER NOT NULL DEFAULT 0);`);
+  const ins = old.prepare("INSERT INTO leads (created_at, source, store, contact) VALUES (?, 'teder', ?, '972543333333')");
+  ins.run(new Date(Date.now() - 5 * 86_400_000).toISOString(), 'week-old.co.il');
+  ins.run(new Date(Date.now() - 3_600_000).toISOString(), 'hour-old.co.il');
+  old.close();
+  const n = sent.length;
+  const p = await start(PORT + 500, db, { TEDER_INTAKE_URL: '' });
+  try {
+    await settle(); // the retry at start
+    assert.deepEqual(sent.slice(n).map((m) => m.form.Body.match(/חנות: (\S+)/)[1]), ['hour-old.co.il']);
+    assert.equal(rows(db).find((r) => r.store === 'week-old.co.il').notified_at, null);
   } finally {
     p.kill();
   }

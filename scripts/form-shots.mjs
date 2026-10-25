@@ -1,7 +1,7 @@
 // The forms end to end in Chrome, against the real endpoint, with a screenshot of each state into docs/screenshots:
 // the thank-you (the request's code and the button to Toran's demo number), a bad address, the endpoint down (the
 // WhatsApp way), a plain post without JS, and the join page's number, which shows only with Teder ticked.
-// Needs a build first (npm run draft). Nothing is sent to Telegram; the leads go to a throwaway database.
+// Needs a build first (npm run draft). Nothing is sent to WhatsApp; the leads go to a throwaway database.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -18,7 +18,7 @@ const DEMO_WA = '972500000098'; // a made-up demo number
 const db = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'of-form-')), 'leads.db');
 
 function startApi() {
-  const p = spawn(process.execPath, ['server/lead.mjs'], { cwd: ROOT, env: { ...process.env, PORT: String(API), LEADS_DB: db, TELEGRAM_BOT_TOKEN: '', TORAN_DEMO_WA: DEMO_WA }, stdio: ['ignore', 'pipe', 'inherit'] });
+  const p = spawn(process.execPath, ['server/lead.mjs'], { cwd: ROOT, env: { ...process.env, PORT: String(API), LEADS_DB: db, TWILIO_ACCOUNT_SID: '', TORAN_DEMO_WA: DEMO_WA }, stdio: ['ignore', 'pipe', 'inherit'] });
   return new Promise((ok) => p.stdout.on('data', (d) => String(d).includes('leads on') && ok(p)));
 }
 

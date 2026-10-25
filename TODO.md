@@ -2,9 +2,9 @@
 
 - [ ] **Fill `site.config.json`.** `npm run build` lists what's missing: the domain, our WhatsApp number (not the demo
       number), how long a demo takes, the two "מי אנחנו" sentences, and the price facts.
-- [ ] **Telegram, for the lead pings.** Create a bot with @BotFather, send it any message, and take the chat id from
-      `https://api.telegram.org/bot<token>/getUpdates`. Put both in `/etc/openfrequency-web/lead.env` on the VPS.
-      Until then leads are saved, not pinged (`node server/lead.mjs list` shows them).
+- [ ] **WhatsApp, for the lead messages.** In Twilio, register the business number as a WhatsApp sender and get the
+      lead template approved (README, "Leads"). Put the account, the two numbers and the template's HX... id in
+      `/etc/openfrequency-web/lead.env` on the VPS. Until then leads are saved, not sent (`node server/lead.mjs list` shows them).
 - [ ] **Pick the Caddy.** Teder uses the host's Caddy; Toran's `docker-compose.yml` starts its own on 80 and 443. On
       one VPS only one of them can have those ports. `deploy/Caddyfile.example` is written for the host's.
 - [ ] **For privacy and terms:** the legal name, the business number (ח.פ or ע.מ), a contact email, and how long
