@@ -10,7 +10,8 @@
 - [ ] **For privacy and terms:** the legal name, the business number (ח.פ or ע.מ), a contact email, and how long
       leads are kept.
 - [ ] **Step 6, still to build:** privacy and terms (as "טיוטה לבדיקה"), the 404 page, titles and descriptions, the
-      share image, sitemap.xml and robots.txt (with /s/ disallowed). Until then the footer's two links are 404s.
+      share image. (sitemap.xml and robots.txt, with /s/ disallowed, are written by the build.) Until then the
+      footer's two links are 404s.
 - [ ] **First deploy:** the one-time steps at the top of `deploy/deploy.sh`, then
       `DEPLOY_HOST=user@vps ./deploy/deploy.sh`.
 - [ ] **As Toran ships:** move lines from `toran.notYet` to `toran.today` in `site.config.json`.

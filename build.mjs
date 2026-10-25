@@ -54,10 +54,12 @@ const css = minifyCss(fs.readFileSync(path.join(ROOT, 'src/style.css'), 'utf8'))
 
 // Render everything first, so one run reports every missing fact and every lint error at once.
 const files = new Map();
+const indexed = []; // the paths the sitemap lists: every page not marked noindex
 for (const def of draft ? [...PAGES, ...DRAFT_PAGES] : PAGES) {
   const p = def(cfg);
   const file = p.file || (p.path === '/' ? 'index.html' : p.path.slice(1) + '/index.html');
   files.set(file, markNames(page(cfg, css, p)));
+  if (!p.noindex) indexed.push(p.path);
 }
 
 // Each page carries its own Content-Security-Policy: everything comes from this site, and the only scripts and
@@ -122,6 +124,17 @@ for (const f of fs.readdirSync(path.join(ROOT, 'assets/clients'))) copy('assets/
   fs.writeFileSync(path.join(OUT, 'toran/example/index.html'), out);
 }
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/toran-example/demo'))) copy('assets/toran-example/demo/' + f, 'toran/example/demo/' + f);
+
+// robots.txt and sitemap.xml. /s/ is where Toran's pitch pages will live: each is for one store, never for search.
+// A draft is noindex on every page, and its robots.txt keeps every crawler out too.
+{
+  const origin = `https://${cfg.get('domain') || 'openfrequency.co.il'}`;
+  fs.writeFileSync(path.join(OUT, 'robots.txt'), draft
+    ? 'User-agent: *\nDisallow: /\n'
+    : `User-agent: *\nDisallow: /s/\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`);
+  const urls = indexed.map((p) => `  <url><loc>${origin}${p}</loc></url>`).join('\n');
+  fs.writeFileSync(path.join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
+}
 
 const kb = (n) => (n / 1024).toFixed(1) + ' KB';
 console.log(`${draft ? 'Draft' : 'Built'}: ${files.size} page${files.size === 1 ? '' : 's'} in dist/ (CSS ${kb(css.length)} inlined)`);

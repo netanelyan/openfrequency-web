@@ -31,7 +31,7 @@ export const TORAN = (cfg) => [
     `שתי חבילות, לפי מספר השיחות בחודש: ${toranPriceLine(cfg)} הדמו בחינם. הפרטים <a href="/toran#price">בעמוד של תורן</a>.`],
 ];
 
-const TEDER = (cfg) => [
+export const TEDER = (cfg) => [
   (cfg.has('teder.monthly') || cfg.banner) && ['כמה עולה תדר?',
     `${priceLine(cfg, 'teder.monthly', 'teder.setup')} הפרטים <a href="/teder#price">בעמוד של תדר</a>.`],
   ['תדר יכול לפרסם משהו בלי שאישרתי?',

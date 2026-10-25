@@ -13,7 +13,8 @@
     "serve": "node scripts/serve.mjs",
     "shots": "node scripts/shots.mjs",
     "leads": "node server/lead.mjs",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "support": "node scripts/support-export.mjs"
   },
   "devDependencies": {
     "playwright-core": "^1.56.0"
