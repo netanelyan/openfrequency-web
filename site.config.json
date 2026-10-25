@@ -22,7 +22,7 @@
   "price": {
     "vat": "excluded",
     "setup": 990,
-    "setupRefund": "",
+    "setupRefund": "את דמי ההקמה לא מחזירים, גם כשמבטלים.",
     "plans": {
       "store": {
         "monthly": 590,
