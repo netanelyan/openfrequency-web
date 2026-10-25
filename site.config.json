@@ -4,13 +4,13 @@
   "business": {
     "legalName": "נתנאל יאנצב׳בסקי",
     "businessId": "327727525",
-    "phone": "",
-    "email": "",
+    "phone": "055-253-6259",
+    "email": "natikyan153@gmail.com",
     "address": {
       "street": "חדרה 16",
       "city": "אשדוד"
     },
-    "replyTime": ""
+    "replyTime": "יום עסקים"
   },
   "demo": {
     "time": "שעה"
@@ -77,7 +77,7 @@
     "redos": 10
   },
   "legal": {
-    "draft": true,
+    "draft": false,
     "court": "אשדוד",
     "host": "גרמניה",
     "leadMonths": 6,
