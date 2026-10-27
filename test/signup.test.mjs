@@ -149,8 +149,9 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
     'משלמים עליו מראש, דרך החשבון',
     price,
     'המנוי מתחדש בכל חודש, עד שמבטלים אותו',
-    'אם מבטלים תוך 14 יום מהתשלום, ותדר עוד לא הכין לכם מצגות לדוגמה, מחזירים לכם את דמי ההקמה',
-    'אחרי שהמצגות לדוגמה הוכנו, דמי ההקמה לא מוחזרים',
+    'משלמים אותם פעם אחת, עם החודש הראשון',
+    'הם מכסים את פתיחת החשבון ואת המצגות הראשונות לדוגמה',
+    'דמי ההקמה לא מוחזרים',
     'מבטלים בחשבון, בכל זמן',
     'תדר ממשיך לעבוד עד סוף התקופה ששילמתם, ואחרי זה לא מחייבים אתכם יותר',
     'על התקופה שכבר שולמה לא מחזירים כסף',
@@ -160,12 +161,23 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
     'העותקים שלנו של המצגות',
     'נשאר בחשבונות שלכם בטיקטוק ובאינסטגרם',
   ]) assert.ok(sub.includes(words), `the Teder section says "${words}"`);
+  assert.doesNotMatch(sub, /מחזירים לכם את דמי ההקמה|14 יום/, 'the setup fee is never refunded');
   // The general sections point Teder to its own; Toran's rules are kept word for word.
   assert.match(text(section(terms, 't-stop')), /את תדר מבטלים בחשבון[\s\S]*בתורן, כדי להפסיק, כותבים לנו[\s\S]*בתורן, דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם/);
   assert.match(text(section(terms, 't-price')), /בתדר משלמים דרך החשבון/);
   for (const id of ['t-answers', 't-yours', 't-teder', 't-who', 't-deal', 't-what', 't-account']) assert.equal(section(terms, id), section(closed, id), id);
   // The other legal pages keep their own date.
   assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-24 באוקטובר 2026/);
+});
+
+test('the terms promise only the take-downs we can do: published posts stay on the customer\'s accounts, TikTok is theirs to delete', () => {
+  for (const b of [built.closed, built.open]) {
+    const part = text(section(main(b.pages['terms/index.html']), 't-teder'));
+    assert.ok(!part.includes('ונוריד אותה'), 'the old promise to take any post down');
+    assert.ok(part.includes('מצגת שעלתה נמצאת בחשבונות שלכם בטיקטוק ובאינסטגרם, ואפשר למחוק אותה שם'));
+    assert.ok(part.includes('נוריד מהצד שלנו את מה שהחיבור שלנו מאפשר, למשל באינסטגרם'));
+    assert.ok(part.includes('מצגת בטיקטוק מוחקים בעצמכם, בחשבון הטיקטוק שלכם'));
+  }
 });
 
 test('the monthly report says it comes by email, and the plan stays at its 40 slideshows', () => {
