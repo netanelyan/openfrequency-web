@@ -47,8 +47,8 @@ const price = `${config.teder.monthly.toLocaleString('he-IL')} ₪ לחודש`;
 const heading = (html, id) => text(new RegExp(`<h2 id="${id}">([\\s\\S]*?)</h2>`).exec(html)[1]).trim();
 const section = (html, id) => new RegExp(`<section class="legal-part" aria-labelledby="${id}">[\\s\\S]*?</section>`).exec(html)?.[0];
 
-test('the switch is a fact with two values, and the config says "closed" for now', () => {
-  assert.equal(config.signup, 'closed');
+test('the switch is a fact with two values, and the config says "open" (sign-up is the main way in)', () => {
+  assert.equal(config.signup, 'open');
   const bad = path.join(dir, 'bad.json');
   fs.writeFileSync(bad, JSON.stringify({ ...config, signup: 'maybe' }));
   const b = spawnSync(process.execPath, ['build.mjs'], { cwd: ROOT, env: { ...process.env, SITE_CONFIG: bad, SITE_OUT: path.join(dir, 'bad') }, encoding: 'utf8' });
