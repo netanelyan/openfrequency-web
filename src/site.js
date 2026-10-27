@@ -153,9 +153,13 @@
       night: ['כן. תורן עונה 24/7, ומה שהוא לא יודע מחכה לכם לבוקר.', 'מהעמוד של תורן'],
       who: ['אנחנו OpenFrequency. בנינו את תורן, שעונה ללקוחות של חנויות אונליין, ואת תדר, שכותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם.', 'מעמוד הבית'],
     };
+    // While Toran is soon, the page brings its own answers about Toran (sections.mjs, <template id="ask-a-KEY">).
+    var own = function (k) { var t = d.getElementById('ask-a-' + k); return t ? t.innerHTML.trim() : null; };
+    Object.keys(A).forEach(function (k) { if (own(k)) A[k][0] = own(k); });
     var KEEP = 'את זה אני לא יודע. אני בודק עם הצוות, ואחזור אליך כאן.';
     var WHY = 'בחנות אמיתית השאלה הייתה עוברת לבעלים בוואטסאפ. כאן זו הדגמה, אז היא לא נשלחת.';
     var EN = ["Toran answers a store's customers on WhatsApp, Instagram, Messenger and email, from what's on the store's site, in Hebrew or in English." + link('/toran#demo', 'Try Toran on your store'), 'ענה לבד, באנגלית'];
+    if (own('en')) EN[0] = own('en');
     var has = function (q, words) { return words.some(function (w) { return q.indexOf(w) > -1; }); };
     var answer = function (raw) {
       var q = ' ' + raw.toLowerCase() + ' ';

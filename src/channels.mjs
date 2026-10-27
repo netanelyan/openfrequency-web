@@ -79,8 +79,9 @@ ${note ? `<p class="ch-note">${note}</p>` : ''}
 </div>`;
 }
 
-export function channelWindow(cfg) {
-  const on = live(cfg);
+// { all: true }: every channel without its "בקרוב" (Toran's page while all of Toran is soon).
+export function channelWindow(cfg, { all = false } = {}) {
+  const on = all ? new Set(CHANNELS) : live(cfg);
   return tabBox(CHANNELS.map((c) => ({ key: c, name: `${named(c)}${on.has(c) ? '' : soon}`, window: WINDOWS[c]() })), {
     label: 'איפה הלקוחה כותבת',
     note: 'שיחה לדוגמה. החנות, השמלה והמחיר מומצאים. בכל ערוץ זו אותה שאלה ואותה תשובה, כי זה אותו תורן שמכיר את אותה חנות.',

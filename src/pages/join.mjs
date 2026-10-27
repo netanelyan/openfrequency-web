@@ -1,10 +1,12 @@
 // The join page, for a store that hasn't picked a product yet: Toran, Teder or both on one form; what happens after it
 // is sent; three of the owners' questions; the price, once it is set; and the way in for stores already with us. The
 // forms at the end of /toran and /teder stay, for a visitor already on a product's page.
-import { esc, ils, mark } from '../lib.mjs';
+// While Toran is soon (products.toran in site.config.json), the page is Teder's: Toran's card is there, marked
+// "בקרוב", and can't be ticked; the steps, the price and the questions are Teder's, with the way to Toran's waitlist.
+import { esc, ils, mark, toranSoon } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
 import { toranPriceLine } from '../sections.mjs';
-import { TORAN } from './faq.mjs';
+import { TEDER, TORAN } from './faq.mjs';
 
 const TOOLS = 'https://accounts.openfrequency.co.il/';
 
@@ -16,6 +18,13 @@ const AFTER = [
 
 const ASKED = ['הלקוחות שלי יראו את הדמו?', 'צריך להתקין משהו בחנות?', 'החנות שלי על Wix. זה יעבוד?'];
 
+const AFTER_SOON = [
+  ['אנחנו מכינים לכם מצגת לדוגמה מהאתר', 'מצגת של תדר מהחנות שלכם, בגודל של טיקטוק ושל אינסטגרם.'],
+  ['המצגת מגיעה לוואטסאפ', 'למספר שמילאתם בטופס.'],
+  ['מנסים, ומחליטים', 'אם זה מתאים לכם, מאשרים את המצגת הראשונה, ותדר ממשיך משם.'],
+];
+const ASKED_SOON = ['תדר יכול לפרסם משהו בלי שאישרתי?', 'מה נחשב מצגת?', 'מאיפה הוא לוקח את העובדות?'];
+
 // Each product's price, a tile each: the monthly figure and the setup fee, VAT as the config says. A product whose price
 // isn't set is left out of the public draft.
 export function priceLine(cfg, monthly, setup) {
@@ -25,7 +34,7 @@ export function priceLine(cfg, monthly, setup) {
 }
 function price(cfg) {
   const items = [['toran', 'תורן', 'price.plans.store.monthly', null, '/toran#price'], ['teder', 'תדר', 'teder.monthly', 'teder.setup', '/teder#price']]
-    .filter(([, , m]) => cfg.has(m) || cfg.banner);
+    .filter(([name, , m]) => (cfg.has(m) || cfg.banner) && !(name === 'toran' && toranSoon(cfg)));
   if (!items.length) return '';
   return `
 <section class="sec" aria-labelledby="join-price-h">
@@ -39,19 +48,23 @@ ${items.map(([name, label, m, s, href]) => `<li>${mark(name, 40)}<span><b>${labe
 }
 
 export default (cfg) => {
-  const faq = TORAN(cfg).filter((x) => x && ASKED.includes(x[0]));
+  const soon = toranSoon(cfg);
+  const faq = soon ? TEDER(cfg).filter((x) => x && ASKED_SOON.includes(x[0])) : TORAN(cfg).filter((x) => x && ASKED.includes(x[0]));
   return {
     path: '/join',
     forms: true,
     title: 'הצטרפות | OpenFrequency',
-    description: 'בוחרים בתורן, בתדר או בשניהם, משאירים את הכתובת של החנות, ואנחנו בונים לכם דמו מהאתר.',
+    description: soon
+      ? 'משאירים את הכתובת של החנות ומספר וואטסאפ, ואנחנו מכינים לכם מצגת לדוגמה של תדר מהאתר. תורן נפתח בקרוב.'
+      : 'בוחרים בתורן, בתדר או בשניהם, משאירים את הכתובת של החנות, ואנחנו בונים לכם דמו מהאתר.',
     body: `
 <section class="sec join-hero" aria-labelledby="hero-h">
 <div class="wrap narrow">
-<h1 id="hero-h">מתחילים עם תורן, עם תדר, או עם שניהם</h1>
-<p class="lede">בוחרים במה להתחיל, משאירים את הכתובת של החנות, ואנחנו בונים לכם דמו מהאתר שלכם.</p>
+${soon ? `<h1 id="hero-h">מתחילים עם תדר</h1>
+<p class="lede">משאירים את הכתובת של החנות ומספר וואטסאפ, ואנחנו מכינים לכם מצגת לדוגמה מהאתר שלכם. תורן נפתח בקרוב.</p>` : `<h1 id="hero-h">מתחילים עם תורן, עם תדר, או עם שניהם</h1>
+<p class="lede">בוחרים במה להתחיל, משאירים את הכתובת של החנות, ואנחנו בונים לכם דמו מהאתר שלכם.</p>`}
 ${joinForm(cfg)}
-<p class="join-tools">כבר עובדים איתנו? <a href="${TOOLS}">לניהול הכלים</a></p>
+${soon ? '<p class="join-tools">רוצים לדעת כשתורן נפתח? <a href="/toran#waitlist">לקבל עדכון</a></p>\n' : ''}<p class="join-tools">כבר עובדים איתנו? <a href="${TOOLS}">לניהול הכלים</a></p>
 </div>
 </section>
 
@@ -59,7 +72,7 @@ ${joinForm(cfg)}
 <div class="wrap narrow">
 <h2 id="after-h">מה קורה אחרי הטופס</h2>
 <ol class="after-steps">
-${AFTER.map(([h, p]) => `<li><h3>${h}</h3><p>${p}</p></li>`).join('\n')}
+${(soon ? AFTER_SOON : AFTER).map(([h, p]) => `<li><h3>${h}</h3><p>${p}</p></li>`).join('\n')}
 </ol>
 </div>
 </section>

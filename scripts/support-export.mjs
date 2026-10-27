@@ -10,15 +10,20 @@
 //
 // Toran reads the file with `npm run company -- sync <file>` (openfrequency-toran, docs/company.md). Like the real
 // build, it stops while a fact in site.config.json is empty.
+//
+// While Toran is soon (products.toran in site.config.json), the export follows the site: Toran is not for sale, so
+// there are no Toran plans or Toran price section, the status says it opens soon and Teder is available, and the
+// questions are /faq's own soon answers (support.json's answers describe a Toran that is running, so they wait).
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, ils, readConfig } from '../src/lib.mjs';
+import { ROOT, ils, readConfig, toranSoon } from '../src/lib.mjs';
 import toran from '../src/pages/toran.mjs';
 import teder from '../src/pages/teder.mjs';
 import { TORAN, TEDER } from '../src/pages/faq.mjs';
 import { terms, privacy, security, accessibility } from '../src/pages/legal.mjs';
 
 const cfg = readConfig(false);
+const soon = toranSoon(cfg);
 const support = JSON.parse(fs.readFileSync(path.join(ROOT, 'support.json'), 'utf8'));
 const origin = `https://${cfg.get('domain')}`;
 
@@ -50,20 +55,21 @@ const priceSection = (page) => {
 const num = (key) => cfg.get(key).toLocaleString('he-IL');
 const toranPage = toran(cfg);
 const tederPage = teder(cfg);
-const plans = [
+const allPlans = [
   { key: 'toran-store', product: 'toran', title: 'תורן, חבילת חנות', monthly: cfg.get('price.plans.store.monthly'), setup: cfg.get('price.setup'), detail: `עד ${num('price.plans.store.conversations')} שיחות בחודש`, url: `${origin}/toran#price` },
   { key: 'toran-big', product: 'toran', title: 'תורן, חבילת חנות גדולה', monthly: cfg.get('price.plans.big.monthly'), setup: cfg.get('price.setup'), detail: `עד ${num('price.plans.big.conversations')} שיחות בחודש`, url: `${origin}/toran#price` },
   { key: 'teder', product: 'teder', title: 'תדר', monthly: cfg.get('teder.monthly'), setup: cfg.get('teder.setup'), detail: `${cfg.get('teder.slideshows')} מצגות ו-${cfg.get('teder.redos')} החלפות בחודש`, url: `${origin}/teder#price` },
 ];
+const plans = allPlans.filter((p) => !(soon && p.product === 'toran'));
 // Each plan in one sentence, the way the site says it: the monthly price, VAT, what it covers, the setup fee.
 const vat = cfg.get('price.vat') === 'included' ? 'כולל מע״מ' : 'לא כולל מע״מ';
 for (const p of plans) p.text = `${ils(p.monthly)} לחודש, ${vat}, ${p.detail}. ${p.setup > 0 ? `בחודש הראשון יש גם ${ils(p.setup)} דמי הקמה, פעם אחת.` : 'אין דמי הקמה.'}`;
 const pricing = [
-  { product: 'toran', title: 'כמה עולה תורן', url: `${origin}/toran#price`, text: priceSection(toranPage) },
+  ...(soon ? [] : [{ product: 'toran', title: 'כמה עולה תורן', url: `${origin}/toran#price`, text: priceSection(toranPage) }]),
   { product: 'teder', title: 'כמה עולה תדר', url: `${origin}/teder#price`, text: priceSection(tederPage) },
 ];
 
-const answers = new Map((support.answers || []).map((x) => [x.q, fill(x.a)]));
+const answers = new Map(soon ? [] : (support.answers || []).map((x) => [x.q, fill(x.a)]));
 const faq = [...TORAN(cfg), ...TEDER(cfg)].filter(Boolean).map(([q, a]) => ({ q: toText(q), a: toText(a), today: answers.get(toText(q)) ?? null, url: `${origin}/faq` }));
 const stale = [...answers.keys()].filter((q) => !faq.some((f) => f.q === q));
 if (stale.length) {
@@ -77,17 +83,27 @@ const legal = [['terms', terms], ['privacy', privacy], ['security', security], [
   const p = def(cfg);
   return { kind, title: p.title.replace(/ \| OpenFrequency$/, ''), url: origin + p.path, text: toText(p.body) };
 });
+// While Toran is soon: what is open and what is not, said plainly, for the agent to put above everything else.
+const soonStatus = [
+  'תדר פתוח: אפשר להצטרף אליו עכשיו, ולקבל מצגת לדוגמה מהחנות דרך הטופס ב-' + `${origin}/teder#demo` + ' או ב-' + `${origin}/join` + '.',
+  'תורן עוד לא פתוח לחנויות, ואנחנו פותחים אותו בקרוב, אחרי שהחיבור לוואטסאפ דרך Meta יאושר. עד אז אין לו דמו, אין לו מחיר, ואי אפשר להצטרף אליו או להתחיל איתו.',
+  'מי שרוצה לדעת כשתורן נפתח משאיר טלפון או מייל ב-' + `${origin}/toran#waitlist` + ', ואנחנו כותבים לו כשהוא נפתח.',
+  'מה שכתוב על תורן באתר הוא מה שהוא יעשה כשייפתח.',
+].join('\n');
 const pages = [
-  { kind: 'about', title: 'מה תורן עושה היום, ומה עוד לא', url: `${origin}/toran`, text: `מה תורן עושה היום:\n${today.map((x) => `- ${x}`).join('\n')}\n\nמה עוד לא עובד בתורן:\n${notYet.map((x) => `- ${x}`).join('\n')}` },
+  soon
+    ? { kind: 'about', title: 'מה פתוח עכשיו: תדר פתוח, תורן נפתח בקרוב', url: `${origin}/toran`, text: soonStatus }
+    : { kind: 'about', title: 'מה תורן עושה היום, ומה עוד לא', url: `${origin}/toran`, text: `מה תורן עושה היום:\n${today.map((x) => `- ${x}`).join('\n')}\n\nמה עוד לא עובד בתורן:\n${notYet.map((x) => `- ${x}`).join('\n')}` },
   { kind: 'about', title: 'מי אנחנו', url: origin, text: `${cfg.get('about.who')}\n${cfg.get('about.why')}` },
   ...pricing.map((p) => ({ kind: 'payment', title: p.title, url: p.url, text: p.text })),
   ...legal,
 ];
 
 const out = {
-  // What Toran does today and what not yet: the agent keeps this in its prompt, above every other passage, since the
-  // site's own pages (the price sections among them) still describe the product at launch.
+  // What Toran does today and what not yet (or, while it is soon, that it is not open yet and Teder is): the agent keeps
+  // this in its prompt, above every other passage, since the site's own pages describe the product at launch.
   status: pages[0].text,
+  ...(soon ? { products: { toran: 'soon', teder: 'live' } } : {}),
   domain: cfg.get('domain'),
   url: `${origin}/`,
   name: 'OpenFrequency',

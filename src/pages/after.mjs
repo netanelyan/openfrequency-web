@@ -1,8 +1,8 @@
 // Where a form lands without JS: a thank-you for each form, one for a number that already asked for a demo, and a
 // page for when it didn't go through (an invalid field, the rate limit, or the endpoint down, which Caddy sends here
 // too). None of them is indexed.
-import { esc } from '../lib.mjs';
-import { WA_TEXT } from '../forms.mjs';
+import { esc, toranSoon } from '../lib.mjs';
+import { waAny } from '../forms.mjs';
 
 const plain = (path, title, body) => (cfg) => ({ path, title: `${title} | OpenFrequency`, description: title, noindex: true, body: body(cfg) });
 
@@ -20,7 +20,7 @@ const hasWa = (cfg) => cfg.has('whatsapp') || cfg.banner;
 const waButton = (cfg, label) => {
   const wa = cfg.get('whatsapp');
   return wa
-    ? `<a class="btn primary" href="https://wa.me/${wa}?text=${esc(encodeURIComponent(WA_TEXT.any))}">${label}</a>`
+    ? `<a class="btn primary" href="https://wa.me/${wa}?text=${esc(encodeURIComponent(waAny(cfg)))}">${label}</a>`
     : hasWa(cfg) ? `<span class="btn primary">${label} ${cfg.ph('whatsapp')}</span>` : '';
 };
 
@@ -49,10 +49,20 @@ export const tryAgain = plain('/try-again', 'הפרטים לא הגיעו אלי
 <div class="wrap narrow" data-rise>
 <h1>הפרטים לא הגיעו אלינו</h1>
 <p class="lede">${hasWa(cfg) ? 'הטופס לא נשלח. אפשר לשלוח לנו את הכתובת של החנות בוואטסאפ, או לנסות שוב בעוד כמה דקות.' : 'הטופס לא נשלח. אפשר לנסות שוב בעוד כמה דקות.'}</p>
-<div class="actions">${button}<a class="btn" href="/toran#demo">לנסות שוב</a></div>
+<div class="actions">${button}<a class="btn" href="${toranSoon(cfg) ? '/join' : '/toran#demo'}">לנסות שוב</a></div>
 </div>
 </section>`;
 });
+
+// Toran's waitlist, posted without JS (built only while Toran is soon).
+export const thanksWaitlist = plain('/thanks/waitlist', 'רשמנו אתכם', () => `
+<section class="sec after">
+<div class="wrap narrow" data-rise>
+<h1>רשמנו אתכם</h1>
+<p class="lede">כשתורן נפתח, נכתוב לכם לטלפון או למייל שהשארתם. בינתיים אפשר להכיר את תדר.</p>
+<div class="actions"><a class="btn" href="/teder">לתדר</a><a class="btn" href="/">לעמוד הבית</a></div>
+</div>
+</section>`);
 
 // The 404 page: Caddy answers any address that isn't there with it, with its 404 status (handle_errors).
 export const notFound = (cfg) => ({ ...plain('/404', 'הדף הזה לא קיים', () => `

@@ -1,5 +1,5 @@
 // What more than one page uses: words that open WhatsApp to us, and the question box on the home page.
-import { esc, ils, mark } from './lib.mjs';
+import { esc, ils, mark, toranSoon } from './lib.mjs';
 
 // Words that open WhatsApp to us; plain words in a draft without the number.
 export const waWords = (cfg, words) => {
@@ -11,13 +11,17 @@ export const waWords = (cfg, words) => {
 
 // The question box, with Toran answering for OpenFrequency itself. The script answers each question from what this
 // site says, the way Toran answers from a store's site, and every suggested question has an answer. Without script,
-// the prefilled question keeps its answer, written here.
-export const askBox = `
+// the prefilled question keeps its answer, written here. While Toran is soon, the answer says what it will do.
+const FIRST = {
+  live: 'תורן עונה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל, מתוך מה שכתוב באתר שלה: מוצרים, מחירים, מלאי ודפי המדיניות. מה שלא כתוב שם, הוא שואל אתכם ומעביר את התשובה ללקוח.',
+  soon: 'תורן יענה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל, מתוך מה שכתוב באתר שלה: מוצרים, מחירים, מלאי ודפי המדיניות. מה שלא כתוב שם, הוא ישאל אתכם. אנחנו פותחים אותו בקרוב.',
+};
+export const askBox = (cfg) => `
 <figure class="chat try" data-ui aria-label="OpenFrequency, שיחה עם תורן">
 <div class="chat-top">${mark('openfrequency', 38)}<span><b>OpenFrequency</b><small>תורן עונה</small></span><span class="tag">דוגמה</span></div>
 <ol class="msgs" data-ask-out aria-live="polite">
 <li class="msg me">מה תורן עושה?<time aria-hidden="true">עכשיו</time></li>
-<li class="msg them">תורן עונה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל, מתוך מה שכתוב באתר שלה: מוצרים, מחירים, מלאי ודפי המדיניות. מה שלא כתוב שם, הוא שואל אתכם ומעביר את התשובה ללקוח. <a class="lnk" href="/toran">לעמוד של תורן</a><time aria-hidden="true">עכשיו</time></li>
+<li class="msg them">${FIRST[toranSoon(cfg) ? 'soon' : 'live']} <a class="lnk" href="/toran">לעמוד של תורן</a><time aria-hidden="true">עכשיו</time></li>
 <li class="sys"><span class="ui-s alone">ענה לבד</span>מהעמוד של תורן</li>
 </ol>
 <div class="ask-ex" data-ask-ex hidden>
@@ -34,6 +38,20 @@ export const askBox = `
 </form>
 </figure>
 `;
+
+// While Toran is soon, the box's answers about Toran say what it will do, and send to its waitlist or to Teder instead of
+// a demo: site.js takes each <template id="ask-a-KEY"> in place of its own answer to KEY.
+const SOON_ANSWERS = {
+  toran: 'תורן יענה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל, מתוך מה שכתוב באתר שלה. הוא עוד לא פתוח, ואנחנו פותחים אותו בקרוב. <a class="lnk" href="/toran#waitlist">לקבל עדכון כשהוא נפתח</a>',
+  demo: 'לתורן אין דמו כרגע, כי הוא עוד לא פתוח. לתדר אפשר לקבל מצגת לדוגמה מהחנות שלכם: שולחים את הכתובת של החנות ומספר וואטסאפ, ואנחנו שולחים לכם אותה. <a class="lnk" href="/teder#demo">לנסות את תדר על החנות שלכם</a>',
+  store: 'כן. תורן יקרא חנויות על Shopify, על WooCommerce ועל Wix, ובחנות על Wix את 150 המוצרים החדשים ביותר. הוא נפתח בקרוב.',
+  number: 'כן, זו הכוונה. כשתורן ייפתח, הלקוחות ימשיכו לכתוב לאותו מספר, ואנחנו נחבר אותו ל-WhatsApp Business Platform של Meta יחד איתכם.',
+  install: 'לא צריך להתקין כלום. תורן קורא את מה שכבר מופיע באתר. כשהוא ייפתח, כדי לחבר את המספר של החנות יהיה צריך חשבון עסקי ב-Meta, ואת החיבור נעשה יחד.',
+  night: 'כן. תורן יענה 24/7, ומה שהוא לא יודע יחכה לכם לבוקר. הוא נפתח בקרוב.',
+  who: 'אנחנו OpenFrequency. בנינו את תדר, שכותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, ואת תורן, שיענה ללקוחות של חנויות אונליין ונפתח בקרוב.',
+  en: 'Toran will answer a store\'s customers on WhatsApp, Instagram, Messenger and email, from what\'s on the store\'s site, in Hebrew or in English. It opens soon. <a class="lnk" href="/toran#waitlist">Hear when it opens</a>',
+};
+export const askSoon = Object.entries(SOON_ANSWERS).map(([k, a]) => `<template id="ask-a-${k}">${a}</template>`).join('\n');
 
 // ---------------------------------------------------------------- the price
 

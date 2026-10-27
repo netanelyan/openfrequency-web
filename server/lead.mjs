@@ -1,4 +1,4 @@
-// The lead endpoint: the only moving part of the site. The demo form and the Teder waitlist post here; each lead is
+// The lead endpoint: the only moving part of the site. The demo forms and Toran's waitlist post here; each lead is
 // saved to SQLite first and then sent to the owner: to their own WhatsApp from the business number (through Twilio),
 // to their email (through Resend), or both, so an outage never loses one (unsent leads are retried).
 //
@@ -31,7 +31,9 @@
 //                        answers with a wa.me link to it, holding the request's code; without it, the code alone
 //
 // What a lead holds: which demo (Toran's or Teder's), the store's address, the page and the time; for Teder a WhatsApp
-// number, and for Toran the request's code (REQ-XXXXXX). The client's IP address is used for the rate limit, in memory
+// number, and for Toran the request's code (REQ-XXXXXX). A Toran waitlist lead (source 'waitlist', the form the site
+// shows while products.toran is "soon") holds a phone or an email and nothing else; it goes to the owner as
+// "רשימת המתנה לתורן", is handed to no product, and is saved once per phone or email. The client's IP address is used for the rate limit, in memory
 // only, and never written down.
 //
 // A Toran demo takes the store's address only. The answer is a code and a wa.me link to Toran's demo number with a
@@ -70,9 +72,9 @@ function open() {
 CREATE TABLE IF NOT EXISTS leads (
   id          INTEGER PRIMARY KEY,
   created_at  TEXT NOT NULL,              -- ISO time, UTC
-  source      TEXT NOT NULL,              -- demo | teder
+  source      TEXT NOT NULL,              -- demo | teder | waitlist (Toran's, while it is soon)
   store       TEXT,                       -- the store's host name, for a demo
-  contact     TEXT NOT NULL,              -- 9725XXXXXXXX; '' for a Toran demo, whose number Toran learns from its message
+  contact     TEXT NOT NULL,              -- 9725XXXXXXXX, or an email on the waitlist; '' for a Toran demo, whose number Toran learns from its message
   page        TEXT,                       -- the page the form was on
   notified_at TEXT,                       -- when the WhatsApp message to the owner went; NULL until then
   tries       INTEGER NOT NULL DEFAULT 0  -- attempts at it
@@ -112,14 +114,26 @@ export function mobile(s) {
   return null;
 }
 
+// An email address, plainly checked, kept in lower case.
+export function email(s) {
+  const t = String(s || '').trim().toLowerCase();
+  return t.length <= 254 && /^[^\s@<>()",;:]+@[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(t) ? t : null;
+}
+
 // The form's fields, checked. Returns { lead, sources } or { error }: 'store', 'contact', 'products' or 'bad'. Every
 // form asks for a demo: 'demo' is Toran's, 'teder' a sample slideshow from Teder, and 'join' (the join page) either or
 // both, ticked as toran=1 and teder=1. Each takes the store's address; Teder's also a WhatsApp number, which Toran's
-// doesn't need (lead.contact is null then). `sources` is the demos asked for, one saved row each.
+// doesn't need (lead.contact is null then). `sources` is the demos asked for, one saved row each. 'waitlist' is
+// Toran's waitlist: a phone or an email in contact, and the store's address only if one is sent and it is valid.
 export function validate(f) {
   const source = f.source;
-  if (source !== 'demo' && source !== 'teder' && source !== 'join') return { error: 'bad' };
+  if (source !== 'demo' && source !== 'teder' && source !== 'join' && source !== 'waitlist') return { error: 'bad' };
   const page = typeof f.page === 'string' && /^\/[\w\-/]{0,60}$/.test(f.page) ? f.page : null;
+  if (source === 'waitlist') {
+    const contact = mobile(f.contact) || email(f.contact);
+    if (!contact) return { error: 'contact' };
+    return { lead: { source, store: storeHost(f.store), contact, page }, sources: [source] };
+  }
   const ticked = (v) => v === '1' || v === 1 || v === true || v === 'on';
   const sources = source !== 'join' ? [source] : [...(ticked(f.toran) ? ['demo'] : []), ...(ticked(f.teder) ? ['teder'] : [])];
   if (!sources.length) return { error: 'products' };
@@ -173,6 +187,10 @@ function message(row) {
   const who = row.code
     ? `קוד: ${row.code}, נספר כשיכתבו איתו למספר של הדמו`
     : /^\d+$/.test(row.contact) ? `וואטסאפ: https://wa.me/${row.contact}` : `מייל: ${row.contact}`;
+  if (row.source === 'waitlist') return `ליד חדש, רשימת המתנה לתורן
+${who}${row.store ? `
+חנות: ${row.store}` : ''}
+מהעמוד ${row.page || '?'}, ${when(row.created_at)}`;
   return row.source === 'demo'
     ? `ליד חדש, דמו לתורן\nחנות: ${row.store}\n${who}\nמהעמוד ${row.page || '?'}, ${when(row.created_at)}`
     : `ליד חדש, דמו לתדר\nחנות: ${row.store}\n${who}\nמהעמוד ${row.page || '?'}, ${when(row.created_at)}`;
@@ -333,7 +351,7 @@ function reply(req, res, status, body) {
     res.end(JSON.stringify(body));
     return;
   }
-  const to = body.ok ? body.wa || (body.source === 'teder' ? '/thanks/teder' : '/thanks') : body.error === 'dup' ? '/thanks/already' : '/try-again';
+  const to = body.ok ? body.wa || (body.source === 'teder' ? '/thanks/teder' : body.source === 'waitlist' ? '/thanks/waitlist' : '/thanks') : body.error === 'dup' ? '/thanks/already' : '/try-again';
   res.writeHead(303, { Location: to, 'Cache-Control': 'no-store' });
   res.end();
 }
@@ -367,11 +385,13 @@ export function createServer(db) {
     if (error) return reply(req, res, 400, { ok: false, error });
 
     // One Teder demo per number: if this number asked for one already, it isn't saved again, and with nothing else
-    // asked for it is answered "we have it". Toran keeps its own one per number, by the number its message comes from,
+    // asked for it is answered "we have it". The waitlist keeps one row per phone or email the same way, but a second
+    // sign-up is simply thanked: it asks for nothing new. Toran keeps its own one per number, by the number its message comes from,
     // so a Toran demo is always saved here. The check and the insert run with no await between them, so two posts at
     // once can't both get through.
     const fresh = sources.filter((s) => s === 'demo' || !db.prepare('SELECT 1 FROM leads WHERE source = ? AND contact = ?').get(s, lead.contact));
     count(ip);
+    if (!fresh.length && lead.source === 'waitlist') return reply(req, res, 200, { ok: true, source: 'waitlist', saved: [] });
     if (!fresh.length) return reply(req, res, 409, { ok: false, error: 'dup' });
 
     const created_at = new Date().toISOString();
@@ -386,7 +406,7 @@ export function createServer(db) {
     // A Toran demo answers its code and the link that writes it to the demo number. Without JS, a Teder-only request
     // lands on Teder's thank-you.
     reply(req, res, 200, {
-      ok: true, source: fresh.includes('demo') ? 'demo' : 'teder', store: lead.store, saved: fresh,
+      ok: true, source: fresh.includes('demo') ? 'demo' : fresh[0], store: lead.store, saved: fresh,
       ...(code ? { code, wa: toranWaLink(lead.store, code) } : {}),
     });
     for (const row of rows) {

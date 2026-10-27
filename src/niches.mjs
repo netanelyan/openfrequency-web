@@ -7,6 +7,8 @@
 // No script needed: each row is the label of a radio button, and the stylesheet shows the card of the one checked
 // (style.css, .niche-sec). Up to 820px the list and the card are one panel: the kinds a row of chips on top, the card
 // under them. site.js adds the search box (from 821px) and keeps the picked chip in view.
+// While Toran is soon (products.toran), each of Toran's lines carries "בקרוב", and the card's button is Teder's demo.
+import { toranSoon } from './lib.mjs';
 
 export const NICHES = [
   {
@@ -85,7 +87,10 @@ export const NICHES = [
 
 const searchIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>';
 
-export const niches = () => `
+export const niches = (cfg) => {
+  const soon = toranSoon(cfg);
+  const who = (p) => (soon && p === 'תורן' ? `<b>${p}</b> <span class="soon">בקרוב</span>` : `<b>${p}</b>`);
+  return `
 <section class="sec niche-sec" id="stores" aria-labelledby="niche-h">
 <div class="wrap">
 <div class="sec-head"><h2 id="niche-h">מה OpenFrequency עושה בחנות כמו שלכם?</h2><p class="lede">בחרו את סוג החנות שלכם ותראו</p></div>
@@ -94,17 +99,17 @@ ${NICHES.map((n, i) => `<input type="radio" name="niche" id="niche-${n.id}" clas
 <div class="niche-list glass">
 <label class="niche-search" data-niche-search hidden>${searchIcon}<input type="search" placeholder="חפשו את סוג החנות שלכם" aria-label="חיפוש סוג חנות" autocomplete="off"></label>
 ${NICHES.map((n) => `<label for="niche-${n.id}" class="niche-row" data-niche-row data-words="${n.name} ${n.words}"><span class="niche-ava" aria-hidden="true">${n.icon}</span><span class="niche-t"><b>${n.name}</b><small>${n.ask}</small></span><span class="niche-meta"><time>${n.time}</time>${n.unread ? `<i class="niche-badge" aria-hidden="true">${n.unread}</i>` : ''}</span></label>`).join('\n')}
-<p class="niche-none" data-niche-none hidden>לא מצאנו את סוג החנות הזה. תורן ותדר עובדים מתוך האתר של החנות, אז אפשר לנסות אותם על החנות שלכם.</p>
+<p class="niche-none" data-niche-none hidden>${soon ? 'לא מצאנו את סוג החנות הזה. תדר עובד מתוך האתר של החנות, אז אפשר לנסות אותו על החנות שלכם.' : 'לא מצאנו את סוג החנות הזה. תורן ותדר עובדים מתוך האתר של החנות, אז אפשר לנסות אותם על החנות שלכם.'}</p>
 </div>
 <div class="niche-cards" data-niche-cards>
 ${NICHES.map((n) => `<article class="niche-card glass" data-niche="${n.id}" aria-label="${n.name}">
 <span class="niche-ava big" aria-hidden="true">${n.icon}</span>
 <h3>${n.name}</h3>
-<ul class="checks">${n.lines.map(([p, t]) => `<li><b>${p}</b> ${t}</li>`).join('')}</ul>
-<a class="btn primary" href="/join">לנסות על החנות שלכם</a>
-<p class="niche-note">הדמו נבנה מהמוצרים שבאתר שלכם</p>
+<ul class="checks">${n.lines.map(([p, t]) => `<li>${who(p)} ${t}</li>`).join('')}</ul>
+${soon ? '<a class="btn primary" href="/join">לנסות את תדר על החנות שלכם</a>\n<p class="niche-note">המצגת לדוגמה נבנית מהאתר שלכם</p>' : '<a class="btn primary" href="/join">לנסות על החנות שלכם</a>\n<p class="niche-note">הדמו נבנה מהמוצרים שבאתר שלכם</p>'}
 </article>`).join('\n')}
 </div>
 </div>
 </div>
 </section>`;
+};

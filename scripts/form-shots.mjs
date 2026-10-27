@@ -10,6 +10,14 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { serve } from './serve.mjs';
+import { readConfig, toranSoon } from '../src/lib.mjs';
+
+// These are Toran's demo forms; while Toran is soon the site has none (test/site.test.mjs and test/lead.test.mjs cover
+// the waitlist that takes their place).
+if (toranSoon(readConfig(true))) {
+  console.log('products.toran is "soon" in site.config.json: there is no Toran demo form to check. Set it to "live" to run this.');
+  process.exit(0);
+}
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'docs/screenshots');

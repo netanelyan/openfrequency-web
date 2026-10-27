@@ -3,11 +3,13 @@
 // real slides playing on its violet. Then what holds for every store, the businesses that work with us, what we do in a
 // store like yours, Toran as the owner's assistant, and Toran answering questions about us. Each product has its own
 // page (/toran, /teder), and the questions have theirs (/faq).
+// While Toran is soon (products.toran in site.config.json), Teder's door comes first and Toran's carries "בקרוב", with
+// the way to its waitlist instead of a demo; every line about Toran says what it will do.
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, esc, mark, glyphOnly } from '../lib.mjs';
+import { CHANNELS, ROOT, esc, mark, glyphOnly, toranSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
-import { askBox, toranPriceLine } from '../sections.mjs';
+import { askBox, askSoon, toranPriceLine } from '../sections.mjs';
 import { priceLine } from './join.mjs';
 import { reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
@@ -28,33 +30,42 @@ const DOOR_CHAT = [
 // from 700px, the door is open and the button isn't there.
 const doorTop = (id, face, name, short, say) => `<div class="door-top">${face}<div><h2 id="door-${id}">${name}</h2><p class="door-sum">${short}</p><p class="door-say">${say}</p></div><button type="button" class="door-open" aria-expanded="true" aria-controls="door-${id}-in" aria-labelledby="door-${id}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg></button></div>`;
 
-const hero = (cfg) => `
-<section class="co-hero" aria-labelledby="hero-h">
-<div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
-<div class="wrap">
-<h1 id="hero-h">פלטפורמות יצירת התוכן ושירות הלקוחות <span class="hl">המובילות בארץ</span></h1>
-<p class="lede">תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.</p>
-<div class="doors">
-<article class="door toran-door glass" aria-labelledby="door-toran" data-door>
-${doorTop('toran', mark('toran', 48), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
+const soonBadge = '<span class="soon">בקרוב</span>';
+const hero = (cfg) => {
+  const soon = toranSoon(cfg);
+  const toranDoor = `<article class="door toran-door glass" aria-labelledby="door-toran" data-door>
+${soon
+    ? doorTop('toran', mark('toran', 48), `תורן ${soonBadge}`, 'יענה ללקוחות של החנות 24/7', 'יענה ללקוחות של החנות מתוך מה שכתוב באתר, ומה שלא כתוב שם ישאל אתכם. אנחנו פותחים אותו בקרוב.')
+    : doorTop('toran', mark('toran', 48), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
 <div class="door-in" id="door-toran-in">
-<div class="door-act"><a class="btn primary" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn" href="/toran">עוד על תורן</a></div>
+<div class="door-act">${soon ? '<a class="btn" href="/toran#waitlist">לקבל עדכון כשתורן נפתח</a><a class="btn" href="/toran">מה תורן יעשה</a>' : '<a class="btn primary" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn" href="/toran">עוד על תורן</a>'}</div>
 <div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
 <p class="pop" data-pop>${mark('toran', 28)}<span class="pop-h"><b>תורן</b><small>בטלפון שלכם, 02:16</small></span><span class="pop-t">לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?</span></p>
 </div>
 </div>
-</article>
-<article class="door teder-door" aria-labelledby="door-teder" data-door>
+</article>`;
+  const tederDoor = `<article class="door teder-door" aria-labelledby="door-teder" data-door>
 ${doorTop('teder', `<span class="wave" aria-hidden="true">${glyphOnly('teder')}</span>`, 'תדר', 'מצגות לטיקטוק ולאינסטגרם', 'כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.')}
 <div class="door-in" id="door-teder-in">
 <div class="door-act"><a class="btn light" href="/teder#demo">לנסות את תדר על החנות שלכם</a><a class="btn on-color" href="/teder">עוד על תדר</a></div>
 ${reel}
 </div>
-</article>
+</article>`;
+  return `
+<section class="co-hero" aria-labelledby="hero-h">
+<div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
+<div class="wrap">
+<h1 id="hero-h">פלטפורמות יצירת התוכן ושירות הלקוחות <span class="hl">המובילות בארץ</span></h1>
+<p class="lede">${soon
+    ? `תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן, שיענה ללקוחות שלכם 24/7 ${inList(CHANNELS)} מתוך מה שכתוב באתר, נפתח בקרוב.`
+    : `תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`}</p>
+<div class="doors">
+${soon ? `${tederDoor}\n${toranDoor}` : `${toranDoor}\n${tederDoor}`}
 </div>
 </div>
 </section>`;
+};
 
 const ask = (cfg) => `
 <section class="sec ask-sec" id="ask" aria-labelledby="ask-h">
@@ -65,8 +76,10 @@ const ask = (cfg) => `
 <p>תורן לא ממציא תשובות. כל מה שהוא עונה כתוב באתר, ומה שלא כתוב שם, הוא שואל אתכם.</p>
 <p class="ask-note">זו הדגמה בדפדפן, עם תשובות שכתבנו מראש מתוך האתר הזה.</p>
 </div>
-${askBox}
-${cfg.has('price.plans.store.monthly') && cfg.has('teder.monthly') ? `<template id="ask-price">תורן עולה ${toranPriceLine(cfg)} תדר עולה ${priceLine(cfg, 'teder.monthly', 'teder.setup')}</template>` : ''}
+${askBox(cfg)}
+${toranSoon(cfg)
+    ? `${cfg.has('teder.monthly') ? `<template id="ask-price">תדר עולה ${priceLine(cfg, 'teder.monthly', 'teder.setup')} תורן עוד לא פתוח, ואת המחיר שלו נפרסם כשהוא ייפתח.</template>` : ''}\n${askSoon}`
+    : cfg.has('price.plans.store.monthly') && cfg.has('teder.monthly') ? `<template id="ask-price">תורן עולה ${toranPriceLine(cfg)} תדר עולה ${priceLine(cfg, 'teder.monthly', 'teder.setup')}</template>` : ''}
 </div>
 </section>`;
 
@@ -85,9 +98,16 @@ const BADGE_ICON = {
   lock: '<rect x="5.5" y="10.5" width="13" height="9.5" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>',
   gift: '<rect x="4.5" y="9" width="15" height="11" rx="1.5"/><path d="M4.5 13h15M12 9v11M12 9c-1.5-3.5-5-3.5-5-1.2C7 9 12 9 12 9zm0 0c1.5-3.5 5-3.5 5-1.2C17 9 12 9 12 9z"/>',
 };
-const trust = () => `
+// While Toran is soon, only what Teder does.
+const BADGES_SOON = [
+  ['doc', 'כל עובדה במצגת נבדקת מול המקור'],
+  ['check', 'תדר מפרסם רק מה שאישרתם'],
+  ['lock', 'המידע של כל חנות נשאר רק אצלה'],
+  ['gift', 'מצגת לדוגמה חינם מהחנות שלכם'],
+];
+const trust = (cfg) => `
 <section class="trust-sec" aria-label="מה מובטח בכל חנות">
-<ul class="trust wrap">${BADGES.map(([ic, t]) => `<li><svg viewBox="0 0 24 24" aria-hidden="true">${BADGE_ICON[ic]}</svg><span>${t}</span></li>`).join('')}</ul>
+<ul class="trust wrap">${(toranSoon(cfg) ? BADGES_SOON : BADGES).map(([ic, t]) => `<li><svg viewBox="0 0 24 24" aria-hidden="true">${BADGE_ICON[ic]}</svg><span>${t}</span></li>`).join('')}</ul>
 </section>`;
 
 // Toran for the owner (openfrequency-toran src/assistant): the owner writes to Toran from their own WhatsApp and asks
@@ -102,13 +122,15 @@ const OWNER_CHAT = [
   ['me', '20:43', 'כן'],
   ['them', '20:43', 'נשלח. שמרתי את התשובה, ובפעם הבאה אענה על זה לבד.'],
 ];
-const assistant = () => `
+const assistant = (cfg) => `
 <section class="sec owner-sec" id="owner" aria-labelledby="owner-h">
 <div class="wrap owner-grid">
 <div class="owner-text">
-<p class="kicker">העוזר האישי שלכם</p>
+${toranSoon(cfg) ? `<p class="kicker">העוזר האישי שלכם ${soonBadge}</p>
+<h2 id="owner-h">תורן יענה גם <span class="hl">לכם</span></h2>
+<p class="lede">כשתורן ייפתח, תוכלו לכתוב לו מהוואטסאפ שלכם, והוא יענה לכם על החנות: מי פנה, מה שאלו, ומה מחכה לכם. הוא יעשה משהו רק אחרי שתכתבו לו כן.</p>` : `<p class="kicker">העוזר האישי שלכם</p>
 <h2 id="owner-h">תורן עונה גם <span class="hl">לכם</span></h2>
-<p class="lede">כתבו לתורן מהוואטסאפ שלכם, והוא עונה לכם על החנות: מי פנה, מה שאלו, ומה מחכה לכם. הוא עושה משהו רק אחרי שכתבתם לו כן.</p>
+<p class="lede">כתבו לתורן מהוואטסאפ שלכם, והוא עונה לכם על החנות: מי פנה, מה שאלו, ומה מחכה לכם. הוא עושה משהו רק אחרי שכתבתם לו כן.</p>`}
 <ul class="checks">
 <li><b>מה קרה היום.</b> כמה לקוחות פנו, בכל ערוץ, ועל כמה הוא ענה לבד.</li>
 <li><b>מה מחכה לכם.</b> השאלות שהוא העביר אליכם, עם הלקוח שמחכה לתשובה.</li>
@@ -133,13 +155,13 @@ const TEDER_CHAT = [
   ['me', '21:04', 'איך היה השבוע?'],
   ['them', '21:04', 'השבוע עלו 4 מצגות לטיקטוק ולאינסטגרם, ואחת עוד מחכה לכם בטיוטות. ביום ראשון אשלח לכם 3 חדשות לאישור.'],
 ];
-const tederAssistant = () => `
+const tederAssistant = (cfg) => `
 <section class="sec owner-sec teder-owner" id="owner-teder" aria-labelledby="owner-teder-h">
 <div class="wrap owner-grid">
 <div class="owner-text">
-<p class="kicker">אותו עוזר, גם לתדר</p>
+<p class="kicker">${toranSoon(cfg) ? 'העוזר שלכם בוואטסאפ' : 'אותו עוזר, גם לתדר'}</p>
 <h2 id="owner-teder-h">את המצגות של תדר מאשרים <span class="hl">בוואטסאפ</span></h2>
-<p class="lede">העוזר שכותב לכם על החנות עובד גם עם תדר. כשמצגות מוכנות, הוא שולח לכם אותן לוואטסאפ, ושם מאשרים, מבקשים תיקון ומקבלים תזכורת לפרסם. אין אפליקציה חדשה ללמוד.</p>
+<p class="lede">${toranSoon(cfg) ? '' : 'העוזר שכותב לכם על החנות עובד גם עם תדר. '}כשמצגות מוכנות, הוא שולח לכם אותן לוואטסאפ, ושם מאשרים, מבקשים תיקון ומקבלים תזכורת לפרסם. אין אפליקציה חדשה ללמוד.</p>
 <ul class="checks">
 <li><b>מאשרים לפי מספר.</b> כותבים לו "אשר את 1 ו-3", ורק מה שאישרתם עולה.</li>
 <li><b>מבקשים תיקון במילים שלכם.</b> "את 2 תעשה קצר יותר", ותדר מכין גרסה חדשה ושולח לכם אותה שוב לאישור.</li>
@@ -154,7 +176,11 @@ const tederAssistant = () => `
 export default (cfg) => ({
   path: '/',
   title: 'OpenFrequency, תורן ותדר',
-  description: `תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,
+  description: toranSoon(cfg)
+    ? 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן, שיענה ללקוחות של החנות 24/7 מתוך מה שכתוב באתר, נפתח בקרוב.'
+    : `תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,
   // "Who we are" is in the footer (layout.mjs), on every page.
-  body: [hero(cfg), trust(), clients(), niches(), assistant(), tederAssistant(), ask(cfg)].join('\n'),
+  body: (toranSoon(cfg)
+    ? [hero(cfg), trust(cfg), clients(), niches(cfg), tederAssistant(cfg), assistant(cfg), ask(cfg)]
+    : [hero(cfg), trust(cfg), clients(), niches(cfg), assistant(cfg), tederAssistant(cfg), ask(cfg)]).join('\n'),
 });

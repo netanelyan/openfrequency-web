@@ -3,14 +3,15 @@
 // the copy lint reads it like the rest.
 //   form[data-form="demo" | "teder" | "join"]: data-wa is our WhatsApp number (empty in a draft), data-wa-text the message
 //   it starts with, where {store} is the address they typed.
+//   form[data-form="waitlist"]: Toran's waitlist while it is soon, a phone or an email; its thank-you is done-waitlist.
 // A Toran demo is answered with a code and a wa.me link to Toran's demo number (server/lead.mjs); the thank-you shows
 // the code and a button that opens the link.
 (function () {
   var forms = document.querySelectorAll('form[data-form]');
-  // /join?p=teder (or toran) ticks that product alone.
+  // /join?p=teder (or toran) ticks that product alone, unless it can't be ticked (Toran, while it is soon).
   var p = new URLSearchParams(location.search).get('p');
   var jf = document.querySelector('form[data-form=join]');
-  if (jf && (p === 'teder' || p === 'toran')) ['toran', 'teder'].forEach(function (k) { jf.elements[k].checked = k === p; });
+  if (jf && (p === 'teder' || p === 'toran') && !jf.elements[p].disabled) ['toran', 'teder'].forEach(function (k) { if (!jf.elements[k].disabled) jf.elements[k].checked = k === p; });
   // On the join page the WhatsApp number is Teder's, so it shows (and is asked for) only while Teder is ticked, and each
   // line under the button only while its product is.
   if (jf) {
@@ -87,7 +88,7 @@
   // and the button to WhatsApp (left out if the endpoint has no demo number to give), and on the join page the Teder
   // line when Teder was asked for too.
   function done(f, body, typed) {
-    var node = copy(body.code ? 'done-code' : 'done-teder');
+    var node = copy(body.code ? 'done-code' : body.source === 'waitlist' ? 'done-waitlist' : 'done-teder');
     var s = node.querySelector('[data-store]');
     if (s) s.textContent = body.store || typed || '';
     var c = node.querySelector('[data-code]');

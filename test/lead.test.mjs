@@ -8,7 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
-import { storeHost, mobile, validate, newCode, toranWaLink, waAddress } from '../server/lead.mjs';
+import { storeHost, mobile, email, validate, newCode, toranWaLink, waAddress } from '../server/lead.mjs';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'of-leads-'));
 const DB = path.join(dir, 'leads.db');
@@ -227,6 +227,64 @@ test('a bad address or number says which field', async () => {
   assert.equal((await res.json()).error, 'contact');
 });
 
+test("Toran's waitlist takes a phone or an email, and the store's address only if it is a real one", () => {
+  assert.deepEqual(validate({ source: 'waitlist', contact: '050-123-4567', page: '/toran' }), { lead: { source: 'waitlist', store: null, contact: '972501234567', page: '/toran' }, sources: ['waitlist'] });
+  assert.equal(validate({ source: 'waitlist', contact: ' Owner@Shop.co.il ' }).lead.contact, 'owner@shop.co.il');
+  assert.equal(validate({ source: 'waitlist', contact: 'owner@shop.co.il', store: 'www.shop.co.il' }).lead.store, 'shop.co.il');
+  assert.equal(validate({ source: 'waitlist', contact: 'owner@shop.co.il', store: 'not a store' }).lead.store, null);
+  for (const bad of ['', '123', 'owner@', 'owner@shop', 'a b@shop.co.il', '<x>@shop.co.il', 'x'.repeat(250) + '@shop.co.il']) {
+    assert.equal(validate({ source: 'waitlist', contact: bad }).error, 'contact', bad);
+  }
+  assert.equal(email('owner@shop.co.il'), 'owner@shop.co.il');
+});
+
+test("a waitlist lead is saved as 'waitlist', sent to the owner as Toran's waitlist, handed to no product, and kept once per phone or email", async () => {
+  const toProducts = handed.length, n = sent.length;
+  let res = await post({ source: 'waitlist', contact: 'wait@shop.co.il', page: '/toran' });
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { ok: true, source: 'waitlist', store: null, saved: ['waitlist'] }, 'no code, no link');
+  await settle();
+  const r = rows().at(-1);
+  assert.deepEqual([r.source, r.contact, r.store, r.code, r.page], ['waitlist', 'wait@shop.co.il', null, null, '/toran']);
+  assert.ok(r.notified_at, 'marked as sent');
+  assert.equal(sent.length, n + 1);
+  assert.match(sent.at(-1).form.Body, /^ליד חדש, רשימת המתנה לתורן\nמייל: wait@shop\.co\.il\nמהעמוד \/toran, /);
+  assert.equal(handed.length, toProducts, 'neither Toran nor Teder gets it');
+
+  // The same email again (in any case) is thanked and saved nowhere, and nothing goes to the owner.
+  const before = rows().length;
+  res = await post({ source: 'waitlist', contact: 'WAIT@shop.co.il', page: '/join' });
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { ok: true, source: 'waitlist', saved: [] });
+  await settle();
+  assert.equal(rows().length, before);
+  assert.equal(sent.length, n + 1);
+
+  // A phone, posted without JS, lands on the waitlist's own thank-you; a bad one on try-again.
+  res = await post({ source: 'waitlist', contact: '052-765-4321', page: '/toran' }, { json: false });
+  assert.equal(res.status, 303);
+  assert.equal(res.headers.get('location'), '/thanks/waitlist');
+  await settle();
+  assert.match(sent.at(-1).form.Body, /רשימת המתנה לתורן\nוואטסאפ: https:\/\/wa\.me\/972527654321/);
+  res = await post({ source: 'waitlist', contact: 'nope' }, { json: false });
+  assert.equal(res.headers.get('location'), '/try-again');
+  res = await post({ source: 'waitlist', contact: 'nope' });
+  assert.equal((await res.json()).error, 'contact');
+});
+
+test('the waitlist keeps the honeypot, the origin check and the limit of 5 an hour', async () => {
+  const before = rows().length;
+  assert.equal((await post({ source: 'waitlist', contact: 'bot@spam.co.il', company: 'Spam Ltd' })).status, 200);
+  assert.equal((await post({ source: 'waitlist', contact: 'far@shop.co.il' }, { origin: 'https://evil.example' })).status, 403);
+  await settle();
+  assert.equal(rows().length, before, 'neither is saved');
+  const ip = '10.9.9.10';
+  for (let i = 0; i < 5; i++) assert.equal((await post({ source: 'waitlist', contact: `w${i}@shop.co.il` }, { ip })).status, 200);
+  const res = await post({ source: 'waitlist', contact: 'w6@shop.co.il' }, { ip });
+  assert.equal(res.status, 429);
+  assert.equal((await res.json()).error, 'rate');
+});
+
 test('a post from another site is refused', async () => {
   const res = await post({ source: 'demo', store: 'shop.co.il' }, { origin: 'https://evil.example' });
   assert.equal(res.status, 403);
@@ -423,6 +481,9 @@ test('with Resend set and no Twilio, each lead is emailed to the owner and marke
     assert.match(m.body.subject, /דמו לתורן: mailshop\.co\.il/);
     assert.ok(m.body.text.includes(body.code), 'the email has the code');
     assert.ok(rows(db).at(-1).notified_at, 'marked as sent');
+    await post({ source: 'waitlist', contact: 'mailwait@shop.co.il', page: '/toran' }, { to: `http://127.0.0.1:${port}` });
+    await settle();
+    assert.equal(mails.at(-1).body.subject, 'ליד חדש, רשימת המתנה לתורן: mailwait@shop.co.il', "a waitlist lead's email says what it is");
   } finally {
     p.kill();
     resend.close();

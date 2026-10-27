@@ -432,6 +432,15 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .ch-tabs button[aria-selected="true"] { background: var(--sheet); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14); }
 .ch-tabs button:focus-visible, .ch-panel:focus-visible { outline: 3px solid var(--accent-fill); outline-offset: 2px; }
 .soon { display: inline-block; padding: 2px 7px; border-radius: 999px; background: var(--warn-bg); color: var(--warn); font-size: 11px; font-weight: 700; line-height: 1.4; }
+.door-top h2 .soon, .faq-sec h2 .soon, .kicker .soon, .pick-box b .soon { margin-inline-start: 4px; font-size: 12px; vertical-align: middle; }
+/* Toran while it is soon (products.toran in site.config.json): the bar on top of /toran, and its card on /join that
+   can't be ticked. */
+.soon-bar { padding-top: 16px; }
+.soon-bar p { margin: 0; padding: 12px 16px; border-radius: var(--r); background: var(--warn-bg); font-size: var(--fs-small); line-height: 1.55; }
+.soon-bar .soon { margin-inline-end: 6px; background: var(--sheet); }
+.pick.off { cursor: default; }
+.pick.off .pick-box { opacity: 0.62; }
+.pick.off .pick-tick { visibility: hidden; }
 /* On a phone the four tabs share the width: the name, and "בקרוב" under it. */
 @media (max-width: 559px) {
   .ch-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; width: 100%; }

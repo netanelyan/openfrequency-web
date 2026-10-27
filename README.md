@@ -7,6 +7,30 @@ Toran or Teder.
 Static pages, built by one Node script with no dependencies, served by Caddy. The look is Teder's (silver wallpaper,
 frosted glass, the system typeface with Heebo behind it); the marks are the brand files in `assets/brand`.
 
+## Toran: live or soon
+
+The first entry in `site.config.json` is the one switch for whether Toran is on sale:
+
+```json
+"products": { "toran": "soon" }
+```
+
+- `"soon"` (now, until Meta approves WhatsApp): Toran stays on show, marked "בקרוב", and nobody can buy it, start it or
+  ask for its demo. Teder comes first and is offered exactly as before. Every page reads the switch: the home page (Toran's
+  door with the badge and a link to the waitlist, its lines in the future, the question box's answers about Toran),
+  `/toran` (a "בקרוב" bar on top, what it will do, no price, and the waitlist form where the demo form was), `/join`
+  (Toran's card shown and not tickable, Teder's steps, price and questions), `/faq` (Teder first, Toran's answers in
+  the future, its demo questions out), the menus and footer, the meta and Open Graph lines, `/toran/example` (no price,
+  no buttons), the privacy page (a line on what the waitlist keeps), and `npm run support` (Toran opens soon, Teder is
+  available, no Toran plans).
+- `"live"`: the site as it was before the switch, word for word (`test/site.test.mjs` builds both and checks).
+
+The waitlist form takes a phone or an email and posts to the lead endpoint as `source: "waitlist"`; the owner gets it as
+"ליד חדש, רשימת המתנה לתורן", it is handed to no product, and a second sign-up from the same phone or email is thanked
+and not saved again. Without JS it lands on `/thanks/waitlist`, which is built only while Toran is soon. The endpoint
+itself doesn't read the switch (only `server/lead.mjs` is deployed to the server, not the config): it keeps accepting a
+Toran demo post, though no page sends one while Toran is soon.
+
 ## Build
 
 ```sh
@@ -21,8 +45,8 @@ npm run og           # assets/og: the share images a sent link shows (OpenFreque
 ## Leads
 
 The demo forms post to `server/lead.mjs`, a small Node server with no dependencies (`node:sqlite`), behind Caddy at
-`/api/lead`. Each lead (the store's host name, the form, the page, the time, and a WhatsApp number for Teder or a
-code for Toran) is saved to SQLite first, then sent to the owner, from the business number to their own WhatsApp
+`/api/lead`. Each lead (the store's host name, the form, the page, the time, and a WhatsApp number for Teder, a
+code for Toran, or a phone or an email for Toran's waitlist) is saved to SQLite first, then sent to the owner, from the business number to their own WhatsApp
 (through Twilio), to their email (through Resend: `RESEND_API_KEY`, `LEAD_EMAIL_FROM`, `LEAD_EMAIL_TO`), or both, and
 handed to Toran or Teder; what fails is retried every 5 minutes, and a lead more than 2 days old is not
 sent any more, so turning the sender on never sends a backlog. One address gets 5 leads an hour, everyone together 200 a day, and a hidden honeypot field catches
@@ -38,8 +62,9 @@ to WhatsApp with its message, a Teder one lands on `/thanks/teder`, and a failur
 serves when the endpoint is down).
 
 ```sh
-npm test                                        # the endpoint: saving, WhatsApp, limits, honeypot, origin, Twilio down
-npm run draft && node scripts/form-shots.mjs    # the forms in Chrome against the real endpoint, every state
+npm test                                        # the endpoint (saving, WhatsApp, limits, honeypot, origin, Twilio down,
+                                                # the waitlist), and the site built with Toran soon and live
+npm run draft && node scripts/form-shots.mjs    # the demo forms in Chrome against the real endpoint (Toran live only)
 node server/lead.mjs list 50                    # the last 50 leads, on the server
 ```
 

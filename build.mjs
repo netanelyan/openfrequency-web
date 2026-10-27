@@ -9,25 +9,28 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { CHANNELS, ROOT, readConfig, lint, minifyCss, markNames } from './src/lib.mjs';
+import { CHANNELS, ROOT, readConfig, lint, minifyCss, markNames, toranSoon } from './src/lib.mjs';
 import { page } from './src/layout.mjs';
 import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
 import teder from './src/pages/teder.mjs';
 import faq from './src/pages/faq.mjs';
 import join from './src/pages/join.mjs';
-import { thanks, thanksAgain, thanksTeder, tryAgain, notFound } from './src/pages/after.mjs';
+import { thanks, thanksAgain, thanksTeder, thanksWaitlist, tryAgain, notFound } from './src/pages/after.mjs';
 import { terms, privacy, security, accessibility } from './src/pages/legal.mjs';
 
 const draft = process.argv.includes('--draft');
 // The draft banner, and the placeholders the public draft leaves out, only for us: npm run dev.
 const banner = draft && process.argv.includes('--banner');
-const OUT = path.join(ROOT, 'dist');
+const OUT = process.env.SITE_OUT ? path.resolve(process.env.SITE_OUT) : path.join(ROOT, 'dist'); // SITE_OUT: the tests' own folder
 
 const PAGES = [home, toran, teder, faq, join, terms, privacy, security, accessibility, thanks, thanksAgain, thanksTeder, tryAgain, notFound];
 const DRAFT_PAGES = [];
 
 const cfg = { ...readConfig(draft), banner };
+// Toran's waitlist has its own thank-you, for a post without JS, while Toran is soon (products.toran).
+if (toranSoon(cfg)) PAGES.splice(PAGES.indexOf(thanksTeder) + 1, 0, thanksWaitlist);
+console.log(`Toran is ${toranSoon(cfg) ? 'soon: shown, not sold, with a waitlist' : 'live'} (products.toran in site.config.json)`);
 
 // Where Toran answers. With toran.channelsFrom "config" in site.config.json, the list is toran.channels there, and
 // Toran isn't asked: that's for when we know better than Toran's settings (every channel in it is live, and no
@@ -110,10 +113,25 @@ for (const f of fs.readdirSync(path.join(ROOT, 'assets/clients'))) copy('assets/
 // The page a store gets from Toran, for a made-up store, as Toran rendered it (assets/toran-example/README.md). Its
 // price card is written here from site.config.json (the Store plan, VAT, the setup fee), so the example never shows
 // a price the site no longer has; a page whose card can't be found stops the build rather than ship an old one.
+// While Toran is soon, the example has no price and no way to start: its buttons, the docked one and the line on
+// top lead to Toran's waitlist, and what it says about writing to Toran now says what it will be.
 {
-  const html = fs.readFileSync(path.join(ROOT, 'assets/toran-example/index.html'), 'utf8');
+  let html = fs.readFileSync(path.join(ROOT, 'assets/toran-example/index.html'), 'utf8');
+  if (toranSoon(cfg)) {
+    const swap = (from, to) => {
+      if (!from.test(html)) throw new Error(`assets/toran-example/index.html: ${from} is not there, so the example can't be shown as soon`);
+      html = html.replace(from, to);
+    };
+    swap(/ככה נראה העמוד שחנות מקבלת מאיתנו\. בעמוד אמיתי הכפתור הירוק פותח וואטסאפ עם התורן של החנות\. <a href="\/toran#demo">לבנות דמו לחנות שלכם<\/a>/,
+      'ככה ייראה העמוד שחנות תקבל מאיתנו כשתורן ייפתח. <a href="/toran#waitlist">לקבל עדכון כשהוא נפתח</a>');
+    swap(/ תורן כבר מכיר אותם\. אפשר לכתוב לו עכשיו כמו לקוח ולראות מה הוא עונה\./, ' תורן כבר מכיר אותם.');
+    swap(/<div class="read-cta">[\s\S]*?<\/div>/, '<div class="read-cta"><p class="quiet">זו הדגמה. אף לקוח שלכם לא רואה אותה.</p></div>');
+    swap(/\s*<section class="price"[\s\S]*?<\/section>/, '');
+    swap(/<div class="dock">[\s\S]*?<\/div>\n/, '');
+    if (/\/toran#demo|class="figure"/.test(html)) throw new Error('assets/toran-example/index.html: a way to start Toran or a price is still there');
+  }
   const card = /<p class="figure">[\s\S]*?<\/p>\s*<p class="price-notes">[\s\S]*?<\/p>/;
-  if (!card.test(html)) throw new Error('assets/toran-example/index.html: no price card to write the price into');
+  if (!toranSoon(cfg) && !card.test(html)) throw new Error('assets/toran-example/index.html: no price card to write the price into');
   const n = (key) => cfg.get(key);
   const fee = n('price.setup');
   const vat = n('price.vat') === 'included' ? 'כולל מע״מ' : 'לא כולל מע״מ';

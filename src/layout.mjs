@@ -1,7 +1,7 @@
 // The frame every page shares: the head, the sticky glass header, and the footer.
 import fs from 'node:fs';
 import path from 'node:path';
-import { FACTS, ROOT, esc, mark } from './lib.mjs';
+import { FACTS, ROOT, esc, mark, toranSoon } from './lib.mjs';
 import { formCopy } from './forms.mjs';
 
 // The two scripts, comments and indentation out: site.js on every page (motion and the question box), form.js only
@@ -11,11 +11,17 @@ const squeeze = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8')
 const siteJs = squeeze('src/site.js');
 const formJs = squeeze('src/form.js');
 
-// The two products, each behind its own mark, then the pages that are about both.
-const PRODUCTS = [
+// The two products, each behind its own mark, then the pages that are about both. While Toran is soon
+// (products.toran), Teder comes first and Toran's line says it is coming.
+const PRODUCTS_LIVE = [
   ['/toran', 'toran', 'תורן', 'עונה ללקוחות של החנות'],
   ['/teder', 'teder', 'תדר', 'מצגות לטיקטוק ולאינסטגרם'],
 ];
+const PRODUCTS_SOON = [
+  ['/teder', 'teder', 'תדר', 'מצגות לטיקטוק ולאינסטגרם'],
+  ['/toran', 'toran', 'תורן', 'יענה ללקוחות של החנות, בקרוב'],
+];
+const products = (cfg) => (toranSoon(cfg) ? PRODUCTS_SOON : PRODUCTS_LIVE);
 // The pages about both products. Each price is on its product's page, so there is no price link of its own.
 const LINKS = () => [['/faq', 'שאלות']];
 
@@ -26,6 +32,7 @@ const menuIcon = `<svg class="i open" viewBox="0 0 24 24" aria-hidden="true"><pa
 
 function header(cfg, current) {
   const here = (href) => (href === current ? ' aria-current="page"' : '');
+  const PRODUCTS = products(cfg);
   const nav = [
     ...PRODUCTS.map(([href, name, label]) => `<a href="${href}"${here(href)}>${mark(name, 20)}${label}</a>`),
     ...LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`),
@@ -49,6 +56,7 @@ function header(cfg, current) {
 // The footer: one dark panel. Who we are, the two products, the site's pages, how to reach us, and the name set
 // large along the bottom edge.
 function footer(cfg, current) {
+  const PRODUCTS = products(cfg);
   const wa = cfg.get('whatsapp');
   const waLink = wa
     ? `<a class="foot-wa" href="https://wa.me/${wa}">לכתוב לנו בוואטסאפ</a>`
@@ -58,7 +66,7 @@ function footer(cfg, current) {
 <div class="foot-cols">
 <div class="foot-who">
 <a class="brand" href="/">${mark('openfrequency', 40)}<b>OpenFrequency</b></a>
-<p>בנינו שני מוצרים לחנויות אונליין. תורן עונה ללקוחות של החנות, ותדר כותב ומעצב מצגות לטיקטוק ולאינסטגרם.</p>
+<p>${toranSoon(cfg) ? 'בנינו שני מוצרים לחנויות אונליין. תדר כותב ומעצב מצגות לטיקטוק ולאינסטגרם, ותורן, שיענה ללקוחות של החנות, נפתח בקרוב.' : 'בנינו שני מוצרים לחנויות אונליין. תורן עונה ללקוחות של החנות, ותדר כותב ומעצב מצגות לטיקטוק ולאינסטגרם.'}</p>
 ${cfg.has('about.who') || cfg.banner ? `<h2 id="f-who">מי אנחנו</h2><p>${cfg.t('about.who')}</p><p class="foot-why">${cfg.t('about.why')}</p>` : ''}
 </div>
 <nav aria-labelledby="f-prod"><h2 id="f-prod">המוצרים</h2><ul>

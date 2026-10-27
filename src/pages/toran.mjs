@@ -5,9 +5,11 @@
 // Which channels Toran answers in is toran.channels in site.config.json, or Toran's own /channels.json when
 // toran.channelsFrom is "toran" (build.mjs); every sentence that names them is built from it, so the page never says
 // a channel works before it does. The owners' questions are on /faq.
-import { CHANNELS, mark } from '../lib.mjs';
+// While Toran is soon (products.toran in site.config.json) the page shows what it will do: a "בקרוב" banner on top,
+// every line in the future, no price, and the waitlist where the demo form was.
+import { CHANNELS, mark, toranSoon } from '../lib.mjs';
 import { channelWindow, inList, inbox, liveChannels } from '../channels.mjs';
-import { demoForm } from '../forms.mjs';
+import { demoForm, waitlistForm } from '../forms.mjs';
 import { toranPricing } from '../sections.mjs';
 
 // What it answers alone comes from the shapes of question in Toran's eval (openfrequency-toran, docs/milestones.md,
@@ -26,7 +28,68 @@ const YOURS = [
 ];
 const rows = (items, cls = '') => `<ul class="rows${cls ? ' ' + cls : ''}">${items.map((s) => `<li><span class="dot" aria-hidden="true"></span><span>${s}</span></li>`).join('')}</ul>`;
 
+// The page while Toran is soon. The channels are the ones it will answer in, all four, with no "בקרוב" on each: the
+// whole of Toran is.
+const soonPage = (cfg) => {
+  const where = inList(CHANNELS);
+  return {
+    path: '/toran',
+    image: 'toran',
+    forms: true,
+    title: 'תורן נפתח בקרוב | OpenFrequency',
+    description: `תורן יענה ללקוחות של החנות 24/7 ${where}, מתוך מה שכתוב באתר. הוא נפתח בקרוב.`,
+    body: `
+<section class="soon-bar" aria-labelledby="soon-h">
+<div class="wrap">
+<p id="soon-h"><span class="soon">בקרוב</span> <b>תורן עוד לא פתוח לחנויות.</b> אנחנו פותחים אותו אחרי שהחיבור לוואטסאפ דרך Meta יאושר. <a href="#waitlist">לקבל עדכון כשהוא נפתח</a></p>
+</div>
+</section>
+
+<section class="hero ch-hero" aria-labelledby="hero-h">
+<div class="wrap">
+<div class="hero-head">${mark('toran', 72, 'תורן')}<h1 id="hero-h"><span class="hl">תורן אחד</span> יענה ללקוחות שלכם ${where}</h1></div>
+<div class="hero-text">
+<p class="lede">תורן יקרא את האתר של החנות ויענה ללקוחות <span class="hl" dir="ltr">24/7</span>, מתוך מה שכתוב בו. בכל מקום שיכתבו לו, הוא יענה אותו דבר, כי זו אותה חנות.</p>
+<a class="btn hero-cta" href="#waitlist">לקבל עדכון כשתורן נפתח</a>
+</div>
+${channelWindow(cfg, { all: true })}
+</div>
+</section>
+
+<section class="sec" id="inbox" aria-labelledby="inbox-h">
+<div class="wrap side">
+<div>
+<h2 id="inbox-h">כל השיחות בתיבה אחת</h2>
+<p class="lede">מה שלקוחות יכתבו ${where} יגיע לרשימה אחת אצלכם. ליד כל שיחה תראו מאיפה היא הגיעה ומה קרה איתה: תורן ענה לבד, היא מחכה לכם, או שתיקנתם והוא למד.</p>
+<p class="quiet">זו דוגמה של התיבה.</p>
+</div>
+<div class="stage glass">${inbox()}</div>
+</div>
+</section>
+
+<section class="sec" id="alone" aria-labelledby="alone-h">
+<div class="wrap">
+<div class="sec-head"><h2 id="alone-h">מה הוא יענה לבד, ומה ישאיר לכם</h2></div>
+<div class="two">
+<div><h3>יענה לבד</h3>${rows(ALONE)}</div>
+<div><h3>ישאיר לכם</h3>${rows(YOURS, 'yours')}<p class="quiet">כשאין באתר תשובה, הוא יגיד ללקוח שהוא בודק, במקום לנחש, וישלח לכם את השאלה. מה שתענו הוא יזכור לפעם הבאה.</p></div>
+</div>
+<p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
+</div>
+</section>
+
+<section class="sec close-sec" id="waitlist" aria-labelledby="waitlist-h">
+<div class="wrap narrow">
+<h2 id="waitlist-h">רוצים לדעת כשתורן נפתח?</h2>
+<p class="lede">משאירים טלפון או מייל, ונכתוב לכם כשאפשר להתחיל. את המחיר נפרסם באותו זמן.</p>
+${waitlistForm(cfg, '/toran')}
+</div>
+</section>`,
+  };
+};
+
 export default (cfg) => {
+  if (toranSoon(cfg)) return soonPage(cfg);
   const live = liveChannels(cfg);
   const soon = CHANNELS.filter((c) => !live.includes(c));
   const where = `${inList(live)}${soon.length ? `, ובקרוב גם ${inList(soon)}` : ''}`;

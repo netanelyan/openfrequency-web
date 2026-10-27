@@ -16,6 +16,9 @@ const foundingOff = (raw) => raw.price?.founding?.on === false;
 // Where a customer can write to a store; the ones in toran.channels are live, the rest are shown as coming.
 export const CHANNELS = ['whatsapp', 'instagram', 'messenger', 'email'];
 export const FACTS = {
+  // The switch: whether Toran is on sale. 'live' is the site as it was; 'soon' keeps Toran on show with a "בקרוב"
+  // badge, and every way to buy it, start it or ask for its demo becomes a waitlist (README, "Toran: live or soon").
+  'products.toran': { label: 'תורן פתוח למכירה (live) או בקרוב (soon)', kind: ['live', 'soon'] },
   domain: { label: 'הדומיין', kind: 'text' },
   whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
   'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
@@ -63,8 +66,9 @@ export const FACTS = {
 
 // The config, read so that nothing missing can be shown as a guess. An empty value ('' or null) is missing.
 // The real build fails on any missing key, used or not; a draft shows each one as a visible [placeholder].
+// SITE_CONFIG points at another file instead (the tests build both ways of the switch from a copy).
 export function readConfig(draft) {
-  const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf8'));
+  const raw = JSON.parse(fs.readFileSync(process.env.SITE_CONFIG || path.join(ROOT, 'site.config.json'), 'utf8'));
   const missing = new Map();
   const empty = (v) => v === null || v === '' || v === undefined || (Array.isArray(v) && v.length === 0);
   const at = (key) => key.split('.').reduce((o, k) => (o == null ? undefined : o[k]), raw);
@@ -109,6 +113,9 @@ export function readConfig(draft) {
   const has = (key) => !empty(at(key));
   return { get, t, ph, has, missing, draft, banner: false };
 }
+
+// While products.toran is 'soon', Toran is shown but not sold: no demo, no price, no way to start it, only a waitlist.
+export const toranSoon = (cfg) => cfg.get('products.toran') === 'soon';
 
 // Shekels the way the site writes them: 1,290 ₪, and 0.15 ₪ for a fraction.
 export const ils = (n) => `${n.toLocaleString('he-IL', { maximumFractionDigits: 2 })} ₪`;
