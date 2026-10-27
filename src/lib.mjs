@@ -19,6 +19,7 @@ export const FACTS = {
   // The switch: whether Toran is on sale. 'live' is the site as it was; 'soon' keeps Toran on show with a "בקרוב"
   // badge, and every way to buy it, start it or ask for its demo becomes a waitlist (README, "Toran: live or soon").
   'products.toran': { label: 'תורן פתוח למכירה (live) או בקרוב (soon)', kind: ['live', 'soon'] },
+  'products.assistant': { label: 'העוזר בוואטסאפ שלנו פועל (live) או בקרוב (soon)', kind: ['live', 'soon'] },
   domain: { label: 'הדומיין', kind: 'text' },
   whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
   'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
@@ -116,6 +117,9 @@ export function readConfig(draft) {
 
 // While products.toran is 'soon', Toran is shown but not sold: no demo, no price, no way to start it, only a waitlist.
 export const toranSoon = (cfg) => cfg.get('products.toran') === 'soon';
+// The assistant on our WhatsApp number (Teder's approvals in a message, Toran's owner line) waits for that number to be
+// connected at Meta, apart from whether Toran is sold: products.assistant "soon" until then, "live" after.
+export const assistantSoon = (cfg) => cfg.get('products.assistant') === 'soon';
 
 // Shekels the way the site writes them: 1,290 ₪, and 0.15 ₪ for a fraction.
 export const ils = (n) => `${n.toLocaleString('he-IL', { maximumFractionDigits: 2 })} ₪`;

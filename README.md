@@ -31,6 +31,12 @@ and not saved again. Without JS it lands on `/thanks/waitlist`, which is built o
 itself doesn't read the switch (only `server/lead.mjs` is deployed to the server, not the config): it keeps accepting a
 Toran demo post, though no page sends one while Toran is soon.
 
+
+**The assistant on WhatsApp** has its own switch, `"assistant"` in the same object. It waits for our WhatsApp number to be
+connected at Meta, not for Toran's sale. `"soon"` (now): the home page shows Teder's approvals on Teder's own screen (one
+click, all at once, a rejection that comes back rewritten, TikTok's drafts), with approving on WhatsApp as one line marked
+"בקרוב". `"live"`: the section about approving Teder's slideshows on WhatsApp comes back as it was.
+
 ## Build
 
 ```sh

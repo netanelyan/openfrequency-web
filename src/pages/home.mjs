@@ -7,11 +7,11 @@
 // the way to its waitlist instead of a demo; every line about Toran says what it will do.
 import fs from 'node:fs';
 import path from 'node:path';
-import { CHANNELS, ROOT, esc, mark, glyphOnly, toranSoon } from '../lib.mjs';
+import { CHANNELS, ROOT, esc, mark, glyphOnly, toranSoon, assistantSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { askBox, askSoon, toranPriceLine } from '../sections.mjs';
 import { priceLine } from './join.mjs';
-import { reel } from '../teder.mjs';
+import { approvals, reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
 import { niches } from '../niches.mjs';
@@ -173,6 +173,27 @@ const tederAssistant = (cfg) => `
 </div>
 </section>`;
 
+// While the assistant is soon (products.assistant), Teder's approvals are shown where they happen today: Teder's own
+// screen, with the day's slideshows, one click each or all at once, a rejection with a reason that comes back
+// rewritten, and the approved one waiting in TikTok's drafts. The WhatsApp way is one line, marked "בקרוב".
+const tederDashboard = () => `
+<section class="sec owner-sec teder-owner" id="owner-teder" aria-labelledby="owner-teder-h">
+<div class="wrap owner-grid">
+<div class="owner-text">
+<p class="kicker">לפני שמשהו עולה</p>
+<h2 id="owner-teder-h">כל מצגת של תדר <span class="hl">מחכה לאישור שלכם</span></h2>
+<p class="lede">המצגות של היום מחכות לכם במסך אחד של תדר. רואים כל אחת, מאשרים, ורק מה שאישרתם עולה.</p>
+<ul class="checks">
+<li><b>מאשרים בלחיצה.</b> כל מצגת לבד, או את כל המצגות של היום בבת אחת.</li>
+<li><b>מצגת שלא מתאימה חוזרת מתוקנת.</b> דוחים אותה, כותבים במילים שלכם מה לשנות, ותדר כותב גרסה חדשה לאישור.</li>
+<li><b>מה שאישרתם מחכה בטיוטות של טיקטוק.</b> נשאר רק להוסיף סאונד ולפרסם.</li>
+<li><b>לאשר מהוואטסאפ ${soonBadge}</b> העוזר ישלח לכם את המצגות לוואטסאפ, ותאשרו שם בהודעה.</li>
+</ul>
+</div>
+<div class="stage glass">${approvals()}</div>
+</div>
+</section>`;
+
 export default (cfg) => ({
   path: '/',
   title: 'OpenFrequency, תורן ותדר',
@@ -180,7 +201,10 @@ export default (cfg) => ({
     ? 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן, שיענה ללקוחות של החנות 24/7 מתוך מה שכתוב באתר, נפתח בקרוב.'
     : `תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,
   // "Who we are" is in the footer (layout.mjs), on every page.
-  body: (toranSoon(cfg)
-    ? [hero(cfg), trust(cfg), clients(), niches(cfg), tederAssistant(cfg), assistant(cfg), ask(cfg)]
-    : [hero(cfg), trust(cfg), clients(), niches(cfg), assistant(cfg), tederAssistant(cfg), ask(cfg)]).join('\n'),
+  body: (() => {
+    const teder = assistantSoon(cfg) ? tederDashboard() : tederAssistant(cfg);
+    return (toranSoon(cfg)
+      ? [hero(cfg), trust(cfg), clients(), niches(cfg), teder, assistant(cfg), ask(cfg)]
+      : [hero(cfg), trust(cfg), clients(), niches(cfg), assistant(cfg), teder, ask(cfg)]).join('\n');
+  })(),
 });
