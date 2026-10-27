@@ -118,13 +118,21 @@ test('with "open", /join starts with sign-up and its price, then the sample form
   assert.match(pages['index.html'], /<a href="\/join">הצטרפות<\/a>/);
 });
 
-test('with "open" and Toran live, /join keeps the form first and adds Teder\'s sign-up after it', () => {
-  const join = main(built.openLive.pages['join/index.html']);
-  const form = join.indexOf('data-form="join"'), signup = join.indexOf(`href="${SIGNUP}"`);
-  assert.ok(form > 0 && signup > form);
+test('with "open" and Toran live, sign-up is the first way in for both products, on /join, /toran and the home page', () => {
+  const { pages } = built.openLive;
+  const TORAN_SIGNUP = SIGNUP.replace('p=teder', 'p=toran');
+  const join = main(pages['join/index.html']);
+  const form = join.indexOf('data-form="join"'), toran = join.indexOf(`href="${TORAN_SIGNUP}"`), teder = join.indexOf(`href="${SIGNUP}"`);
+  assert.ok(toran > 0 && teder > 0 && form > toran && form > teder, 'both sign-up buttons come before the demo form');
   assert.match(join, /<input type="checkbox" name="toran" value="1" checked>/);
   assert.match(join, /<button class="btn primary" type="submit">לקבל דמו<\/button>/);
-  assert.match(join, /מה קורה אחרי הטופס/);
+  assert.match(join, /מה קורה אחרי ההרשמה[\s\S]*נרשמים ומשלמים/);
+  // Toran's page: the sign-up in the first screen and on the price card, the demo as the second way.
+  const page = main(pages['toran/index.html']);
+  assert.equal(page.split(`href="${TORAN_SIGNUP}"`).length - 1, 2);
+  assert.match(page, /href="#demo">לנסות את תורן על החנות שלכם/);
+  // The home page's door for Toran.
+  assert.ok(main(pages['index.html']).includes(`href="${TORAN_SIGNUP}">להצטרף לתורן</a>`));
 });
 
 test('with "open", the FAQ and the support export say how to sign up and cancel', () => {

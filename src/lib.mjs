@@ -130,7 +130,9 @@ export const assistantSoon = (cfg) => cfg.get('products.assistant') === 'soon';
 // While signup is 'open', Teder's main ways in go to accounts' sign-up, where a business opens its account and pays.
 // p=teder is a hint for the form; accounts ignores what it doesn't read.
 export const signupOpen = (cfg) => cfg.get('signup') === 'open';
-export const SIGNUP_URL = 'https://accounts.openfrequency.co.il/signup?p=teder';
+// Accounts' sign-up, with the product the visitor came from ticked (?p=).
+export const signupUrl = (product) => `https://accounts.openfrequency.co.il/signup?p=${product}`;
+export const SIGNUP_URL = signupUrl('teder');
 
 // Shekels the way the site writes them: 1,290 ₪, and 0.15 ₪ for a fraction.
 export const ils = (n) => `${n.toLocaleString('he-IL', { maximumFractionDigits: 2 })} ₪`;

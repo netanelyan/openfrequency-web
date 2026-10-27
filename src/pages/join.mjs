@@ -8,7 +8,7 @@
 // sign-up's. With Toran live, the form stays first and Teder's sign-up button follows it.
 import { mark, signupOpen, toranSoon } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
-import { priceLine, tederStart, toranPriceLine } from '../sections.mjs';
+import { priceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
 import { TEDER, TORAN } from './faq.mjs';
 
 export { priceLine };
@@ -37,6 +37,12 @@ const SIGNUP_STEPS = [
   ['עוברים על המצגות לדוגמה', 'תדר מכין חמש מצגות מהמקורות שבחרתם, ואתם עוברים עליהן לפני שמשהו עולה.'],
   ['מעלים לאוויר', 'מחברים את טיקטוק ואת אינסטגרם, ומכאן המצגות מחכות לאישור שלכם במסך אחד.'],
 ];
+// With Toran live and sign-up open: the steps for either product, since the visitor picks on accounts' page.
+const SIGNUP_STEPS_BOTH = [
+  ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם, בוחרים תורן, תדר או שניהם, ומשלמים בחשבון.'],
+  ['מקימים לפי הצעדים', 'בתורן מוסיפים את האתר של החנות ומחברים את הוואטסאפ. בתדר בוחרים מקורות ועוברים על המצגות לדוגמה.'],
+  ['מתחילים לעבוד', 'תורן עונה ללקוחות, ותדר שולח לכם מצגות לאישור. הכול מנוהל מהחשבון שלכם.'],
+];
 const ASKED_SIGNUP = ['תדר יכול לפרסם משהו בלי שאישרתי?', 'מאיפה הוא לוקח את העובדות?', 'איך מבטלים את תדר?'];
 
 function price(cfg) {
@@ -57,23 +63,28 @@ ${items.map(([name, label, m, s, href]) => `<li>${mark(name, 40)}<span><b>${labe
 export default (cfg) => {
   const soon = toranSoon(cfg);
   const open = signupOpen(cfg);
-  const signupFirst = open && soon;
+  // Sign-up is the first way in whenever it is open; the demo or sample form follows, for who wants to see one first.
+  const signupFirst = open;
   const asked = open ? ASKED_SIGNUP : ASKED_SOON;
   const faq = soon ? TEDER(cfg).filter((x) => x && asked.includes(x[0])) : TORAN(cfg).filter((x) => x && ASKED.includes(x[0]));
   const ways = `${soon ? '<p class="join-tools">רוצים לדעת כשתורן נפתח? <a href="/toran#waitlist">לקבל עדכון</a></p>\n' : ''}<p class="join-tools">כבר עובדים איתנו? <a href="${TOOLS}">לניהול הכלים</a></p>`;
   const first = signupFirst ? `
 <section class="sec join-hero" aria-labelledby="hero-h">
 <div class="wrap narrow">
-<h1 id="hero-h">מתחילים עם תדר</h1>
+${soon ? `<h1 id="hero-h">מתחילים עם תדר</h1>
 <p class="lede">פותחים חשבון ומקימים את תדר בעצמכם. בוחרים מקורות, עוברים על המצגות לדוגמה שהוא מכין, ומעלים לאוויר. תורן נפתח בקרוב.</p>
-${tederStart(cfg, { wrap: 'start join-start' })}
+${tederStart(cfg, { wrap: 'start join-start' })}` : `<h1 id="hero-h">מתחילים עם תורן, עם תדר או עם שניהם</h1>
+<p class="lede">פותחים חשבון ומקימים בעצמכם, לפי הצעדים.</p>
+${toranStart(cfg, { wrap: 'start join-start' })}
+${tederStart(cfg, { wrap: 'start join-start' })}`}
 </div>
 </section>
 
 <section class="sec" id="sample" aria-labelledby="sample-h">
 <div class="wrap narrow">
-<h2 id="sample-h">רוצים קודם לראות מצגת מהחנות שלכם?</h2>
-<p class="lede">משאירים את הכתובת של החנות ומספר וואטסאפ, ואנחנו מכינים לכם מצגת לדוגמה מהאתר שלכם.</p>
+${soon ? `<h2 id="sample-h">רוצים קודם לראות מצגת מהחנות שלכם?</h2>
+<p class="lede">משאירים את הכתובת של החנות ומספר וואטסאפ, ואנחנו מכינים לכם מצגת לדוגמה מהאתר שלכם.</p>` : `<h2 id="sample-h">רוצים קודם לראות דמו מהחנות שלכם?</h2>
+<p class="lede">בוחרים במה, משאירים את הכתובת של החנות, ואנחנו בונים לכם דמו מהאתר שלכם.</p>`}
 ${joinForm(cfg)}
 ${ways}
 </div>
@@ -92,7 +103,9 @@ ${open ? `<p class="join-tools">את תדר אפשר גם לפתוח לבד, ב�
     forms: true,
     title: 'הצטרפות | OpenFrequency',
     description: signupFirst
-      ? 'פותחים חשבון בתדר ומקימים אותו בעצמכם, או משאירים את הכתובת של החנות ומקבלים קודם מצגת לדוגמה מהאתר. תורן נפתח בקרוב.'
+      ? soon
+        ? 'פותחים חשבון בתדר ומקימים אותו בעצמכם, או משאירים את הכתובת של החנות ומקבלים קודם מצגת לדוגמה מהאתר. תורן נפתח בקרוב.'
+        : 'פותחים חשבון בתורן, בתדר או בשניהם ומקימים בעצמכם, או משאירים את הכתובת של החנות ומקבלים קודם דמו מהאתר.'
       : soon
         ? 'משאירים את הכתובת של החנות ומספר וואטסאפ, ואנחנו מכינים לכם מצגת לדוגמה של תדר מהאתר. תורן נפתח בקרוב.'
         : 'בוחרים בתורן, בתדר או בשניהם, משאירים את הכתובת של החנות, ואנחנו בונים לכם דמו מהאתר.',
@@ -102,7 +115,7 @@ ${open ? `<p class="join-tools">את תדר אפשר גם לפתוח לבד, ב�
 <div class="wrap narrow">
 <h2 id="after-h">${signupFirst ? 'מה קורה אחרי ההרשמה' : 'מה קורה אחרי הטופס'}</h2>
 <ol class="after-steps">
-${(signupFirst ? SIGNUP_STEPS : soon ? AFTER_SOON : AFTER).map(([h, p]) => `<li><h3>${h}</h3><p>${p}</p></li>`).join('\n')}
+${(signupFirst ? (soon ? SIGNUP_STEPS : SIGNUP_STEPS_BOTH) : soon ? AFTER_SOON : AFTER).map(([h, p]) => `<li><h3>${h}</h3><p>${p}</p></li>`).join('\n')}
 </ol>
 </div>
 </section>

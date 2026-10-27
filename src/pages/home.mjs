@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { CHANNELS, ROOT, esc, mark, glyphOnly, signupOpen, toranSoon, assistantSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
-import { askBox, askSoon, priceLine, tederStart, toranPriceLine } from '../sections.mjs';
+import { askBox, askSoon, priceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -39,7 +39,11 @@ ${soon
     ? doorTop('toran', mark('toran', 48), `תורן ${soonBadge}`, 'יענה ללקוחות של החנות 24/7', 'יענה ללקוחות של החנות מתוך מה שכתוב באתר, ומה שלא כתוב שם ישאל אתכם. אנחנו פותחים אותו בקרוב.')
     : doorTop('toran', mark('toran', 48), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
 <div class="door-in" id="door-toran-in">
-<div class="door-act">${soon ? '<a class="btn" href="/toran#waitlist">לקבל עדכון כשתורן נפתח</a><a class="btn" href="/toran">מה תורן יעשה</a>' : '<a class="btn primary" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn" href="/toran">עוד על תורן</a>'}</div>
+${soon
+    ? '<div class="door-act"><a class="btn" href="/toran#waitlist">לקבל עדכון כשתורן נפתח</a><a class="btn" href="/toran">מה תורן יעשה</a></div>'
+    : signupOpen(cfg)
+      ? toranStart(cfg, { wrap: 'start door-start', act: 'door-act', more: '<a class="btn" href="/toran">עוד על תורן</a>', demo: '/toran#demo' })
+      : '<div class="door-act"><a class="btn primary" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn" href="/toran">עוד על תורן</a></div>'}
 <div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
 <p class="pop" data-pop>${mark('toran', 28)}<span class="pop-h"><b>תורן</b><small>בטלפון שלכם, 02:16</small></span><span class="pop-t">לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?</span></p>

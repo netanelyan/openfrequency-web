@@ -1,5 +1,5 @@
 // What more than one page uses: words that open WhatsApp to us, and the question box on the home page.
-import { SIGNUP_URL, esc, ils, mark, signupOpen, toranSoon } from './lib.mjs';
+import { SIGNUP_URL, esc, ils, mark, signupOpen, signupUrl, toranSoon } from './lib.mjs';
 
 // Words that open WhatsApp to us; plain words in a draft without the number.
 export const waWords = (cfg, words) => {
@@ -80,6 +80,14 @@ export const tederStart = (cfg, { sample, cls = 'btn primary', wrap = 'start', m
 ${more ? `<div class="${act}">` : ''}<a class="${cls}" href="${SIGNUP_URL}">${SIGNUP_LABEL}</a>${more ? `${more}</div>` : ''}
 <p class="start-price">${priceLine(cfg, 'teder.monthly', 'teder.setup')}</p>
 ${sample ? sampleLine(sample) : ''}</div>`;
+
+// Toran's way in once it is live and sign-up is open: the same button to accounts' sign-up, its price, and the demo
+// for who wants to see Toran answer on their own store first.
+export const TORAN_SIGNUP_LABEL = 'להצטרף לתורן';
+export const toranStart = (cfg, { demo, cls = 'btn primary', wrap = 'start', more = '', act = 'start-act' } = {}) => `<div class="${wrap}">
+${more ? `<div class="${act}">` : ''}<a class="${cls}" href="${signupUrl('toran')}">${TORAN_SIGNUP_LABEL}</a>${more ? `${more}</div>` : ''}
+<p class="start-price">${toranPriceLine(cfg)}</p>
+${demo ? `<p class="start-alt">רוצים קודם לראות אותו עונה על החנות שלכם? <a href="${demo}">לנסות את תורן על החנות שלכם</a></p>` : ''}</div>`;
 
 // How to stop, once the terms are set: the commitment, the last month, and (Toran) the number and the conversations.
 function termsLine(cfg, toran) {

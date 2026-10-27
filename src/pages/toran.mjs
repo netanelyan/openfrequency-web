@@ -7,10 +7,10 @@
 // a channel works before it does. The owners' questions are on /faq.
 // While Toran is soon (products.toran in site.config.json) the page shows what it will do: a "בקרוב" banner on top,
 // every line in the future, no price, and the waitlist where the demo form was.
-import { CHANNELS, mark, toranSoon } from '../lib.mjs';
+import { CHANNELS, mark, signupOpen, signupUrl, toranSoon } from '../lib.mjs';
 import { channelWindow, inList, inbox, liveChannels } from '../channels.mjs';
 import { demoForm, waitlistForm } from '../forms.mjs';
-import { toranPricing } from '../sections.mjs';
+import { TORAN_SIGNUP_LABEL, toranPricing, toranStart } from '../sections.mjs';
 
 // What it answers alone comes from the shapes of question in Toran's eval (openfrequency-toran, docs/milestones.md,
 // milestone 3); what it leaves to the owner is what that eval checks it hands off.
@@ -105,7 +105,7 @@ export default (cfg) => {
 <div class="hero-head">${mark('toran', 72, 'תורן')}<h1 id="hero-h"><span class="hl">תורן אחד</span> עונה ללקוחות שלכם ${where}</h1></div>
 <div class="hero-text">
 <p class="lede">תורן קורא את האתר של החנות ועונה ללקוחות <span class="hl" dir="ltr">24/7</span>, מתוך מה שכתוב בו. בכל מקום שכותבים לו, הוא עונה אותו דבר, כי זו אותה חנות.</p>
-<a class="btn primary hero-cta" href="#demo">לנסות את תורן על החנות שלכם</a>
+${signupOpen(cfg) ? toranStart(cfg, { wrap: 'start hero-cta', demo: '#demo' }) : '<a class="btn primary hero-cta" href="#demo">לנסות את תורן על החנות שלכם</a>'}
 </div>
 ${channelWindow(cfg)}
 </div>
@@ -132,7 +132,7 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
-${toranPricing(cfg, { cta: ['#demo', 'לנסות את תורן על החנות שלכם'], includes: [
+${toranPricing(cfg, { cta: signupOpen(cfg) ? [signupUrl('toran'), TORAN_SIGNUP_LABEL] : ['#demo', 'לנסות את תורן על החנות שלכם'], includes: [
   `עונה ללקוחות 24/7 ${soon.length ? `בכל הערוצים הפעילים, ${inList(live)}` : inList(live)}, מתוך מה שכתוב באתר שלכם`,
   'תזכורות על עגלה נטושה, למי שהסכים לקבל מכם הודעות, כלולות במחיר',
   'כל השיחות בתיבה אחת, ושאלה שאין עליה תשובה באתר מגיעה אליכם',
