@@ -20,6 +20,10 @@ export const FACTS = {
   // badge, and every way to buy it, start it or ask for its demo becomes a waitlist (README, "Toran: live or soon").
   'products.toran': { label: 'תורן פתוח למכירה (live) או בקרוב (soon)', kind: ['live', 'soon'] },
   'products.assistant': { label: 'העוזר בוואטסאפ שלנו פועל (live) או בקרוב (soon)', kind: ['live', 'soon'] },
+  // Whether a business can sign up to Teder on its own, at accounts' /signup, and pay there. 'closed' is the site as it
+  // was (Teder's ways in are the free sample); 'open' sends them to sign-up with the price beside it, keeps the sample
+  // as the second way, and shows the self-serve terms (README, "Sign-up: open or closed").
+  signup: { label: 'ההרשמה לתדר פתוחה (open) או סגורה (closed)', kind: ['open', 'closed'] },
   domain: { label: 'הדומיין', kind: 'text' },
   whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
   'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
@@ -53,6 +57,9 @@ export const FACTS = {
   'legal.host': { label: 'באיזו מדינה השרת', kind: 'text' },
   'legal.leadMonths': { label: 'כמה חודשים שומרים פניות מהטופס', kind: 'number' },
   'legal.updated': { label: 'תאריך העדכון של העמודים המשפטיים, YYYY-MM-DD', kind: 'text' },
+  // The date of the terms with the self-serve section, shown on /terms while sign-up is open. It is the terms version
+  // accounts stores on each sign-up (openfrequency-accounts, TERMS_VERSION in src/accounts/signup.js).
+  'legal.signupUpdated': { label: 'תאריך תנאי השימוש כשההרשמה פתוחה, YYYY-MM-DD', kind: 'text', unless: (raw) => raw.signup !== 'open' },
   'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
   'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },
   'teder.monthly': { label: 'מחיר', kind: 'number' },
@@ -120,6 +127,10 @@ export const toranSoon = (cfg) => cfg.get('products.toran') === 'soon';
 // The assistant on our WhatsApp number (Teder's approvals in a message, Toran's owner line) waits for that number to be
 // connected at Meta, apart from whether Toran is sold: products.assistant "soon" until then, "live" after.
 export const assistantSoon = (cfg) => cfg.get('products.assistant') === 'soon';
+// While signup is 'open', Teder's main ways in go to accounts' sign-up, where a business opens its account and pays.
+// p=teder is a hint for the form; accounts ignores what it doesn't read.
+export const signupOpen = (cfg) => cfg.get('signup') === 'open';
+export const SIGNUP_URL = 'https://accounts.openfrequency.co.il/signup?p=teder';
 
 // Shekels the way the site writes them: 1,290 ₪, and 0.15 ₪ for a fraction.
 export const ils = (n) => `${n.toLocaleString('he-IL', { maximumFractionDigits: 2 })} ₪`;

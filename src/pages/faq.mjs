@@ -2,9 +2,8 @@
 // While Toran is soon (products.toran in site.config.json), Teder's group comes first and Toran's carries "בקרוב": its
 // answers say what it will do, and the questions that only make sense once it is on sale (its demo, its price today)
 // are out or say so.
-import { ils, mark, toranSoon } from '../lib.mjs';
-import { toranPriceLine, waWords } from '../sections.mjs';
-import { priceLine } from './join.mjs';
+import { SIGNUP_URL, mark, signupOpen, toranSoon } from '../lib.mjs';
+import { priceLine, toranPriceLine, waWords } from '../sections.mjs';
 
 const TORAN_SOON = () => [
   ['מתי תורן נפתח?',
@@ -59,9 +58,13 @@ export const TORAN = (cfg) => toranSoon(cfg) ? TORAN_SOON(cfg) : [
     `שתי חבילות, לפי מספר השיחות בחודש: ${toranPriceLine(cfg)} הדמו בחינם. הפרטים <a href="/toran#price">בעמוד של תורן</a>.`],
 ];
 
+// While sign-up is open (signup in site.config.json), the answers say what holds for a business that set Teder up on its
+// own: it signs up and pays in its account, picks its sources, and cancels there.
 export const TEDER = (cfg) => [
   (cfg.has('teder.monthly') || cfg.banner) && ['כמה עולה תדר?',
-    `${priceLine(cfg, 'teder.monthly', 'teder.setup')} הפרטים <a href="/teder#price">בעמוד של תדר</a>.`],
+    signupOpen(cfg)
+      ? `${priceLine(cfg, 'teder.monthly', 'teder.setup')} משלמים מראש, בחשבון שלכם, ונרשמים <a href="${SIGNUP_URL}">בעמוד ההרשמה</a>. הפרטים <a href="/teder#price">בעמוד של תדר</a>.`
+      : `${priceLine(cfg, 'teder.monthly', 'teder.setup')} הפרטים <a href="/teder#price">בעמוד של תדר</a>.`],
   ['תדר יכול לפרסם משהו בלי שאישרתי?',
     'לא. כל מצגת יוצאת רק אחרי שמישהו אישר אותה, ובשבת ובחג הוא לא מפרסם בכלל.'],
   ['מה נחשב מצגת?',
@@ -71,7 +74,9 @@ export const TEDER = (cfg) => [
   [`מה קורה כשמגיעים ל-${cfg.t('teder.slideshows')} מצגות?`,
     `${cfg.t('teder.slideshows')} המצגות המוצעות הן מה שכלול בחודש. מה שלא השתמשתם בו לא עובר לחודש הבא, ובתחילת כל חודש מתחילים מחדש. צריכים יותר? ${waWords(cfg, 'דברו איתנו')}.`],
   ['מאיפה הוא לוקח את העובדות?',
-    'רק ממקורות שאישרנו מראש. כל עובדה בשקופית נשענת על ציטוט מילה במילה מהמקור, ומספר שלא מופיע בציטוט לא עולה על שקופית.'],
+    `${signupOpen(cfg) ? 'רק מהמקורות שבחרתם בהקמה, מתוך אלה שתדר מצא לחנות שלכם.' : 'רק ממקורות שאישרנו מראש.'} כל עובדה בשקופית נשענת על ציטוט מילה במילה מהמקור, ומספר שלא מופיע בציטוט לא עולה על שקופית.`],
+  signupOpen(cfg) && ['איך מבטלים את תדר?',
+    'בחשבון שלכם, בכל זמן. תדר ממשיך לעבוד עד סוף התקופה ששילמתם, ואחרי זה לא מחייבים אתכם יותר. שם אפשר גם למחוק את החשבון ואת המידע שבו. הפרטים <a href="/terms#t-teder-sub">בתנאי השימוש</a>.'],
 ];
 
 const group = (id, name, label, items) => `

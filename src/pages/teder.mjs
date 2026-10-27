@@ -1,23 +1,33 @@
 // Teder's page, in the shape of Toran's, on its own violet: the headline and a button down to the demo form, beside its
 // slideshows under TikTok and Instagram tabs; the one screen where the day's slideshows wait for approval; what it
 // does alone and what is left for you; and the demo form at the end. What it does comes from openfrequency-teder's
-// README ("What it does").
-import { mark } from '../lib.mjs';
+// README ("What it does", "Publishing").
+// While sign-up is open (signup in site.config.json), the first screen's button and the price's go to accounts'
+// sign-up, with the price beside it, and the form at the end is the second way, a sample slideshow first. The lists say
+// what a business that set Teder up on its own does: it picks the sources and connects its accounts.
+import { SIGNUP_URL, mark, signupOpen } from '../lib.mjs';
 import { approvals, platformWindow } from '../teder.mjs';
 import { demoForm } from '../forms.mjs';
-import { priceSection, waWords } from '../sections.mjs';
+import { SIGNUP_LABEL, priceSection, sampleLine, tederStart, waWords } from '../sections.mjs';
 
-const ALONE = [
+const alone = (open) => [
   'כותב את המצגת בקול של החשבון, לפי מדריך הכתיבה שלו',
-  'קורא רק ממקורות שאישרנו, וכל עובדה בשקופית נשענת על ציטוט מילה במילה',
+  `${open ? 'קורא רק מהמקורות שבחרתם' : 'קורא רק ממקורות שאישרנו'}, וכל עובדה בשקופית נשענת על ציטוט מילה במילה`,
   'מעצב את השקופיות, עם צילום ברישיון שנבדק מול השקופית או גרף מהמספרים שלה',
   'מכין כל מצגת בגודל של טיקטוק ובגודל של אינסטגרם',
-  'מפרסם בשעה שנקבעה, ובשבת ובחג לא מפרסם',
+  'מפרסם באינסטגרם בשעה שנקבעה, ובטיקטוק שם את המצגת בטיוטות ומזכיר לכם לפרסם. בשבת ובחג לא מפרסם',
 ];
-const YOURS = ['לאשר כל מצגת לפני שהיא עולה. לחיצה אחת מאשרת אותה', 'לדחות מצגת שלא מתאימה, לכתוב למה, ולקבל גרסה חדשה'];
+const yours = (open) => [
+  ...(open ? ['בהקמה, לבחור את המקורות ולעבור על המצגות לדוגמה', 'לחבר את טיקטוק ואת אינסטגרם, פעם אחת'] : []),
+  'לאשר כל מצגת לפני שהיא עולה. לחיצה אחת מאשרת אותה',
+  'לדחות מצגת שלא מתאימה, לכתוב למה, ולקבל גרסה חדשה',
+  'בטיקטוק, להוסיף סאונד ולפרסם את המצגת מהטיוטות',
+];
 const rows = (items, cls = '') => `<ul class="rows${cls ? ' ' + cls : ''}">${items.map((s) => `<li><span class="dot" aria-hidden="true"></span><span>${s}</span></li>`).join('')}</ul>`;
 
-export default (cfg) => ({
+export default (cfg) => {
+  const open = signupOpen(cfg);
+  return {
   path: '/teder',
     image: 'teder',
   forms: true,
@@ -30,7 +40,7 @@ export default (cfg) => ({
 ${mark('teder', 72, 'תדר')}
 <h1 id="hero-h"><span class="hl">מצגות אוטומטיות</span> בעברית לטיקטוק ולאינסטגרם</h1>
 <p class="lede">תדר כותב ומעצב את המצגות, ומפרסם כל אחת רק אחרי שמישהו אישר אותה. אותה מצגת יוצאת בגודל של טיקטוק ובגודל של אינסטגרם.</p>
-<a class="btn primary hero-cta" href="#demo">לנסות את תדר על החנות שלכם</a>
+${open ? tederStart(cfg, { wrap: 'start hero-cta', sample: '#demo' }) : '<a class="btn primary hero-cta" href="#demo">לנסות את תדר על החנות שלכם</a>'}
 </div>
 ${platformWindow()}
 </div>
@@ -51,19 +61,19 @@ ${platformWindow()}
 <div class="wrap">
 <div class="sec-head"><h2 id="alone-h">מה הוא עושה לבד, ומה נשאר לכם</h2></div>
 <div class="two">
-<div><h3>עושה לבד</h3>${rows(ALONE)}</div>
-<div><h3>נשאר לכם</h3>${rows(YOURS, 'yours')}</div>
+<div><h3>עושה לבד</h3>${rows(alone(open))}</div>
+<div><h3>נשאר לכם</h3>${rows(yours(open), 'yours')}</div>
 </div>
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
 
-${priceSection(cfg, { monthly: 'teder.monthly', setup: 'teder.setup', product: { name: 'teder', label: 'תדר', cta: ['#demo', 'לנסות את תדר על החנות שלכם'], includes: [
+${priceSection(cfg, { monthly: 'teder.monthly', setup: 'teder.setup', product: { name: 'teder', label: 'תדר', cta: open ? [SIGNUP_URL, SIGNUP_LABEL] : ['#demo', 'לנסות את תדר על החנות שלכם'], alt: open ? sampleLine('#demo') : '', includes: [
   `${cfg.t('teder.slideshows')} מצגות מוצעות בחודש לטיקטוק ולאינסטגרם, מוכנות לפרסום`,
   'בסגנון של העסק שלכם, וכל עובדה בהן נבדקת מול המקור',
   'כל מצגת עולה רק אחרי שאישרתם אותה',
   `עד ${cfg.t('teder.redos')} החלפות בחודש, כשמצגת לא יצאה כמו שצריך`,
-  'דוח תוצאות בכל חודש',
+  'דוח תוצאות שמגיע אליכם במייל בכל חודש',
 ], notes: [
   'החלפה היא מצגת שדחיתם עם סיבה, ובמקומה מקבלים גרסה חדשה. תיקון קטן בטקסט או בתמונה לא נחשב החלפה, ואין עליו הגבלה.',
   `צריכים יותר? ${waWords(cfg, 'דברו איתנו')}.`,
@@ -71,9 +81,10 @@ ${priceSection(cfg, { monthly: 'teder.monthly', setup: 'teder.setup', product: {
 ] } })}
 <section class="sec close-sec" aria-labelledby="demo-h">
 <div class="wrap narrow">
-<h2 id="demo-h">לנסות את תדר על החנות שלכם</h2>
+<h2 id="demo-h">${open ? 'רוצים קודם לראות מצגת מהחנות שלכם?' : 'לנסות את תדר על החנות שלכם'}</h2>
 <p class="lede">שולחים לנו את הכתובת של החנות, ואנחנו מכינים לכם מצגת לדוגמה מהאתר שלכם, בגודל של טיקטוק ושל אינסטגרם.</p>
 ${demoForm(cfg, '/teder', 'demo', 'teder')}
 </div>
 </section>`,
-});
+  };
+};

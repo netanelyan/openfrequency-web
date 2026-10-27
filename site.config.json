@@ -3,6 +3,7 @@
     "toran": "soon",
     "assistant": "soon"
   },
+  "signup": "closed",
   "domain": "openfrequency.co.il",
   "whatsapp": "972552536259",
   "demo": {
@@ -76,6 +77,7 @@
     "court": "אשדוד",
     "host": "גרמניה",
     "leadMonths": 6,
-    "updated": "2026-10-24"
+    "updated": "2026-10-24",
+    "signupUpdated": "2026-10-27"
   }
 }

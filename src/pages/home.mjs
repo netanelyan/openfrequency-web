@@ -5,12 +5,13 @@
 // page (/toran, /teder), and the questions have theirs (/faq).
 // While Toran is soon (products.toran in site.config.json), Teder's door comes first and Toran's carries "בקרוב", with
 // the way to its waitlist instead of a demo; every line about Toran says what it will do.
+// While sign-up is open (signup), Teder's door sends to accounts' sign-up with the price under it, and the sample
+// slideshow is the line after.
 import fs from 'node:fs';
 import path from 'node:path';
-import { CHANNELS, ROOT, esc, mark, glyphOnly, toranSoon, assistantSoon } from '../lib.mjs';
+import { CHANNELS, ROOT, esc, mark, glyphOnly, signupOpen, toranSoon, assistantSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
-import { askBox, askSoon, toranPriceLine } from '../sections.mjs';
-import { priceLine } from './join.mjs';
+import { askBox, askSoon, priceLine, tederStart, toranPriceLine } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -48,7 +49,9 @@ ${soon
   const tederDoor = `<article class="door teder-door" aria-labelledby="door-teder" data-door>
 ${doorTop('teder', `<span class="wave" aria-hidden="true">${glyphOnly('teder')}</span>`, 'תדר', 'מצגות לטיקטוק ולאינסטגרם', 'כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.')}
 <div class="door-in" id="door-teder-in">
-<div class="door-act"><a class="btn light" href="/teder#demo">לנסות את תדר על החנות שלכם</a><a class="btn on-color" href="/teder">עוד על תדר</a></div>
+${signupOpen(cfg)
+    ? tederStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', more: '<a class="btn on-color" href="/teder">עוד על תדר</a>', sample: '/teder#demo' })
+    : '<div class="door-act"><a class="btn light" href="/teder#demo">לנסות את תדר על החנות שלכם</a><a class="btn on-color" href="/teder">עוד על תדר</a></div>'}
 ${reel}
 </div>
 </article>`;

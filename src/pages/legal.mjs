@@ -1,12 +1,15 @@
 // The four legal pages: terms, privacy, information security and accessibility. In the serious register, and each
 // says only what the code does today (what is collected, where it goes, how long it stays). A fact that isn't set yet
 // is a [placeholder] in a draft and a build error for real. The legal name and number appear here and nowhere else.
-import { esc, toranSoon } from '../lib.mjs';
-import { waWords } from '../sections.mjs';
+// While sign-up is open (signup in site.config.json), the terms carry Teder's self-serve section (paying, cancelling
+// and deleting in the account) and its own date, legal.signupUpdated, the terms version accounts stores on sign-up.
+// Closed, they are the terms as they were.
+import { SIGNUP_URL, esc, signupOpen, toranSoon } from '../lib.mjs';
+import { priceLine, waWords } from '../sections.mjs';
 
-const updated = (cfg) => {
-  const v = cfg.get('legal.updated');
-  if (v == null) return cfg.ph('legal.updated');
+const updated = (cfg, key = 'legal.updated') => {
+  const v = cfg.get(key);
+  if (v == null) return cfg.ph(key);
   return esc(new Date(`${v}T12:00:00Z`).toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' }));
 };
 const mail = (cfg) => {
@@ -16,7 +19,7 @@ const mail = (cfg) => {
 const who = (cfg) => `OpenFrequency, עסק של <bdi>${cfg.t('legal.name')}</bdi>, עוסק מספר ${cfg.t('legal.number')}, מאשדוד`;
 
 // A page: the heading, the date, the sections listed at the top, then the sections. sections: [id, heading, html].
-function doc(cfg, { path, title, description, lede, sections }) {
+function doc(cfg, { path, title, description, lede, sections, date = 'legal.updated' }) {
   return {
     path,
     title: `${title} | OpenFrequency`,
@@ -26,7 +29,7 @@ function doc(cfg, { path, title, description, lede, sections }) {
 <div class="wrap narrow">
 <h1 id="legal-h">${title}</h1>
 <p class="lede">${lede}</p>
-<p class="legal-date">עודכן לאחרונה ב-${updated(cfg)}</p>
+<p class="legal-date">עודכן לאחרונה ב-${updated(cfg, date)}</p>
 <nav class="legal-toc" aria-label="בעמוד הזה"><ol>${sections.map(([id, h]) => `<li><a href="#${id}">${h}</a></li>`).join('')}</ol></nav>
 ${sections.map(([id, h, html]) => `<section class="legal-part" aria-labelledby="${id}"><h2 id="${id}">${h}</h2>${html}</section>`).join('\n')}
 </div>
@@ -37,8 +40,20 @@ const ul = (items) => `<ul>${items.map((x) => `<li>${x}</li>`).join('')}</ul>`;
 
 // ---------------------------------------------------------------- terms
 
+// Teder bought on its own, through the account. DRAFT for the owner (and a lawyer) to approve before sign-up opens.
+const tederSub = (cfg) => `<p>את תדר אפשר לפתוח לבד, בחשבון OpenFrequency ב-<a href="${SIGNUP_URL}" dir="ltr">accounts.openfrequency.co.il</a>. הסעיף הזה חל על מנוי לתדר שנפתח שם. אם יש סתירה בינו לבין סעיף אחר בתנאים, הסעיף הזה קובע.</p>
+${ul([
+  `<b>תשלום.</b> המנוי חודשי, ומשלמים עליו מראש, דרך החשבון. היום המחיר הוא ${priceLine(cfg, 'teder.monthly', 'teder.setup')} המנוי מתחדש בכל חודש, עד שמבטלים אותו.`,
+  '<b>דמי הקמה.</b> משלמים אותם פעם אחת, עם החודש הראשון. הם מכסים את פתיחת החשבון ואת המצגות הראשונות לדוגמה, שתדר מכין מהמקורות שבחרתם. אם מבטלים תוך 14 יום מהתשלום, ותדר עוד לא הכין לכם מצגות לדוגמה, מחזירים לכם את דמי ההקמה. אחרי שהמצגות לדוגמה הוכנו, דמי ההקמה לא מוחזרים.',
+  '<b>ביטול.</b> מבטלים בחשבון, בכל זמן, ולא צריך לכתוב לנו. תדר ממשיך לעבוד עד סוף התקופה ששילמתם, ואחרי זה לא מחייבים אתכם יותר. על התקופה שכבר שולמה לא מחזירים כסף, גם כשמבטלים באמצע.',
+  '<b>הזכויות שלכם לפי חוק.</b> אם חוק הגנת הצרכן חל עליכם, למשל על ביטול של עסקת מכר מרחוק, הזכויות שהוא נותן לכם נשמרות, גם כשהן רחבות ממה שכתוב כאן.',
+  '<b>מחיקת החשבון.</b> את החשבון ואת המידע שבו אפשר למחוק בעצמכם, מתוך החשבון. מחיקה מבטלת גם את המנוי, ועל מה שנשאר מהתקופה ששילמתם לא מחזירים כסף. כשאתם מוחקים, אנחנו מוחקים את החשבון, את המקורות וההגדרות שלו ואת העותקים שלנו של המצגות, ומנתקים את החיבור לטיקטוק ולאינסטגרם. חשבוניות ורישומי תשלום אנחנו שומרים כמה שחוק המס מחייב.',
+  '<b>מצגות שכבר עלו.</b> מה שפורסם נשאר בחשבונות שלכם בטיקטוק ובאינסטגרם, ואפשר למחוק אותו שם. אחרי שהמנוי נגמר אנחנו לא מפרסמים בהם יותר.',
+])}`;
+
 export const terms = (cfg) => doc(cfg, {
   path: '/terms',
+  date: signupOpen(cfg) ? 'legal.signupUpdated' : 'legal.updated',
   title: 'תנאי שימוש',
   description: 'התנאים של OpenFrequency לשימוש באתר, בתורן ובתדר: מחיר, ביטול, התשובות של תורן, האחריות שלכם כלפי הלקוחות שלכם, והגבלת האחריות שלנו.',
   lede: 'התנאים האלה חלים על האתר הזה, על תורן ועל תדר. כשאתם מצטרפים לאחד מהם, אתם מסכימים להם.',
@@ -51,13 +66,16 @@ export const terms = (cfg) => doc(cfg, {
 <p><b>תדר</b> כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, ומפרסם אותן בחשבונות שלכם רק אחרי שאישרתם כל אחת.</p>
 <p>הדמו בחינם, ואין חובה להצטרף אחריו.</p>`],
     ['t-account', 'הגישה שלכם', `<p>נכנסים לשירות עם המייל שלכם. אתם אחראים למי שנתתם לו גישה, ולשמור על המייל שלכם מפני אחרים. אם אתם חושבים שמישהו נכנס בלי רשות, כתבו לנו מיד ונסגור את הגישה.</p>`],
-    ['t-price', 'מחיר ותשלום', `<p>המחיר החודשי, דמי ההקמה ומה שהם כוללים כתובים בעמוד של כל מוצר. משלמים מראש, בתחילת כל חודש.${cfg.get('price.vat') === 'excluded' ? ' המחירים לא כוללים מע״מ, והוא מתווסף לחשבונית.' : ''} דמי הקמה משלמים פעם אחת, בחודש הראשון. כשיש הצעה לחנויות הראשונות, היא כתובה באותו עמוד, ואנחנו יכולים לסיים אותה בכל זמן. מי שהצטרף בזמן ההצעה שומר עליה לכל התקופה שכתובה בה.</p>
+    ['t-price', 'מחיר ותשלום', `<p>המחיר החודשי, דמי ההקמה ומה שהם כוללים כתובים בעמוד של כל מוצר. משלמים מראש, בתחילת כל חודש.${cfg.get('price.vat') === 'excluded' ? ' המחירים לא כוללים מע״מ, והוא מתווסף לחשבונית.' : ''} דמי הקמה משלמים פעם אחת, בחודש הראשון.${signupOpen(cfg) ? ' בתדר משלמים דרך החשבון, כמו שכתוב <a href="#t-teder-sub">בסעיף על המנוי לתדר</a>.' : ''} כשיש הצעה לחנויות הראשונות, היא כתובה באותו עמוד, ואנחנו יכולים לסיים אותה בכל זמן. מי שהצטרף בזמן ההצעה שומר עליה לכל התקופה שכתובה בה.</p>
 <p>בתורן, המחיר החודשי נקבע לפי החבילה, וכל חבילה מכסה מספר שיחות בחודש. אין חיוב נוסף על שיחה, ואת מה ש-Meta גובה על ההודעות אנחנו משלמים. מתי חנות עוברת חבילה, ואיך אנחנו מודיעים על זה מראש, כתוב בעמוד של תורן.</p>
 <p>אם נשנה את המחיר, נודיע לכם לפחות 30 יום מראש. אם לא מתאים לכם, אפשר להפסיק לפני שהשינוי מתחיל.</p>
 <p>אם תשלום לא עבר, נכתוב לכם. אם הוא לא הוסדר תוך 14 יום מההודעה, אנחנו יכולים לעצור את השירות עד שישולם. ביטול חיוב מול חברת האשראי על שירות שקיבלתם הוא הפרה של ההסכם, ואנחנו יכולים לגבות את הסכום ואת ההוצאות שנגרמו לנו בגללו.</p>`],
-    ['t-stop', 'הפסקה וביטול', `<p>אין התחייבות. כדי להפסיק, ${waWords(cfg, 'כותבים לנו')} או שולחים מייל ל-${mail(cfg)}. השירות ממשיך עד סוף החודש האחרון ששילמתם, ואז נעצר. על חלק מחודש לא מחזירים כסף. דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם.</p>
+    ['t-stop', 'הפסקה וביטול', `${signupOpen(cfg)
+      ? `<p>אין התחייבות. את תדר מבטלים בחשבון, כמו שכתוב <a href="#t-teder-sub">בסעיף על המנוי לתדר</a>. בתורן, כדי להפסיק, ${waWords(cfg, 'כותבים לנו')} או שולחים מייל ל-${mail(cfg)}. השירות ממשיך עד סוף החודש האחרון ששילמתם, ואז נעצר. על חלק מחודש לא מחזירים כסף. בתורן, דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם.</p>`
+      : `<p>אין התחייבות. כדי להפסיק, ${waWords(cfg, 'כותבים לנו')} או שולחים מייל ל-${mail(cfg)}. השירות ממשיך עד סוף החודש האחרון ששילמתם, ואז נעצר. על חלק מחודש לא מחזירים כסף. דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם.</p>`}
 <p>גם אנחנו יכולים להפסיק את השירות, בהודעה של 30 יום מראש. אם השתמשתם בשירות בניגוד לחוק או לתנאים האלה, אנחנו יכולים לעצור אותו מיד ולהגיד לכם למה.</p>
 <p>בתורן, מספר הוואטסאפ של החנות נשאר שלכם, ואנחנו מנתקים אותו מהצד שלנו. את השיחות אנחנו שומרים עוד ${cfg.t('price.keepDays')} יום אחרי שהשירות נעצר, כדי שתוכלו לבקש עותק שלהן, ואחר כך מוחקים אותן. חשבוניות אנחנו שומרים כמה שחוק המס מחייב.</p>`],
+    ...(signupOpen(cfg) ? [['t-teder-sub', 'המנוי לתדר', tederSub(cfg)]] : []),
     ['t-answers', 'התשובות של תורן', `<p>תורן הוא עוזר דיגיטלי שעונה לבד, מתוך מה שכתוב באתר שלכם. הוא יכול לטעות, למשל כשמשהו באתר לא מעודכן או כתוב בצורה שאפשר להבין בשתי דרכים. בשבועיים הראשונים אנחנו עוברים איתכם על כל שיחה ומתקנים מה שצריך, ואחר כך כל השיחות מחכות לכם בתיבה אחת.</p>
 ${ul([
   'אתם אחראים שמה שכתוב באתר שלכם נכון ומעודכן: מחירים, מלאי, משלוחים, החזרות. תשובה של תורן מתוך האתר שלכם היא כמו מה שהאתר עצמו אומר ללקוח.',

@@ -1,6 +1,8 @@
 // The demo forms, Toran's and Teder's, and every word they can show: the thank-you that takes a form's place, and the messages under the
 // button. They live in the page as <template>s, which src/form.js copies in.
-import { esc, mark, toranSoon } from './lib.mjs';
+// While sign-up is open (signup in site.config.json), joining Teder is accounts' sign-up, so Teder's forms ask for what
+// they send, a sample slideshow, and the join form's button no longer says "join".
+import { esc, mark, signupOpen, toranSoon } from './lib.mjs';
 
 // The first words of a WhatsApp message to us, when the endpoint can't take the form. {store} is the typed address.
 export const WA_TEXT = {
@@ -38,7 +40,7 @@ export function demoForm(cfg, page, id = 'demo', kind = 'demo') {
   const fields = kind === 'teder' ? `${storeField(false)}\n${contactField('הוואטסאפ שלכם')}` : storeField(true);
   return `${open(cfg, kind, page, 'demo', id)}
 ${fields}
-<button class="btn primary" type="submit">${kind === 'teder' ? 'לנסות את תדר' : 'לנסות את תורן'}</button>
+<button class="btn primary" type="submit">${kind === 'teder' ? (signupOpen(cfg) ? 'לקבל מצגת לדוגמה' : 'לנסות את תדר') : 'לנסות את תורן'}</button>
 <p class="when">${kind === 'teder' ? tederWhen : toranWhen(cfg)}</p>
 ${status(id)}
 </form>`;
@@ -72,7 +74,7 @@ ${card('teder', 'תדר', 'כותב ומעצב מצגות בעברית לטיק�
 </fieldset>
 ${storeField(false)}
 ${contactField('הוואטסאפ שלכם, למצגת של תדר', false)}
-<button class="btn primary" type="submit">להצטרף</button>
+<button class="btn primary" type="submit">${!signupOpen(cfg) ? 'להצטרף' : soon ? 'לקבל מצגת לדוגמה' : 'לקבל דמו'}</button>
 ${soon ? '' : `<p class="when" data-for="toran">${toranWhen(cfg)}</p>`}
 <p class="when" data-for="teder">${tederWhen}</p>
 ${status('join')}

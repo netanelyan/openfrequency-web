@@ -37,6 +37,32 @@ connected at Meta, not for Toran's sale. `"soon"` (now): the home page shows Ted
 click, all at once, a rejection that comes back rewritten, TikTok's drafts), with approving on WhatsApp as one line marked
 "בקרוב". `"live"`: the section about approving Teder's slideshows on WhatsApp comes back as it was.
 
+## Sign-up: open or closed
+
+Teder is sold self-serve: a business signs up on openfrequency-accounts, pays there, and sets Teder up itself. The
+switch for whether the site sends people there is `signup` in `site.config.json`:
+
+```json
+"signup": "closed"
+```
+
+- `"closed"` (now, until accounts takes payments and its `OF_SIGNUP=1`): nothing links to sign-up. Teder's ways in are
+  the free sample slideshow (the forms on `/teder` and `/join`), which the owner sends by hand, and the terms are as they
+  were, with their date `legal.updated`.
+- `"open"`: Teder's main buttons, "להצטרף לתדר", go to `https://accounts.openfrequency.co.il/signup?p=teder` (`p` is a
+  hint; accounts ignores what it doesn't read) with the price under them: the first screen of `/teder`, its price card,
+  Teder's door on the home page, and the top of `/join`. The sample stays as the second way, "רוצים קודם לראות מצגת
+  מהחנות שלכם?", down to the same forms, whose buttons then say "לקבל מצגת לדוגמה". `/join` shows sign-up's steps (sign
+  up and pay, pick sources, look over the samples, go live); the menu's "הצטרפות" still leads to `/join`, which holds
+  both ways. The copy says what a business that set Teder up on its own does (it picks the sources, connects its
+  accounts, and cancels in the account), the FAQ adds how to cancel, the support export gives the sign-up address, and
+  `/terms` carries the Teder subscription section ("המנוי לתדר": paying, the setup fee, cancelling and deleting online)
+  with its own date, `legal.signupUpdated`. That date is the terms version accounts stores on each sign-up
+  (`TERMS_VERSION` in openfrequency-accounts `src/accounts/signup.js`), so the two change together. With Toran live,
+  `/join` keeps its form first and adds Teder's sign-up after it.
+
+`test/signup.test.mjs` builds both ways and checks them.
+
 ## Build
 
 ```sh
@@ -69,7 +95,8 @@ serves when the endpoint is down).
 
 ```sh
 npm test                                        # the endpoint (saving, WhatsApp, limits, honeypot, origin, Twilio down,
-                                                # the waitlist), and the site built with Toran soon and live
+                                                # the waitlist), and the site built with Toran soon and live,
+                                                # and with sign-up closed and open
 npm run draft && node scripts/form-shots.mjs    # the demo forms in Chrome against the real endpoint (Toran live only)
 node server/lead.mjs list 50                    # the last 50 leads, on the server
 ```

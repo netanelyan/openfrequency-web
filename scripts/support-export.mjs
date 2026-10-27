@@ -16,7 +16,7 @@
 // questions are /faq's own soon answers (support.json's answers describe a Toran that is running, so they wait).
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, ils, readConfig, toranSoon } from '../src/lib.mjs';
+import { ROOT, SIGNUP_URL, ils, readConfig, signupOpen, toranSoon } from '../src/lib.mjs';
 import toran from '../src/pages/toran.mjs';
 import teder from '../src/pages/teder.mjs';
 import { TORAN, TEDER } from '../src/pages/faq.mjs';
@@ -85,7 +85,9 @@ const legal = [['terms', terms], ['privacy', privacy], ['security', security], [
 });
 // While Toran is soon: what is open and what is not, said plainly, for the agent to put above everything else.
 const soonStatus = [
-  'תדר פתוח: אפשר להצטרף אליו עכשיו, ולקבל מצגת לדוגמה מהחנות דרך הטופס ב-' + `${origin}/teder#demo` + ' או ב-' + `${origin}/join` + '.',
+  signupOpen(cfg)
+    ? 'תדר פתוח: אפשר לפתוח בו חשבון עכשיו ולהקים אותו לבד ב-' + SIGNUP_URL + ', או לקבל קודם מצגת לדוגמה מהחנות דרך הטופס ב-' + `${origin}/teder#demo` + ' או ב-' + `${origin}/join` + '.'
+    : 'תדר פתוח: אפשר להצטרף אליו עכשיו, ולקבל מצגת לדוגמה מהחנות דרך הטופס ב-' + `${origin}/teder#demo` + ' או ב-' + `${origin}/join` + '.',
   'תורן עוד לא פתוח לחנויות, ואנחנו פותחים אותו בקרוב. עד אז אין לו דמו, אין לו מחיר, ואי אפשר להצטרף אליו או להתחיל איתו.',
   'מי שרוצה לדעת כשתורן נפתח משאיר טלפון או מייל ב-' + `${origin}/toran#waitlist` + ', ואנחנו כותבים לו כשהוא נפתח.',
   'מה שכתוב על תורן באתר הוא מה שהוא יעשה כשייפתח.',
