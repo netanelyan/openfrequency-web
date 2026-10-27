@@ -8,7 +8,7 @@
 import { SIGNUP_URL, mark, signupOpen } from '../lib.mjs';
 import { approvals, platformWindow } from '../teder.mjs';
 import { demoForm } from '../forms.mjs';
-import { SIGNUP_LABEL, priceSection, sampleLine, tederStart, waWords } from '../sections.mjs';
+import { SIGNUP_LABEL, TEDER_SAMPLE, priceSection, sampleLine, tederStart, waWords } from '../sections.mjs';
 
 const alone = (open) => [
   'כותב את המצגת בקול של החשבון, לפי מדריך הכתיבה שלו',
@@ -40,7 +40,7 @@ export default (cfg) => {
 ${mark('teder', 72, 'תדר')}
 <h1 id="hero-h"><span class="hl">מצגות אוטומטיות</span> בעברית לטיקטוק ולאינסטגרם</h1>
 <p class="lede">תדר כותב ומעצב את המצגות, ומפרסם כל אחת רק אחרי שמישהו אישר אותה. אותה מצגת יוצאת בגודל של טיקטוק ובגודל של אינסטגרם.</p>
-${open ? tederStart(cfg, { wrap: 'start hero-cta', sample: '#demo' }) : '<a class="btn primary hero-cta" href="#demo">לנסות את תדר על החנות שלכם</a>'}
+${open ? tederStart(cfg, { wrap: 'start hero-cta', cls: 'btn light', price: false, more: `<a class="btn on-color" href="#demo">${TEDER_SAMPLE}</a>` }) : '<a class="btn primary hero-cta" href="#demo">לנסות את תדר על החנות שלכם</a>'}
 </div>
 ${platformWindow()}
 </div>

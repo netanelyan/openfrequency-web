@@ -76,18 +76,26 @@ export function priceLine(cfg, monthly, setup) {
 // in the same row (the home page's door), whose row then takes the class act.
 export const SIGNUP_LABEL = 'להצטרף לתדר';
 export const sampleLine = (href) => `<p class="start-alt">רוצים קודם לראות מצגת מהחנות שלכם? <a href="${href}">לבקש מצגת לדוגמה</a></p>`;
-export const tederStart = (cfg, { sample, cls = 'btn primary', wrap = 'start', more = '', act = 'start-act' } = {}) => `<div class="${wrap}">
+export const tederStart = (cfg, { sample, cls = 'btn primary', wrap = 'start', more = '', act = 'start-act', price = true } = {}) => `<div class="${wrap}">
 ${more ? `<div class="${act}">` : ''}<a class="${cls}" href="${SIGNUP_URL}">${SIGNUP_LABEL}</a>${more ? `${more}</div>` : ''}
-<p class="start-price">${priceLine(cfg, 'teder.monthly', 'teder.setup')}</p>
+${price ? `<p class="start-price">${priceLine(cfg, 'teder.monthly', 'teder.setup')}</p>` : ''}
 ${sample ? sampleLine(sample) : ''}</div>`;
 
 // Toran's way in once it is live and sign-up is open: the same button to accounts' sign-up, its price, and the demo
 // for who wants to see Toran answer on their own store first.
 export const TORAN_SIGNUP_LABEL = 'להצטרף לתורן';
-export const toranStart = (cfg, { demo, cls = 'btn primary', wrap = 'start', more = '', act = 'start-act' } = {}) => `<div class="${wrap}">
+export const toranStart = (cfg, { demo, cls = 'btn primary', wrap = 'start', more = '', act = 'start-act', price = true } = {}) => `<div class="${wrap}">
 ${more ? `<div class="${act}">` : ''}<a class="${cls}" href="${signupUrl('toran')}">${TORAN_SIGNUP_LABEL}</a>${more ? `${more}</div>` : ''}
-<p class="start-price">${toranPriceLine(cfg)}</p>
+${price ? `<p class="start-price">${toranPriceLine(cfg)}</p>` : ''}
 ${demo ? `<p class="start-alt">רוצים קודם לראות אותו עונה על החנות שלכם? <a href="${demo}">לנסות את תורן על החנות שלכם</a></p>` : ''}</div>`;
+
+// The first screens (the home page's doors, a product page's top): sign-up and two more buttons, no price; the price
+// waits on the price card. The demo shows the product working; the sample (Teder) or the demo form (Toran) is the
+// store's own.
+export const TEDER_DEMO = 'לראות דמו';
+export const TEDER_SAMPLE = 'מצגת לדוגמה מהחנות שלכם';
+export const TORAN_DEMO = 'לראות דמו';
+export const TORAN_TRY = 'לנסות על החנות שלכם';
 
 // How to stop, once the terms are set: the commitment, the last month, and (Toran) the number and the conversations.
 function termsLine(cfg, toran) {

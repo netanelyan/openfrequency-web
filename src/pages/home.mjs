@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { CHANNELS, ROOT, esc, mark, glyphOnly, signupOpen, toranSoon, assistantSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
-import { askBox, askSoon, priceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
+import { TEDER_DEMO, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, askBox, askSoon, priceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -42,7 +42,7 @@ ${soon
 ${soon
     ? '<div class="door-act"><a class="btn" href="/toran#waitlist">לקבל עדכון כשתורן נפתח</a><a class="btn" href="/toran">מה תורן יעשה</a></div>'
     : signupOpen(cfg)
-      ? toranStart(cfg, { wrap: 'start door-start', act: 'door-act', more: '<a class="btn" href="/toran">עוד על תורן</a>', demo: '/toran#demo' })
+      ? toranStart(cfg, { wrap: 'start door-start', act: 'door-act', price: false, more: `<a class="btn" href="/toran">${TORAN_DEMO}</a><a class="btn" href="/toran#demo">${TORAN_TRY}</a>` })
       : '<div class="door-act"><a class="btn primary" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn" href="/toran">עוד על תורן</a></div>'}
 <div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
@@ -54,7 +54,7 @@ ${soon
 ${doorTop('teder', `<span class="wave" aria-hidden="true">${glyphOnly('teder')}</span>`, 'תדר', 'מצגות לטיקטוק ולאינסטגרם', 'כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.')}
 <div class="door-in" id="door-teder-in">
 ${signupOpen(cfg)
-    ? tederStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', more: '<a class="btn on-color" href="/teder">עוד על תדר</a>', sample: '/teder#demo' })
+    ? tederStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', price: false, more: `<a class="btn on-color" href="/teder">${TEDER_DEMO}</a><a class="btn on-color" href="/teder#demo">${TEDER_SAMPLE}</a>` })
     : '<div class="door-act"><a class="btn light" href="/teder#demo">לנסות את תדר על החנות שלכם</a><a class="btn on-color" href="/teder">עוד על תדר</a></div>'}
 ${reel}
 </div>

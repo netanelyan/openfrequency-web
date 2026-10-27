@@ -77,13 +77,13 @@ test('with "closed", nothing links to sign-up and Teder is offered by its sample
   assert.doesNotMatch(support.status, /signup/);
 });
 
-test('with "open", Teder\'s main buttons go to sign-up with the price beside them, and the sample is the second way', () => {
+test('with "open", Teder\'s first screens have sign-up, the demo and the sample as buttons, no price; the price card keeps it', () => {
   const { pages } = built.open;
   const teder = main(pages['teder/index.html']);
   const hero = /<div class="start hero-cta">[\s\S]*?<\/div>/.exec(teder)[0];
-  assert.match(hero, new RegExp(`<a class="btn primary" href="${SIGNUP.replace(/[?.]/g, '\\$&')}">להצטרף לתדר</a>`));
-  assert.ok(text(hero).includes(price), 'the price beside the hero button');
-  assert.match(hero, /רוצים קודם לראות מצגת מהחנות שלכם\? <a href="#demo">לבקש מצגת לדוגמה<\/a>/);
+  assert.match(hero, new RegExp(`<a class="btn light" href="${SIGNUP.replace(/[?.]/g, '\\$&')}">להצטרף לתדר</a>`));
+  assert.ok(!text(hero).includes(price), 'no price in the first screen');
+  assert.match(hero, /<a class="btn on-color" href="#demo">מצגת לדוגמה מהחנות שלכם<\/a>/);
   assert.doesNotMatch(teder, /href="#demo">לנסות את תדר על החנות שלכם/);
   const card = /<div class="price-main">[\s\S]*?<\/div>/.exec(teder)[0];
   assert.ok(card.includes(`href="${SIGNUP}"`), "the price card's button");
@@ -97,9 +97,8 @@ test('with "open", Teder\'s main buttons go to sign-up with the price beside the
   assert.match(teder, /לחבר את טיקטוק ואת אינסטגרם, פעם אחת/);
   // The home page's door.
   const door = /<article class="door teder-door[\s\S]*?<\/article>/.exec(main(pages['index.html']))[0];
-  assert.ok(door.includes(`<a class="btn light" href="${SIGNUP}">להצטרף לתדר</a><a class="btn on-color" href="/teder">עוד על תדר</a>`));
-  assert.ok(text(door).includes(price));
-  assert.match(door, /href="\/teder#demo">לבקש מצגת לדוגמה/);
+  assert.ok(door.includes(`<a class="btn light" href="${SIGNUP}">להצטרף לתדר</a><a class="btn on-color" href="/teder">לראות דמו</a><a class="btn on-color" href="/teder#demo">מצגת לדוגמה מהחנות שלכם</a>`));
+  assert.ok(!text(door).includes(price), 'no price on the door');
 });
 
 test('with "open", /join starts with sign-up and its price, then the sample form, and its steps are sign-up\'s', () => {
@@ -130,9 +129,9 @@ test('with "open" and Toran live, sign-up is the first way in for both products,
   // Toran's page: the sign-up in the first screen and on the price card, the demo as the second way.
   const page = main(pages['toran/index.html']);
   assert.equal(page.split(`href="${TORAN_SIGNUP}"`).length - 1, 2);
-  assert.match(page, /href="#demo">לנסות את תורן על החנות שלכם/);
+  assert.match(page, /<a class="btn" href="#demo">לנסות על החנות שלכם<\/a>/);
   // The home page's door for Toran.
-  assert.ok(main(pages['index.html']).includes(`href="${TORAN_SIGNUP}">להצטרף לתורן</a>`));
+  assert.ok(main(pages['index.html']).includes(`href="${TORAN_SIGNUP}">להצטרף לתורן</a><a class="btn" href="/toran">לראות דמו</a><a class="btn" href="/toran#demo">לנסות על החנות שלכם</a>`));
 });
 
 test('with "open", the FAQ and the support export say how to sign up and cancel', () => {
