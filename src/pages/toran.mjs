@@ -41,7 +41,7 @@ const soonPage = (cfg) => {
     body: `
 <section class="soon-bar" aria-labelledby="soon-h">
 <div class="wrap">
-<p id="soon-h"><span class="soon">בקרוב</span> <b>תורן עוד לא פתוח לחנויות.</b> אנחנו פותחים אותו אחרי שהחיבור לוואטסאפ דרך Meta יאושר. <a href="#waitlist">לקבל עדכון כשהוא נפתח</a></p>
+<p id="soon-h"><span class="soon">בקרוב</span> <b>תורן עוד לא פתוח לחנויות.</b> <a href="#waitlist">לקבל עדכון כשהוא נפתח</a></p>
 </div>
 </section>
 
