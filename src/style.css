@@ -623,6 +623,9 @@ label.f[hidden], .demo .when[hidden] { display: none; }
   .teder-hero :is(h1, .lede) .hl { background: linear-gradient(transparent 58%, rgb(170 140 255 / 0.4) 58%, rgb(170 140 255 / 0.4) 92%, transparent 92%); }
 }
 .co-hero .lede { margin-top: 18px; max-width: 40ch; }
+/* On a phone the line under the headline is left out: the doors right below say the same, each in one short line,
+   and the first screen shows them instead. From 700px (doors open) it stays. */
+@media (max-width: 699px) { .co-hero .lede { display: none; } }
 /* The mark's dots alone, large, faint and turned 30 degrees behind the headline, pushed toward the left edge. The doors' glass blurs them. */
 .co-bg { position: absolute; z-index: -1; top: -190px; left: clamp(-300px, calc(50% - 820px), -100px); color: var(--of); opacity: 0.2; pointer-events: none; }
 .co-bg svg { display: block; width: clamp(620px, 62vw, 940px); height: auto; transform: rotate(30deg); }

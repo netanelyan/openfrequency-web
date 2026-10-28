@@ -1,6 +1,7 @@
 // The home page: OpenFrequency and its two products. The first screen says what we make, with our mark large and
 // faint behind it, and opens a door to each product in its own material: Toran's chat answering on glass, Teder's
-// real slides playing on its violet. Then what holds for every store, the businesses that work with us, what we do in a
+// real slides playing on its violet; on a phone the line under the headline is left out (style.css), since the doors
+// say it. Then what holds for every store, the businesses that work with us, what we do in a
 // store like yours, Toran as the owner's assistant, and Toran answering questions about us. Each product has its own
 // page (/toran, /teder), and the questions have theirs (/faq).
 // While Toran is soon (products.toran in site.config.json), Teder's door comes first and Toran's carries "בקרוב", with
