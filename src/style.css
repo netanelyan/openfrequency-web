@@ -1151,3 +1151,36 @@ html.a-contrast { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: 
 .thumb { position: relative; flex: 1 1 0; min-width: 0; max-width: 90px; }
 .thumb img { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; border-radius: 8px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08); }
 .thumb b { position: absolute; top: 5px; inset-inline-start: 5px; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--teder); color: #fff; font-size: 12px; line-height: 1; }
+
+/* ------------------------------------------------------------ loading
+   A tap never sits still (site.js, the same as the products'): ~120ms after a link to another of our pages, a thin
+   bar runs along the top and the page becomes the outline of a page, until the next one paints. On a quick
+   connection none of it shows. With reduced motion (or the still switch) both stay, still. */
+:root { --sk-hi: rgba(255, 255, 255, 0.6); }
+@media (prefers-color-scheme: dark) { :root { --sk-hi: rgba(255, 255, 255, 0.07); } }
+.loadbar { position: fixed; inset-inline: 0; top: 0; height: 3px; z-index: 90; pointer-events: none; opacity: 0; transition: opacity 0.15s ease-out; }
+.loadbar::before { content: ''; position: absolute; inset: 0; background: var(--accent-fill); transform: scaleX(0); transform-origin: right; }
+html.is-loading .loadbar { opacity: 1; }
+html.is-loading .loadbar::before { animation: load-creep 14s var(--ease-out) forwards; }
+@keyframes load-creep { from { transform: scaleX(0.06); } to { transform: scaleX(0.94); } }
+html.sk-on #main > :not(.sk-page) { display: none; }
+.sk-page { padding-block: clamp(40px, 6vw, 88px); display: grid; gap: 24px; animation: sk-in 0.15s var(--ease-out) both; }
+@keyframes sk-in { from { opacity: 0; } }
+.sk-say { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.sk { display: block; height: 14px; border-radius: 7px; background: var(--fill); position: relative; overflow: hidden; }
+.sk::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--sk-hi), transparent); transform: translateX(100%); animation: sk-shine 1.4s linear infinite; }
+@keyframes sk-shine { to { transform: translateX(-100%); } }
+.sk.h1 { height: clamp(34px, 5vw, 56px); border-radius: 12px; max-width: 560px; }
+.sk.btn { width: 150px; height: 48px; border-radius: 999px; }
+.sk-lines { display: grid; gap: 12px; max-width: 620px; }
+.sk-tiles { display: grid; gap: 20px; }
+@media (min-width: 820px) { .sk-tiles { grid-template-columns: 1fr 1fr; } }
+.sk-tiles .tile { padding: 28px; display: grid; gap: 12px; min-height: 180px; align-content: start; }
+
+/* A form's button while it sends: it spins (form.js sets aria-busy). */
+.btn[aria-busy='true'] { position: relative; color: transparent !important; opacity: 0.85; }
+.btn[aria-busy='true'] > * { visibility: hidden; }
+.btn[aria-busy='true']::after { content: ''; position: absolute; inset: 0; margin: auto; width: 18px; height: 18px; border-radius: 50%; border: 2px solid; border-color: var(--ink-3) var(--ink-3) var(--ink-3) transparent; animation: spin 0.7s linear infinite; }
+.btn.primary[aria-busy='true']::after { border-color: var(--accent-ink) var(--accent-ink) var(--accent-ink) transparent; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .btn[aria-busy='true']::after { border-color: var(--ink-3); opacity: 0.6; } }

@@ -242,4 +242,55 @@
       });
     });
   }
+
+  // Loading: a tap never sits still (the products do the same). ~120ms after a link to another of our pages, a bar runs
+  // along the top and the page becomes the outline of a page, until the next one paints; on a quick connection none of
+  // it shows. Other sites, new tabs, anchors on this page and downloads go as they are. Back to a page the browser
+  // kept gets it as it was.
+  (function () {
+    var main = d.getElementById('main');
+    if (!main) return;
+    var timer = 0, bar = null, scrolled = null;
+    var el = function (cls) { var x = d.createElement('div'); x.className = cls; for (var i = 1; i < arguments.length; i++) x.appendChild(arguments[i]); return x; };
+    var W = [82, 64, 90, 48, 72];
+    var line = function (i, cls) { var x = el('sk' + (cls ? ' ' + cls : '')); x.style.width = W[i % W.length] + '%'; return x; };
+    var tile = function (i) { return el('tile glass', line(i), line(i + 1), line(i + 2), line(i + 3)); };
+    var skeleton = function () {
+      var say = d.createElement('span');
+      say.className = 'sk-say';
+      say.textContent = 'טוען…';
+      var page = el('sk-page wrap', say, line(0, 'h1'), el('sk-lines', line(1), line(2), line(3)), el('sk btn'), el('sk-tiles', tile(0), tile(2)));
+      page.setAttribute('role', 'status');
+      return page;
+    };
+    var stop = function () {
+      clearTimeout(timer);
+      root.classList.remove('is-loading', 'sk-on');
+      var sk = main.querySelector('.sk-page');
+      if (sk) sk.remove();
+      main.removeAttribute('aria-busy');
+      if (scrolled != null) scrollTo(0, scrolled);
+      scrolled = null;
+    };
+    d.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href]');
+      if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if ((a.target && a.target !== '_self') || a.hasAttribute('download')) return;
+      var url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || /\.(pdf|zip|png|jpe?g|webp|svg|xml|txt)$/i.test(url.pathname)) return;
+      if (url.pathname === location.pathname && url.search === location.search) return;
+      stop();
+      timer = setTimeout(function () {
+        bar = bar || d.body.appendChild(el('loadbar'));
+        root.classList.add('is-loading');
+        main.insertBefore(skeleton(), main.firstChild);
+        main.setAttribute('aria-busy', 'true');
+        root.classList.add('sk-on');
+        scrolled = scrollY;
+        scrollTo(0, 0);
+      }, 120);
+    });
+    addEventListener('pageshow', function (e) { if (e.persisted) stop(); });
+    d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-loading')) stop(); });
+  })();
 })();
