@@ -1,0 +1,40 @@
+# /etc/systemd/system/openfrequency-web-leads-backup.service, run each night by openfrequency-web-leads-backup.timer
+#
+# A checked copy of the leads database (server/lead.mjs backup): VACUUM INTO /var/backups/openfrequency-web, the copy
+# opened again (PRAGMA integrity_check, the leads counted), the newest 14 kept. A copy that fails its check is removed
+# and this unit fails, and OnFailure sends the alert (openfrequency-web-alert@.service, /usr/local/bin/of-alert;
+# UNVERIFIED that it exists on the server: ls -l /usr/local/bin/of-alert).
+#
+# It runs as root, reading only: the endpoint runs with DynamicUser=yes and StateDirectory=openfrequency-web, so its
+# database really sits in /var/lib/private/openfrequency-web (checked on the server, SERVER-FACTS.md, 2026-10-29), a
+# folder only root and that dynamic user can enter. A second DynamicUser unit of its own on the same StateDirectory
+# would take the folder's ownership from the running endpoint. The copy is opened read-only: SQLite creates no file
+# beside the database, so nothing there becomes root's. These copies hold phone numbers
+# and emails, so the folder is root's alone (mode 700); copying it off the server is the server's off-site backup.
+#
+# Once (after deploy/openfrequency-web-leads.service):
+#   sudo cp deploy/openfrequency-web-leads-backup.service deploy/openfrequency-web-leads-backup.timer \
+#     deploy/openfrequency-web-alert@.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now openfrequency-web-leads-backup.timer
+#   sudo systemctl start openfrequency-web-leads-backup && sudo ls -l /var/backups/openfrequency-web
+# deploy/deploy.sh copies server/lead.mjs to /opt/openfrequency-web/server, which is the file this runs.
+
+[Unit]
+Description=OpenFrequency site: a checked copy of the leads database
+After=openfrequency-web-leads.service
+OnFailure=openfrequency-web-alert@%n.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/openfrequency-web
+Environment=LEADS_DB=/var/lib/private/openfrequency-web/leads.db
+ExecStart=/opt/node24/bin/node server/lead.mjs backup /var/backups/openfrequency-web --keep 14
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=full
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true

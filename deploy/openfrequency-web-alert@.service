@@ -1,0 +1,13 @@
+# /etc/systemd/system/openfrequency-web-alert@.service: the alert when a unit of the site fails. A unit names it as
+# OnFailure=openfrequency-web-alert@%n.service (the lead endpoint, once its restarts give up; the nightly backup, when
+# a copy fails its check). /usr/local/bin/of-alert "<title>" "<body>" carries the message to the owner's phone; it is
+# installed by the server's own setup (openfrequency-ops), not by this repo. UNVERIFIED that it is there: run
+# ls -l /usr/local/bin/of-alert on the server (it was not on 2026-10-29). Until it exists this unit fails too, and
+# journalctl -u 'openfrequency-web-alert@*' shows what would have been sent.
+
+[Unit]
+Description=OpenFrequency site: alert that %i failed
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/of-alert "OpenFrequency site: %i failed" "On the server: systemctl status %i, and journalctl -u %i -n 50"

@@ -1,6 +1,8 @@
 # OpenFrequency's public site, for the host's Caddy (the one Teder uses, /etc/caddy/Caddyfile). Needs Caddy 2.8 or
 # later. Put the domain in (replace example.co.il, three times), append this to /etc/caddy/Caddyfile, then:
-#   sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy
+#   sudo caddy validate --config /etc/caddy/Caddyfile && sudo caddy reload --config /etc/caddy/Caddyfile --force
+# On a server whose Caddyfile is already written (tiyul-vps: by hand, with other sites in it), never append or replace:
+# edit the openfrequency.co.il block in place, as deploy/caddy-error-headers.md does.
 #
 # The pages are static files in /var/www/openfrequency-web/current (deploy/deploy.sh puts them there). /api/* goes to
 # the lead endpoint on 127.0.0.1:4720 (deploy/openfrequency-web-leads.service).
@@ -9,6 +11,10 @@
 #   /toran        stays Toran's page
 #   /s/*          Toran's pitch pages will live here; robots.txt already disallows it. Until then it is a 404.
 #   app.<domain>  reserved for the owner's login; nothing answers there yet.
+#
+# An error page (the 404, the try-again page Caddy serves when the endpoint is down) is answered by its handle_errors
+# route, which gets none of the site's headers or its compression: each handle_errors block repeats them. On the live
+# server this is an edit of the hand-written Caddyfile, never this file in its place: deploy/caddy-error-headers.md.
 
 www.example.co.il {
 	redir https://example.co.il{uri} permanent
@@ -28,7 +34,7 @@ example.co.il {
 		-Server
 	}
 
-	# The lead endpoint. If it is down, the 502 is answered by handle_errors below.
+	# The lead endpoint (/api/lead, /api/health, /api/readyz). If it is down, the 502 is answered by handle_errors below.
 	handle /api/* {
 		reverse_proxy 127.0.0.1:4720
 	}
@@ -48,8 +54,17 @@ example.co.il {
 		file_server
 	}
 
-	# A page that isn't there gets the 404 page, with its 404 status.
+	# A page that isn't there gets the 404 page, with its 404 status and the site's headers.
 	handle_errors 404 {
+		encode zstd gzip
+		header {
+			Strict-Transport-Security "max-age=31536000; includeSubDomains"
+			X-Content-Type-Options "nosniff"
+			Referrer-Policy "strict-origin-when-cross-origin"
+			Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+			Content-Security-Policy "frame-ancestors 'none'"
+			-Server
+		}
 		rewrite * /404.html
 		file_server
 	}
@@ -57,6 +72,15 @@ example.co.il {
 	# The lead endpoint down or not answering: a plain form post lands on the try-again page (with the WhatsApp
 	# link), and the form's script reads the 5xx and offers WhatsApp in place.
 	handle_errors 502 503 504 {
+		encode zstd gzip
+		header {
+			Strict-Transport-Security "max-age=31536000; includeSubDomains"
+			X-Content-Type-Options "nosniff"
+			Referrer-Policy "strict-origin-when-cross-origin"
+			Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+			Content-Security-Policy "frame-ancestors 'none'"
+			-Server
+		}
 		rewrite * /try-again/index.html
 		file_server
 	}

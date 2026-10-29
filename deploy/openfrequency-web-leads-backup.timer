@@ -1,0 +1,14 @@
+# /etc/systemd/system/openfrequency-web-leads-backup.timer: the leads database copied and checked each night, at 03:40
+# on the server's clock (UTC), after Teder's and accounts' backups (03:30) and before Toran's (03:45). Persistent: a
+# night the server was off is copied at the next boot. The service's header has the one-time setup.
+
+[Unit]
+Description=OpenFrequency site: copy the leads database each night
+
+[Timer]
+OnCalendar=*-*-* 03:40:00
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

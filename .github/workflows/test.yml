@@ -1,0 +1,34 @@
+# The site's checks on every push and pull request to main: the real build (it stops on an empty fact or the copy
+# lint), the lead endpoint's tests, the site built every way its switches go, and the accessibility check of every
+# page in Chromium. A skipped test fails the run, as it stops deploy/deploy.sh: a check that did not run is no pass.
+# Nothing here deploys, and the workflow holds no secrets.
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright-core install --with-deps chromium
+      - run: node build.mjs
+      - name: npm test (a skipped test fails)
+        run: |
+          node --test --test-concurrency=1 --test-reporter=spec test/*.test.mjs 2>&1 | tee test.log
+          status=${PIPESTATUS[0]}
+          [ "$status" = 0 ] || exit "$status"
+          grep -q '^ℹ skipped 0$' test.log || { echo "a test was skipped"; exit 1; }
