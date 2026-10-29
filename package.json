@@ -14,10 +14,11 @@
     "shots": "node scripts/shots.mjs",
     "og": "node scripts/og.mjs",
     "leads": "node server/lead.mjs",
-    "test": "node --test test/*.test.mjs",
+    "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "support": "node scripts/support-export.mjs"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "playwright-core": "^1.56.0"
   }
 }
