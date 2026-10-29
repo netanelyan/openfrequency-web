@@ -8,7 +8,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
-import { storeHost, mobile, email, validate, newCode, toranWaLink, waAddress } from '../server/lead.mjs';
+import { storeHost, mobile, email, validate, newCode, toranWaLink, waAddress, open, purge, KEEP_MONTHS } from '../server/lead.mjs';
+import { spawnSync } from 'node:child_process';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'of-leads-'));
 const DB = path.join(dir, 'leads.db');
@@ -94,7 +95,9 @@ const post = (fields, { json = true, ip = `10.0.0.${++ipN}`, origin = 'https://e
 const rows = (db = DB) => new DatabaseSync(db, { readOnly: true }).prepare('SELECT * FROM leads ORDER BY id').all();
 // The message a Toran demo's link writes, read back out of the link.
 const waText = (wa) => new URL(wa).searchParams.get('text');
-const settle = () => new Promise((ok) => setTimeout(ok, 300));
+// The sends after an answer happen in the background: give them time, with room for a busy machine (300ms was flaky
+// beside the browser tests).
+const settle = () => new Promise((ok) => setTimeout(ok, 800));
 
 test('a store address is kept as its host name', () => {
   assert.equal(storeHost('shop.co.il'), 'shop.co.il');
@@ -488,4 +491,65 @@ test('with Resend set and no Twilio, each lead is emailed to the owner and marke
     p.kill();
     resend.close();
   }
+});
+
+// ---------------------------------------------------------------- keeping, copying, readiness
+
+test("a lead is kept the privacy policy's months from its last contact, then deleted", () => {
+  const config = JSON.parse(fs.readFileSync(new URL('../site.config.json', import.meta.url), 'utf8'));
+  assert.equal(KEEP_MONTHS, config.legal.leadMonths, 'the endpoint keeps leads as long as the privacy page says');
+  const db = open(path.join(dir, 'keep.db'));
+  const add = (source, contact, at, last = null) => db.prepare('INSERT INTO leads (created_at, source, store, contact, page, last_at) VALUES (?, ?, ?, ?, ?, ?)').run(at, source, 'shop.co.il', contact, '/', last);
+  const now = Date.parse('2026-10-29T12:00:00Z');
+  add('teder', '972500000001', '2026-01-01T00:00:00.000Z'); // old, nothing since: goes
+  add('teder', '972500000002', '2026-01-01T00:00:00.000Z', '2026-09-01T00:00:00.000Z'); // asked again in September: stays
+  add('waitlist', 'old@shop.co.il', '2026-03-01T00:00:00.000Z'); // old, but the same email wrote again since: stays
+  add('teder', 'old@shop.co.il', '2026-08-01T00:00:00.000Z');
+  add('demo', '', '2026-04-28T00:00:00.000Z'); // a Toran demo, past 6 months by its own time: goes
+  add('demo', '', '2026-05-01T00:00:00.000Z'); // inside: stays
+  assert.equal(purge(db, { now }), 2);
+  const left = db.prepare('SELECT contact, created_at FROM leads ORDER BY id').all().map((r) => `${r.contact || 'toran'} ${r.created_at.slice(0, 10)}`);
+  assert.deepEqual(left, ['972500000002 2026-01-01', 'old@shop.co.il 2026-03-01', 'old@shop.co.il 2026-08-01', 'toran 2026-05-01']);
+  assert.equal(purge(db, { now }), 0, 'nothing more the second time');
+  db.close();
+});
+
+test('a second ask from the same number is a contact: the lead it repeats is kept from then', async () => {
+  const res = await post({ source: 'teder', store: 'again.co.il', contact: '0507770001' });
+  assert.equal(res.status, 200);
+  assert.equal(rows().find((r) => r.contact === '972507770001').last_at, null);
+  assert.equal((await post({ source: 'teder', store: 'again.co.il', contact: '0507770001' })).status, 409);
+  assert.ok(rows().find((r) => r.contact === '972507770001').last_at, 'last_at set by the second ask');
+});
+
+test('readyz answers ready while the database reads', async () => {
+  const res = await fetch(base + '/api/readyz');
+  assert.equal(res.status, 200);
+  assert.equal(await res.text(), 'ready');
+  assert.equal(res.headers.get('cache-control'), 'no-store');
+});
+
+test('the backup is a checked copy, the newest kept, and a database that is not one fails it', () => {
+  const src = path.join(dir, 'backup-src.db');
+  const db = open(src);
+  db.prepare("INSERT INTO leads (created_at, source, store, contact, page) VALUES ('2026-10-29T00:00:00.000Z', 'teder', 'shop.co.il', '972500000003', '/')").run();
+  db.close();
+  const out = path.join(dir, 'backups');
+  const run = (dbFile) => spawnSync(process.execPath, ['server/lead.mjs', 'backup', out, '--keep', '2'], { env: { ...process.env, LEADS_DB: dbFile }, encoding: 'utf8' });
+  for (let i = 0; i < 3; i++) {
+    const r = run(src);
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /backup: .*leads-.*\.db, 1 leads, integrity ok/);
+  }
+  const copies = fs.readdirSync(out).filter((f) => f.endsWith('.db'));
+  assert.equal(copies.length, 2, 'the newest 2 kept');
+  const copy = new DatabaseSync(path.join(out, copies[1]), { readOnly: true });
+  assert.equal(copy.prepare('SELECT count(*) AS n FROM leads').get().n, 1);
+  copy.close();
+  const junk = path.join(dir, 'not-a-db.db');
+  fs.writeFileSync(junk, 'this is not a database');
+  const bad = run(junk);
+  assert.equal(bad.status, 1, 'a failed copy fails the unit, so its alert goes out');
+  assert.match(bad.stderr, /backup failed/);
+  assert.equal(fs.readdirSync(out).filter((f) => f.endsWith('.db')).length, 2, 'nothing half-written left behind');
 });

@@ -4,10 +4,24 @@
 //
 //   node server/lead.mjs            listen on 127.0.0.1:$PORT (Caddy proxies /api/* to it)
 //   node server/lead.mjs list [n]   print the last n leads (default 20)
+//   node server/lead.mjs purge      delete the leads past the privacy policy's period now (the server does it daily)
+//   node server/lead.mjs backup [dir] [--keep 14]
+//                                   a consistent copy of the database into dir (LEADS_BACKUPS, default
+//                                   private/backups), checked (PRAGMA integrity_check and a count of the leads), the
+//                                   newest --keep kept; exits 1 when the copy fails the check
+//                                   (deploy/openfrequency-web-leads-backup.service runs it nightly)
+//
+// Keeping leads (the privacy policy, legal.leadMonths in site.config.json): a lead stays KEEP_MONTHS (6) from the last
+// time its phone or email asked us anything, then it is deleted, once a day, with the count in the log. The database
+// overwrites what it deletes (secure_delete), so a deleted lead is not left in the file's free pages.
+//
+// Health: GET /api/health answers "ok" while the process runs; GET /api/readyz reads the database and answers 503 when
+// it can't (deploy/deploy.sh checks it after each restart).
 //
 // Environment (on the server, in /etc/openfrequency-web/lead.env, never in the repo):
 //   PORT                 default 4720
 //   LEADS_DB             default private/leads.db
+//   LEAD_KEEP_MONTHS     default 6, the privacy policy's legal.leadMonths; change both together
 //   TWILIO_ACCOUNT_SID   the Twilio account that sends the WhatsApp message (AC...); without it leads are only saved
 //   TWILIO_AUTH_TOKEN    its auth token
 //   LEAD_WA_FROM         the business number, a WhatsApp sender on that Twilio account (0552536259 or 972552536259)
@@ -65,10 +79,11 @@ const LIMITS = {
 
 // ---------------------------------------------------------------- storage
 
-function open() {
-  fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-  const db = new DatabaseSync(DB_PATH);
+export function open(dbPath = DB_PATH) {
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  const db = new DatabaseSync(dbPath);
   db.exec(`PRAGMA journal_mode = WAL;
+PRAGMA secure_delete = ON;
 CREATE TABLE IF NOT EXISTS leads (
   id          INTEGER PRIMARY KEY,
   created_at  TEXT NOT NULL,              -- ISO time, UTC
@@ -85,9 +100,70 @@ CREATE TABLE IF NOT EXISTS leads (
   if (!cols.has('forward_tries')) db.exec('ALTER TABLE leads ADD COLUMN forward_tries INTEGER NOT NULL DEFAULT 0');
   // Added with the codes: a Toran demo's REQ-XXXXXX. Rows from before have none, and are not handed to Toran again.
   if (!cols.has('code')) db.exec('ALTER TABLE leads ADD COLUMN code TEXT');
+  // Added with the retention: the last time this phone or email asked again (a second ask is not saved as a row of
+  // its own), so the period runs from the last contact.
+  if (!cols.has('last_at')) db.exec('ALTER TABLE leads ADD COLUMN last_at TEXT');
   db.exec("CREATE INDEX IF NOT EXISTS leads_demo_contact ON leads (contact) WHERE source = 'demo'");
   db.exec('CREATE UNIQUE INDEX IF NOT EXISTS leads_code ON leads (code) WHERE code IS NOT NULL');
+  db.exec('CREATE INDEX IF NOT EXISTS leads_created ON leads (created_at)');
   return db;
+}
+
+// ---------------------------------------------------------------- keeping and copying
+
+// How long a lead is kept: the privacy policy's legal.leadMonths (site.config.json), from the last contact.
+export const KEEP_MONTHS = Number(env.LEAD_KEEP_MONTHS || 6);
+
+// The leads past the period, deleted: a lead whose last contact (its own time, or the last time the same phone or
+// email asked again) is more than `months` ago, unless the same phone or email has a newer lead inside the period. A
+// Toran demo's row holds no contact (Toran has the number), so its own time is all it has. Returns how many went.
+export function purge(db, { now = Date.now(), months = KEEP_MONTHS } = {}) {
+  const d = new Date(now);
+  d.setUTCMonth(d.getUTCMonth() - months);
+  const cutoff = d.toISOString();
+  const { changes } = db.prepare(`DELETE FROM leads WHERE COALESCE(last_at, created_at) < ? AND (contact = '' OR NOT EXISTS (
+    SELECT 1 FROM leads newer WHERE newer.contact = leads.contact AND COALESCE(newer.last_at, newer.created_at) >= ?))`).run(cutoff, cutoff);
+  return Number(changes);
+}
+
+function purgeAndLog(db) {
+  try {
+    const n = purge(db);
+    console.log(`leads: ${n} deleted, older than ${KEEP_MONTHS} months since the last contact (privacy policy)`);
+  } catch (e) {
+    console.error(`leads: the daily delete failed (${e.message})`);
+  }
+}
+
+// A consistent copy of the database (SQLite's VACUUM INTO reads a snapshot while the endpoint runs), opened again and
+// checked: PRAGMA integrity_check must say ok and the leads must be readable. A copy that fails is removed and the
+// call throws, so the nightly unit fails and its OnFailure alert goes out. The newest `keep` copies stay.
+export function backup(dbPath, dir, { keep = 14, now = new Date() } = {}) {
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  const file = path.join(dir, `leads-${now.toISOString().replace(/[:.]/g, '-')}.db`);
+  const src = new DatabaseSync(dbPath, { readOnly: true });
+  try {
+    src.exec(`VACUUM INTO '${file.replace(/'/g, "''")}'`);
+  } finally {
+    src.close();
+  }
+  let rows;
+  try {
+    const copy = new DatabaseSync(file, { readOnly: true });
+    try {
+      const check = Object.values(copy.prepare('PRAGMA integrity_check').get())[0];
+      if (check !== 'ok') throw new Error(`integrity_check says ${check}`);
+      rows = copy.prepare('SELECT count(*) AS n FROM leads').get().n;
+    } finally {
+      copy.close();
+    }
+  } catch (e) {
+    fs.rmSync(file, { force: true });
+    throw new Error(`the copy ${file} failed its check, and was removed: ${e.message}`);
+  }
+  const all = fs.readdirSync(dir).filter((f) => /^leads-.*\.db$/.test(f)).sort();
+  for (const f of all.slice(0, Math.max(0, all.length - keep))) fs.rmSync(path.join(dir, f));
+  return { file, rows, kept: Math.min(all.length, keep) };
 }
 
 // ---------------------------------------------------------------- what a lead may contain
@@ -360,6 +436,19 @@ export function createServer(db) {
   return http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x');
     if (url.pathname === '/api/health') { res.writeHead(200, { 'Content-Type': 'text/plain' }); res.end('ok'); return; }
+    // Ready: the database answers a read. The deploy checks this after a restart, and a monitor can.
+    if (url.pathname === '/api/readyz') {
+      let ready = false;
+      try {
+        db.prepare('SELECT count(*) AS n FROM leads').get();
+        ready = true;
+      } catch (e) {
+        console.error(`readyz: the database did not answer (${e.message})`);
+      }
+      res.writeHead(ready ? 200 : 503, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' });
+      res.end(ready ? 'ready' : 'not ready');
+      return;
+    }
     if (url.pathname !== '/api/lead') { res.writeHead(404); res.end(); return; }
     if (req.method !== 'POST') { res.writeHead(405, { Allow: 'POST' }); res.end(); return; }
 
@@ -390,6 +479,10 @@ export function createServer(db) {
     // so a Toran demo is always saved here. The check and the insert run with no await between them, so two posts at
     // once can't both get through.
     const fresh = sources.filter((s) => s === 'demo' || !db.prepare('SELECT 1 FROM leads WHERE source = ? AND contact = ?').get(s, lead.contact));
+    // A second ask is not saved again, but it is a contact: the lead it repeats is kept KEEP_MONTHS from now (purge).
+    for (const s of sources) {
+      if (s !== 'demo' && !fresh.includes(s)) db.prepare('UPDATE leads SET last_at = ? WHERE source = ? AND contact = ?').run(new Date().toISOString(), s, lead.contact);
+    }
     count(ip);
     if (!fresh.length && lead.source === 'waitlist') return reply(req, res, 200, { ok: true, source: 'waitlist', saved: [] });
     if (!fresh.length) return reply(req, res, 409, { ok: false, error: 'dup' });
@@ -427,6 +520,22 @@ if (main && process.argv[2] === 'list') {
     console.log([r.id, when(r.created_at), r.source, r.store || '-', r.code || r.contact || '-', r.page || '-', r.notified_at ? 'sent' : 'NOT SENT', r.source === 'demo' ? (r.forwarded_at ? 'in toran' : 'NOT IN TORAN') : r.source === 'teder' ? (r.forwarded_at ? 'in teder' : 'NOT IN TEDER') : ''].join('  ').trim());
   }
   db.close();
+} else if (main && process.argv[2] === 'purge') {
+  const db = open();
+  purgeAndLog(db);
+  db.close();
+} else if (main && process.argv[2] === 'backup') {
+  const args = process.argv.slice(3);
+  const at = args.indexOf('--keep');
+  const keep = at >= 0 ? Number(args[at + 1]) : 14;
+  const dir = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--keep') || env.LEADS_BACKUPS || path.join(ROOT, 'private/backups');
+  try {
+    const r = backup(DB_PATH, dir, { keep: Number.isInteger(keep) && keep > 0 ? keep : 14 });
+    console.log(`backup: ${r.file}, ${r.rows} leads, integrity ok (${r.kept} kept)`);
+  } catch (e) {
+    console.error(`backup failed: ${e.message}`);
+    process.exit(1);
+  }
 } else if (main) {
   const db = open();
   const port = Number(env.PORT || 4720);
@@ -434,7 +543,10 @@ if (main && process.argv[2] === 'list') {
   server.listen(port, '127.0.0.1', () => console.log(`leads on 127.0.0.1:${port}, saved to ${DB_PATH}${waReady() || mailReady() ? `, sent by ${[waReady() && 'WhatsApp', mailReady() && 'email'].filter(Boolean).join(' and ')}` : ' (no WhatsApp sender and no email: saving only)'}${toranWaLink('x', 'x') ? '' : " (no TORAN_DEMO_WA: a Toran demo's form shows its code with no WhatsApp button)"}`));
   const timer = setInterval(() => retry(db), 300_000);
   retry(db);
-  const stop = () => { clearInterval(timer); server.close(() => { db.close(); process.exit(0); }); };
+  // The privacy policy's period, once a day and at start.
+  const daily = setInterval(() => purgeAndLog(db), 86_400_000);
+  purgeAndLog(db);
+  const stop = () => { clearInterval(timer); clearInterval(daily); server.close(() => { db.close(); process.exit(0); }); };
   process.on('SIGTERM', stop);
   process.on('SIGINT', stop);
 }
