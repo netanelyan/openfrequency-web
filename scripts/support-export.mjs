@@ -58,7 +58,8 @@ const tederPage = teder(cfg);
 const allPlans = [
   { key: 'toran-store', product: 'toran', title: 'תורן, חבילת חנות', monthly: cfg.get('price.plans.store.monthly'), setup: cfg.get('price.setup'), detail: `עד ${num('price.plans.store.conversations')} שיחות בחודש`, url: `${origin}/toran#price` },
   { key: 'toran-big', product: 'toran', title: 'תורן, חבילת חנות גדולה', monthly: cfg.get('price.plans.big.monthly'), setup: cfg.get('price.setup'), detail: `עד ${num('price.plans.big.conversations')} שיחות בחודש`, url: `${origin}/toran#price` },
-  { key: 'teder', product: 'teder', title: 'תדר', monthly: cfg.get('teder.monthly'), setup: cfg.get('teder.setup'), detail: `${cfg.get('teder.slideshows')} מצגות ו-${cfg.get('teder.redos')} החלפות בחודש`, url: `${origin}/teder#price` },
+  { key: 'teder-small', product: 'teder', title: 'תדר, חבילה קטנה', monthly: cfg.get('teder.small.monthly'), setup: cfg.get('teder.small.setup'), detail: `${cfg.get('teder.small.slideshows')} מצגות ו-${cfg.get('teder.small.redos')} החלפות בחודש`, url: `${origin}/teder#price` },
+  { key: 'teder', product: 'teder', title: 'תדר, חבילה מלאה', monthly: cfg.get('teder.monthly'), setup: cfg.get('teder.setup'), detail: `${cfg.get('teder.slideshows')} מצגות ו-${cfg.get('teder.redos')} החלפות בחודש`, url: `${origin}/teder#price` },
 ];
 const plans = allPlans.filter((p) => !(soon && p.product === 'toran'));
 // Each plan in one sentence, the way the site says it: the monthly price, VAT, what it covers, the setup fee.

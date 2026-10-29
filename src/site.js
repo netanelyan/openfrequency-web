@@ -153,7 +153,8 @@
       night: ['כן. תורן עונה 24/7, ומה שהוא לא יודע מחכה לכם לבוקר.', 'מהעמוד של תורן'],
       who: ['אנחנו OpenFrequency. בנינו את תורן, שעונה ללקוחות של חנויות אונליין, ואת תדר, שכותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם.', 'מעמוד הבית'],
     };
-    // While Toran is soon, the page brings its own answers about Toran (sections.mjs, <template id="ask-a-KEY">).
+    // The page brings its own answers where the config decides them (sections.mjs, <template id="ask-a-KEY">): Teder's
+    // platforms always, and while Toran is soon every answer about Toran.
     var own = function (k) { var t = d.getElementById('ask-a-' + k); return t ? t.innerHTML.trim() : null; };
     Object.keys(A).forEach(function (k) { if (own(k)) A[k][0] = own(k); });
     var KEEP = 'את זה אני לא יודע. אני בודק עם הצוות, ואחזור אליך כאן.';
@@ -171,7 +172,7 @@
       if (has(q, ['להתקין', 'התקנה', 'קוד באתר'])) return A.install;
       if (has(q, ['המספר', 'מספר של', 'מספר שלי', 'וואטסאפ עסקי'])) return A.number;
       if (has(q, ['לילה', 'בלילה', 'שעות', '24'])) return A.night;
-      if (has(q, ['תדר', 'מצגת', 'מצגות', 'טיקטוק', 'אינסטגרם', 'תוכן'])) return A.teder;
+      if (has(q, ['תדר', 'מצגת', 'מצגות', 'טיקטוק', 'אינסטגרם', 'פייסבוק', 'תוכן'])) return A.teder;
       if (has(q, ['תורן', 'וואטסאפ', 'לקוחות', 'שירות'])) return A.toran;
       if (has(q, ['מי אתם', 'openfrequency', 'החברה', 'אתם'])) return A.who;
       return { keep: KEEP, why: WHY };

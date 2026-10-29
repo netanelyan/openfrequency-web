@@ -66,7 +66,6 @@
       if (n) wa.href = 'https://wa.me/' + n + '?text=' + encodeURIComponent(f.getAttribute('data-wa-text').replace('{store}', data.store || ''));
       else wa.remove();
     }
-    msg.hidden = false;
     var field = key === 'store' ? f.elements.store : key.indexOf('contact') === 0 ? f.elements.contact : key === 'products' ? f.elements.toran : null;
     if (field) {
       field.setAttribute('aria-invalid', 'true');
@@ -75,8 +74,8 @@
     }
   }
 
+  // The message region stays in the page (forms.mjs status); emptying it hides it.
   function reset(f, msg) {
-    msg.hidden = true;
     msg.textContent = '';
     ['store', 'contact'].forEach(function (k) {
       var x = f.elements[k];

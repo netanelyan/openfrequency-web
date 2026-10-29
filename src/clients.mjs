@@ -1,10 +1,11 @@
-// Businesses that work with OpenFrequency, on the home page under the two doors. To add one, put its square icon in
-// assets/clients/ and add a row here. The line says what the business does, in its own words from its site. `pad`
-// insets an icon that has no tile of its own, so it sits on white like the others.
+// The businesses we run ourselves, on the home page under the two doors: our own online stores and sites, where we met
+// what Toran and Teder do before we built them. The heading and the line under it say they are ours; they are not
+// customers, and the strip never calls them that (the build's copy lint keeps market claims out too). To add one, put
+// its square icon in assets/clients/ and add a row here. The line says what the business does, in its own words from
+// its site. `pad` insets an icon that has no tile of its own, so it sits on white like the others.
 import { esc, mark } from './lib.mjs';
 
 export const CLIENTS = [
-  { name: 'OpenFrequency', url: 'https://openfrequency.co.il', line: 'החברה שמאחורי תורן ותדר' },
   { name: 'חנות השופט', url: 'https://hashofet.com', logo: 'hashofet.png', pad: 3, line: 'חולצות כדורגל לקבוצות, לנבחרות ורטרו' },
   { name: 'BrickDeal', url: 'https://brickdealil.com', logo: 'brickdeal.svg', line: 'דילים על אבני בנייה תואמות מאליאקספרס' },
   { name: 'טיול+', url: 'https://www.tiyulplus.com', logo: 'tiyulplus.svg', pad: 9, line: 'סוכן נסיעות חכם לישראלים' },
@@ -22,7 +23,8 @@ export function clients() {
   const list = (hidden) => Array.from({ length: reps }, (_, r) => CLIENTS.map((c) => card(c, hidden || r > 0)).join('')).join('');
   return `
 <section class="clients-sec" aria-labelledby="clients-h">
-<div class="wrap"><h2 id="clients-h" class="clients-h"><span>עסקים שעובדים עם</span> <span class="clients-of">${mark('openfrequency', 28)}<b>OpenFrequency</b></span></h2></div>
+<div class="wrap"><h2 id="clients-h" class="clients-h"><span>העסקים של</span> <span class="clients-of">${mark('openfrequency', 28)}<b>OpenFrequency</b></span></h2>
+<p class="clients-sub">אנחנו מריצים את העסקים האלה בעצמנו, ובהם הכרנו קודם את מה שתורן ותדר פותרים.</p></div>
 <div class="clients" style="--n:${CLIENTS.length * reps}">
 <div class="clients-row">
 <ul class="clients-list">${list(false)}</ul>

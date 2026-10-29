@@ -64,7 +64,8 @@
   --line-2: rgba(0, 0, 0, 0.16);
   --ink: #1d1d1f;
   --ink-2: #424245;
-  --ink-3: #6e6e73;
+  /* 4.6:1 on the wallpaper's darkest stop (#e2e3e8), 5.2:1 on --bg: the quiet text still passes WCAG AA */
+  --ink-3: #636368;
   --ink-p: #56565b;
   --accent: #0066cc;
   --accent-p: #0060c0;
@@ -511,6 +512,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .logo.messenger { color: #00b2ff; }
 .logo.email { color: var(--ink-3); }
 .logo.tiktok { color: var(--ink); }
+.logo.facebook { color: #0866ff; }
 .chat-top small .logo, .mail-subj small .logo { width: 13px; height: 13px; margin-inline-end: 4px; vertical-align: -2px; }
 .ch-tabs .logo { width: 18px; height: 18px; }
 
@@ -529,6 +531,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .ch-field .ch-tabs button[aria-selected="true"] { background: #fff; color: var(--teder-ink); }
 .ch-field .ch-tabs button:not([aria-selected="true"]) .logo.tiktok { color: #fff; }
 .ch-field .ch-tabs button[aria-selected="true"] .logo.tiktok { color: #000; }
+.ch-field .ch-tabs button:not([aria-selected="true"]) .logo.facebook { color: #fff; }
 .ch-field .hero-cta { justify-self: start; }
 .ch-field h1 { font-size: clamp(30px, 3.3vw, 46px); }
 @media (min-width: 1000px) { .teder-field.ch-field { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); } }
@@ -543,6 +546,12 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .igp-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-2); }
 .igp-dots i.on { background: #3797f0; }
 .igp figcaption { padding: 4px 12px 14px; font-size: 14px; line-height: 1.45; }
+/* Facebook: the same cover as a post on the Page, its text above the photo and the three actions under it */
+.fbp .chat-top .ava { box-shadow: none; background: #0866ff; color: #fff; }
+.fbp-text { margin: 0; padding: 0 12px 10px; font-size: 14px; line-height: 1.45; }
+.fbp-act { display: flex; justify-content: space-around; padding: 8px 12px 10px; border-top: 1px solid var(--line); color: var(--ink-2); font-size: 13px; }
+.fbp-act span { display: inline-flex; align-items: center; gap: 6px; }
+.fbp-act svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
 
 /* Teder's approval screen: each slideshow with its cover, where it goes out, and what happened to it. */
 .approvals li { grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: 'th text st' 'th where ok'; align-items: center; }
@@ -636,6 +645,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
    by one list's width, so the loop has no seam; it stops under the pointer or on focus, and stands still for anyone
    who asked for less motion, as a row they can scroll. */
 .clients-sec { padding-top: clamp(48px, 6vw, 80px); }
+.clients-sub { max-width: 60ch; margin: 10px auto 0; color: var(--ink-2); font-size: var(--fs-small); text-align: center; }
 /* the title sits centred between two hairlines that fade out, our name in its own type with the mark */
 .clients-h { display: flex; align-items: center; justify-content: center; gap: 18px; color: var(--ink-2); font-size: var(--fs-lead); font-weight: 600; line-height: 1.3; text-align: center; }
 .clients-h > span:first-child { flex: none; }
@@ -908,6 +918,9 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .foot-wa { color: var(--night-ink); font: 600 var(--fs-lead)/1.3 var(--display); }
 .foot .ph { color: var(--night-ink); }
 .foot-legal { margin: clamp(36px, 5vw, 56px) 0 0; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: var(--night-ink-2); font-size: 13px; }
+/* the name as a faint texture on the dark footer: pure decoration, so it is drawn by CSS (::before) and not read out or
+   checked as text, which at 7% white it could never pass */
+.foot-word::before { content: attr(data-word); }
 .foot-word { margin: 18px 0 0; color: rgba(255, 255, 255, 0.07); font: 700 13.4cqi/0.8 var(--wordmark); letter-spacing: -0.06em; white-space: nowrap; text-align: center; direction: ltr; user-select: none; }
 @media (min-width: 700px) { .foot-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1000px) { .foot-cols { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr) minmax(0, 0.7fr) minmax(0, 1fr); gap: 40px; } }
@@ -950,7 +963,9 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .demo, .wait { position: relative; }
 .form-msg { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 14px; border-radius: var(--r-m); background: var(--warn-bg); color: var(--ink); font-size: var(--fs-small); }
-.form-msg[hidden] { display: none; }
+/* Always in the page (forms.mjs status), so a screen reader hears what is put in it; while empty, out of sight and
+   out of the grid. */
+.form-msg:empty { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .form-msg p { margin: 0; flex: 1 1 260px; }
 input[aria-invalid='true'] { border-color: var(--warn); }
 .done { grid-column: 1 / -1; outline: none; }
@@ -1123,8 +1138,8 @@ html.a-contrast { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: 
 .foot-cta { justify-self: start; white-space: nowrap; }
 @media (min-width: 1000px) { .foot-cols { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.7fr) minmax(0, 1.3fr); } }
 
-/* ---- Toran's two plans (sections.mjs toranPricing): a card each, what both include beside the setup fee and the way
-   in, and how a store moves between them */
+/* ---- Toran's two plans (sections.mjs toranPricing) and Teder's (tederPricing): a card each, what both include beside
+   the setup fee and the way in, and (Toran) how a store moves between them */
 .plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .plan { display: grid; align-content: start; gap: 6px; padding: clamp(22px, 3vw, 34px); border-radius: var(--r-l, 26px); }
 .plan-name { margin: 0; font-size: var(--fs-lead); }
@@ -1132,6 +1147,9 @@ html.a-contrast { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: 
 .plan-vat { margin: 0; color: var(--ink-2); font-size: var(--fs-small); }
 .plan-cap { margin: 10px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: var(--fs-body); }
 .plan-cap b { font-variant-numeric: tabular-nums; }
+/* Teder's plans (sections.mjs tederPricing): each card's setup fee and its own way in */
+.plan-fee { margin: 4px 0 0; color: var(--ink-2); font-size: var(--fs-small); }
+.plan .btn { justify-self: start; margin-top: 14px; }
 .plan-offer { margin: 14px 0 0; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--pc) 12%, transparent); font-size: var(--fs-small); line-height: 1.5; }
 .plan-offer b { color: var(--toran-name); }
 .plan-more { margin: 16px 4px 28px; color: var(--ink-2); }

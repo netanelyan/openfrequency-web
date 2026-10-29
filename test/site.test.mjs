@@ -121,8 +121,8 @@ test('with "soon", Teder is offered exactly as with "live"', () => {
   assert.match(join, /<input type="checkbox" name="teder" value="1" checked>/, 'Teder is ticked on /join, and can be');
   assert.match(join, /<input name="contact" type="tel"/, "Teder's WhatsApp number");
   assert.match(join, new RegExp(`${price(config.teder.monthly)} ₪ לחודש`), "Teder's price on /join");
-  assert.deepEqual(soon.support.plans.map((p) => p.key), ['teder']);
-  assert.deepEqual(soon.support.plans[0], live.support.plans.find((p) => p.key === 'teder'));
+  assert.deepEqual(soon.support.plans.map((p) => p.key), ['teder-small', 'teder']);
+  assert.deepEqual(soon.support.plans, live.support.plans.filter((p) => p.product === 'teder'));
 });
 
 test('with "soon", the support export says Toran opens soon and Teder is available', () => {
@@ -150,9 +150,10 @@ test('with "live", the ways into Toran are back', () => {
   assert.match(visible(pages['toran/example/index.html']), /href="\/toran#demo"/);
   for (const [file, html] of Object.entries(pages)) {
     const v = visible(html);
-    assert.doesNotMatch(v, /data-form="waitlist"|class="soon-bar"|\/toran#waitlist|ask-a-/, `${file}: something of the waitlist`);
+    // The question box's Teder answer and who we are come from the config either way (askTeder); nothing else.
+    assert.doesNotMatch(v, /data-form="waitlist"|class="soon-bar"|\/toran#waitlist|ask-a-(?!teder"|who")/, `${file}: something of the waitlist`);
   }
   assert.ok(!pages['thanks/waitlist/index.html'], 'no waitlist thank-you');
   assert.equal(support.products, undefined);
-  assert.deepEqual(support.plans.map((p) => p.key), ['toran-store', 'toran-big', 'teder']);
+  assert.deepEqual(support.plans.map((p) => p.key), ['toran-store', 'toran-big', 'teder-small', 'teder']);
 });

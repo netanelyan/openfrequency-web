@@ -1,7 +1,7 @@
 // The frame every page shares: the head, the sticky glass header, and the footer.
 import fs from 'node:fs';
 import path from 'node:path';
-import { FACTS, ROOT, esc, mark, toranSoon } from './lib.mjs';
+import { FACTS, ROOT, esc, mark, tederNets, toranSoon } from './lib.mjs';
 import { formCopy } from './forms.mjs';
 
 // The two scripts, comments and indentation out: site.js on every page (motion and the question box), form.js only
@@ -13,15 +13,10 @@ const formJs = squeeze('src/form.js');
 
 // The two products, each behind its own mark, then the pages that are about both. While Toran is soon
 // (products.toran), Teder comes first and Toran's line says it is coming.
-const PRODUCTS_LIVE = [
-  ['/toran', 'toran', 'תורן', 'עונה ללקוחות של החנות'],
-  ['/teder', 'teder', 'תדר', 'מצגות לטיקטוק ולאינסטגרם'],
-];
-const PRODUCTS_SOON = [
-  ['/teder', 'teder', 'תדר', 'מצגות לטיקטוק ולאינסטגרם'],
-  ['/toran', 'toran', 'תורן', 'יענה ללקוחות של החנות, בקרוב'],
-];
-const products = (cfg) => (toranSoon(cfg) ? PRODUCTS_SOON : PRODUCTS_LIVE);
+const products = (cfg) => {
+  const teder = ['/teder', 'teder', 'תדר', `מצגות ${tederNets(cfg)}`];
+  return toranSoon(cfg) ? [teder, ['/toran', 'toran', 'תורן', 'יענה ללקוחות של החנות, בקרוב']] : [['/toran', 'toran', 'תורן', 'עונה ללקוחות של החנות'], teder];
+};
 // The pages about both products. Each price is on its product's page, so there is no price link of its own.
 const LINKS = () => [['/faq', 'שאלות']];
 
@@ -66,7 +61,7 @@ function footer(cfg, current) {
 <div class="foot-cols">
 <div class="foot-who">
 <a class="brand" href="/">${mark('openfrequency', 40)}<b>OpenFrequency</b></a>
-<p>${toranSoon(cfg) ? 'בנינו שני מוצרים לחנויות אונליין. תדר כותב ומעצב מצגות לטיקטוק ולאינסטגרם, ותורן, שיענה ללקוחות של החנות, נפתח בקרוב.' : 'בנינו שני מוצרים לחנויות אונליין. תורן עונה ללקוחות של החנות, ותדר כותב ומעצב מצגות לטיקטוק ולאינסטגרם.'}</p>
+<p>${toranSoon(cfg) ? `בנינו שני מוצרים לחנויות אונליין. תדר כותב ומעצב מצגות ${tederNets(cfg)}, ותורן, שיענה ללקוחות של החנות, נפתח בקרוב.` : `בנינו שני מוצרים לחנויות אונליין. תורן עונה ללקוחות של החנות, ותדר כותב ומעצב מצגות ${tederNets(cfg)}.`}</p>
 ${cfg.has('about.who') || cfg.banner ? `<h2 id="f-who">מי אנחנו</h2><p>${cfg.t('about.who')}</p><p class="foot-why">${cfg.t('about.why')}</p>` : ''}
 </div>
 <nav aria-labelledby="f-prod"><h2 id="f-prod">המוצרים</h2><ul>
@@ -78,7 +73,7 @@ ${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a
 <div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<p class="foot-cta-t">רוצים לראות את זה על החנות שלכם?</p><a class="foot-cta" href="/join">דמו חינם לחנות שלכם<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></a></div>
 </div>
 <p class="foot-legal">© 2026 OpenFrequency</p>
-<p class="foot-word" aria-hidden="true">OpenFrequency</p>
+<p class="foot-word" aria-hidden="true" data-word="OpenFrequency"></p>
 </div>
 </footer>`;
 }

@@ -1,5 +1,5 @@
 // What more than one page uses: words that open WhatsApp to us, and the question box on the home page.
-import { SIGNUP_URL, esc, ils, mark, signupOpen, signupUrl, toranSoon } from './lib.mjs';
+import { SIGNUP_URL, esc, ils, mark, payOnline, signupOpen, signupUrl, tederNets, toranSoon } from './lib.mjs';
 
 // Words that open WhatsApp to us; plain words in a draft without the number.
 export const waWords = (cfg, words) => {
@@ -41,17 +41,22 @@ export const askBox = (cfg) => `
 
 // While Toran is soon, the box's answers about Toran say what it will do, and send to its waitlist or to Teder instead of
 // a demo: site.js takes each <template id="ask-a-KEY"> in place of its own answer to KEY.
-const SOON_ANSWERS = {
+const SOON_ANSWERS = (cfg) => ({
   toran: 'תורן יענה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל, מתוך מה שכתוב באתר שלה. הוא עוד לא פתוח, ואנחנו פותחים אותו בקרוב. <a class="lnk" href="/toran#waitlist">לקבל עדכון כשהוא נפתח</a>',
   demo: 'לתורן אין דמו כרגע, כי הוא עוד לא פתוח. לתדר אפשר לקבל מצגת לדוגמה מהחנות שלכם: שולחים את הכתובת של החנות ומספר וואטסאפ, ואנחנו שולחים לכם אותה. <a class="lnk" href="/teder#demo">לנסות את תדר על החנות שלכם</a>',
   store: 'כן. תורן יקרא חנויות על Shopify, על WooCommerce ועל Wix, ובחנות על Wix את 150 המוצרים החדשים ביותר. הוא נפתח בקרוב.',
   number: 'כן, זו הכוונה. כשתורן ייפתח, הלקוחות ימשיכו לכתוב לאותו מספר, ואנחנו נחבר אותו ל-WhatsApp Business Platform של Meta יחד איתכם.',
   install: 'לא צריך להתקין כלום. תורן קורא את מה שכבר מופיע באתר. כשהוא ייפתח, כדי לחבר את המספר של החנות יהיה צריך חשבון עסקי ב-Meta, ואת החיבור נעשה יחד.',
   night: 'כן. תורן יענה 24/7, ומה שהוא לא יודע יחכה לכם לבוקר. הוא נפתח בקרוב.',
-  who: 'אנחנו OpenFrequency. בנינו את תדר, שכותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, ואת תורן, שיענה ללקוחות של חנויות אונליין ונפתח בקרוב.',
+  who: `אנחנו OpenFrequency. בנינו את תדר, שכותב ומעצב מצגות בעברית ${tederNets(cfg)}, ואת תורן, שיענה ללקוחות של חנויות אונליין ונפתח בקרוב.`,
   en: 'Toran will answer a store\'s customers on WhatsApp, Instagram, Messenger and email, from what\'s on the store\'s site, in Hebrew or in English. It opens soon. <a class="lnk" href="/toran#waitlist">Hear when it opens</a>',
-};
-export const askSoon = Object.entries(SOON_ANSWERS).map(([k, a]) => `<template id="ask-a-${k}">${a}</template>`).join('\n');
+});
+export const askSoon = (cfg) => Object.entries(SOON_ANSWERS(cfg)).map(([k, a]) => `<template id="ask-a-${k}">${a}</template>`).join('\n');
+// Teder's answer in the box, where it posts as the config says (teder.facebook), and with Toran live who we are too.
+export const askTeder = (cfg) => [
+  `<template id="ask-a-teder">תדר כותב ומעצב מצגות בעברית ${tederNets(cfg)}, וכל מצגת עולה רק אחרי שמישהו אישר אותה. <a class="lnk" href="/teder">לעמוד של תדר</a></template>`,
+  toranSoon(cfg) ? '' : `<template id="ask-a-who">אנחנו OpenFrequency. בנינו את תורן, שעונה ללקוחות של חנויות אונליין, ואת תדר, שכותב ומעצב מצגות בעברית ${tederNets(cfg)}.</template>`,
+].filter(Boolean).join('\n');
 
 // ---------------------------------------------------------------- the price
 
@@ -62,13 +67,30 @@ const months = (n) => (n === 1 ? 'חודש' : n === 2 ? 'חודשיים' : `${n}
 const days = (n) => (n === 7 ? 'שבוע' : n === 14 ? 'שבועיים' : n === 1 ? 'יום' : `${n} ימים`);
 const said = (cfg, key, words) => (cfg.get(key) == null ? cfg.ph(key) : esc(words(cfg.get(key))));
 
-// Each product's price in one sentence: the monthly figure and the setup fee, VAT as the config says. For /join, the
-// questions, the question box and Teder's sign-up button.
-export function priceLine(cfg, monthly, setup) {
-  const m = cfg.get(monthly), s = cfg.get(setup);
-  const vat = cfg.get('price.vat') === 'included' ? 'כולל מע״מ' : cfg.get('price.vat') === 'excluded' ? 'לא כולל מע״מ' : cfg.ph('price.vat');
-  return `${m == null ? cfg.ph(monthly) : esc(ils(m))} לחודש, ${vat}${s == null ? `, ${cfg.ph(setup)}` : s > 0 ? `, ועוד ${esc(ils(s))} דמי הקמה, פעם אחת` : ''}.`;
+// Teder's two plans, the small one first: [the plan as accounts takes it (plan=), its facts in the config, its name, and
+// "in it" for a sentence].
+const TEDER_PLANS = [
+  ['small', 'teder.small', 'חבילה קטנה', 'בחבילה הקטנה'],
+  ['full', 'teder', 'חבילה מלאה', 'בחבילה המלאה'],
+];
+
+// Teder's price in one sentence, for /join, the questions, the question box, the terms and the sign-up buttons: each
+// plan's monthly price and slideshows, VAT, then each plan's setup fee. Every number from the config.
+export function tederPriceLine(cfg) {
+  const fees = TEDER_PLANS.map(([, k, , inIt]) => {
+    const fee = cfg.get(`${k}.setup`);
+    return fee == null ? cfg.ph(`${k}.setup`) : fee === 0 ? `אין ${inIt}` : `${esc(ils(fee))} ${inIt}`;
+  });
+  const none = TEDER_PLANS.every(([, k]) => cfg.get(`${k}.setup`) === 0);
+  const each = TEDER_PLANS.map(([, k]) => `${amount(cfg, `${k}.monthly`)} לחודש ל-${count(cfg, `${k}.slideshows`)} מצגות`);
+  return `${each.join(', או ')}, ${vatOf(cfg)}. ${none ? 'אין דמי הקמה.' : `דמי ההקמה, פעם אחת: ${fees.join(', ו-')}.`}`;
 }
+
+// How a business pays once it has signed up: until a payment provider is connected (payment in site.config.json) we
+// send the details by WhatsApp or email; once it is, in the account.
+export const payLine = (cfg) => (payOnline(cfg)
+  ? 'משלמים מראש לכל חודש, בחשבון שלכם.'
+  : 'אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל. משלמים מראש לכל חודש.');
 
 // While sign-up is open (signup in site.config.json): Teder's way in, the button to accounts' sign-up with the price
 // beside it, and, for who wants to see one first, the way to the free sample. sample: where the sample form is (null
@@ -78,7 +100,7 @@ export const SIGNUP_LABEL = 'להצטרף לתדר';
 export const sampleLine = (href) => `<p class="start-alt">רוצים קודם לראות מצגת מהחנות שלכם? <a href="${href}">לבקש מצגת לדוגמה</a></p>`;
 export const tederStart = (cfg, { sample, cls = 'btn primary', wrap = 'start', more = '', act = 'start-act', price = true } = {}) => `<div class="${wrap}">
 ${more ? `<div class="${act}">` : ''}<a class="${cls}" href="${SIGNUP_URL}">${SIGNUP_LABEL}</a>${more ? `${more}</div>` : ''}
-${price ? `<p class="start-price">${priceLine(cfg, 'teder.monthly', 'teder.setup')}</p>` : ''}
+${price ? `<p class="start-price">${tederPriceLine(cfg)}</p>` : ''}
 ${sample ? sampleLine(sample) : ''}</div>`;
 
 // Toran's way in once it is live and sign-up is open: the same button to accounts' sign-up, its price, and the demo
@@ -112,32 +134,42 @@ function termsLine(cfg, toran) {
     : `${commit} ${stop}, ${write}, ו${stopWords}.`;
 }
 
-// Teder's price, in the serious register, on one card: the monthly figure, VAT and the setup fee, the way to try it,
-// and beside them what the price includes. monthly and setup are the facts' keys (teder.monthly, teder.setup);
-// product is { name, label, includes: [html], notes?: [html], cta: [href, text], alt?: html under the button }. Left out of the public draft until
-// the monthly price is set; the terms line waits for its own facts the same way.
-export function priceSection(cfg, { monthly, setup, product, id = 'price' }) {
-  if (!cfg.has(monthly) && !cfg.banner) return '';
-  const fee = cfg.get(setup);
-  const setupLine = fee == null ? cfg.ph(setup) : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת.`;
-  const figure = cfg.get(monthly) == null ? cfg.ph(monthly) : esc(cfg.get(monthly).toLocaleString('he-IL'));
+// Teder's two plans, every number from site.config.json (teder.small and teder): a card each with its monthly price,
+// its slideshows and redos and its setup fee, and while sign-up is open its own button to accounts' sign-up with that
+// plan picked (&plan=small or full); then what both include, beside how paying works and, with sign-up closed, the way
+// in (cta); and the terms line. alt: a line under it (the sample). Left out of the public draft until both prices are set.
+export function tederPricing(cfg, { includes, notes = [], cta = null, alt = '', id = 'price' }) {
+  if (!TEDER_PLANS.every(([, k]) => cfg.has(`${k}.monthly`)) && !cfg.banner) return '';
+  const open = signupOpen(cfg);
+  const card = ([plan, k, name, inIt]) => {
+    const fee = cfg.get(`${k}.setup`);
+    return `<article class="plan glass">
+<h3 class="plan-name">${name}</h3>
+<p class="figure"><span class="num">${count(cfg, `${k}.monthly`)}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
+<p class="plan-vat">${vatOf(cfg)}</p>
+<p class="plan-cap"><b>${count(cfg, `${k}.slideshows`)}</b> מצגות מוצעות בחודש, ועד <b>${count(cfg, `${k}.redos`)}</b> החלפות</p>
+<p class="plan-fee">${fee == null ? cfg.ph(`${k}.setup`) : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת.`}</p>
+${open ? `<a class="btn primary" href="${esc(signupUrl('teder', plan))}">להצטרף ${inIt}</a>` : ''}
+</article>`;
+  };
   const terms = termsLine(cfg, false);
   return `
-<section class="sec price-sec ${product.name}" id="${id}" aria-labelledby="${id}-h">
+<section class="sec price-sec teder" id="${id}" aria-labelledby="${id}-h">
 <div class="wrap">
-<div class="sec-head"><h2 id="${id}-h">כמה זה עולה</h2></div>
-<div class="price-card glass">
-<div class="price-main">
-<p class="price-name">${mark(product.name, 36)}<b>${product.label}</b></p>
-<p class="figure"><span class="num">${figure}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
-<p class="price-notes">${vatOf(cfg)}. ${setupLine}</p>
-<a class="btn primary" href="${product.cta[0]}">${product.cta[1]}</a>
-${product.alt || ''}</div>
+<div class="sec-head"><h2 id="${id}-h">כמה זה עולה</h2><p class="lede">שתי חבילות, לפי מספר המצגות בחודש. כל השאר זהה בשתיהן.</p></div>
+<div class="plans">${TEDER_PLANS.map(card).join('\n')}</div>
+<p class="plan-more">צריכים יותר מ-${count(cfg, 'teder.slideshows')} מצגות בחודש? ${waWords(cfg, 'כתבו לנו בוואטסאפ')}.</p>
+<div class="price-card plan-both glass">
 <div class="price-incl">
-<h3>מה כלול במחיר</h3>
-<ul class="checks">${product.includes.map((x) => `<li>${x}</li>`).join('')}</ul>
-${(product.notes || []).map((x) => `<p class="incl-note">${x}</p>`).join('')}
+<h3>מה יש בשתי החבילות</h3>
+<ul class="checks">${includes.map((x) => `<li>${x}</li>`).join('')}</ul>
+${notes.map((x) => `<p class="incl-note">${x}</p>`).join('')}
 </div>
+<div class="price-main">
+<p class="price-name">${mark('teder', 36)}<b>תדר</b></p>
+<p class="price-notes">${open ? payLine(cfg) : 'משלמים מראש לכל חודש.'}</p>
+${cta ? `<a class="btn primary" href="${cta[0]}">${cta[1]}</a>` : ''}
+${alt}</div>
 </div>
 ${terms ? `<p class="terms-line">${terms}</p>` : ''}
 </div>

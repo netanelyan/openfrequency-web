@@ -6,12 +6,12 @@
 // While sign-up is open (signup in site.config.json), Teder's first action is the button to accounts' sign-up with its
 // price, the form follows as the second way, for a store that wants to see a sample slideshow first, and the steps are
 // sign-up's. With Toran live, the form stays first and Teder's sign-up button follows it.
-import { mark, signupOpen, toranSoon } from '../lib.mjs';
+// Until a payment provider is connected (payment in site.config.json), sign-up's first step says we send the payment
+// details by WhatsApp or email once the account is open; with "online", that it is paid in the account.
+import { mark, payOnline, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
-import { priceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
+import { tederPriceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
 import { TEDER, TORAN } from './faq.mjs';
-
-export { priceLine };
 
 const TOOLS = 'https://accounts.openfrequency.co.il/';
 
@@ -31,22 +31,27 @@ const AFTER_SOON = [
 const ASKED_SOON = ['תדר יכול לפרסם משהו בלי שאישרתי?', 'מה נחשב מצגת?', 'מאיפה הוא לוקח את העובדות?'];
 
 // After sign-up, Teder's own setup (openfrequency-teder, the new-account flow: account, sources, samples, live).
-const SIGNUP_STEPS = [
-  ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם, ומשלמים בו את החודש הראשון ואת דמי ההקמה.'],
+const PAY_STEP = (cfg) => (payOnline(cfg)
+  ? ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם, בוחרים חבילה, ומשלמים בו את החודש הראשון ואת דמי ההקמה.']
+  : ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם ובוחרים חבילה. אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל, על החודש הראשון ועל דמי ההקמה.']);
+const SIGNUP_STEPS = (cfg) => [
+  PAY_STEP(cfg),
   ['בוחרים מקורות', 'תדר מחפש מקורות שמתאימים לחנות שלכם, ואתם בוחרים מהם את אלה שהוא יקרא.'],
   ['עוברים על המצגות לדוגמה', 'תדר מכין חמש מצגות מהמקורות שבחרתם, ואתם עוברים עליהן לפני שמשהו עולה.'],
-  ['מעלים לאוויר', 'מחברים את טיקטוק ואת אינסטגרם, ומכאן המצגות מחכות לאישור שלכם במסך אחד.'],
+  ['מעלים לאוויר', `מחברים ${tederNets(cfg, 'the')}, ומכאן המצגות מחכות לאישור שלכם במסך אחד.`],
 ];
 // With Toran live and sign-up open: the steps for either product, since the visitor picks on accounts' page.
-const SIGNUP_STEPS_BOTH = [
-  ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם, בוחרים תורן, תדר או שניהם, ומשלמים בחשבון.'],
+const SIGNUP_STEPS_BOTH = (cfg) => [
+  payOnline(cfg)
+    ? ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם, בוחרים תורן, תדר או שניהם, ומשלמים בחשבון.']
+    : ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם ובוחרים תורן, תדר או שניהם. אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל.'],
   ['מקימים לפי הצעדים', 'בתורן מוסיפים את האתר של החנות ומחברים את הוואטסאפ. בתדר בוחרים מקורות ועוברים על המצגות לדוגמה.'],
   ['מתחילים לעבוד', 'תורן עונה ללקוחות, ותדר שולח לכם מצגות לאישור. הכול מנוהל מהחשבון שלכם.'],
 ];
 const ASKED_SIGNUP = ['תדר יכול לפרסם משהו בלי שאישרתי?', 'מאיפה הוא לוקח את העובדות?', 'איך מבטלים את תדר?'];
 
 function price(cfg) {
-  const items = [['toran', 'תורן', 'price.plans.store.monthly', null, '/toran#price'], ['teder', 'תדר', 'teder.monthly', 'teder.setup', '/teder#price']]
+  const items = [['toran', 'תורן', 'price.plans.store.monthly', '/toran#price'], ['teder', 'תדר', 'teder.monthly', '/teder#price']]
     .filter(([name, , m]) => (cfg.has(m) || cfg.banner) && !(name === 'toran' && toranSoon(cfg)));
   if (!items.length) return '';
   return `
@@ -54,7 +59,7 @@ function price(cfg) {
 <div class="wrap narrow">
 <h2 id="join-price-h">כמה זה עולה</h2>
 <ul class="join-prices">
-${items.map(([name, label, m, s, href]) => `<li>${mark(name, 40)}<span><b>${label}</b><span>${name === 'toran' ? toranPriceLine(cfg) : priceLine(cfg, m, s)}</span></span><a href="${href}">פרטים</a></li>`).join('\n')}
+${items.map(([name, label, , href]) => `<li>${mark(name, 40)}<span><b>${label}</b><span>${name === 'toran' ? toranPriceLine(cfg) : tederPriceLine(cfg)}</span></span><a href="${href}">פרטים</a></li>`).join('\n')}
 </ul>
 </div>
 </section>`;
@@ -115,7 +120,7 @@ ${open ? `<p class="join-tools">את תדר אפשר גם לפתוח לבד, ב�
 <div class="wrap narrow">
 <h2 id="after-h">${signupFirst ? 'מה קורה אחרי ההרשמה' : 'מה קורה אחרי הטופס'}</h2>
 <ol class="after-steps">
-${(signupFirst ? (soon ? SIGNUP_STEPS : SIGNUP_STEPS_BOTH) : soon ? AFTER_SOON : AFTER).map(([h, p]) => `<li><h3>${h}</h3><p>${p}</p></li>`).join('\n')}
+${(signupFirst ? (soon ? SIGNUP_STEPS(cfg) : SIGNUP_STEPS_BOTH(cfg)) : soon ? AFTER_SOON : AFTER).map(([h, p]) => `<li><h3>${h}</h3><p>${p}</p></li>`).join('\n')}
 </ol>
 </div>
 </section>

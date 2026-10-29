@@ -2,8 +2,8 @@
 // While Toran is soon (products.toran in site.config.json), Teder's group comes first and Toran's carries "בקרוב": its
 // answers say what it will do, and the questions that only make sense once it is on sale (its demo, its price today)
 // are out or say so.
-import { SIGNUP_URL, mark, signupOpen, toranSoon } from '../lib.mjs';
-import { priceLine, toranPriceLine, waWords } from '../sections.mjs';
+import { SIGNUP_URL, facebookOn, mark, payOnline, signupOpen, toranSoon } from '../lib.mjs';
+import { tederPriceLine, toranPriceLine, waWords } from '../sections.mjs';
 
 const TORAN_SOON = () => [
   ['מתי תורן נפתח?',
@@ -59,20 +59,22 @@ export const TORAN = (cfg) => toranSoon(cfg) ? TORAN_SOON(cfg) : [
 ];
 
 // While sign-up is open (signup in site.config.json), the answers say what holds for a business that set Teder up on its
-// own: it signs up and pays in its account, picks its sources, and cancels there.
+// own: it signs up in its account (and pays there once payment is online; until then we send the details), picks its
+// sources, and cancels there. The plans' numbers are both plans', from the config (teder, teder.small).
+const plans = (cfg, key, unit) => `${cfg.t(`teder.small.${key}`)} ${unit} בחבילה הקטנה, ו-${cfg.t(`teder.${key}`)} בחבילה המלאה`;
 export const TEDER = (cfg) => [
   (cfg.has('teder.monthly') || cfg.banner) && ['כמה עולה תדר?',
     signupOpen(cfg)
-      ? `${priceLine(cfg, 'teder.monthly', 'teder.setup')} משלמים מראש, בחשבון שלכם, ונרשמים <a href="${SIGNUP_URL}">בעמוד ההרשמה</a>. הפרטים <a href="/teder#price">בעמוד של תדר</a>.`
-      : `${priceLine(cfg, 'teder.monthly', 'teder.setup')} הפרטים <a href="/teder#price">בעמוד של תדר</a>.`],
+      ? `יש שתי חבילות: ${tederPriceLine(cfg)} נרשמים <a href="${SIGNUP_URL}">בעמוד ההרשמה</a>${payOnline(cfg) ? ', ומשלמים מראש בחשבון שלכם' : ', ואנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל. משלמים מראש לכל חודש'}. הפרטים <a href="/teder#price">בעמוד של תדר</a>.`
+      : `יש שתי חבילות: ${tederPriceLine(cfg)} הפרטים <a href="/teder#price">בעמוד של תדר</a>.`],
   ['תדר יכול לפרסם משהו בלי שאישרתי?',
     'לא. כל מצגת יוצאת רק אחרי שמישהו אישר אותה. בשבת ובחג הוא לא מפרסם, אלא אם תבחרו אחרת בהגדרות.'],
   ['מה נחשב מצגת?',
-    'מצגת היא פוסט אחד: כמה שקופיות שעולות יחד. תדר מכין כל מצגת בגודל של טיקטוק ובגודל של אינסטגרם, והיא נספרת פעם אחת, גם כשהיא עולה בשתי הרשתות.'],
+    `מצגת היא פוסט אחד: כמה שקופיות שעולות יחד. תדר מכין כל מצגת בגודל של טיקטוק ובגודל של אינסטגרם${facebookOn(cfg) ? ', ובפייסבוק היא עולה בגודל של אינסטגרם' : ''}. היא נספרת פעם אחת, גם כשהיא עולה בכמה רשתות.`],
   ['מה קורה אם אני דוחה מצגת?',
-    `כותבים למה דחיתם, ותדר מכין גרסה חדשה במקומה. זו החלפה, ויש עד ${cfg.t('teder.redos')} כאלה בחודש. תיקון קטן בטקסט או בתמונה לא נחשב החלפה, ואפשר לבקש כמה שצריך. אחרי ${cfg.t('teder.redos')} החלפות בחודש, מצגת שדוחים פשוט יורדת, ולא מגיעה במקומה גרסה חדשה.`],
-  [`מה קורה כשמגיעים ל-${cfg.t('teder.slideshows')} מצגות?`,
-    `${cfg.t('teder.slideshows')} המצגות המוצעות הן מה שכלול בחודש. מה שלא השתמשתם בו לא עובר לחודש הבא, ובתחילת כל חודש מתחילים מחדש. צריכים יותר? ${waWords(cfg, 'דברו איתנו')}.`],
+    `כותבים למה דחיתם, ותדר מכין גרסה חדשה במקומה. זו החלפה. בכל חודש יש עד ${plans(cfg, 'redos', 'החלפות')}. תיקון קטן בטקסט או בתמונה לא נחשב החלפה, ואפשר לבקש כמה שצריך. כשההחלפות של החודש נגמרות, מצגת שדוחים פשוט יורדת, ולא מגיעה במקומה גרסה חדשה.`],
+  ['מה קורה כשהמצגות של החודש נגמרות?',
+    `בכל חודש יש ${plans(cfg, 'slideshows', 'מצגות מוצעות')}. כשהן נגמרות, תדר לא כותב מצגות חדשות עד החודש הבא. החודש נספר לפי לוח השנה, מה-1 בחודש ועד סופו, גם כשהתשלום שלכם יורד בתאריך אחר. מה שלא השתמשתם בו לא עובר לחודש הבא. צריכים יותר? ${waWords(cfg, 'דברו איתנו')}.`],
   ['מאיפה הוא לוקח את העובדות?',
     `${signupOpen(cfg) ? 'רק מהמקורות שבחרתם בהקמה, מתוך אלה שתדר מצא לחנות שלכם.' : 'רק ממקורות שאישרנו מראש.'} כל עובדה בשקופית נשענת על ציטוט מילה במילה מהמקור, ומספר שלא מופיע בציטוט לא עולה על שקופית.`],
   signupOpen(cfg) && ['איך מבטלים את תדר?',

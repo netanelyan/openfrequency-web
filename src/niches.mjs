@@ -6,7 +6,8 @@
 //
 // No script needed: each row is the label of a radio button, and the stylesheet shows the card of the one checked
 // (style.css, .niche-sec). Up to 820px the list and the card are one panel: the kinds a row of chips on top, the card
-// under them. site.js adds the search box (from 821px) and keeps the picked chip in view.
+// under them. site.js adds the search box (from 821px) and keeps the picked chip in view. The list can be focused
+// (tabindex), so a keyboard can scroll the row of chips where it scrolls sideways.
 // While Toran is soon (products.toran), each of Toran's lines carries "בקרוב", and the card's button is Teder's demo.
 import { toranSoon } from './lib.mjs';
 
@@ -17,7 +18,7 @@ export const NICHES = [
       ['תורן', 'עונה על מידות, צבעים ומלאי של כל פריט באתר'],
       ['תורן', 'מסביר החלפות והחזרות כמו שכתוב בדף המדיניות שלכם'],
       ['תורן', 'מזכיר על עגלה שנשארה פתוחה, למי שהסכים לקבל מכם הודעות'],
-      ['תדר', 'מכין מצגות על שילובים, בדים וטרנדים, לטיקטוק ולאינסטגרם'],
+      ['תדר', 'מכין מצגות על שילובים, בדים וטרנדים'],
     ],
   },
   {
@@ -96,7 +97,7 @@ export const niches = (cfg) => {
 <div class="sec-head"><h2 id="niche-h">מה OpenFrequency עושה בחנות כמו שלכם?</h2><p class="lede">בחרו את סוג החנות שלכם ותראו</p></div>
 <div class="niches">
 ${NICHES.map((n, i) => `<input type="radio" name="niche" id="niche-${n.id}" class="niche-pick"${i === 0 ? ' checked' : ''}>`).join('')}
-<div class="niche-list glass">
+<div class="niche-list glass" role="group" aria-label="סוגי החנויות" tabindex="0">
 <label class="niche-search" data-niche-search hidden>${searchIcon}<input type="search" placeholder="חפשו את סוג החנות שלכם" aria-label="חיפוש סוג חנות" autocomplete="off"></label>
 ${NICHES.map((n) => `<label for="niche-${n.id}" class="niche-row" data-niche-row data-words="${n.name} ${n.words}"><span class="niche-ava" aria-hidden="true">${n.icon}</span><span class="niche-t"><b>${n.name}</b><small>${n.ask}</small></span><span class="niche-meta"><time>${n.time}</time>${n.unread ? `<i class="niche-badge" aria-hidden="true">${n.unread}</i>` : ''}</span></label>`).join('\n')}
 <p class="niche-none" data-niche-none hidden>${soon ? 'לא מצאנו את סוג החנות הזה. תדר עובד מתוך האתר של החנות, אז אפשר לנסות אותו על החנות שלכם.' : 'לא מצאנו את סוג החנות הזה. תורן ותדר עובדים מתוך האתר של החנות, אז אפשר לנסות אותם על החנות שלכם.'}</p>

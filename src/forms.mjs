@@ -2,7 +2,7 @@
 // button. They live in the page as <template>s, which src/form.js copies in.
 // While sign-up is open (signup in site.config.json), joining Teder is accounts' sign-up, so Teder's forms ask for what
 // they send, a sample slideshow, and the join form's button no longer says "join".
-import { esc, mark, signupOpen, toranSoon } from './lib.mjs';
+import { esc, mark, signupOpen, tederNets, toranSoon } from './lib.mjs';
 
 // The first words of a WhatsApp message to us, when the endpoint can't take the form. {store} is the typed address.
 export const WA_TEXT = {
@@ -26,7 +26,10 @@ ${honeypot}`;
 // How long a demo takes, as the forms say it; until it is set, the public draft says only that it comes when ready.
 const within = (cfg) => (cfg.has('demo.time') || cfg.banner ? `תוך ${cfg.t('demo.time')}` : null);
 
-const status = (id) => `<div class="form-msg" id="msg-${id}" role="status" aria-live="polite" hidden></div>`;
+// The message under a form's button. It stays in the page, empty, from the start: a live region that appears together
+// with its words is often not read out, so form.js only changes what is inside it, and the stylesheet keeps it out of
+// sight while it is empty (.form-msg:empty).
+const status = (id) => `<div class="form-msg" id="msg-${id}" role="status" aria-live="polite"></div>`;
 
 // A demo form: Toran's (kind 'demo') or Teder's (kind 'teder'). A page can hold one twice (the first screen and the
 // close), so each copy has its own id. Toran's takes the store's address only: its answer is a code and a button that
@@ -69,7 +72,7 @@ export function joinForm(cfg) {
 <fieldset class="picks"><legend>במה מתחילים</legend>
 <div class="pick-row">
 ${soon ? card('toran', 'תורן', 'יענה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל', false, true) : card('toran', 'תורן', 'עונה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל', true)}
-${card('teder', 'תדר', 'כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם', soon)}
+${card('teder', 'תדר', `כותב ומעצב מצגות בעברית ${tederNets(cfg)}`, soon)}
 </div>
 </fieldset>
 ${storeField(false)}

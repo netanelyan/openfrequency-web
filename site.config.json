@@ -4,6 +4,7 @@
     "assistant": "soon"
   },
   "signup": "open",
+  "payment": "manual",
   "domain": "openfrequency.co.il",
   "whatsapp": "972552536259",
   "demo": {
@@ -68,7 +69,14 @@
     "monthly": 790,
     "setup": 1490,
     "slideshows": 40,
-    "redos": 10
+    "redos": 10,
+    "small": {
+      "monthly": 490,
+      "setup": 990,
+      "slideshows": 15,
+      "redos": 4
+    },
+    "facebook": true
   },
   "legal": {
     "name": "Netanel Yanchevsky",
@@ -77,7 +85,7 @@
     "court": "אשדוד",
     "host": "גרמניה",
     "leadMonths": 6,
-    "updated": "2026-10-24",
-    "signupUpdated": "2026-10-27"
+    "updated": "2026-10-29",
+    "signupUpdated": "2026-10-29"
   }
 }

@@ -24,6 +24,9 @@ export const FACTS = {
   // was (Teder's ways in are the free sample); 'open' sends them to sign-up with the price beside it, keeps the sample
   // as the second way, and shows the self-serve terms (README, "Sign-up: open or closed").
   signup: { label: 'ההרשמה לתדר פתוחה (open) או סגורה (closed)', kind: ['open', 'closed'] },
+  // How a business that signed up pays: 'manual' while no payment provider is connected (we send the payment details
+  // by WhatsApp or email after the account is opened), 'online' once accounts takes payments in the account itself.
+  payment: { label: 'איך משלמים: פרטי תשלום שאנחנו שולחים (manual) או תשלום בחשבון (online)', kind: ['manual', 'online'] },
   domain: { label: 'הדומיין', kind: 'text' },
   whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
   'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
@@ -62,10 +65,18 @@ export const FACTS = {
   'legal.signupUpdated': { label: 'תאריך תנאי השימוש כשההרשמה פתוחה, YYYY-MM-DD', kind: 'text', unless: (raw) => raw.signup !== 'open' },
   'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
   'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },
-  'teder.monthly': { label: 'מחיר', kind: 'number' },
-  'teder.slideshows': { label: 'כמה מצגות מוצעות בחודש', kind: 'number' },
-  'teder.redos': { label: 'כמה החלפות בחודש', kind: 'number' },
-  'teder.setup': { label: 'דמי ההקמה של תדר, 0 אם אין', kind: 'number' },
+  // Teder's two plans, the same product with a different number of slideshows: the full one (teder.*) and the small one
+  // (teder.small.*). accounts sells them as plan=full and plan=small (signupUrl below).
+  'teder.monthly': { label: 'המחיר החודשי של החבילה המלאה של תדר', kind: 'number' },
+  'teder.slideshows': { label: 'כמה מצגות מוצעות בחודש בחבילה המלאה', kind: 'number' },
+  'teder.redos': { label: 'כמה החלפות בחודש בחבילה המלאה', kind: 'number' },
+  'teder.setup': { label: 'דמי ההקמה של החבילה המלאה, 0 אם אין', kind: 'number' },
+  'teder.small.monthly': { label: 'המחיר החודשי של החבילה הקטנה של תדר', kind: 'number' },
+  'teder.small.slideshows': { label: 'כמה מצגות מוצעות בחודש בחבילה הקטנה', kind: 'number' },
+  'teder.small.redos': { label: 'כמה החלפות בחודש בחבילה הקטנה', kind: 'number' },
+  'teder.small.setup': { label: 'דמי ההקמה של החבילה הקטנה, 0 אם אין', kind: 'number' },
+  // Whether Teder also posts to the customer's Facebook Page. Off, every page says TikTok and Instagram only (tederNets).
+  'teder.facebook': { label: 'תדר מפרסם גם בפייסבוק', kind: 'flag' },
   'toran.channels': { label: 'הערוצים שתורן עונה בהם היום', kind: 'channels' },
   // Where the list of live channels comes from: 'config' (toran.channels above, whatever Toran says), or 'toran'
   // (Toran's own /channels.json at build time, with toran.channels only when Toran doesn't answer). build.mjs.
@@ -130,9 +141,23 @@ export const assistantSoon = (cfg) => cfg.get('products.assistant') === 'soon';
 // While signup is 'open', Teder's main ways in go to accounts' sign-up, where a business opens its account and pays.
 // p=teder is a hint for the form; accounts ignores what it doesn't read.
 export const signupOpen = (cfg) => cfg.get('signup') === 'open';
-// Accounts' sign-up, with the product the visitor came from ticked (?p=).
-export const signupUrl = (product) => `https://accounts.openfrequency.co.il/signup?p=${product}`;
+// Accounts' sign-up, with the product the visitor came from ticked (?p=), and for Teder the plan they picked
+// (&plan=small or full; without it accounts lets them choose). Raw: escape it (esc) before it goes into an attribute.
+export const signupUrl = (product, plan = null) => `https://accounts.openfrequency.co.il/signup?p=${product}${plan ? `&plan=${plan}` : ''}`;
 export const SIGNUP_URL = signupUrl('teder');
+// Until a payment provider is connected (payment in site.config.json), a business opens its account and we send it the
+// payment details by WhatsApp or email; the copy says so instead of "pay in your account".
+export const payOnline = (cfg) => cfg.get('payment') === 'online';
+
+// Where Teder posts, as a sentence needs it: to (לטיקטוק ולאינסטגרם), in (בטיקטוק ובאינסטגרם) or the (את טיקטוק ואת
+// אינסטגרם), with Facebook while teder.facebook is on.
+const NETS = {
+  to: ['לטיקטוק ולאינסטגרם', 'לטיקטוק, לאינסטגרם ולפייסבוק'],
+  in: ['בטיקטוק ובאינסטגרם', 'בטיקטוק, באינסטגרם ובפייסבוק'],
+  the: ['את טיקטוק ואת אינסטגרם', 'את טיקטוק, את אינסטגרם ואת פייסבוק'],
+};
+export const facebookOn = (cfg) => cfg.get('teder.facebook') === true;
+export const tederNets = (cfg, form = 'to') => NETS[form][facebookOn(cfg) ? 1 : 0];
 
 // Shekels the way the site writes them: 1,290 ₪, and 0.15 ₪ for a fraction.
 export const ils = (n) => `${n.toLocaleString('he-IL', { maximumFractionDigits: 2 })} ₪`;
@@ -195,6 +220,10 @@ const BANNED = [
   ['תקופת ניסיון', 'there is no free trial'],
 ];
 
+// A claim about our place in the market (the leading, the best, number one) that nothing on the page can back: the
+// site states what the products do, never a rank. A prefix letter (ו, ש, כ...) is part of the word.
+const RANK = /(?:^|[^֐-׿])[ובכלמשה]{0,2}(המוביל(?:ה|ים|ות)?|הכי|הטוב(?:ה|ים|ות)? ביותר|הגדול(?:ה|ים|ות)? ביותר|מספר (?:1|אחת?)(?= |[.,]|$)|#1(?![\w]))(?![֐-׿])/m;
+
 export function lint(file, html, { draft }) {
   const errors = [];
   const body = html.replace(/<style[\s\S]*?<\/style>/g, '').replace(/<script[\s\S]*?<\/script>/g, '');
@@ -210,6 +239,8 @@ export function lint(file, html, { draft }) {
     if (m[1].replace(/<[^>]+>/g, '').replace(/\d:\d/g, '').includes(':')) errors.push(`a colon in a heading: "${m[1].replace(/<[^>]+>/g, '').trim()}"`);
   }
   for (const [w, fix] of BANNED) if (all.includes(w)) errors.push(`"${w}"${fix ? ` (${fix})` : ''}`);
+  const rank = RANK.exec(all);
+  if (rank) errors.push(`a market claim, "${rank[1]}" (say what the product does, not where it ranks)`);
   if (!draft && /\[[^\]\n]{1,60}\]/.test(text)) errors.push('a [placeholder] left in the text');
   return errors.map((e) => `${file}: ${e}`);
 }

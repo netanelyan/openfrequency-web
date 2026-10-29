@@ -1,7 +1,7 @@
 // The home page: OpenFrequency and its two products. The first screen says what we make, with our mark large and
 // faint behind it, and opens a door to each product in its own material: Toran's chat answering on glass, Teder's
 // real slides playing on its violet; on a phone the line under the headline is left out (style.css), since the doors
-// say it. Then what holds for every store, the businesses that work with us, what we do in a
+// say it. Then what holds for every store, the businesses we run ourselves, what we do in a
 // store like yours, Toran as the owner's assistant, and Toran answering questions about us. Each product has its own
 // page (/toran, /teder), and the questions have theirs (/faq).
 // While Toran is soon (products.toran in site.config.json), Teder's door comes first and Toran's carries "בקרוב", with
@@ -10,9 +10,9 @@
 // slideshow is the line after.
 import fs from 'node:fs';
 import path from 'node:path';
-import { CHANNELS, ROOT, esc, mark, glyphOnly, signupOpen, toranSoon, assistantSoon } from '../lib.mjs';
+import { CHANNELS, ROOT, esc, mark, glyphOnly, signupOpen, tederNets, toranSoon, assistantSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
-import { TEDER_DEMO, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, askBox, askSoon, priceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
+import { TEDER_DEMO, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, askBox, askSoon, askTeder, tederPriceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -52,7 +52,7 @@ ${soon
 </div>
 </article>`;
   const tederDoor = `<article class="door teder-door" aria-labelledby="door-teder" data-door>
-${doorTop('teder', `<span class="wave" aria-hidden="true">${glyphOnly('teder')}</span>`, 'תדר', 'מצגות לטיקטוק ולאינסטגרם', 'כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.')}
+${doorTop('teder', `<span class="wave" aria-hidden="true">${glyphOnly('teder')}</span>`, 'תדר', `מצגות ${tederNets(cfg)}`, `כותב ומעצב מצגות בעברית ${tederNets(cfg)}. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.`)}
 <div class="door-in" id="door-teder-in">
 ${signupOpen(cfg)
     ? tederStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', price: false, more: `<a class="btn on-color" href="/teder">${TEDER_DEMO}</a><a class="btn on-color" href="/teder#demo">${TEDER_SAMPLE}</a>` })
@@ -64,10 +64,10 @@ ${reel}
 <section class="co-hero" aria-labelledby="hero-h">
 <div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
 <div class="wrap">
-<h1 id="hero-h">פלטפורמות יצירת התוכן ושירות הלקוחות <span class="hl">המובילות בארץ</span></h1>
+<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>
 <p class="lede">${soon
-    ? `תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן, שיענה ללקוחות שלכם 24/7 ${inList(CHANNELS)} מתוך מה שכתוב באתר, נפתח בקרוב.`
-    : `תדר כותב ומעצב לכם מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`}</p>
+    ? `תדר כותב ומעצב לכם מצגות בעברית ${tederNets(cfg)}. תורן, שיענה ללקוחות שלכם 24/7 ${inList(CHANNELS)} מתוך מה שכתוב באתר, נפתח בקרוב.`
+    : `תדר כותב ומעצב לכם מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`}</p>
 <div class="doors">
 ${soon ? `${tederDoor}\n${toranDoor}` : `${toranDoor}\n${tederDoor}`}
 </div>
@@ -85,9 +85,10 @@ const ask = (cfg) => `
 <p class="ask-note">זו הדגמה בדפדפן, עם תשובות שכתבנו מראש מתוך האתר הזה.</p>
 </div>
 ${askBox(cfg)}
+${askTeder(cfg)}
 ${toranSoon(cfg)
-    ? `${cfg.has('teder.monthly') ? `<template id="ask-price">תדר עולה ${priceLine(cfg, 'teder.monthly', 'teder.setup')} תורן עוד לא פתוח, ואת המחיר שלו נפרסם כשהוא ייפתח.</template>` : ''}\n${askSoon}`
-    : cfg.has('price.plans.store.monthly') && cfg.has('teder.monthly') ? `<template id="ask-price">תורן עולה ${toranPriceLine(cfg)} תדר עולה ${priceLine(cfg, 'teder.monthly', 'teder.setup')}</template>` : ''}
+    ? `${cfg.has('teder.monthly') ? `<template id="ask-price">תדר עולה ${tederPriceLine(cfg)} תורן עוד לא פתוח, ואת המחיר שלו נפרסם כשהוא ייפתח.</template>` : ''}\n${askSoon(cfg)}`
+    : cfg.has('price.plans.store.monthly') && cfg.has('teder.monthly') ? `<template id="ask-price">תורן עולה ${toranPriceLine(cfg)} תדר עולה ${tederPriceLine(cfg)}</template>` : ''}
 </div>
 </section>`;
 
@@ -143,7 +144,7 @@ ${toranSoon(cfg) ? `<p class="kicker">העוזר האישי שלכם ${soonBadge
 <li><b>מה קרה היום.</b> כמה לקוחות פנו, בכל ערוץ, ועל כמה הוא ענה לבד.</li>
 <li><b>מה מחכה לכם.</b> השאלות שהוא העביר אליכם, עם הלקוח שמחכה לתשובה.</li>
 <li><b>עונים דרכו.</b> אומרים לו מה לענות, והוא שולח ללקוח רק אחרי שכתבתם כן. את התשובה הוא זוכר לפעם הבאה.</li>
-<li><b>על מה שואלים.</b> המוצרים שלקוחות שאלו עליהם הכי הרבה, ומה מהם אזל מהמלאי.</li>
+<li><b>על מה שואלים.</b> המוצרים שלקוחות שואלים עליהם הרבה, ומה מהם אזל מהמלאי.</li>
 </ul>
 </div>
 <div class="phone owner-phone">${chat({ id: 'owner-chat', who: 'תורן', sub: 'העוזר שלכם', face: mark('toran', 38), msgs: OWNER_CHAT, names: { me: 'אתם', them: 'תורן' } })}</div>
@@ -184,7 +185,7 @@ const tederAssistant = (cfg) => `
 // While the assistant is soon (products.assistant), Teder's approvals are shown where they happen today: Teder's own
 // screen, with the day's slideshows, one click each or all at once, a rejection with a reason that comes back
 // rewritten, and the approved one waiting in TikTok's drafts. The WhatsApp way is one line, marked "בקרוב".
-const tederDashboard = () => `
+const tederDashboard = (cfg) => `
 <section class="sec owner-sec teder-owner" id="owner-teder" aria-labelledby="owner-teder-h">
 <div class="wrap owner-grid">
 <div class="owner-text">
@@ -198,7 +199,7 @@ const tederDashboard = () => `
 <li><b>לאשר מהוואטסאפ ${soonBadge}</b> העוזר ישלח לכם את המצגות לוואטסאפ, ותאשרו שם בהודעה.</li>
 </ul>
 </div>
-<div class="stage glass">${approvals()}</div>
+<div class="stage glass">${approvals(cfg)}</div>
 </div>
 </section>`;
 
@@ -206,11 +207,11 @@ export default (cfg) => ({
   path: '/',
   title: 'OpenFrequency, תורן ותדר',
   description: toranSoon(cfg)
-    ? 'תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן, שיענה ללקוחות של החנות 24/7 מתוך מה שכתוב באתר, נפתח בקרוב.'
-    : `תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,
+    ? `תדר כותב ומעצב מצגות בעברית ${tederNets(cfg)}. תורן, שיענה ללקוחות של החנות 24/7 מתוך מה שכתוב באתר, נפתח בקרוב.`
+    : `תדר כותב ומעצב מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,
   // "Who we are" is in the footer (layout.mjs), on every page.
   body: (() => {
-    const teder = assistantSoon(cfg) ? tederDashboard() : tederAssistant(cfg);
+    const teder = assistantSoon(cfg) ? tederDashboard(cfg) : tederAssistant(cfg);
     return (toranSoon(cfg)
       ? [hero(cfg), trust(cfg), clients(), niches(cfg), teder, assistant(cfg), ask(cfg)]
       : [hero(cfg), trust(cfg), clients(), niches(cfg), assistant(cfg), teder, ask(cfg)]).join('\n');

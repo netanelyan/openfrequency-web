@@ -9,7 +9,7 @@ import { CHANNELS, mark } from './lib.mjs';
 import { chat } from './chat.mjs';
 import { LOGOS } from './logos.mjs';
 
-export const NAMES = { whatsapp: 'וואטסאפ', instagram: 'אינסטגרם', messenger: 'מסנג׳ר', email: 'מייל', tiktok: 'טיקטוק' };
+export const NAMES = { whatsapp: 'וואטסאפ', instagram: 'אינסטגרם', messenger: 'מסנג׳ר', email: 'מייל', tiktok: 'טיקטוק', facebook: 'פייסבוק' };
 // A channel's name with its mark in front.
 export const named = (c) => `${LOGOS[c]}${NAMES[c]}`;
 

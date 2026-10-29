@@ -72,7 +72,7 @@ test('with "closed", nothing links to sign-up and Teder is offered by its sample
   assert.ok(!text(main(pages['faq/index.html'])).includes('איך מבטלים את תדר'));
   const terms = main(pages['terms/index.html']);
   assert.doesNotMatch(terms, /t-teder-sub/);
-  assert.match(terms, /עודכן לאחרונה ב-24 באוקטובר 2026/);
+  assert.match(terms, /עודכן לאחרונה ב-29 באוקטובר 2026/);
   assert.match(text(section(terms, 't-stop')), /דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם/);
   assert.doesNotMatch(support.status, /signup/);
 });
@@ -85,16 +85,22 @@ test('with "open", Teder\'s first screens have sign-up, the demo and the sample 
   assert.ok(!text(hero).includes(price), 'no price in the first screen');
   assert.match(hero, /<a class="btn on-color" href="#demo">מצגת לדוגמה מהחנות שלכם<\/a>/);
   assert.doesNotMatch(teder, /href="#demo">לנסות את תדר על החנות שלכם/);
+  // Each plan's card has its own button, to sign-up with that plan picked; the card both share keeps the sample and
+  // says how paying works while no payment provider is connected.
+  const plans = [...teder.matchAll(/<article class="plan glass">[\s\S]*?<\/article>/g)].map((m) => m[0]);
+  assert.equal(plans.length, 2);
+  assert.ok(plans[0].includes(`href="${SIGNUP}&amp;plan=small">להצטרף בחבילה הקטנה</a>`), "the small plan's button");
+  assert.ok(plans[1].includes(`href="${SIGNUP}&amp;plan=full">להצטרף בחבילה המלאה</a>`), "the full plan's button");
   const card = /<div class="price-main">[\s\S]*?<\/div>/.exec(teder)[0];
-  assert.ok(card.includes(`href="${SIGNUP}"`), "the price card's button");
   assert.match(card, /href="#demo">לבקש מצגת לדוגמה/);
+  assert.match(text(card), /אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל/);
   assert.match(teder, /כדי להפסיק, מבטלים בחשבון, בכל זמן, והחיוב נעצר בסוף החודש שכבר שולם\./);
   // The sample form stays, at the end, as the second way.
   assert.equal(heading(teder, 'demo-h'), 'רוצים קודם לראות מצגת מהחנות שלכם?');
   assert.match(teder, /data-form="teder"[\s\S]*?<button class="btn primary" type="submit">לקבל מצגת לדוגמה<\/button>/);
   // What is left to a business that set Teder up on its own.
   assert.match(teder, /קורא רק מהמקורות שבחרתם/);
-  assert.match(teder, /לחבר את טיקטוק ואת אינסטגרם, פעם אחת/);
+  assert.match(teder, /לחבר את טיקטוק, את אינסטגרם ואת פייסבוק, פעם אחת/);
   // The home page's door.
   const door = /<article class="door teder-door[\s\S]*?<\/article>/.exec(main(pages['index.html']))[0];
   assert.ok(door.includes(`<a class="btn light" href="${SIGNUP}">להצטרף לתדר</a><a class="btn on-color" href="/teder">לראות דמו</a><a class="btn on-color" href="/teder#demo">מצגת לדוגמה מהחנות שלכם</a>`));
@@ -137,7 +143,7 @@ test('with "open" and Toran live, sign-up is the first way in for both products,
 test('with "open", the FAQ and the support export say how to sign up and cancel', () => {
   const { pages, support } = built.open;
   const faq = main(pages['faq/index.html']);
-  assert.ok(faq.includes(`ונרשמים <a href="${SIGNUP}">בעמוד ההרשמה</a>`));
+  assert.ok(faq.includes(`נרשמים <a href="${SIGNUP}">בעמוד ההרשמה</a>, ואנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל`));
   assert.match(text(faq), /איך מבטלים את תדר\? בחשבון שלכם, בכל זמן/);
   assert.match(faq, /href="\/terms#t-teder-sub">בתנאי השימוש<\/a>/);
   assert.match(faq, /רק מהמקורות שבחרתם בהקמה/);
@@ -148,13 +154,15 @@ test('with "open", the FAQ and the support export say how to sign up and cancel'
 test('with "open", the terms carry Teder\'s self-serve section and their own date; Toran\'s stay', () => {
   const closed = main(built.closed.pages['terms/index.html']);
   const terms = main(built.open.pages['terms/index.html']);
-  assert.match(terms, /עודכן לאחרונה ב-27 באוקטובר 2026/);
-  assert.equal(config.legal.signupUpdated, '2026-10-27', 'the terms version accounts stores once sign-up opens');
+  assert.match(terms, /עודכן לאחרונה ב-29 באוקטובר 2026/);
+  assert.equal(config.legal.signupUpdated, '2026-10-29', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION)');
   assert.match(terms, /<li><a href="#t-stop">הפסקה וביטול<\/a><\/li><li><a href="#t-teder-sub">המנוי לתדר<\/a><\/li>/);
   const sub = text(section(terms, 't-teder-sub'));
   for (const words of [
-    'משלמים עליו מראש, דרך החשבון',
+    'משלמים עליו מראש. אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל',
+    'יש שתי חבילות',
     price,
+    `${config.teder.small.monthly.toLocaleString('he-IL')} ₪ לחודש ל-${config.teder.small.slideshows} מצגות`,
     'המנוי מתחדש בכל חודש, עד שמבטלים אותו',
     'משלמים אותם פעם אחת, עם החודש הראשון',
     'הם מכסים את פתיחת החשבון ואת המצגות הראשונות לדוגמה',
@@ -166,32 +174,62 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
     'עסקת מכר מרחוק',
     'את החשבון ואת המידע שבו אפשר למחוק בעצמכם',
     'העותקים שלנו של המצגות',
-    'נשאר בחשבונות שלכם בטיקטוק ובאינסטגרם',
+    'נשאר בחשבונות שלכם בטיקטוק, באינסטגרם ובפייסבוק',
   ]) assert.ok(sub.includes(words), `the Teder section says "${words}"`);
   assert.doesNotMatch(sub, /מחזירים לכם את דמי ההקמה|14 יום/, 'the setup fee is never refunded');
   // The general sections point Teder to its own; Toran's rules are kept word for word.
   assert.match(text(section(terms, 't-stop')), /את תדר מבטלים בחשבון[\s\S]*בתורן, כדי להפסיק, כותבים לנו[\s\S]*בתורן, דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם/);
-  assert.match(text(section(terms, 't-price')), /בתדר משלמים דרך החשבון/);
+  assert.match(text(section(terms, 't-price')), /בתדר אנחנו שולחים את פרטי התשלום בוואטסאפ או במייל אחרי שפותחים את החשבון/);
   for (const id of ['t-answers', 't-yours', 't-teder', 't-who', 't-deal', 't-what', 't-account']) assert.equal(section(terms, id), section(closed, id), id);
   // The other legal pages keep their own date.
-  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-24 באוקטובר 2026/);
+  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-29 באוקטובר 2026/);
 });
 
 test('the terms promise only the take-downs we can do: published posts stay on the customer\'s accounts, TikTok is theirs to delete', () => {
   for (const b of [built.closed, built.open]) {
     const part = text(section(main(b.pages['terms/index.html']), 't-teder'));
     assert.ok(!part.includes('ונוריד אותה'), 'the old promise to take any post down');
-    assert.ok(part.includes('מצגת שעלתה נמצאת בחשבונות שלכם בטיקטוק ובאינסטגרם, ואפשר למחוק אותה שם'));
+    assert.ok(part.includes('מצגת שעלתה נמצאת בחשבונות שלכם בטיקטוק, באינסטגרם ובפייסבוק, ואפשר למחוק אותה שם'));
     assert.ok(part.includes('נוריד מהצד שלנו את מה שהחיבור שלנו מאפשר, למשל באינסטגרם'));
     assert.ok(part.includes('מצגת בטיקטוק מוחקים בעצמכם, בחשבון הטיקטוק שלכם'));
   }
 });
 
-test('the monthly report says it comes by email, and the plan stays at its 40 slideshows', () => {
+test('the monthly report says it comes by email, and the two plans are 15 and 40 slideshows', () => {
+  assert.deepEqual([config.teder.small.monthly, config.teder.small.setup, config.teder.small.slideshows, config.teder.small.redos], [490, 990, 15, 4]);
+  assert.deepEqual([config.teder.monthly, config.teder.setup, config.teder.slideshows, config.teder.redos], [790, 1490, 40, 10]);
   for (const b of [built.closed, built.open]) {
     const teder = main(b.pages['teder/index.html']);
     assert.match(teder, /<li>דוח תוצאות שמגיע אליכם במייל בכל חודש<\/li>/);
-    assert.match(teder, new RegExp(`<li>${config.teder.slideshows} מצגות מוצעות בחודש`));
-    assert.equal(config.teder.slideshows, 40);
+    const plans = [...teder.matchAll(/<article class="plan glass">[\s\S]*?<\/article>/g)].map((m) => text(m[0]).trim());
+    assert.match(plans[0], /^חבילה קטנה 490 ₪ לחודש לא כולל מע״מ 15 מצגות מוצעות בחודש, ועד 4 החלפות בחודש הראשון יש גם 990 ₪ דמי הקמה, פעם אחת\./);
+    assert.match(plans[1], /^חבילה מלאה 790 ₪ לחודש לא כולל מע״מ 40 מצגות מוצעות בחודש, ועד 10 החלפות בחודש הראשון יש גם 1,490 ₪ דמי הקמה, פעם אחת\./);
+    // TED-17: the slideshows are counted by the calendar month, said beside the price and in the FAQ.
+    assert.match(text(teder), /נספרות לפי חודש קלנדרי, מה-1 בחודש ועד סופו, גם כשהתשלום שלכם יורד בתאריך אחר/);
+    assert.match(text(main(b.pages['faq/index.html'])), /החודש נספר לפי לוח השנה, מה-1 בחודש ועד סופו, גם כשהתשלום שלכם יורד בתאריך אחר/);
   }
+});
+
+test('the payment switch: "manual" says we send the payment details, "online" says it is paid in the account', () => {
+  const online = build('online', { signup: 'open', payment: 'online', products: { toran: 'soon' } });
+  const join = text(main(online.pages['join/index.html']));
+  assert.match(join, /בוחרים חבילה, ומשלמים בו את החודש הראשון ואת דמי ההקמה/);
+  assert.doesNotMatch(join, /פרטי התשלום/);
+  assert.match(text(section(main(online.pages['terms/index.html']), 't-teder-sub')), /משלמים עליו מראש, דרך החשבון/);
+  const manual = text(main(built.open.pages['join/index.html']));
+  assert.match(manual, /אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל, על החודש הראשון ועל דמי ההקמה/);
+  assert.doesNotMatch(manual, /ומשלמים בו את החודש הראשון/);
+  assert.equal(config.payment, 'manual', 'no payment provider is connected yet');
+});
+
+test('Facebook is in every list of where Teder posts while teder.facebook is on, and nowhere while it is off', () => {
+  const off = build('no-facebook', { signup: 'open', products: { toran: 'soon' }, teder: { ...config.teder, facebook: false } });
+  // Every page of ours (the Toran example is Toran's own page, without our frame).
+  for (const [file, html] of Object.entries(off.pages).filter(([, h]) => h.includes('<main id="main">'))) assert.doesNotMatch(main(html), /פייסבוק|Facebook/, `${file}: Facebook while it is off`);
+  const teder = main(built.open.pages['teder/index.html']);
+  assert.match(teder, /<h1 id="hero-h"><span class="hl">מצגות אוטומטיות<\/span> בעברית לטיקטוק, לאינסטגרם ולפייסבוק<\/h1>/);
+  assert.match(teder, /<button type="button" role="tab" id="tab-facebook"/, "the Facebook post under its own tab");
+  assert.match(text(teder), /מפרסם באינסטגרם ובפייסבוק בשעה שנקבעה/);
+  assert.match(text(teder), /לחבר את טיקטוק, את אינסטגרם ואת פייסבוק, פעם אחת/);
+  assert.match(text(main(built.open.pages['privacy/index.html'])), /או עמוד Facebook/);
 });
