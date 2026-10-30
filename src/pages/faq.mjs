@@ -2,8 +2,8 @@
 // While Toran is soon (products.toran in site.config.json), Teder's group comes first and Toran's carries "בקרוב": its
 // answers say what it will do, and the questions that only make sense once it is on sale (its demo, its price today)
 // are out or say so.
-import { SIGNUP_URL, facebookOn, mark, payOnline, signupOpen, toranSoon } from '../lib.mjs';
-import { tederPriceLine, toranPriceLine, waWords } from '../sections.mjs';
+import { SIGNUP_URL, facebookOn, mark, signupOpen, toranSoon } from '../lib.mjs';
+import { payLine, tederPriceLine, toranPriceLine, waWords } from '../sections.mjs';
 
 const TORAN_SOON = () => [
   ['מתי תורן נפתח?',
@@ -59,13 +59,13 @@ export const TORAN = (cfg) => toranSoon(cfg) ? TORAN_SOON(cfg) : [
 ];
 
 // While sign-up is open (signup in site.config.json), the answers say what holds for a business that set Teder up on its
-// own: it signs up in its account (and pays there once payment is online; until then we send the details), picks its
-// sources, and cancels there. The plans' numbers are both plans', from the config (teder, teder.small).
+// own: it signs up in its account and pays as /teder's price card says (payLine: by card there once a payment provider
+// is connected, until then by the details we email), picks its sources, and cancels there. The plans' numbers are both plans', from the config (teder, teder.small).
 const plans = (cfg, key, unit) => `${cfg.t(`teder.small.${key}`)} ${unit} בחבילה הקטנה, ו-${cfg.t(`teder.${key}`)} בחבילה המלאה`;
 export const TEDER = (cfg) => [
   (cfg.has('teder.monthly') || cfg.banner) && ['כמה עולה תדר?',
     signupOpen(cfg)
-      ? `יש שתי חבילות: ${tederPriceLine(cfg)} נרשמים <a href="${SIGNUP_URL}">בעמוד ההרשמה</a>${payOnline(cfg) ? ', ומשלמים מראש בחשבון שלכם' : ', ואנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל. משלמים מראש לכל חודש'}. הפרטים <a href="/teder#price">בעמוד של תדר</a>.`
+      ? `יש שתי חבילות: ${tederPriceLine(cfg)} נרשמים <a href="${SIGNUP_URL}">בעמוד ההרשמה</a>. ${payLine(cfg)} הפרטים <a href="/teder#price">בעמוד של תדר</a>.`
       : `יש שתי חבילות: ${tederPriceLine(cfg)} הפרטים <a href="/teder#price">בעמוד של תדר</a>.`],
   ['תדר יכול לפרסם משהו בלי שאישרתי?',
     'לא. כל מצגת יוצאת רק אחרי שמישהו אישר אותה. בשבת ובחג הוא לא מפרסם, אלא אם תבחרו אחרת בהגדרות.'],

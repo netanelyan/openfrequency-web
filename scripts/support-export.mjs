@@ -20,6 +20,7 @@ import { ROOT, SIGNUP_URL, ils, readConfig, signupOpen, toranSoon } from '../src
 import toran from '../src/pages/toran.mjs';
 import teder from '../src/pages/teder.mjs';
 import { TORAN, TEDER } from '../src/pages/faq.mjs';
+import { NO_REFUND } from '../src/sections.mjs';
 import { terms, privacy, security, accessibility } from '../src/pages/legal.mjs';
 
 const cfg = readConfig(false);
@@ -62,9 +63,11 @@ const allPlans = [
   { key: 'teder', product: 'teder', title: 'תדר, חבילה מלאה', monthly: cfg.get('teder.monthly'), setup: cfg.get('teder.setup'), detail: `${cfg.get('teder.slideshows')} מצגות ו-${cfg.get('teder.redos')} החלפות בחודש`, url: `${origin}/teder#price` },
 ];
 const plans = allPlans.filter((p) => !(soon && p.product === 'toran'));
-// Each plan in one sentence, the way the site says it: the monthly price, VAT, what it covers, the setup fee.
+// Each plan in one sentence, the way the site says it: the monthly price, VAT, what it covers, the setup fee (and for
+// Teder while sign-up is open, as its plan cards say, that the fee is not refunded).
 const vat = cfg.get('price.vat') === 'included' ? 'כולל מע״מ' : 'לא כולל מע״מ';
-for (const p of plans) p.text = `${ils(p.monthly)} לחודש, ${vat}, ${p.detail}. ${p.setup > 0 ? `בחודש הראשון יש גם ${ils(p.setup)} דמי הקמה, פעם אחת.` : 'אין דמי הקמה.'}`;
+const noRefund = (p) => (p.product === 'teder' && signupOpen(cfg) ? ` ${NO_REFUND}` : '');
+for (const p of plans) p.text = `${ils(p.monthly)} לחודש, ${vat}, ${p.detail}. ${p.setup > 0 ? `בחודש הראשון יש גם ${ils(p.setup)} דמי הקמה, פעם אחת.${noRefund(p)}` : 'אין דמי הקמה.'}`;
 const pricing = [
   ...(soon ? [] : [{ product: 'toran', title: 'כמה עולה תורן', url: `${origin}/toran#price`, text: priceSection(toranPage) }]),
   { product: 'teder', title: 'כמה עולה תדר', url: `${origin}/teder#price`, text: priceSection(tederPage) },

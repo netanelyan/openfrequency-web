@@ -1,5 +1,5 @@
 // What more than one page uses: words that open WhatsApp to us, and the question box on the home page.
-import { SIGNUP_URL, esc, ils, mark, payOnline, signupOpen, signupUrl, tederNets, toranSoon } from './lib.mjs';
+import { SIGNUP_URL, esc, ils, mark, payProvider, signupOpen, signupUrl, tederNets, toranSoon } from './lib.mjs';
 
 // Words that open WhatsApp to us; plain words in a draft without the number.
 export const waWords = (cfg, words) => {
@@ -86,11 +86,16 @@ export function tederPriceLine(cfg) {
   return `${each.join(', או ')}, ${vatOf(cfg)}. ${none ? 'אין דמי הקמה.' : `דמי ההקמה, פעם אחת: ${fees.join(', ו-')}.`}`;
 }
 
-// How a business pays once it has signed up: until a payment provider is connected (payment in site.config.json) we
-// send the details by WhatsApp or email; once it is, in the account.
-export const payLine = (cfg) => (payOnline(cfg)
-  ? 'משלמים מראש לכל חודש, בחשבון שלכם.'
-  : 'אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל. משלמים מראש לכל חודש.');
+// How a business pays for Teder once it has signed up (payment in site.config.json): until a payment provider is
+// connected we email the details (sign-up asks for an email and no phone) and Teder opens once the payment reaches us;
+// once one is, by card on the payment page in the account, and Teder opens once the payment is confirmed (accounts'
+// paywall opens a product only for a payment that covers today).
+export const payLine = (cfg) => (payProvider(cfg)
+  ? 'משלמים מראש לכל חודש, בכרטיס אשראי, בעמוד התשלום שבחשבון שלכם. תדר נפתח כשהתשלום מאושר.'
+  : 'אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום במייל. משלמים מראש לכל חודש, ותדר נפתח כשהתשלום מגיע אלינו.');
+// The setup fee, as the self-serve terms say it (legal.mjs tederSub): beside the plans while sign-up is open. Closed, the
+// terms say Toran's rule (not refunded once we started building), so the plans say nothing more than the fee.
+export const NO_REFUND = 'דמי ההקמה לא מוחזרים.';
 
 // While sign-up is open (signup in site.config.json): Teder's way in, the button to accounts' sign-up with the price
 // beside it, and, for who wants to see one first, the way to the free sample. sample: where the sample form is (null
@@ -135,8 +140,8 @@ function termsLine(cfg, toran) {
 }
 
 // Teder's two plans, every number from site.config.json (teder.small and teder): a card each with its monthly price,
-// its slideshows and redos and its setup fee, and while sign-up is open its own button to accounts' sign-up with that
-// plan picked (&plan=small or full); then what both include, beside how paying works and, with sign-up closed, the way
+// its slideshows and redos and its setup fee, and while sign-up is open that the fee is not refunded (NO_REFUND) and its
+// own button to accounts' sign-up with that plan picked (&plan=small or full); then what both include, beside how paying works and, with sign-up closed, the way
 // in (cta); and the terms line. alt: a line under it (the sample). Left out of the public draft until both prices are set.
 export function tederPricing(cfg, { includes, notes = [], cta = null, alt = '', id = 'price' }) {
   if (!TEDER_PLANS.every(([, k]) => cfg.has(`${k}.monthly`)) && !cfg.banner) return '';
@@ -148,7 +153,7 @@ export function tederPricing(cfg, { includes, notes = [], cta = null, alt = '', 
 <p class="figure"><span class="num">${count(cfg, `${k}.monthly`)}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
 <p class="plan-vat">${vatOf(cfg)}</p>
 <p class="plan-cap"><b>${count(cfg, `${k}.slideshows`)}</b> מצגות מוצעות בחודש, ועד <b>${count(cfg, `${k}.redos`)}</b> החלפות</p>
-<p class="plan-fee">${fee == null ? cfg.ph(`${k}.setup`) : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת.`}</p>
+<p class="plan-fee">${fee == null ? cfg.ph(`${k}.setup`) : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת.${open ? ` ${NO_REFUND}` : ''}`}</p>
 ${open ? `<a class="btn primary" href="${esc(signupUrl('teder', plan))}">להצטרף ${inIt}</a>` : ''}
 </article>`;
   };

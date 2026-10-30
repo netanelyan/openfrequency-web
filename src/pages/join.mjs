@@ -6,11 +6,13 @@
 // While sign-up is open (signup in site.config.json), Teder's first action is the button to accounts' sign-up with its
 // price, the form follows as the second way, for a store that wants to see a sample slideshow first, and the steps are
 // sign-up's. With Toran live, the form stays first and Teder's sign-up button follows it.
-// Until a payment provider is connected (payment in site.config.json), sign-up's first step says we send the payment
-// details by WhatsApp or email once the account is open; with "online", that it is paid in the account.
-import { mark, payOnline, signupOpen, tederNets, toranSoon } from '../lib.mjs';
+// Sign-up's first step says how paying works (payment in site.config.json): "manual", we email the payment details once
+// the account is open and the product opens once the payment reaches us; "provider", it is paid by card on the payment
+// page in the account and opens once the payment is confirmed. While sign-up is open, Teder's price says its setup fee
+// is not refunded, as the terms do.
+import { mark, payProvider, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
-import { tederPriceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
+import { NO_REFUND, tederPriceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
 import { TEDER, TORAN } from './faq.mjs';
 
 const TOOLS = 'https://accounts.openfrequency.co.il/';
@@ -31,9 +33,9 @@ const AFTER_SOON = [
 const ASKED_SOON = ['תדר יכול לפרסם משהו בלי שאישרתי?', 'מה נחשב מצגת?', 'מאיפה הוא לוקח את העובדות?'];
 
 // After sign-up, Teder's own setup (openfrequency-teder, the new-account flow: account, sources, samples, live).
-const PAY_STEP = (cfg) => (payOnline(cfg)
-  ? ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם, בוחרים חבילה, ומשלמים בו את החודש הראשון ואת דמי ההקמה.']
-  : ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם ובוחרים חבילה. אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל, על החודש הראשון ועל דמי ההקמה.']);
+const PAY_STEP = (cfg) => (payProvider(cfg)
+  ? ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם ובוחרים חבילה. את החודש הראשון ואת דמי ההקמה משלמים בכרטיס אשראי, בעמוד התשלום שבחשבון, ותדר נפתח כשהתשלום מאושר.']
+  : ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם ובוחרים חבילה. אנחנו שולחים לכם במייל את פרטי התשלום על החודש הראשון ועל דמי ההקמה, ותדר נפתח כשהתשלום מגיע אלינו.']);
 const SIGNUP_STEPS = (cfg) => [
   PAY_STEP(cfg),
   ['בוחרים מקורות', 'תדר מחפש מקורות שמתאימים לחנות שלכם, ואתם בוחרים מהם את אלה שהוא יקרא.'],
@@ -42,9 +44,9 @@ const SIGNUP_STEPS = (cfg) => [
 ];
 // With Toran live and sign-up open: the steps for either product, since the visitor picks on accounts' page.
 const SIGNUP_STEPS_BOTH = (cfg) => [
-  payOnline(cfg)
-    ? ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם, בוחרים תורן, תדר או שניהם, ומשלמים בחשבון.']
-    : ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם ובוחרים תורן, תדר או שניהם. אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל.'],
+  payProvider(cfg)
+    ? ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם, בוחרים תורן, תדר או שניהם, ומשלמים בכרטיס אשראי, בעמוד התשלום שבחשבון. המוצרים נפתחים כשהתשלום מאושר.']
+    : ['נרשמים ומשלמים', 'פותחים חשבון עם המייל שלכם ובוחרים תורן, תדר או שניהם. אנחנו שולחים לכם את פרטי התשלום במייל, והמוצרים נפתחים כשהתשלום מגיע אלינו.'],
   ['מקימים לפי הצעדים', 'בתורן מוסיפים את האתר של החנות ומחברים את הוואטסאפ. בתדר בוחרים מקורות ועוברים על המצגות לדוגמה.'],
   ['מתחילים לעבוד', 'תורן עונה ללקוחות, ותדר שולח לכם מצגות לאישור. הכול מנוהל מהחשבון שלכם.'],
 ];
@@ -59,7 +61,7 @@ function price(cfg) {
 <div class="wrap narrow">
 <h2 id="join-price-h">כמה זה עולה</h2>
 <ul class="join-prices">
-${items.map(([name, label, , href]) => `<li>${mark(name, 40)}<span><b>${label}</b><span>${name === 'toran' ? toranPriceLine(cfg) : tederPriceLine(cfg)}</span></span><a href="${href}">פרטים</a></li>`).join('\n')}
+${items.map(([name, label, , href]) => `<li>${mark(name, 40)}<span><b>${label}</b><span>${name === 'toran' ? toranPriceLine(cfg) : `${tederPriceLine(cfg)}${signupOpen(cfg) ? ` ${NO_REFUND}` : ''}`}</span></span><a href="${href}">פרטים</a></li>`).join('\n')}
 </ul>
 </div>
 </section>`;

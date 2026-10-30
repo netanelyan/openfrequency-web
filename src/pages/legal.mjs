@@ -3,10 +3,11 @@
 // is a [placeholder] in a draft and a build error for real. The legal name and number appear here and nowhere else.
 // While sign-up is open (signup in site.config.json), the terms carry Teder's self-serve section (paying, cancelling
 // and deleting in the account) and its own date, legal.signupUpdated, the terms version accounts stores on sign-up.
-// Closed, they are the terms as they were. Until a payment provider is connected (payment in site.config.json), they say
-// we send the payment details by WhatsApp or email once the account is open; with "online", that it is paid there.
+// Closed, they are the terms as they were. How Teder is paid follows payment in site.config.json: "manual", we email the
+// payment details once the account is open and Teder opens once the payment reaches us; "provider", by card on the
+// payment page in the account, and Teder opens once the payment is confirmed.
 // Teder's platforms are lib.mjs tederNets (Facebook while teder.facebook is on).
-import { SIGNUP_URL, esc, facebookOn, payOnline, signupOpen, tederNets, toranSoon } from '../lib.mjs';
+import { SIGNUP_URL, esc, facebookOn, payProvider, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { tederPriceLine, waWords } from '../sections.mjs';
 
 const updated = (cfg, key = 'legal.updated') => {
@@ -45,7 +46,7 @@ const ul = (items) => `<ul>${items.map((x) => `<li>${x}</li>`).join('')}</ul>`;
 // Teder bought on its own, through the account. DRAFT for the owner (and a lawyer) to approve before sign-up opens.
 const tederSub = (cfg) => `<p>את תדר אפשר לפתוח לבד, בחשבון OpenFrequency ב-<a href="${SIGNUP_URL}" dir="ltr">accounts.openfrequency.co.il</a>. הסעיף הזה חל על מנוי לתדר שנפתח שם. אם יש סתירה בינו לבין סעיף אחר בתנאים, הסעיף הזה קובע.</p>
 ${ul([
-  `<b>תשלום.</b> המנוי חודשי, ומשלמים עליו מראש${payOnline(cfg) ? ', דרך החשבון' : '. אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום בוואטסאפ או במייל'}. יש שתי חבילות, שההבדל ביניהן הוא מספר המצגות וההחלפות בחודש. היום המחירים הם ${tederPriceLine(cfg)} המנוי מתחדש בכל חודש, עד שמבטלים אותו.`,
+  `<b>תשלום.</b> המנוי חודשי, ומשלמים עליו מראש${payProvider(cfg) ? ', בכרטיס אשראי, בעמוד התשלום שבחשבון. תדר נפתח כשהתשלום מאושר' : '. אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום במייל, ותדר נפתח כשהתשלום מגיע אלינו'}. יש שתי חבילות, שההבדל ביניהן הוא מספר המצגות וההחלפות בחודש. היום המחירים הם ${tederPriceLine(cfg)} המנוי מתחדש בכל חודש, עד שמבטלים אותו.`,
   '<b>דמי הקמה.</b> משלמים אותם פעם אחת, עם החודש הראשון. הם מכסים את פתיחת החשבון ואת המצגות הראשונות לדוגמה, שתדר מכין מהמקורות שבחרתם. דמי ההקמה לא מוחזרים.',
   '<b>ביטול.</b> מבטלים בחשבון, בכל זמן, ולא צריך לכתוב לנו. תדר ממשיך לעבוד עד סוף התקופה ששילמתם, ואחרי זה לא מחייבים אתכם יותר. על התקופה שכבר שולמה לא מחזירים כסף, גם כשמבטלים באמצע.',
   '<b>הזכויות שלכם לפי חוק.</b> אם חוק הגנת הצרכן חל עליכם, למשל על ביטול של עסקת מכר מרחוק, הזכויות שהוא נותן לכם נשמרות, גם כשהן רחבות ממה שכתוב כאן.',
@@ -68,7 +69,7 @@ export const terms = (cfg) => doc(cfg, {
 <p><b>תדר</b> כותב ומעצב מצגות בעברית ${tederNets(cfg)}, ומפרסם אותן בחשבונות שלכם רק אחרי שאישרתם כל אחת.</p>
 <p>הדמו בחינם, ואין חובה להצטרף אחריו.</p>`],
     ['t-account', 'הגישה שלכם', `<p>נכנסים לשירות עם המייל שלכם. אתם אחראים למי שנתתם לו גישה, ולשמור על המייל שלכם מפני אחרים. אם אתם חושבים שמישהו נכנס בלי רשות, כתבו לנו מיד ונסגור את הגישה.</p>`],
-    ['t-price', 'מחיר ותשלום', `<p>המחיר החודשי, דמי ההקמה ומה שהם כוללים כתובים בעמוד של כל מוצר. משלמים מראש, בתחילת כל חודש.${cfg.get('price.vat') === 'excluded' ? ' המחירים לא כוללים מע״מ, והוא מתווסף לחשבונית.' : ''} דמי הקמה משלמים פעם אחת, בחודש הראשון.${signupOpen(cfg) ? ` בתדר ${payOnline(cfg) ? 'משלמים דרך החשבון' : 'אנחנו שולחים את פרטי התשלום בוואטסאפ או במייל אחרי שפותחים את החשבון'}, כמו שכתוב <a href="#t-teder-sub">בסעיף על המנוי לתדר</a>.` : ''} כשיש הצעה לחנויות הראשונות, היא כתובה באותו עמוד, ואנחנו יכולים לסיים אותה בכל זמן. מי שהצטרף בזמן ההצעה שומר עליה לכל התקופה שכתובה בה.</p>
+    ['t-price', 'מחיר ותשלום', `<p>המחיר החודשי, דמי ההקמה ומה שהם כוללים כתובים בעמוד של כל מוצר. משלמים מראש, בתחילת כל חודש.${cfg.get('price.vat') === 'excluded' ? ' המחירים לא כוללים מע״מ, והוא מתווסף לחשבונית.' : ''} דמי הקמה משלמים פעם אחת, בחודש הראשון.${signupOpen(cfg) ? ` בתדר ${payProvider(cfg) ? 'משלמים בכרטיס אשראי, בעמוד התשלום שבחשבון, והשירות נפתח כשהתשלום מאושר' : 'אנחנו שולחים את פרטי התשלום במייל אחרי שפותחים את החשבון, והשירות נפתח כשהתשלום מגיע אלינו'}, כמו שכתוב <a href="#t-teder-sub">בסעיף על המנוי לתדר</a>.` : ''} כשיש הצעה לחנויות הראשונות, היא כתובה באותו עמוד, ואנחנו יכולים לסיים אותה בכל זמן. מי שהצטרף בזמן ההצעה שומר עליה לכל התקופה שכתובה בה.</p>
 <p>בתורן, המחיר החודשי נקבע לפי החבילה, וכל חבילה מכסה מספר שיחות בחודש. אין חיוב נוסף על שיחה, ואת מה ש-Meta גובה על ההודעות אנחנו משלמים. מתי חנות עוברת חבילה, ואיך אנחנו מודיעים על זה מראש, כתוב בעמוד של תורן.</p>
 <p>אם נשנה את המחיר, נודיע לכם לפחות 30 יום מראש. אם לא מתאים לכם, אפשר להפסיק לפני שהשינוי מתחיל.</p>
 <p>אם תשלום לא עבר, נכתוב לכם. אם הוא לא הוסדר תוך 14 יום מההודעה, אנחנו יכולים לעצור את השירות עד שישולם. ביטול חיוב מול חברת האשראי על שירות שקיבלתם הוא הפרה של ההסכם, ואנחנו יכולים לגבות את הסכום ואת ההוצאות שנגרמו לנו בגללו.</p>`],

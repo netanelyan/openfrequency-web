@@ -12,6 +12,7 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 //   kind: 'text', 'number' (0 or more), 'flag' (true or false), 'lines' (a list of sentences), 'channels' (a list of CHANNELS), or the list of
 //         allowed values
 //   unless: the fact is not needed when this is true (the build then lets it stay empty)
+//   renamed: { old value: its new name }, a value the build refuses with the new name instead of the plain list
 const foundingOff = (raw) => raw.price?.founding?.on === false;
 // Where a customer can write to a store; the ones in toran.channels are live, the rest are shown as coming.
 export const CHANNELS = ['whatsapp', 'instagram', 'messenger', 'email'];
@@ -24,9 +25,10 @@ export const FACTS = {
   // was (Teder's ways in are the free sample); 'open' sends them to sign-up with the price beside it, keeps the sample
   // as the second way, and shows the self-serve terms (README, "Sign-up: open or closed").
   signup: { label: 'ההרשמה לתדר פתוחה (open) או סגורה (closed)', kind: ['open', 'closed'] },
-  // How a business that signed up pays: 'manual' while no payment provider is connected (we send the payment details
-  // by WhatsApp or email after the account is opened), 'online' once accounts takes payments in the account itself.
-  payment: { label: 'איך משלמים: פרטי תשלום שאנחנו שולחים (manual) או תשלום בחשבון (online)', kind: ['manual', 'online'] },
+  // How a business that signed up pays, the same switch as accounts' OF_PAYMENT (README, "Paying: payment"): 'manual'
+  // while no payment provider is connected (we email the payment details once the account is open), 'provider' once
+  // accounts takes card payments on its payment page. Either way the product opens once the payment is in.
+  payment: { label: 'איך משלמים: פרטי תשלום שאנחנו שולחים במייל (manual) או בכרטיס, בעמוד התשלום בחשבון (provider)', kind: ['manual', 'provider'], renamed: { online: 'provider' } },
   domain: { label: 'הדומיין', kind: 'text' },
   whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
   'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
@@ -105,6 +107,7 @@ export function readConfig(draft) {
       if (f.kind === 'lines' && !(Array.isArray(v) && v.every((x) => typeof x === 'string' && x.trim()))) throw new Error(`site.config.json: "${key}" must be a list of sentences`);
       if (f.kind === 'channels' && !(Array.isArray(v) && v.every((x) => CHANNELS.includes(x)))) throw new Error(`site.config.json: "${key}" must be a list of ${CHANNELS.join(', ')}`);
       if (f.kind !== 'lines' && f.kind !== 'channels' && Array.isArray(v)) throw new Error(`site.config.json: "${key}" must not be a list`);
+      if (f.renamed && Object.hasOwn(f.renamed, v)) throw new Error(`site.config.json: "${key}": "${v}" is now called "${f.renamed[v]}" (must be one of ${f.kind.join(', ')})`);
       if (Array.isArray(f.kind) && !f.kind.includes(v)) throw new Error(`site.config.json: "${key}" must be one of ${f.kind.join(', ')} (got ${JSON.stringify(v)})`);
     }
   };
@@ -145,9 +148,9 @@ export const signupOpen = (cfg) => cfg.get('signup') === 'open';
 // (&plan=small or full; without it accounts lets them choose). Raw: escape it (esc) before it goes into an attribute.
 export const signupUrl = (product, plan = null) => `https://accounts.openfrequency.co.il/signup?p=${product}${plan ? `&plan=${plan}` : ''}`;
 export const SIGNUP_URL = signupUrl('teder');
-// Until a payment provider is connected (payment in site.config.json), a business opens its account and we send it the
-// payment details by WhatsApp or email; the copy says so instead of "pay in your account".
-export const payOnline = (cfg) => cfg.get('payment') === 'online';
+// Once a payment provider is connected (payment "provider" in site.config.json), a business pays by card on the payment
+// page in its account; until then ("manual") it opens its account and we email it the payment details.
+export const payProvider = (cfg) => cfg.get('payment') === 'provider';
 
 // Where Teder posts, as a sentence needs it: to (לטיקטוק ולאינסטגרם), in (בטיקטוק ובאינסטגרם) or the (את טיקטוק ואת
 // אינסטגרם), with Facebook while teder.facebook is on.

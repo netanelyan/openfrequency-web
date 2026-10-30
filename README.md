@@ -71,10 +71,25 @@ plan, and accounts lets the business choose. Every sentence that says the price 
 the terms, under each sign-up button) is `tederPriceLine` in `src/sections.mjs`, both plans with their setup fees.
 accounts sells the same two plans (`plan=full` and `plan=small`) and tells Teder the size of each workspace's month.
 
-**Paying: `payment`.** Until a payment provider is connected, `"payment": "manual"`: `/join`, `/teder`, the FAQ and
-the terms say that once the account is open we send the payment details by WhatsApp or email. With `"online"` they
-say it is paid in the account. The terms' date (`legal.signupUpdated`) moves with the wording, and accounts' `TERMS_VERSION`
-moves with it.
+**Paying: `payment`.** The switch for how a business that signed up pays, and what every page that says so tells it
+(`payLine` in `src/sections.mjs` on `/teder` and in the FAQ, the first step on `/join`, and the terms):
+
+```json
+"payment": "manual"
+```
+
+- `"manual"` (now, while no payment provider is connected): once the account is open we email the payment details
+  (sign-up asks for an email, not a phone), it is paid in advance each month, and the product opens once the payment
+  reaches us.
+- `"provider"` (once accounts takes card payments): it is paid by card, on the payment page in the account, and the
+  product opens once the payment is confirmed.
+
+Any other value stops the build; `"online"`, the old name of `"provider"`, stops it with a message saying so.
+openfrequency-accounts has the same switch, `OF_PAYMENT` in its `.env` (`manual` or `provider`), and the two must say
+the same: change both together. The terms' date (`legal.signupUpdated`) moves with the wording, and accounts'
+`TERMS_VERSION` moves with it. While sign-up is open, each plan card on `/teder` and Teder's price on `/join` also say
+"דמי ההקמה לא מוחזרים.", the self-serve terms' words (`NO_REFUND`); closed, the terms say Toran's rule, and the plans
+say only the fee.
 
 **Where Teder posts: `teder.facebook`.** `true`: every list of Teder's platforms says TikTok, Instagram and Facebook
 (`tederNets` in `src/lib.mjs`), `/teder` has a Facebook tab with the same cover as a Page post, and the privacy
