@@ -76,7 +76,8 @@
       "slideshows": 15,
       "redos": 4
     },
-    "facebook": true
+    "facebook": true,
+    "demoBy": "form"
   },
   "legal": {
     "name": "Netanel Yanchevsky",

@@ -77,6 +77,10 @@ export const FACTS = {
   'teder.small.setup': { label: 'דמי ההקמה של החבילה הקטנה, 0 אם אין', kind: 'number' },
   // Whether Teder also posts to the customer's Facebook Page. Off, every page says TikTok and Instagram only (tederNets).
   'teder.facebook': { label: 'תדר מפרסם גם בפייסבוק', kind: 'flag' },
+  // How /teder's form asks for the sample slideshow: 'form' is the site as it was (the address and a typed WhatsApp
+  // number); 'whatsapp' takes the address only and answers like Toran's demo, with a code the visitor sends us on
+  // WhatsApp, so the number proves itself (README, "How Teder's sample is asked for"). The join form is not affected.
+  'teder.demoBy': { label: 'מצגת לדוגמה של תדר מבקשים בטופס עם מספר (form) או בקוד בוואטסאפ (whatsapp)', kind: ['form', 'whatsapp'] },
   'toran.channels': { label: 'הערוצים שתורן עונה בהם היום', kind: 'channels' },
   // Where the list of live channels comes from: 'config' (toran.channels above, whatever Toran says), or 'toran'
   // (Toran's own /channels.json at build time, with toran.channels only when Toran doesn't answer). build.mjs.
@@ -157,6 +161,9 @@ const NETS = {
   the: ['את טיקטוק ואת אינסטגרם', 'את טיקטוק, את אינסטגרם ואת פייסבוק'],
 };
 export const facebookOn = (cfg) => cfg.get('teder.facebook') === true;
+// While teder.demoBy is 'whatsapp', /teder's form asks for the address only and its answer is a code to send us on
+// WhatsApp, as Toran's demo is (forms.mjs, server/lead.mjs).
+export const tederByWa = (cfg) => cfg.get('teder.demoBy') === 'whatsapp';
 export const tederNets = (cfg, form = 'to') => NETS[form][facebookOn(cfg) ? 1 : 0];
 
 // Shekels the way the site writes them: 1,290 ₪, and 0.15 ₪ for a fraction.

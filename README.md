@@ -81,6 +81,18 @@ moves with it.
 policy names a connected Facebook Page. `false`: TikTok and Instagram, as before. Turn it on only once Teder's Facebook
 posting is live on the server.
 
+**How Teder's sample is asked for: `teder.demoBy`.** `"form"` (now, while our WhatsApp number doesn't answer yet): the
+form on `/teder` takes the store's address and a typed WhatsApp number, the sample goes to that number, and the site
+keeps one per number, as it always has. `"whatsapp"`: the form takes the address only and is answered like Toran's
+demo, with a code (`REQ-XXXXXX`) and a button that opens WhatsApp to the same demo number (`TORAN_DEMO_WA`) with the
+message `היי, אשמח לדמו של תדר לחנות <store>.` and, on its second line, `הקוד מהאתר: <code>`. The number that sends it
+is the one the sample goes to, so it proves itself, and Toran keeps one demo per number per product (below, "Leads").
+The line under the button, the thank-you and the home page's question box say so; nothing else on the site changes,
+and the join form keeps its number field. `test/teder-demo.test.mjs` builds both and checks that every other page is
+the same, byte for byte. Before turning it on: `TORAN_DEMO_WA` set on the server, our demo number answering, and
+Toran's `/internal/lead` taking `product` live on the server. A Toran from before that reads only `url` and `code`, and
+would take the request as a demo of Toran's.
+
 ## Build
 
 ```sh
@@ -96,7 +108,7 @@ npm run og           # assets/og: the share images a sent link shows (OpenFreque
 
 The demo forms post to `server/lead.mjs`, a small Node server with no dependencies (`node:sqlite`), behind Caddy at
 `/api/lead`. Each lead (the store's host name, the form, the page, the time, and a WhatsApp number for Teder, a
-code for Toran, or a phone or an email for Toran's waitlist) is saved to SQLite first, then sent to the owner, from the business number to their own WhatsApp
+code for Toran (and for Teder asked for by WhatsApp), or a phone or an email for Toran's waitlist) is saved to SQLite first, then sent to the owner, from the business number to their own WhatsApp
 (through Twilio), to their email (through Resend: `RESEND_API_KEY`, `LEAD_EMAIL_FROM`, `LEAD_EMAIL_TO`), or both, and
 handed to Toran or Teder; what fails is retried every 5 minutes, and a lead more than 2 days old is not
 sent any more, so turning the sender on never sends a backlog. One address gets 5 leads an hour, everyone together 200 a day, and a hidden honeypot field catches
@@ -112,15 +124,24 @@ Toran's demo form takes the store's address only. It answers with a code (`REQ-X
 WhatsApp to Toran's demo number (`TORAN_DEMO_WA`) with a message holding the code; Toran counts the demo when that
 message arrives, from the number that sent it, one per number (openfrequency-toran, `docs/operator.md`, section 3).
 
+With `teder.demoBy` `"whatsapp"`, Teder's sample is asked for the same way. The form posts `by=whatsapp` with the
+address (the endpoint doesn't read the config: only `server/lead.mjs` is deployed), the answer is a code and a wa.me
+link to `TORAN_DEMO_WA` whose message names Teder, and the lead goes to Toran's intake (`TORAN_INTAKE_URL`, not
+`TEDER_INTAKE_URL`) as exactly `{url, code, product: "teder"}`. Toran checks one demo per number per product, by the
+number its message comes from, and hands the request to Teder itself. The site's one-per-typed-number check doesn't
+apply, since nothing is typed; the limits and the honeypot do. A Teder post without `by=whatsapp` (the join form's, or
+`/teder`'s with `"form"`) is handed to Teder as `{url, whatsapp}`, as before.
+
 With JS the form sends itself and shows the thank-you in place; if the endpoint doesn't answer in 8 seconds, it offers
-a WhatsApp link with the store's address already typed. Without JS the form posts normally: a Toran demo goes straight
-to WhatsApp with its message, a Teder one lands on `/thanks/teder`, and a failure on `/try-again` (which Caddy also
-serves when the endpoint is down).
+a WhatsApp link with the store's address already typed. Without JS the form posts normally: a Toran demo, and a Teder
+one asked for by WhatsApp, go straight to WhatsApp with their message, a Teder one with a number lands on
+`/thanks/teder`, and a failure on `/try-again` (which Caddy also serves when the endpoint is down).
 
 ```sh
 npm test                                        # the endpoint (saving, WhatsApp, limits, honeypot, origin, Twilio down,
                                                 # the waitlist, keeping and copying), the site built with Toran soon
-                                                # and live, with sign-up closed and open, the copy, and every page
+                                                # and live, with sign-up closed and open, with Teder's sample by form
+                                                # and by WhatsApp, the copy, and every page
                                                 # through axe in a browser (WCAG 2.0 A and AA, 390 and 1440px, light
                                                 # and dark: Playwright's Chromium, or the installed Chrome)
 npm run draft && node scripts/form-shots.mjs    # the demo forms in Chrome against the real endpoint (Toran live only)
@@ -171,7 +192,8 @@ What's left before launch is in `TODO.md`.
 ## Facts
 
 Every price, number and time the site states lives in `site.config.json`, never in a template (Teder's two plans,
-`teder` and `teder.small`; how a business pays, `payment`; whether Teder posts to Facebook, `teder.facebook`). An empty value
+`teder` and `teder.small`; how a business pays, `payment`; whether Teder posts to Facebook, `teder.facebook`; how
+Teder's sample is asked for, `teder.demoBy`). An empty value
 (`""` or `null`) means "not decided yet": the real build refuses to run and lists each one, so the site can't ship
 with a guess. Each key has a Hebrew label in `FACTS` (`src/lib.mjs`), which is what a draft shows in its place.
 

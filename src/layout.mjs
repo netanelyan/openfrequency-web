@@ -147,7 +147,7 @@ ${a11y}
 <script>
 ${siteJs}
 </script>
-${forms ? `${formCopy(cfg)}\n<script>\n${formJs}\n</script>` : ''}
+${forms ? `${formCopy(cfg, forms)}\n<script>\n${formJs}\n</script>` : ''}
 </body>
 </html>
 `;
