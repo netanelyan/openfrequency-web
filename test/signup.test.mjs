@@ -72,7 +72,8 @@ test('with "closed", nothing links to sign-up and Teder is offered by its sample
   assert.ok(!text(main(pages['faq/index.html'])).includes('איך מבטלים את תדר'));
   const terms = main(pages['terms/index.html']);
   assert.doesNotMatch(terms, /t-teder-sub/);
-  assert.match(terms, /עודכן לאחרונה ב-29 באוקטובר 2026/);
+  // With sign-up closed, the terms carry legal.updated, the legal pages' own date (the privacy page changed on 2026-10-30).
+  assert.match(terms, /עודכן לאחרונה ב-30 באוקטובר 2026/);
   assert.match(text(section(terms, 't-stop')), /דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם/);
   assert.doesNotMatch(support.status, /signup/);
 });
@@ -182,7 +183,7 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
   assert.match(text(section(terms, 't-price')), /בתדר אנחנו שולחים את פרטי התשלום בוואטסאפ או במייל אחרי שפותחים את החשבון/);
   for (const id of ['t-answers', 't-yours', 't-teder', 't-who', 't-deal', 't-what', 't-account']) assert.equal(section(terms, id), section(closed, id), id);
   // The other legal pages keep their own date.
-  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-29 באוקטובר 2026/);
+  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-30 באוקטובר 2026/);
 });
 
 test('the terms promise only the take-downs we can do: published posts stay on the customer\'s accounts, TikTok is theirs to delete', () => {

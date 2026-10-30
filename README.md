@@ -161,7 +161,7 @@ the copy is checked (`PRAGMA integrity_check` and a count of the leads) and the 
 `openfrequency-web-alert@.service`, which calls `/usr/local/bin/of-alert "<title>" "<body>"` (the server's own setup
 installs it). Copying `/var/backups` off the server is the server's off-site backup, not this repo's.
 The live Caddyfile is written by hand and serves other sites too: change only its openfrequency.co.il block, in place
-(`deploy/caddy-error-headers.md` gives the 404 and try-again pages the site's headers and compression).
+(`deploy/caddy-error-headers.md` points to the one edit, in openfrequency-ops, that gives the 404 and try-again pages the site's headers and compression).
 `.github/workflows/test.yml` runs the build and the tests on each push and pull request to main; it deploys nothing. Each page carries its own Content-Security-Policy with the
 hashes of its inline script and style; Caddy adds the headers a page can't set.
 
