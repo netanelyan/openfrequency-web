@@ -107,6 +107,9 @@ for (const f of ['heebo-hebrew.woff2', 'heebo-latin.woff2', 'HEEBO-LICENSE.txt',
 copy('assets/brand/svg/openfrequency-small.svg', 'favicon.svg');
 copy('assets/brand/png/openfrequency-180.png', 'apple-touch-icon.png');
 copy('assets/brand/png/openfrequency-512.png', 'icon-512.png');
+// The marks the emails show above their card (openfrequency-accounts src/mail/messages.js, MAIL_IMAGES): a mail
+// program shows no SVG, so they are the 180px PNGs, at openfrequency.co.il/mail/<name>.png.
+for (const name of ['openfrequency', 'teder', 'toran']) copy(`assets/brand/png/${name}-180.png`, `mail/${name}.png`);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/og'))) if (f.endsWith('.png')) copy('assets/og/' + f, 'og/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/showcase'), { recursive: true })) if (f.endsWith('.jpg')) copy('assets/teder/showcase/' + f, 'teder/showcase/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/assistant'))) copy('assets/teder/assistant/' + f, 'teder/assistant/' + f);
