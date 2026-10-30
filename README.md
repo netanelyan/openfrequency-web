@@ -84,7 +84,7 @@ posting is live on the server.
 ## Build
 
 ```sh
-npm install          # only playwright-core, for screenshots
+npm ci               # playwright-core (screenshots) and axe (the accessibility test), as package-lock.json has them
 npm run build        # dist/; stops while any fact in site.config.json is empty, or the copy lint fails
 npm run draft        # the same, with each missing fact shown as a visible [placeholder]
 npm run serve        # dist/ on http://127.0.0.1:4730
@@ -144,7 +144,8 @@ service. `deploy/` has the Caddyfile, the service, its env file, and the script:
 DEPLOY_HOST=user@vps ./deploy/deploy.sh
 ```
 
-It runs the real build and every test (a failed or a skipped one stops it before anything is uploaded), uploads the
+It installs the test packages from `package-lock.json` (`npm ci`), runs the real build and every test (a failed or a
+skipped one stops it before anything is uploaded), uploads the
 pages as a new release and switches to it in one step (the last 5 are kept), updates the endpoint only if it changed
 (keeping the one it replaced as `lead.mjs.prev`), and checks the live site and `/api/readyz` over HTTPS. If the new
 endpoint isn't ready within 30 seconds, the previous one goes back and the deploy fails. The one-time setup is at the

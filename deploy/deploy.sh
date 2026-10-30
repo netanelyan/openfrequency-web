@@ -29,6 +29,9 @@ cd "$(dirname "$0")/.."
 DOMAIN=$(node -e "process.stdout.write(JSON.parse(require('fs').readFileSync('site.config.json','utf8')).domain||'')")
 
 echo "== build and test"
+# The test's packages exactly as package-lock.json has them (the accessibility check's axe and Playwright): on
+# 2026-10-30 a checkout installed before they were added stopped the deploy at the tests.
+npm ci --no-audit --no-fund --silent
 node build.mjs
 # A skipped test is a test that did not run (the accessibility check without a browser): it stops the deploy too.
 if ! out=$(node --test --test-concurrency=1 --test-reporter=spec test/*.test.mjs 2>&1); then echo "$out" | tail -40; echo "tests failed: nothing was uploaded"; exit 1; fi
