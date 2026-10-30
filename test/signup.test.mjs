@@ -178,8 +178,8 @@ test('with "open", the FAQ and the support export say how to sign up and cancel'
 test('with "open", the terms carry Teder\'s self-serve section and their own date; Toran\'s stay', () => {
   const closed = main(built.closed.pages['terms/index.html']);
   const terms = main(built.open.pages['terms/index.html']);
-  assert.match(terms, /עודכן לאחרונה ב-29 באוקטובר 2026/);
-  assert.equal(config.legal.signupUpdated, '2026-10-29', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION)');
+  assert.match(terms, /עודכן לאחרונה ב-30 באוקטובר 2026/);
+  assert.equal(config.legal.signupUpdated, '2026-10-30', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION)');
   assert.match(terms, /<li><a href="#t-stop">הפסקה וביטול<\/a><\/li><li><a href="#t-teder-sub">המנוי לתדר<\/a><\/li>/);
   const sub = text(section(terms, 't-teder-sub'));
   for (const words of [
