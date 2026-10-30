@@ -1,5 +1,5 @@
 // What more than one page uses: words that open WhatsApp to us, and the question box on the home page.
-import { SIGNUP_URL, esc, ils, mark, payProvider, signupOpen, signupUrl, tederNets, toranSoon } from './lib.mjs';
+import { SIGNUP_URL, esc, ils, mark, payProvider, signupOpen, signupUrl, tederByWa, tederNets, toranSoon } from './lib.mjs';
 
 // Words that open WhatsApp to us; plain words in a draft without the number.
 export const waWords = (cfg, words) => {
@@ -40,10 +40,11 @@ export const askBox = (cfg) => `
 `;
 
 // While Toran is soon, the box's answers about Toran say what it will do, and send to its waitlist or to Teder instead of
-// a demo: site.js takes each <template id="ask-a-KEY"> in place of its own answer to KEY.
+// a demo: site.js takes each <template id="ask-a-KEY"> in place of its own answer to KEY. How Teder's sample is asked
+// for follows teder.demoBy: a typed number, or a code sent on WhatsApp.
 const SOON_ANSWERS = (cfg) => ({
   toran: 'תורן יענה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל, מתוך מה שכתוב באתר שלה. הוא עוד לא פתוח, ואנחנו פותחים אותו בקרוב. <a class="lnk" href="/toran#waitlist">לקבל עדכון כשהוא נפתח</a>',
-  demo: 'לתורן אין דמו כרגע, כי הוא עוד לא פתוח. לתדר אפשר לקבל מצגת לדוגמה מהחנות שלכם: שולחים את הכתובת של החנות ומספר וואטסאפ, ואנחנו שולחים לכם אותה. <a class="lnk" href="/teder#demo">לנסות את תדר על החנות שלכם</a>',
+  demo: `לתורן אין דמו כרגע, כי הוא עוד לא פתוח. לתדר אפשר לקבל מצגת לדוגמה מהחנות שלכם: ${tederByWa(cfg) ? 'שולחים את הכתובת של החנות, ואחר כך הודעה מוכנה עם קוד בוואטסאפ. לשם נשלח לכם את הלינק למצגת.' : 'שולחים את הכתובת של החנות ומספר וואטסאפ, ואנחנו שולחים לכם אותה.'} <a class="lnk" href="/teder#demo">לנסות את תדר על החנות שלכם</a>`,
   store: 'כן. תורן יקרא חנויות על Shopify, על WooCommerce ועל Wix, ובחנות על Wix את 150 המוצרים החדשים ביותר. הוא נפתח בקרוב.',
   number: 'כן, זו הכוונה. כשתורן ייפתח, הלקוחות ימשיכו לכתוב לאותו מספר, ואנחנו נחבר אותו ל-WhatsApp Business Platform של Meta יחד איתכם.',
   install: 'לא צריך להתקין כלום. תורן קורא את מה שכבר מופיע באתר. כשהוא ייפתח, כדי לחבר את המספר של החנות יהיה צריך חשבון עסקי ב-Meta, ואת החיבור נעשה יחד.',

@@ -9,7 +9,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { CHANNELS, ROOT, readConfig, lint, minifyCss, markNames, toranSoon } from './src/lib.mjs';
+import { CHANNELS, ROOT, readConfig, lint, minifyCss, markNames, tederByWa, toranSoon } from './src/lib.mjs';
 import { page } from './src/layout.mjs';
 import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
@@ -31,6 +31,7 @@ const cfg = { ...readConfig(draft), banner };
 // Toran's waitlist has its own thank-you, for a post without JS, while Toran is soon (products.toran).
 if (toranSoon(cfg)) PAGES.splice(PAGES.indexOf(thanksTeder) + 1, 0, thanksWaitlist);
 console.log(`Toran is ${toranSoon(cfg) ? 'soon: shown, not sold, with a waitlist' : 'live'} (products.toran in site.config.json)`);
+console.log(`Teder's sample is asked for ${tederByWa(cfg) ? 'by a code sent to us on WhatsApp' : 'with a typed WhatsApp number'} (teder.demoBy in site.config.json)`);
 
 // Where Toran answers. With toran.channelsFrom "config" in site.config.json, the list is toran.channels there, and
 // Toran isn't asked: that's for when we know better than Toran's settings (every channel in it is live, and no

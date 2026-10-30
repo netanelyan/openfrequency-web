@@ -37,16 +37,18 @@
 //   LEAD_EMAIL_TO        the owner's address (several, comma-separated)
 //   RESEND_API           default https://api.resend.com (the tests point it at a fake)
 //   TORAN_INTAKE_URL     Toran's /internal/lead on this machine (http://127.0.0.1:4710/internal/lead); without it a
-//                        demo lead only goes to WhatsApp
+//                        demo lead only goes to WhatsApp. It also takes Teder's demos asked for by WhatsApp
+//                        (teder.demoBy), as {url, code, product: 'teder'}
 //   TEDER_INTAKE_URL     Teder's /internal/lead on this machine (http://127.0.0.1:4700/internal/lead); without it a
 //                        Teder lead only goes to WhatsApp
 //   OF_INTERNAL_TOKEN    the token Toran and Teder check, the same value as in their and accounts' private/.env
-//   TORAN_DEMO_WA        Toran's demo WhatsApp number, digits with the country code (972...): a Toran demo's form
-//                        answers with a wa.me link to it, holding the request's code; without it, the code alone
+//   TORAN_DEMO_WA        Toran's demo WhatsApp number, digits with the country code (972...): a Toran demo's form, and
+//                        Teder's asked for by WhatsApp, answers with a wa.me link to it, holding the request's code;
+//                        without it, the code alone
 //
 // What a lead holds: which demo (Toran's or Teder's), the store's address, the page and the time; for Teder a WhatsApp
-// number, and for Toran the request's code (REQ-XXXXXX). A Toran waitlist lead (source 'waitlist', the form the site
-// shows while products.toran is "soon") holds a phone or an email and nothing else; it goes to the owner as
+// number (or, asked for by WhatsApp, a code), and for Toran the request's code (REQ-XXXXXX). A Toran waitlist lead
+// (source 'waitlist', the form the site shows while products.toran is "soon") holds a phone or an email and nothing else; it goes to the owner as
 // "רשימת המתנה לתורן", is handed to no product, and is saved once per phone or email. The client's IP address is used for the rate limit, in memory
 // only, and never written down.
 //
@@ -58,6 +60,14 @@
 // A Teder demo takes a WhatsApp number too, and Teder gets one per number: a second ask from a number that already
 // asked is answered "we have it" and saved nowhere. It is handed to Teder as {url, whatsapp}, and Teder builds the
 // store's slideshow for the operator to approve. Like the WhatsApp message, a handover that fails is retried.
+//
+// While teder.demoBy in site.config.json is "whatsapp", /teder's form takes the store's address only and posts
+// by=whatsapp with it (only this file is deployed, not the config, so the form says which way it asks). Such a Teder
+// demo is answered like Toran's: a code, and a wa.me link to the same demo number (TORAN_DEMO_WA) with a message that
+// names Teder and holds the code on the same second line. It is handed to Toran, not Teder, as
+// {url, code, product: 'teder'}: Toran keeps one demo per number per product, by the number its message comes from,
+// and hands the request to Teder itself. No typed number, so the site's one-per-number check doesn't apply to it; the
+// limits and the honeypot do. The join form and a Teder post without by=whatsapp are as above.
 import crypto from 'node:crypto';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -89,7 +99,7 @@ CREATE TABLE IF NOT EXISTS leads (
   created_at  TEXT NOT NULL,              -- ISO time, UTC
   source      TEXT NOT NULL,              -- demo | teder | waitlist (Toran's, while it is soon)
   store       TEXT,                       -- the store's host name, for a demo
-  contact     TEXT NOT NULL,              -- 9725XXXXXXXX, or an email on the waitlist; '' for a Toran demo, whose number Toran learns from its message
+  contact     TEXT NOT NULL,              -- 9725XXXXXXXX, or an email on the waitlist; '' for a demo with a code, whose number Toran learns from its message
   page        TEXT,                       -- the page the form was on
   notified_at TEXT,                       -- when the WhatsApp message to the owner went; NULL until then
   tries       INTEGER NOT NULL DEFAULT 0  -- attempts at it
@@ -116,7 +126,8 @@ export const KEEP_MONTHS = Number(env.LEAD_KEEP_MONTHS || 6);
 
 // The leads past the period, deleted: a lead whose last contact (its own time, or the last time the same phone or
 // email asked again) is more than `months` ago, unless the same phone or email has a newer lead inside the period. A
-// Toran demo's row holds no contact (Toran has the number), so its own time is all it has. Returns how many went.
+// demo with a code (Toran's, or Teder's asked for by WhatsApp) holds no contact (Toran has the number), so its own time
+// is all it has. Returns how many went.
 export function purge(db, { now = Date.now(), months = KEEP_MONTHS } = {}) {
   const d = new Date(now);
   d.setUTCMonth(d.getUTCMonth() - months);
@@ -201,6 +212,7 @@ export function email(s) {
 // both, ticked as toran=1 and teder=1. Each takes the store's address; Teder's also a WhatsApp number, which Toran's
 // doesn't need (lead.contact is null then). `sources` is the demos asked for, one saved row each. 'waitlist' is
 // Toran's waitlist: a phone or an email in contact, and the store's address only if one is sent and it is valid.
+// Teder's form with by=whatsapp (teder.demoBy) takes no number, like Toran's, and the result says byWa: true.
 export function validate(f) {
   const source = f.source;
   if (source !== 'demo' && source !== 'teder' && source !== 'join' && source !== 'waitlist') return { error: 'bad' };
@@ -215,20 +227,30 @@ export function validate(f) {
   if (!sources.length) return { error: 'products' };
   const store = storeHost(f.store);
   if (!store) return { error: 'store' };
+  if (source === 'teder' && f.by === 'whatsapp') return { lead: { source, store, contact: null, page }, sources, byWa: true };
   const contact = sources.includes('teder') ? mobile(f.contact) : null;
   if (sources.includes('teder') && !contact) return { error: 'contact' };
   return { lead: { source: sources[0], store, contact, page }, sources };
 }
 
 // A Toran demo's code: REQ- and 6 of A-Z0-9, random. Toran (channels/request.ts) reads it from the person's message.
+// A Teder demo asked for by WhatsApp gets one from the same pool.
 const CODE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 export const newCode = () => 'REQ-' + Array.from({ length: 6 }, () => CODE_CHARS[crypto.randomInt(CODE_CHARS.length)]).join('');
 
 // The message the form's button writes to Toran's demo number, and the link that opens it; null without TORAN_DEMO_WA.
+// Teder's, asked for by WhatsApp, names Teder; its second line is the same, which is the line Toran reads the code from.
 export const toranWaText = (store, code) => `היי, אשמח לדמו של תורן לחנות ${store}.\nהקוד מהאתר: ${code}`;
-export function toranWaLink(store, code, number = env.TORAN_DEMO_WA) {
+export const tederWaText = (store, code) => `היי, אשמח לדמו של תדר לחנות ${store}.\nהקוד מהאתר: ${code}`;
+const waLink = (number, text) => {
   const n = String(number || '').replace(/\D/g, '');
-  return n ? `https://wa.me/${n}?text=${encodeURIComponent(toranWaText(store, code))}` : null;
+  return n ? `https://wa.me/${n}?text=${encodeURIComponent(text)}` : null;
+};
+export function toranWaLink(store, code, number = env.TORAN_DEMO_WA) {
+  return waLink(number, toranWaText(store, code));
+}
+export function tederWaLink(store, code, number = env.TORAN_DEMO_WA) {
+  return waLink(number, tederWaText(store, code));
 }
 
 // ---------------------------------------------------------------- the rate limit, in memory
@@ -346,22 +368,26 @@ async function notify(db, row) {
 
 // ---------------------------------------------------------------- Toran and Teder
 
-// Which product takes a lead of each source, where it listens on this machine, and what it is handed: Toran the
-// request's code (a lead from before the codes has none, and Toran would refuse it), Teder the WhatsApp number.
-const INTAKE = {
-  demo: ['Toran', () => env.TORAN_INTAKE_URL, (row) => (row.code ? { url: `https://${row.store}/`, code: row.code } : null)],
-  teder: ['Teder', () => env.TEDER_INTAKE_URL, (row) => ({ url: `https://${row.store}/`, whatsapp: row.contact })],
-};
+// Which product takes a lead, where it listens on this machine, and what it is handed: Toran the request's code (a
+// lead from before the codes has none, and Toran would refuse it), Teder the WhatsApp number. A Teder demo with a code
+// (asked for by WhatsApp) goes to Toran with product 'teder', and Toran hands it to Teder once the code arrives.
+function intake(row) {
+  const url = `https://${row.store}/`;
+  if (row.source === 'demo') return ['Toran', env.TORAN_INTAKE_URL, row.code ? { url, code: row.code } : null];
+  if (row.source === 'teder' && row.code) return ['Toran', env.TORAN_INTAKE_URL, { url, code: row.code, product: 'teder' }];
+  if (row.source === 'teder') return ['Teder', env.TEDER_INTAKE_URL, { url, whatsapp: row.contact }];
+  return [];
+}
 
 async function forward(db, row) {
-  const [product, url, body] = INTAKE[row.source] || [];
-  if (!product || !url() || !env.OF_INTERNAL_TOKEN || !body(row)) return false;
+  const [product, url, body] = intake(row);
+  if (!product || !url || !env.OF_INTERNAL_TOKEN || !body) return false;
   db.prepare('UPDATE leads SET forward_tries = forward_tries + 1 WHERE id = ?').run(row.id);
   try {
-    const res = await fetch(url(), {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.OF_INTERNAL_TOKEN}` },
-      body: JSON.stringify(body(row)),
+      body: JSON.stringify(body),
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) throw new Error(`${product} ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -420,7 +446,8 @@ function parse(req, body) {
 }
 
 // A browser with JS asks for JSON and gets JSON; a plain form post gets a redirect to a page that says what happened,
-// or, for a Toran demo, straight to WhatsApp with the message that holds its code (the pages' form-action allows it).
+// or, for a demo with a code (Toran's, or Teder's asked for by WhatsApp), straight to WhatsApp with the message that
+// holds it (the pages' form-action allows it).
 function reply(req, res, status, body) {
   if (String(req.headers.accept || '').includes('application/json')) {
     res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
@@ -470,18 +497,20 @@ export function createServer(db) {
     const ip = clientIp(req);
     if (!allowed(ip)) return reply(req, res, 429, { ok: false, error: 'rate' });
 
-    const { lead, sources, error } = validate(fields);
+    const { lead, sources, error, byWa } = validate(fields);
     if (error) return reply(req, res, 400, { ok: false, error });
 
     // One Teder demo per number: if this number asked for one already, it isn't saved again, and with nothing else
     // asked for it is answered "we have it". The waitlist keeps one row per phone or email the same way, but a second
     // sign-up is simply thanked: it asks for nothing new. Toran keeps its own one per number, by the number its message comes from,
-    // so a Toran demo is always saved here. The check and the insert run with no await between them, so two posts at
+    // so a Toran demo is always saved here, and so is a Teder demo asked for by WhatsApp (byWa), which Toran checks the
+    // same way, per product. The check and the insert run with no await between them, so two posts at
     // once can't both get through.
-    const fresh = sources.filter((s) => s === 'demo' || !db.prepare('SELECT 1 FROM leads WHERE source = ? AND contact = ?').get(s, lead.contact));
+    const coded = (s) => s === 'demo' || byWa === true;
+    const fresh = sources.filter((s) => coded(s) || !db.prepare('SELECT 1 FROM leads WHERE source = ? AND contact = ?').get(s, lead.contact));
     // A second ask is not saved again, but it is a contact: the lead it repeats is kept KEEP_MONTHS from now (purge).
     for (const s of sources) {
-      if (s !== 'demo' && !fresh.includes(s)) db.prepare('UPDATE leads SET last_at = ? WHERE source = ? AND contact = ?').run(new Date().toISOString(), s, lead.contact);
+      if (!coded(s) && !fresh.includes(s)) db.prepare('UPDATE leads SET last_at = ? WHERE source = ? AND contact = ?').run(new Date().toISOString(), s, lead.contact);
     }
     count(ip);
     if (!fresh.length && lead.source === 'waitlist') return reply(req, res, 200, { ok: true, source: 'waitlist', saved: [] });
@@ -489,18 +518,18 @@ export function createServer(db) {
 
     const created_at = new Date().toISOString();
     let code = null;
-    if (fresh.includes('demo')) do code = newCode(); while (db.prepare('SELECT 1 FROM leads WHERE code = ?').get(code));
+    if (fresh.some(coded)) do code = newCode(); while (db.prepare('SELECT 1 FROM leads WHERE code = ?').get(code));
     const rows = fresh.map((source) => {
-      const row = { created_at, ...lead, source, contact: source === 'demo' ? '' : lead.contact, code: source === 'demo' ? code : null };
+      const row = { created_at, ...lead, source, contact: coded(source) ? '' : lead.contact, code: coded(source) ? code : null };
       const { lastInsertRowid } = db.prepare('INSERT INTO leads (created_at, source, store, contact, page, code) VALUES (?, ?, ?, ?, ?, ?)')
         .run(row.created_at, row.source, row.store, row.contact, row.page, row.code);
       return { id: Number(lastInsertRowid), ...row };
     });
-    // A Toran demo answers its code and the link that writes it to the demo number. Without JS, a Teder-only request
-    // lands on Teder's thank-you.
+    // A demo with a code answers it and the link that writes it to the demo number, naming Teder for Teder's. Without
+    // JS, a Teder-only request with a number lands on Teder's thank-you.
     reply(req, res, 200, {
       ok: true, source: fresh.includes('demo') ? 'demo' : fresh[0], store: lead.store, saved: fresh,
-      ...(code ? { code, wa: toranWaLink(lead.store, code) } : {}),
+      ...(code ? { code, wa: byWa ? tederWaLink(lead.store, code) : toranWaLink(lead.store, code) } : {}),
     });
     for (const row of rows) {
       notify(db, row);
@@ -517,7 +546,7 @@ if (main && process.argv[2] === 'list') {
   const n = Number(process.argv[3]) || 20;
   const rows = db.prepare('SELECT id, created_at, source, store, contact, code, page, notified_at, forwarded_at FROM leads ORDER BY id DESC LIMIT ?').all(n);
   for (const r of rows.reverse()) {
-    console.log([r.id, when(r.created_at), r.source, r.store || '-', r.code || r.contact || '-', r.page || '-', r.notified_at ? 'sent' : 'NOT SENT', r.source === 'demo' ? (r.forwarded_at ? 'in toran' : 'NOT IN TORAN') : r.source === 'teder' ? (r.forwarded_at ? 'in teder' : 'NOT IN TEDER') : ''].join('  ').trim());
+    console.log([r.id, when(r.created_at), r.source, r.store || '-', r.code || r.contact || '-', r.page || '-', r.notified_at ? 'sent' : 'NOT SENT', r.source === 'demo' || (r.source === 'teder' && r.code) ? (r.forwarded_at ? 'in toran' : 'NOT IN TORAN') : r.source === 'teder' ? (r.forwarded_at ? 'in teder' : 'NOT IN TEDER') : ''].join('  ').trim());
   }
   db.close();
 } else if (main && process.argv[2] === 'purge') {
@@ -540,7 +569,7 @@ if (main && process.argv[2] === 'list') {
   const db = open();
   const port = Number(env.PORT || 4720);
   const server = createServer(db);
-  server.listen(port, '127.0.0.1', () => console.log(`leads on 127.0.0.1:${port}, saved to ${DB_PATH}${waReady() || mailReady() ? `, sent by ${[waReady() && 'WhatsApp', mailReady() && 'email'].filter(Boolean).join(' and ')}` : ' (no WhatsApp sender and no email: saving only)'}${toranWaLink('x', 'x') ? '' : " (no TORAN_DEMO_WA: a Toran demo's form shows its code with no WhatsApp button)"}`));
+  server.listen(port, '127.0.0.1', () => console.log(`leads on 127.0.0.1:${port}, saved to ${DB_PATH}${waReady() || mailReady() ? `, sent by ${[waReady() && 'WhatsApp', mailReady() && 'email'].filter(Boolean).join(' and ')}` : ' (no WhatsApp sender and no email: saving only)'}${toranWaLink('x', 'x') ? '' : " (no TORAN_DEMO_WA: a demo answered with a code, Toran's or Teder's by WhatsApp, shows it with no WhatsApp button)"}`));
   const timer = setInterval(() => retry(db), 300_000);
   retry(db);
   // The privacy policy's period, once a day and at start.

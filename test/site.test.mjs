@@ -17,8 +17,9 @@ const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), '
 const built = {};
 function build(toran) {
   const cfg = path.join(dir, `${toran}.json`);
-  // Sign-up closed: these tests are about the Toran switch alone (signup.test.mjs covers sign-up open).
-  fs.writeFileSync(cfg, JSON.stringify({ ...config, signup: 'closed', products: { ...config.products, toran } }));
+  // Sign-up closed and Teder's sample by its form: these tests are about the Toran switch alone (signup.test.mjs covers
+  // sign-up open, teder-demo.test.mjs the sample asked for by WhatsApp).
+  fs.writeFileSync(cfg, JSON.stringify({ ...config, signup: 'closed', products: { ...config.products, toran }, teder: { ...config.teder, demoBy: 'form' } }));
   const out = path.join(dir, toran);
   const env = { ...process.env, SITE_CONFIG: cfg, SITE_OUT: out };
   const b = spawnSync(process.execPath, ['build.mjs'], { cwd: ROOT, env, encoding: 'utf8' });

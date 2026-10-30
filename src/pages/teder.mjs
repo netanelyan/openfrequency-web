@@ -31,7 +31,8 @@ export default (cfg) => {
   return {
   path: '/teder',
     image: 'teder',
-  forms: true,
+  // Teder's form only: with teder.demoBy "whatsapp", its thank-you with the code is Teder's (forms.mjs formCopy).
+  forms: 'teder',
   title: `תדר, מצגות אוטומטיות בעברית ${tederNets(cfg)} | OpenFrequency`,
   description: `תדר כותב ומעצב מצגות בעברית ${tederNets(cfg)}, וכל מצגת עולה רק אחרי שמישהו אישר אותה.`,
   body: `
