@@ -1,6 +1,7 @@
 // What the pages claim about us, and the form's message region: the build stops on a market claim (the leading, the
 // best, number one), the home page says what the products are instead of where they rank, the strip of businesses
-// says they are our own, and a form's message is a live region that is in the page from the start.
+// says they are our own, the privacy page says how a lead reaches us and what we keep for an invoice, and a form's
+// message is a live region that is in the page from the start.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -40,6 +41,22 @@ test('the home page says what the products are, not where they rank, and the str
   assert.equal(text(/<h2 id="clients-h"[^>]*>([\s\S]*?)<\/h2>/.exec(strip)[1]), 'העסקים של OpenFrequency');
   assert.match(text(strip), /אנחנו מריצים את העסקים האלה בעצמנו/);
   assert.doesNotMatch(strip, /href="https:\/\/openfrequency\.co\.il"/, 'OpenFrequency is not one of its own businesses in the strip');
+});
+
+// The server sends each lead by email through Resend and has no Twilio sender (SERVER-FACTS.md, 2026-10-30), and
+// accounts' sign-up asks for a name, the business's name and an email, nothing for an invoice.
+test('the privacy page says a lead reaches us by email, and what we keep for an invoice is what sign-up asks for', () => {
+  const privacy = /<main id="main">([\s\S]*)<\/main>/.exec(pages['privacy/index.html'])[1];
+  const part = (id) => text(new RegExp(`<section class="legal-part" aria-labelledby="${id}">([\\s\\S]*?)</section>`).exec(privacy)[1]);
+  assert.ok(part('p-form').includes('על כל טופס שנשלח מגיע אלינו מייל, דרך Resend, עם כתובת החנות ומספר הנייד, או הקוד של הבקשה.'));
+  assert.doesNotMatch(part('p-form'), /Twilio|הודעה בוואטסאפ/);
+  // Twilio is named once, for the demo number, and only while that number goes through it.
+  assert.equal(text(privacy).split('Twilio').length - 1, 1);
+  assert.ok(part('p-share').includes('Twilio , ארצות הברית: הודעות הוואטסאפ במספר הדמו, כשהמספר מחובר דרכה.'));
+  assert.ok(part('p-share').includes('Resend , ארצות הברית: מיילים של כניסה לשירות, המיילים שתורן מקבל ועונה עליהם, והמייל שמגיע אלינו על כל טופס.'));
+  assert.ok(part('p-customers').includes('את שם העסק, שכותבים בהרשמה. כשצריך מספר עוסק וכתובת לחשבונית, אנחנו מבקשים אותם מכם.'));
+  assert.ok(!part('p-customers').includes('פרטים לחשבונית'));
+  assert.match(privacy, /עודכן לאחרונה ב-30 באוקטובר 2026/, 'legal.updated, the day this changed');
 });
 
 test("a form's message region is in the page from the start, empty, and never hidden", () => {
