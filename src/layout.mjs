@@ -98,7 +98,7 @@ ${A11Y.map(([k, label]) => `<button type="button" data-a="${k}" aria-pressed="fa
 
 // What a link to the page shows where it is sent (WhatsApp, Facebook, LinkedIn, X): the page's own title and line, and
 // its share image from assets/og (scripts/og.mjs draws them). Every address is absolute, on the site's domain.
-const OG_ALT = { openfrequency: 'OpenFrequency: תורן ותדר', toran: 'תורן, עונה ללקוחות של החנות', teder: 'תדר, מצגות בעברית לטיקטוק ולאינסטגרם' };
+const OG_ALT = (cfg) => ({ openfrequency: 'OpenFrequency: תורן ותדר', toran: 'תורן, עונה ללקוחות של החנות', teder: `תדר, מצגות בעברית ${tederNets(cfg)}` });
 function share(cfg, path, title, description, image) {
   const origin = `https://${cfg.get('domain') || 'openfrequency.co.il'}`;
   const url = origin + path;
@@ -112,7 +112,7 @@ function share(cfg, path, title, description, image) {
 <meta property="og:image" content="${origin}/og/${image}.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="${esc(OG_ALT[image])}">
+<meta property="og:image:alt" content="${esc(OG_ALT(cfg)[image])}">
 <meta name="twitter:card" content="summary_large_image">
 `;
 }

@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
+import { readConfig, tederNets } from '../src/lib.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'assets/og');
@@ -13,14 +14,16 @@ const svg = (f) => fs.readFileSync(path.join(ROOT, 'assets/brand/svg', f), 'utf8
 // The fonts go in as data URLs: a page set from a string may not load files from disk.
 const font = (f) => `data:font/woff2;base64,${fs.readFileSync(path.join(ROOT, 'assets/fonts', f)).toString('base64')}`;
 
-// One card per image: the mark, the name, one line. The colours are the site's tokens (src/style.css).
+// One card per image: the mark, the name, one line. The colours are the site's tokens (src/style.css). Where Teder posts
+// follows teder.facebook in site.config.json, as every page does (tederNets): run this again when it changes.
+const cfg = readConfig(true);
 export const CARDS = [
   { file: 'openfrequency', mark: svg('openfrequency-glyph.svg'), color: '#0066cc', name: 'OpenFrequency', latin: true,
-    lines: ['תורן עונה ללקוחות של החנות.', 'תדר כותב מצגות לטיקטוק ולאינסטגרם.'] },
+    lines: ['תורן עונה ללקוחות של החנות.', 'תדר כותב מצגות לרשתות.'] },
   { file: 'toran', mark: svg('toran-glyph.svg'), color: '#0f7a54', name: 'תורן',
     lines: ['עונה ללקוחות של החנות שלכם בכל שעה, מתוך מה שכתוב באתר.'] },
   { file: 'teder', mark: svg('teder-glyph.svg'), color: '#6a3fd6', name: 'תדר',
-    lines: ['מצגות בעברית לטיקטוק ולאינסטגרם, שעולות רק אחרי שאישרתם.'] },
+    lines: [`מצגות בעברית ${tederNets(cfg)}, שעולות רק אחרי שאישרתם.`] },
 ];
 
 const html = (c) => `<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><style>
