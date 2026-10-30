@@ -35,6 +35,7 @@ example.co.il {
 	}
 
 	# The lead endpoint (/api/lead, /api/health, /api/readyz). If it is down, the 502 is answered by handle_errors below.
+	# Only /api/* goes there: its /internal/leads is for Toran on this machine, and is never proxied.
 	handle /api/* {
 		reverse_proxy 127.0.0.1:4720
 	}

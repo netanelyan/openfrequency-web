@@ -652,3 +652,51 @@ test('the backup is a checked copy, the newest kept, and a database that is not 
   assert.match(bad.stderr, /backup failed/);
   assert.equal(fs.readdirSync(out).filter((f) => f.endsWith('.db')).length, 2, 'nothing half-written left behind');
 });
+
+test("the operator's lead centre: GET /internal/leads gives the last 30 days' leads to Toran on this machine, with who should take each and when it did; never through the proxy, nor without the token", async () => {
+  const port = PORT + 700;
+  const db = path.join(dir, 'centre.db');
+  // Teder's intake down: a Teder lead nobody took.
+  const p = await start(port, db, { TEDER_INTAKE_URL: 'http://127.0.0.1:9/internal/lead' });
+  const to = `http://127.0.0.1:${port}`;
+  const get = (headers = {}) => fetch(`${to}/internal/leads`, { headers });
+  try {
+    await post({ source: 'waitlist', contact: '0527770001', store: 'soon.co.il', page: '/toran' }, { to });
+    await post({ source: 'teder', store: 'nobody-took.co.il', contact: '0527770002', page: '/teder' }, { to });
+    await post({ source: 'demo', store: 'coded.co.il', page: '/toran' }, { to });
+    await settle();
+    // One from before the period.
+    const w = new DatabaseSync(db);
+    w.prepare("INSERT INTO leads (created_at, source, store, contact, page) VALUES (?, 'waitlist', NULL, 'old@shop.co.il', '/toran')").run(new Date(Date.now() - 40 * 86_400_000).toISOString());
+    w.close();
+
+    const res = await get({ authorization: `Bearer ${TOKEN}` });
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('cache-control'), 'no-store');
+    const { leads } = await res.json();
+    assert.deepEqual(leads.map((l) => [l.source, l.store, l.contact, l.page, l.handedTo, Boolean(l.handedAt)]), [
+      ['demo', 'coded.co.il', null, '/toran', 'toran', true],
+      ['teder', 'nobody-took.co.il', '972527770002', '/teder', 'teder', false],
+      ['waitlist', 'soon.co.il', '972527770001', '/toran', null, false],
+    ], 'newest first, the last 30 days only; the waitlist is handed to no product');
+    assert.deepEqual(Object.keys(leads[0]).sort(), ['contact', 'createdAt', 'handedAt', 'handedTo', 'id', 'page', 'source', 'store']);
+    assert.ok(leads.every((l) => Number.isInteger(l.id) && !Number.isNaN(Date.parse(l.createdAt))));
+
+    // Refused as Toran's and Teder's internal routes refuse: no token or a wrong one, through the proxy, not a GET.
+    assert.deepEqual([(await get()).status, await (await get()).json()], [401, { error: 'bad_token' }]);
+    assert.equal((await get({ authorization: `Bearer ${'y'.repeat(40)}` })).status, 401);
+    const proxied = await get({ authorization: `Bearer ${TOKEN}`, 'x-forwarded-for': '203.0.113.9' });
+    assert.deepEqual([proxied.status, await proxied.json()], [403, { error: 'forbidden' }]);
+    assert.equal((await fetch(`${to}/internal/leads`, { method: 'POST', headers: { authorization: `Bearer ${TOKEN}` } })).status, 405);
+  } finally {
+    p.kill();
+  }
+  // Without the token set here, nothing is given.
+  const q = await start(port + 1, db, { OF_INTERNAL_TOKEN: '' });
+  try {
+    const r = await fetch(`http://127.0.0.1:${port + 1}/internal/leads`, { headers: { authorization: 'Bearer ' } });
+    assert.deepEqual([r.status, await r.json()], [503, { error: 'not_configured' }]);
+  } finally {
+    q.kill();
+  }
+});

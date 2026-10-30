@@ -135,6 +135,13 @@ A lead stays 6 months from the last time its phone or email asked us anything (`
 contact. The database overwrites what it deletes (`secure_delete`). `GET /api/readyz` reads the database (503 when it
 can't); `GET /api/health` only says the process runs.
 
+`GET /internal/leads` gives the last 30 days' leads to Toran, for the operator's dashboard on accounts' `/admin`, where
+the waitlist and any lead no product took show beside the demos (until then they reached the owner only by email):
+`{ "leads": [{ "id", "source", "store", "contact", "page", "createdAt", "handedTo": "toran" | "teder" | null,
+"handedAt" }] }`, newest first. It answers only on this machine, with `OF_INTERNAL_TOKEN` as a bearer, and refuses a
+request with `X-Forwarded-For` (403), as Toran's and Teder's internal routes do; Caddy proxies only `/api/*` here, so
+it is not public anyway.
+
 Toran's demo form takes the store's address only. It answers with a code (`REQ-XXXXXX`) and a button that opens
 WhatsApp to Toran's demo number (`TORAN_DEMO_WA`) with a message holding the code; Toran counts the demo when that
 message arrives, from the number that sent it, one per number (openfrequency-toran, `docs/operator.md`, section 3).

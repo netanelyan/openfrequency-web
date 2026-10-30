@@ -18,6 +18,9 @@
 // Health: GET /api/health answers "ok" while the process runs; GET /api/readyz reads the database and answers 503 when
 // it can't (deploy/deploy.sh checks it after each restart).
 //
+// The operator: GET /internal/leads gives the last 30 days' leads to Toran, for the dashboard on accounts' /admin; from
+// this machine only, with OF_INTERNAL_TOKEN, never through Caddy (below, "the operator's lead centre").
+//
 // Environment (on the server, in /etc/openfrequency-web/lead.env, never in the repo):
 //   PORT                 default 4720
 //   LEADS_DB             default private/leads.db
@@ -41,7 +44,8 @@
 //                        (teder.demoBy), as {url, code, product: 'teder'}
 //   TEDER_INTAKE_URL     Teder's /internal/lead on this machine (http://127.0.0.1:4700/internal/lead); without it a
 //                        Teder lead only goes to WhatsApp
-//   OF_INTERNAL_TOKEN    the token Toran and Teder check, the same value as in their and accounts' private/.env
+//   OF_INTERNAL_TOKEN    the token Toran and Teder check, the same value as in their and accounts' private/.env; Toran
+//                        sends it to GET /internal/leads too
 //   TORAN_DEMO_WA        Toran's demo WhatsApp number, digits with the country code (972...): a Toran demo's form, and
 //                        Teder's asked for by WhatsApp, answers with a wa.me link to it, holding the request's code;
 //                        without it, the code alone
@@ -407,6 +411,58 @@ async function retry(db) {
   for (const row of toHand) await forward(db, row);
 }
 
+// ---------------------------------------------------------------- the operator's lead centre
+
+// GET /internal/leads: the last LEADS_DAYS days' leads, for the operator's dashboard on accounts' /admin (Toran reads
+// it, openfrequency-toran src/ops/sources.ts siteLeads): until now the waitlist, and a lead no product took, reached the
+// owner only by email. Each says which product should take it (handedTo: toran, teder, or null for the waitlist and a
+// Toran demo from before the codes) and when that one did (handedAt). From this machine only, with OF_INTERNAL_TOKEN as
+// a bearer (32 characters or more), and never through the proxy: a request with X-Forwarded-For is refused, as Toran's
+// and Teder's internal routes refuse it. The public Caddy proxies only /api/* here (deploy/Caddyfile.example), so
+// /internal/* does not reach this endpoint from outside anyway. Refusals answer as theirs do: 503 not_configured, 403
+// forbidden, 401 bad_token.
+export const LEADS_DAYS = 30;
+
+function internalRefusal(req) {
+  const token = String(env.OF_INTERNAL_TOKEN || '').trim();
+  if (token.length < 32) return [503, { error: 'not_configured' }];
+  const peer = req.socket.remoteAddress || '';
+  if (req.headers['x-forwarded-for'] || !/^(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$/.test(peer)) return [403, { error: 'forbidden' }];
+  const got = Buffer.from(String(req.headers.authorization || ''));
+  const want = Buffer.from(`Bearer ${token}`);
+  if (got.length !== want.length || !crypto.timingSafeEqual(got, want)) return [401, { error: 'bad_token' }];
+  return null;
+}
+
+// The leads of the last `days` days, newest first, at most 500: what /internal/leads answers.
+export function recentLeads(db, { now = Date.now(), days = LEADS_DAYS } = {}) {
+  const since = new Date(now - days * 86_400_000).toISOString();
+  return db.prepare('SELECT * FROM leads WHERE created_at > ? ORDER BY id DESC LIMIT 500').all(since).map((r) => {
+    const [product, , body] = intake(r);
+    return {
+      id: r.id,
+      source: r.source,
+      store: r.store || null,
+      contact: r.contact || null, // null for a demo with a code: Toran has its number
+      page: r.page || null,
+      createdAt: r.created_at,
+      handedTo: product && body ? product.toLowerCase() : null,
+      handedAt: r.forwarded_at || null,
+    };
+  });
+}
+
+function internalLeads(req, res, db) {
+  const json = (status, body) => {
+    res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+    res.end(JSON.stringify(body));
+  };
+  if (req.method !== 'GET') { res.writeHead(405, { Allow: 'GET' }); res.end(); return; }
+  const no = internalRefusal(req);
+  if (no) return json(...no);
+  json(200, { leads: recentLeads(db) });
+}
+
 // ---------------------------------------------------------------- HTTP
 
 function clientIp(req) {
@@ -476,6 +532,7 @@ export function createServer(db) {
       res.end(ready ? 'ready' : 'not ready');
       return;
     }
+    if (url.pathname === '/internal/leads') return internalLeads(req, res, db);
     if (url.pathname !== '/api/lead') { res.writeHead(404); res.end(); return; }
     if (req.method !== 'POST') { res.writeHead(405, { Allow: 'POST' }); res.end(); return; }
 
