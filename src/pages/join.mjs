@@ -39,7 +39,7 @@ const PAY_STEP = (cfg) => (payProvider(cfg)
 const SIGNUP_STEPS = (cfg) => [
   PAY_STEP(cfg),
   ['בוחרים מקורות', 'תדר מחפש מקורות שמתאימים לחנות שלכם, ואתם בוחרים מהם את אלה שהוא יקרא.'],
-  ['עוברים על המצגות לדוגמה', 'תדר מכין חמש מצגות מהמקורות שבחרתם, ואתם עוברים עליהן לפני שמשהו עולה.'],
+  ['עוברים על המצגות לדוגמה', 'תדר מכין כמה מצגות מהמקורות שבחרתם, ואתם עוברים עליהן לפני שמשהו עולה.'],
   ['מעלים לאוויר', `מחברים ${tederNets(cfg, 'the')}, ומכאן המצגות מחכות לאישור שלכם במסך אחד.`],
 ];
 // With Toran live and sign-up open: the steps for either product, since the visitor picks on accounts' page.

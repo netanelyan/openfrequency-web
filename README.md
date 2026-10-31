@@ -102,11 +102,14 @@ keeps one per number, as it always has. `"whatsapp"`: the form takes the address
 demo, with a code (`REQ-XXXXXX`) and a button that opens WhatsApp to the same demo number (`TORAN_DEMO_WA`) with the
 message `היי, אשמח לדמו של תדר לחנות <store>.` and, on its second line, `הקוד מהאתר: <code>`. The number that sends it
 is the one the sample goes to, so it proves itself, and Toran keeps one demo per number per product (below, "Leads").
-The line under the button, the thank-you and the home page's question box say so; nothing else on the site changes,
-and the join form keeps its number field. `test/teder-demo.test.mjs` builds both and checks that every other page is
-the same, byte for byte. Before turning it on: `TORAN_DEMO_WA` set on the server, our demo number answering, and
-Toran's `/internal/lead` taking `product` live on the server. A Toran from before that reads only `url` and `code`, and
-would take the request as a demo of Toran's.
+The line under the button, the thank-you and the home page's question box say so, and the privacy page says that Teder
+too learns the number from the message, that Meta carries the demo number's messages and that those chats are kept as
+Toran's are; nothing else on the site changes, and the join form keeps its number field. `test/teder-demo.test.mjs`
+builds both and checks that every other page is the same, byte for byte. Before turning it on: `TORAN_DEMO_WA` set on
+the server, our demo number answering, and Toran's `/internal/lead` taking `product` live on the server. A Toran from
+before that reads only `url` and `code`, and would take the request as a demo of Toran's. **Turning it on, set
+`legal.privacyWaUpdated` to that day:** it is the privacy page's date while the switch is on, and the build stops
+without it, so the page never changes under its old date.
 
 ## Build
 

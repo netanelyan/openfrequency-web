@@ -65,6 +65,10 @@ export const FACTS = {
   // The date of the terms with the self-serve section, shown on /terms while sign-up is open. It is the terms version
   // accounts stores on each sign-up (openfrequency-accounts, TERMS_VERSION in src/accounts/signup.js).
   'legal.signupUpdated': { label: 'תאריך תנאי השימוש כשההרשמה פתוחה, YYYY-MM-DD', kind: 'text', unless: (raw) => raw.signup !== 'open' },
+  // The date of the privacy page once Teder's sample is asked for by a WhatsApp code (teder.demoBy "whatsapp"), which
+  // adds Teder to the demos that learn the number from the message: set to the day the switch is turned on. Without it
+  // the real build stops, so the switch cannot go out under the old date.
+  'legal.privacyWaUpdated': { label: 'תאריך מדיניות הפרטיות כשהמצגת לדוגמה של תדר מבקשים בקוד בוואטסאפ, YYYY-MM-DD', kind: 'text', unless: (raw) => raw.teder?.demoBy !== 'whatsapp' },
   'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
   'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },
   // Teder's two plans, the same product with a different number of slideshows: the full one (teder.*) and the small one

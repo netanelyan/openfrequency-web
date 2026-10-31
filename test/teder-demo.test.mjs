@@ -2,7 +2,8 @@
 // touched, and neither is dist/): "form" is the site as it was, word for word, /teder's form asking for the store's
 // address and a WhatsApp number; "whatsapp" asks for the address only and is answered like Toran's demo, with a code
 // to send us on WhatsApp, so the number proves itself. Only /teder and the home page's question box change; the join
-// form keeps its number. The endpoint's side (by=whatsapp, the code, the handover to Toran) is in lead.test.mjs.
+// form keeps its number. The privacy page says Teder learns the number from the message too, under its own date
+// (legal.privacyWaUpdated), and a "whatsapp" build without that date stops. The endpoint's side (by=whatsapp, the code, the handover to Toran) is in lead.test.mjs.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -21,8 +22,11 @@ const run = (name, cfg) => {
   const out = path.join(dir, name);
   return { out, b: spawnSync(process.execPath, ['build.mjs'], { cwd: ROOT, env: { ...process.env, SITE_CONFIG: file, SITE_OUT: out }, encoding: 'utf8' }) };
 };
+// The day the switch goes on, as it would be set then.
+const WA_DATE = '2026-11-15';
 function build(name, demoBy, patch = {}) {
-  const { out, b } = run(name, { ...config, ...patch, products: { ...config.products, ...patch.products }, teder: { ...config.teder, demoBy } });
+  const legal = demoBy === 'whatsapp' ? { ...config.legal, privacyWaUpdated: WA_DATE } : config.legal;
+  const { out, b } = run(name, { ...config, ...patch, legal, products: { ...config.products, ...patch.products }, teder: { ...config.teder, demoBy } });
   assert.equal(b.status, 0, `the build "${name}" failed:\n${b.stdout}\n${b.stderr}`);
   const pages = {};
   for (const f of fs.readdirSync(out, { recursive: true })) {
@@ -76,8 +80,8 @@ test('the switch is a fact with two values, the config says "form" (our WhatsApp
   assert.match(gone.b.stderr + gone.b.stdout, /"teder\.demoBy" is not there/);
 });
 
-test('the switch changes /teder and the question box only: every other page is the same either way, byte for byte', () => {
-  for (const [form, wa, changes] of [[built.form, built.wa, ['index.html', 'teder/index.html']], [built.formLive, built.waLive, ['teder/index.html']]]) {
+test('the switch changes /teder, the question box and the privacy page only: every other page is the same either way, byte for byte', () => {
+  for (const [form, wa, changes] of [[built.form, built.wa, ['index.html', 'teder/index.html', 'privacy/index.html']], [built.formLive, built.waLive, ['teder/index.html', 'privacy/index.html']]]) {
     assert.deepEqual(Object.keys(wa).sort(), Object.keys(form).sort(), 'the same pages');
     for (const file of Object.keys(form)) {
       if (changes.includes(file)) assert.notEqual(wa[file], form[file], file);
@@ -139,4 +143,34 @@ test('with "whatsapp", the question box says how to get Teder\'s sample: the add
   assert.match(answer, /שולחים את הכתובת של החנות, ואחר כך הודעה מוכנה עם קוד בוואטסאפ\. לשם נשלח לכם את הלינק למצגת\./);
   assert.doesNotMatch(answer, /מספר וואטסאפ/);
   assert.match(answer, /href="\/teder#demo"/);
+});
+
+test('with "whatsapp", the privacy page says Teder learns the number from the message too, Meta carries the demo number, and the page has the day of the switch', () => {
+  const said = (html) => html.replace(/<[^>]+>/g, '');
+  for (const pages of [built.wa, built.waLive]) {
+    const html = said(pages['privacy/index.html']);
+    assert.match(html, /בדמו של תורן ובמצגת לדוגמה של תדר, את מספר הנייד אנחנו מקבלים מההודעה ששולחים לנו בוואטסאפ עם הקוד מהטופס\./);
+    assert.match(html, /Meta: הודעות הוואטסאפ במספר הדמו ובמספרים המחוברים של החנויות, והפרסום והנתונים ב-Instagram\./);
+    assert.match(html, /שיחות במספר הדמו, על תורן ועל תדר: 6 חודשים מההודעה האחרונה\./);
+    assert.match(html, /עודכן לאחרונה ב-15 בנובמבר 2026/);
+  }
+  // With "form", the page as it was, under the legal pages' own date.
+  for (const pages of [built.form, built.formLive]) {
+    const html = said(pages['privacy/index.html']);
+    assert.match(html, /\. בדמו של תורן, את מספר הנייד אנחנו מקבלים מההודעה/);
+    assert.match(html, /Meta: הודעות הוואטסאפ כשמספר החנות מחובר, והפרסום והנתונים ב-Instagram\./);
+    assert.match(html, /שיחות במספר הדמו של תורן: 6 חודשים/);
+    assert.doesNotMatch(html, /תדר, את מספר הנייד|15 בנובמבר/);
+    assert.match(html, /עודכן לאחרונה ב-30 באוקטובר 2026/);
+  }
+  // The other legal pages keep their date either way.
+  for (const file of ['terms/index.html', 'security/index.html', 'accessibility/index.html']) assert.equal(built.wa[file], built.form[file], file);
+});
+
+test('the switch cannot go out under the old date: a "whatsapp" build without legal.privacyWaUpdated stops, and nothing is written', () => {
+  assert.equal(config.legal.privacyWaUpdated, '', 'empty until the switch goes on');
+  const bare = run('wa-no-date', { ...config, teder: { ...config.teder, demoBy: 'whatsapp' } });
+  assert.notEqual(bare.b.status, 0);
+  assert.match(bare.b.stderr + bare.b.stdout, /תאריך מדיניות הפרטיות כשהמצגת לדוגמה של תדר מבקשים בקוד בוואטסאפ/);
+  assert.ok(!fs.existsSync(path.join(bare.out, 'index.html')), 'no site');
 });
