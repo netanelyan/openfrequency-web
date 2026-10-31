@@ -56,7 +56,7 @@ test('the privacy page says a lead reaches us by email, and what we keep for an 
   assert.ok(part('p-share').includes('Resend , ארצות הברית: מיילים של כניסה לשירות, המיילים שתורן מקבל ועונה עליהם, והמייל שמגיע אלינו על כל טופס.'));
   assert.ok(part('p-customers').includes('את שם העסק, שכותבים בהרשמה. כשצריך מספר עוסק וכתובת לחשבונית, אנחנו מבקשים אותם מכם.'));
   assert.ok(!part('p-customers').includes('פרטים לחשבונית'));
-  assert.match(privacy, /עודכן לאחרונה ב-30 באוקטובר 2026/, 'legal.updated, the day this changed');
+  assert.match(privacy, /עודכן לאחרונה ב-31 באוקטובר 2026/, 'legal.privacyWaUpdated, the day Teder\'s sample went to the WhatsApp code');
 });
 
 test("a form's message region is in the page from the start, empty, and never hidden", () => {

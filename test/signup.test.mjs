@@ -205,8 +205,9 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
   assert.match(text(section(terms, 't-stop')), /את תדר מבטלים בחשבון[\s\S]*בתורן, כדי להפסיק, כותבים לנו[\s\S]*בתורן, דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם/);
   assert.ok(text(section(terms, 't-price')).includes(PAY.manual.price));
   for (const id of ['t-answers', 't-yours', 't-teder', 't-who', 't-deal', 't-what', 't-account']) assert.equal(section(terms, id), section(closed, id), id);
-  // The other legal pages keep their own date.
-  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-30 באוקטובר 2026/);
+  // The other legal pages keep their own date (the privacy page's is legal.privacyWaUpdated while Teder's sample is
+  // asked for on WhatsApp).
+  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-31 באוקטובר 2026/);
 });
 
 test('the terms promise only the take-downs we can do: published posts stay on the customer\'s accounts, TikTok is theirs to delete', () => {

@@ -68,8 +68,8 @@ const OLD_FORM = (button) => `<form class="demo" id="demo" action="/api/lead" me
 <div class="form-msg" id="msg-demo" role="status" aria-live="polite"></div>
 </form>`;
 
-test('the switch is a fact with two values, the config says "form" (our WhatsApp number does not answer yet), and anything else stops the build', () => {
-  assert.equal(config.teder.demoBy, 'form');
+test('the switch is a fact with two values, the config says "whatsapp" (our number answers on Meta since 2026-10-31), and anything else stops the build', () => {
+  assert.equal(config.teder.demoBy, 'whatsapp');
   const bad = run('bad', { ...config, teder: { ...config.teder, demoBy: 'sms' } });
   assert.notEqual(bad.b.status, 0);
   assert.match(bad.b.stderr + bad.b.stdout, /"teder\.demoBy" must be one of form, whatsapp \(got "sms"\)/);
@@ -168,8 +168,8 @@ test('with "whatsapp", the privacy page says Teder learns the number from the me
 });
 
 test('the switch cannot go out under the old date: a "whatsapp" build without legal.privacyWaUpdated stops, and nothing is written', () => {
-  assert.equal(config.legal.privacyWaUpdated, '', 'empty until the switch goes on');
-  const bare = run('wa-no-date', { ...config, teder: { ...config.teder, demoBy: 'whatsapp' } });
+  assert.equal(config.legal.privacyWaUpdated, '2026-10-31', 'the day the switch went on');
+  const bare = run('wa-no-date', { ...config, legal: { ...config.legal, privacyWaUpdated: '' }, teder: { ...config.teder, demoBy: 'whatsapp' } });
   assert.notEqual(bare.b.status, 0);
   assert.match(bare.b.stderr + bare.b.stdout, /תאריך מדיניות הפרטיות כשהמצגת לדוגמה של תדר מבקשים בקוד בוואטסאפ/);
   assert.ok(!fs.existsSync(path.join(bare.out, 'index.html')), 'no site');

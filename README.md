@@ -96,9 +96,9 @@ say only the fee.
 policy names a connected Facebook Page. `false`: TikTok and Instagram, as before. Turn it on only once Teder's Facebook
 posting is live on the server.
 
-**How Teder's sample is asked for: `teder.demoBy`.** `"form"` (now, while our WhatsApp number doesn't answer yet): the
+**How Teder's sample is asked for: `teder.demoBy`.** `"form"` (until 2026-10-31, while our WhatsApp number didn't answer): the
 form on `/teder` takes the store's address and a typed WhatsApp number, the sample goes to that number, and the site
-keeps one per number, as it always has. `"whatsapp"`: the form takes the address only and is answered like Toran's
+keeps one per number, as it always has. `"whatsapp"` (now, since our number answers on Meta, 2026-10-31): the form takes the address only and is answered like Toran's
 demo, with a code (`REQ-XXXXXX`) and a button that opens WhatsApp to the same demo number (`TORAN_DEMO_WA`) with the
 message `היי, אשמח לדמו של תדר לחנות <store>.` and, on its second line, `הקוד מהאתר: <code>`. The number that sends it
 is the one the sample goes to, so it proves itself, and Toran keeps one demo per number per product (below, "Leads").
