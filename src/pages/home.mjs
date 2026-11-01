@@ -22,13 +22,14 @@ import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
 import { niches } from '../niches.mjs';
 
-// Toran's door: the sample chat on the customer's phone. The first question it answers from the site; the second
-// isn't there, so it tells the customer it's checking, and the question pops up on the owner's phone.
+// Toran's door: the sample chat on the customer's phone, in the words Toran uses (openfrequency-toran src/agent/intro.ts
+// and guard.ts). It says it is the store's bot, answers the first question from the site; the second isn't there, so
+// it says it isn't sure and passed the question to someone from the store, and the question pops up on the owner's phone.
 const DOOR_CHAT = [
   ['me', '02:14', 'היי, יש את שמלת הפשתן הירוקה במידה M?'],
-  ['them', '02:14', 'יש, נשארו 2 במידה M. היא 289 ₪, והמשלוח לוקח 3 עד 5 ימי עסקים.'],
+  ['them', '02:14', 'כאן הבוט של החנות. יש, נשארו 2 במידה M. היא 289 ₪, והמשלוח לוקח 3 עד 5 ימי עסקים.'],
   ['me', '02:16', 'ואפשר לאסוף מהמחסן?'],
-  ['them', '02:16', 'את זה אני לא יודע. אני בודק עם החנות, ואחזור אליך כאן.'],
+  ['them', '02:16', 'על זה אני לא בטוח, אז העברתי את השאלה לנציג מהחנות. הוא יחזור אליך כאן.'],
 ];
 
 // A door's top row: the mark, the name, and what it does. On a phone the door starts shut (site.js), showing the name
