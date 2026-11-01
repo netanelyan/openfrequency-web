@@ -83,9 +83,9 @@
     });
   }
 
-  // The thank-you takes the form's place and gets the focus, so a screen reader reads it. A Toran demo's shows its code
-  // and the button to WhatsApp (left out if the endpoint has no demo number to give), and on the join page the Teder
-  // line when Teder was asked for too.
+  // The thank-you takes the form's place and gets the focus, so a screen reader reads it. A demo by code says to press
+  // the button to WhatsApp and send the message as it is; if the endpoint has no demo number to give, the button and
+  // that line go and the code shows instead. On the join page the Teder line shows when Teder was asked for too.
   function done(f, body, typed) {
     var node = copy(body.code ? 'done-code' : body.source === 'waitlist' ? 'done-waitlist' : 'done-teder');
     var s = node.querySelector('[data-store]');
@@ -94,7 +94,13 @@
     if (c) c.textContent = body.code;
     var go = node.querySelector('[data-wa-go]');
     if (go && body.wa) go.href = body.wa;
-    else if (go) go.remove();
+    else if (go) {
+      go.remove();
+      var say = node.querySelector('[data-wa-say]');
+      if (say) say.remove();
+      var bare = node.querySelector('[data-no-wa]');
+      if (bare) bare.hidden = false;
+    }
     var t = node.querySelector('[data-teder]');
     if (t) t.hidden = !(body.saved && body.saved.indexOf('teder') >= 0);
     f.replaceChildren(node);

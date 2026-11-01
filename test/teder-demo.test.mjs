@@ -98,7 +98,7 @@ test('with "form", /teder is as it was: its form takes the address and a WhatsAp
   for (const pages of [built.form, built.formLive]) assert.doesNotMatch(pages['teder/index.html'], /name="by"|לשם נשלח את הלינק|לקבל בו את המצגת/);
   // With Toran soon no thank-you with a code anywhere; with Toran live, /teder carries Toran's, as before.
   assert.equal(codeTemplates(built.form['teder/index.html']), 0);
-  assert.match(template(built.formLive['teder/index.html'], 'done-code'), /שהדמו יענה לו/);
+  assert.match(template(built.formLive['teder/index.html'], 'done-code'), /<p data-teder hidden>/, "Toran's, with the join page's Teder line");
   assert.match(template(built.form['index.html'], 'ask-a-demo'), /שולחים את הכתובת של החנות ומספר וואטסאפ, ואנחנו שולחים לכם אותה\./);
   // On /teder, every part of the page but the form and the thank-you templates is the same in both modes.
   const rest = (html) => html.replace(/<form class="demo"[^>]*data-form="teder"[\s\S]*?<\/form>/, '').replace(/<template id="done-code">[\s\S]*?<\/template>\n?/, '');
@@ -123,19 +123,28 @@ test('with "whatsapp", /teder\'s form asks for the store\'s address only and tel
   }
 });
 
-test('with "whatsapp", /teder\'s thank-you is the code to send on WhatsApp and the button that writes it, naming Teder; Toran\'s pages keep Toran\'s', () => {
+// The thank-you says one thing (the owner, 2026-11-01: "just tell him to send the message in the url AS IS. everything
+// should be easy for a user"): press the button and send the message as it is. The code is shown only when there is no
+// button (no demo number), as what to send.
+test('with "whatsapp", /teder\'s thank-you is one line, to send the ready message as it is, and the button; the code only without a button; Toran\'s pages keep Toran\'s', () => {
   for (const pages of [built.wa, built.waLive]) {
     const html = pages['teder/index.html'];
     assert.equal(codeTemplates(html), 1, 'one thank-you with a code on /teder');
     const done = template(html, 'done-code');
-    assert.equal(done, '<template id="done-code"><div class="done" tabindex="-1"><h3>נשאר לשלוח לנו הודעה בוואטסאפ</h3><p>הקוד של הבקשה הוא <bdi class="code" data-code></bdi>, והוא כבר כתוב בהודעה שהכפתור פותח.</p><p>צריך לשלוח אותה מהמספר שתרצו לקבל בו את המצגת לדוגמה של תדר. כשהיא מוכנה, נשלח לשם את הלינק.</p><a class="btn primary" data-wa-go href="#">לשלוח בוואטסאפ</a></div></template>');
+    assert.equal(done, '<template id="done-code"><div class="done" tabindex="-1"><h3>נשאר רק לשלוח לנו הודעה בוואטסאפ</h3><p data-wa-say>לחצו על הכפתור ושלחו את ההודעה כמו שהיא.</p><p data-no-wa hidden>שלחו לנו בוואטסאפ את הקוד <bdi class="code" data-code></bdi>.</p><a class="btn primary" data-wa-go href="#">לשלוח בוואטסאפ</a></div></template>');
+    assert.doesNotMatch(done, /הקוד של הבקשה הוא|מהמספר שתרצו/, 'no mechanics to read');
     assert.ok(template(html, 'done-teder'), 'the thank-you for an answer with no code stays');
   }
-  // Toran's own, where Toran's forms are, word for word as with "form".
+  // Toran's own, where Toran's forms are, word for word as with "form", and as simple.
   for (const file of ['toran/index.html', 'join/index.html']) assert.equal(template(built.waLive[file], 'done-code'), template(built.formLive[file], 'done-code'), file);
-  assert.match(template(built.waLive['toran/index.html'], 'done-code'), /שהדמו יענה לו/);
-  // form.js shows done-code for any answer with a code, which is how /teder's shows (src/form.js, done).
-  assert.match(fs.readFileSync(path.join(ROOT, 'src/form.js'), 'utf8'), /copy\(body\.code \? 'done-code'/);
+  const toran = template(built.waLive['toran/index.html'], 'done-code');
+  assert.match(toran, /<p data-wa-say>לחצו על הכפתור ושלחו את ההודעה כמו שהיא\.<\/p>/);
+  assert.match(toran, /<p data-teder hidden>/);
+  // form.js shows done-code for any answer with a code, which is how /teder's shows, and without a demo number it drops
+  // the button and the line about it and shows the code (src/form.js, done).
+  const js = fs.readFileSync(path.join(ROOT, 'src/form.js'), 'utf8');
+  assert.match(js, /copy\(body\.code \? 'done-code'/);
+  assert.match(js, /querySelector\('\[data-wa-say\]'\)[\s\S]*querySelector\('\[data-no-wa\]'\)[\s\S]*hidden = false/);
 });
 
 test('with "whatsapp", the question box says how to get Teder\'s sample: the address, then a message with a code on WhatsApp', () => {

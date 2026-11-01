@@ -96,9 +96,13 @@ export function formCopy(cfg, forms = true) {
   // is soon no form asks for its demo, so there is no code to show, and the waitlist has its own thank-you.
   // On /teder, while Teder's sample is asked for by WhatsApp (teder.demoBy), the code is Teder's: the same id, since
   // form.js shows done-code for any answer with a code, and words that name Teder. That page has no Toran form.
+  // Either way the visitor is told one thing (the owner, 2026-11-01: "just tell him to send the message in the url AS
+  // IS. everything should be easy for a user"): press the button and send the message as it is. The code is shown only
+  // when there is no button to press (no demo number), as what to send us.
   const tederCode = forms === 'teder' && tederByWa(cfg);
-  return `${tederCode ? `<template id="done-code"><div class="done" tabindex="-1"><h3>נשאר לשלוח לנו הודעה בוואטסאפ</h3><p>הקוד של הבקשה הוא <bdi class="code" data-code></bdi>, והוא כבר כתוב בהודעה שהכפתור פותח.</p><p>צריך לשלוח אותה מהמספר שתרצו לקבל בו את המצגת לדוגמה של תדר. כשהיא מוכנה, נשלח לשם את הלינק.</p><a class="btn primary" data-wa-go href="#">לשלוח בוואטסאפ</a></div></template>
-` : toranSoon(cfg) ? '' : `<template id="done-code"><div class="done" tabindex="-1"><h3>נשאר לשלוח לנו הודעה בוואטסאפ</h3><p>הקוד של הבקשה הוא <bdi class="code" data-code></bdi>, והוא כבר כתוב בהודעה שהכפתור פותח.</p><p>צריך לשלוח אותה מהמספר שהדמו יענה לו, ולשם יגיע הלינק${within(cfg) ? ` ${within(cfg)}` : ' כשהוא מוכן'}.</p><p data-teder hidden>את המצגת לדוגמה של תדר נשלח למספר שכתבתם בטופס.</p><a class="btn primary" data-wa-go href="#">לשלוח בוואטסאפ</a></div></template>
+  const send = '<p data-wa-say>לחצו על הכפתור ושלחו את ההודעה כמו שהיא.</p><p data-no-wa hidden>שלחו לנו בוואטסאפ את הקוד <bdi class="code" data-code></bdi>.</p>';
+  return `${tederCode ? `<template id="done-code"><div class="done" tabindex="-1"><h3>נשאר רק לשלוח לנו הודעה בוואטסאפ</h3>${send}<a class="btn primary" data-wa-go href="#">לשלוח בוואטסאפ</a></div></template>
+` : toranSoon(cfg) ? '' : `<template id="done-code"><div class="done" tabindex="-1"><h3>נשאר רק לשלוח לנו הודעה בוואטסאפ</h3>${send}<p data-teder hidden>את המצגת לדוגמה של תדר נשלח למספר שכתבתם בטופס.</p><a class="btn primary" data-wa-go href="#">לשלוח בוואטסאפ</a></div></template>
 `}<template id="done-teder"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>כשהמצגת לדוגמה מוכנה, נשלח לכם אותה לוואטסאפ, בגודל של טיקטוק ושל אינסטגרם.</p></div></template>
 ${toranSoon(cfg) ? `<template id="done-waitlist"><div class="done" tabindex="-1"><h3>רשמנו אתכם</h3><p>כשתורן נפתח, נכתוב לכם לטלפון או למייל שהשארתם.</p></div></template>
 <template id="msg-contact-waitlist"><p>צריך מספר נייד ישראלי, למשל 050-1234567, או כתובת מייל, כדי שנוכל לכתוב לכם כשתורן נפתח.</p></template>

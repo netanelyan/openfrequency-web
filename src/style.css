@@ -591,6 +591,8 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 /* Teder's sign-up, while it is open (sections.mjs tederStart): the button, the price under it, and the sample slideshow
    as the second way. On Teder's violet the lines are white. */
 .start { display: grid; gap: 8px; justify-items: start; }
+/* Its buttons in one row (a product page's top): apart, side by side or wrapped one over the other. */
+.start-act { display: flex; flex-wrap: wrap; gap: 10px; }
 .start .start-price, .start-alt { margin: 0; color: var(--ink-2); font-size: var(--fs-small); max-width: 52ch; }
 .join-start { margin-top: 28px; }
 .teder-field .start-price, .teder-field .start-alt, .teder-door .start-price, .teder-door .start-alt { color: rgba(255, 255, 255, 0.86); }
@@ -681,7 +683,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .door { --pad: clamp(18px, 2.2vw, 28px); display: flex; flex-direction: column; gap: 20px; min-width: 0; overflow: hidden; padding: var(--pad) var(--pad) 0; border-radius: var(--r); }
 .door-top { display: flex; align-items: center; gap: 14px; }
 .door-top h2 { font-size: var(--fs-lead); line-height: 1.2; }
-.door-top p { margin: 2px 0 0; color: var(--ink-2); }
+.door-top p { margin: 6px 0 0; color: var(--ink-2); }
 .door-act { display: flex; flex-wrap: wrap; gap: 10px; }
 /* The door's inside is laid out as part of the door; on a phone a shut door shows only its top row, with a short line
    in place of the long one, and opens under a tap anywhere on that row (home.mjs doorTop, site.js). */
@@ -1016,6 +1018,18 @@ input[aria-invalid='true'] { border-color: var(--warn); }
 .a11y-reset { min-height: 44px; padding: 0; border: 0; background: none; color: var(--ink-2); font: inherit; text-decoration: underline; cursor: pointer; }
 .a11y-end a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); }
 @media print { .a11y { display: none; } }
+
+/* Our customer support on WhatsApp, which Toran answers: a glass pill at the other bottom corner, on every page
+   (layout.mjs support). The footer leaves room under its panel, so at the end of a page neither corner covers it. */
+.support { position: fixed; z-index: 44; bottom: calc(16px + env(safe-area-inset-bottom)); inset-inline-start: 16px; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 18px 6px 14px; border: 1px solid var(--edge); border-radius: 999px; background: var(--surface-hi); -webkit-backdrop-filter: var(--glass); backdrop-filter: var(--glass); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); color: var(--ink); text-decoration: none; }
+.support .logo { width: 26px; height: 26px; vertical-align: 0; }
+.support span { display: grid; line-height: 1.15; }
+.support b { font: 600 15px/1.2 var(--text); }
+.support small { color: var(--ink-2); font-size: 12px; }
+.support:focus-visible { outline: 3px solid var(--accent-fill); outline-offset: 2px; }
+@media (hover: hover) { .support:hover { background: var(--sheet); } }
+.foot { padding-bottom: calc(var(--gut) + 72px); }
+@media print { .support { display: none; } }
 
 /* The switches. Bigger text zooms the page, so the sizes written in px grow with it. */
 html.a-big body { zoom: 1.2; }

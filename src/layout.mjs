@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { FACTS, ROOT, esc, mark, tederNets, toranSoon } from './lib.mjs';
 import { formCopy } from './forms.mjs';
+import { LOGOS } from './logos.mjs';
 
 // The two scripts, comments and indentation out: site.js on every page (motion and the question box), form.js only
 // where there is a form.
@@ -96,6 +97,17 @@ ${A11Y.map(([k, label]) => `<button type="button" data-a="${k}" aria-pressed="fa
 <button class="a11y-btn" type="button" aria-expanded="false" aria-controls="a11y-p"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="1.8"/><path d="M5 8.5l7 1.5 7-1.5M12 10v4.5M12 14.5l-3 6M12 14.5l3 6"/></svg><span class="sr">נגישות</span></button>
 </div>`;
 
+// Our customer support, on every page (the owner, 2026-11-01: "add a customer support by toran button (openfrequency
+// customer support)"): our WhatsApp number, where Toran answers anyone with no demo as our support (openfrequency-toran
+// src/company.ts), with a first line written for them. A plain link, so it works without script; none in a draft
+// without the number.
+export const SUPPORT_TEXT = 'היי, יש לי שאלה';
+export function support(cfg) {
+  const wa = cfg.get('whatsapp');
+  if (!wa) return '';
+  return `<a class="support" href="https://wa.me/${esc(wa)}?text=${encodeURIComponent(SUPPORT_TEXT)}" target="_blank" rel="noopener">${LOGOS.whatsapp}<span><b>שירות לקוחות</b><small>עונה תורן, בוואטסאפ</small></span></a>`;
+}
+
 // What a link to the page shows where it is sent (WhatsApp, Facebook, LinkedIn, X): the page's own title and line, and
 // its share image from assets/og (scripts/og.mjs draws them). Every address is absolute, on the site's domain.
 const OG_ALT = (cfg) => ({ openfrequency: 'OpenFrequency: תורן ותדר', toran: 'תורן, עונה ללקוחות של החנות', teder: `תדר, מצגות בעברית ${tederNets(cfg)}` });
@@ -143,6 +155,7 @@ ${missing}${header(cfg, path)}
 ${body}
 </main>
 ${footer(cfg, path)}
+${support(cfg)}
 ${a11y}
 <script>
 ${siteJs}
