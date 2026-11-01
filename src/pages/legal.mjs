@@ -11,7 +11,7 @@
 // too learns the number from that message, Meta carries the demo number's messages (the switch goes on once our number
 // answers there), and the page has its own date, legal.privacyWaUpdated, the day the switch was turned on.
 import { SIGNUP_URL, esc, facebookOn, payProvider, signupOpen, tederByWa, tederNets, toranSoon } from '../lib.mjs';
-import { tederPriceLine, waWords } from '../sections.mjs';
+import { tederPriceLine, toranPriceLine, waWords } from '../sections.mjs';
 
 const updated = (cfg, key = 'legal.updated') => {
   const v = cfg.get(key);
@@ -23,9 +23,14 @@ const mail = (cfg) => {
   return v == null ? cfg.ph('legal.email') : `<a href="mailto:${esc(v)}" dir="ltr">${esc(v)}</a>`;
 };
 const who = (cfg) => `OpenFrequency, עסק של <bdi>${cfg.t('legal.name')}</bdi>, עוסק מספר ${cfg.t('legal.number')}, מאשדוד`;
+/** Each product's short contract, the one a customer accepts on sign-up (accounts' sign-up form links it). */
+export const TEDER_CONTRACT = '/teder/contract';
+export const TORAN_CONTRACT = '/toran/contract';
 
 // A page: the heading, the date, the sections listed at the top, then the sections. sections: [id, heading, html].
-function doc(cfg, { path, title, description, lede, sections, date = 'legal.updated' }) {
+// toc false: no list at the top (a contract short enough to read through), and the headings numbered instead.
+function doc(cfg, { path, title, description, lede, sections, date = 'legal.updated', toc = true }) {
+  const head = (h, i) => (toc ? h : `${i + 1}. ${h}`);
   return {
     path,
     title: `${title} | OpenFrequency`,
@@ -36,8 +41,8 @@ function doc(cfg, { path, title, description, lede, sections, date = 'legal.upda
 <h1 id="legal-h">${title}</h1>
 <p class="lede">${lede}</p>
 <p class="legal-date">עודכן לאחרונה ב-${updated(cfg, date)}</p>
-<nav class="legal-toc" aria-label="בעמוד הזה"><ol>${sections.map(([id, h]) => `<li><a href="#${id}">${h}</a></li>`).join('')}</ol></nav>
-${sections.map(([id, h, html]) => `<section class="legal-part" aria-labelledby="${id}"><h2 id="${id}">${h}</h2>${html}</section>`).join('\n')}
+${toc ? `<nav class="legal-toc" aria-label="בעמוד הזה"><ol>${sections.map(([id, h]) => `<li><a href="#${id}">${h}</a></li>`).join('')}</ol></nav>` : ''}
+${sections.map(([id, h, html], i) => `<section class="legal-part" aria-labelledby="${id}"><h2 id="${id}">${head(h, i)}</h2>${html}</section>`).join('\n')}
 </div>
 </section>`,
   };
@@ -67,6 +72,7 @@ export const terms = (cfg) => doc(cfg, {
     ['t-who', 'מי אנחנו', `<p>אנחנו ${who(cfg)}. בתנאים האלה "אנחנו" זה OpenFrequency, ו"אתם" זה העסק שמשתמש בשירות, וכל מי שעובד בו ונכנס לשירות בשמו.</p>
 <p>השירותים שלנו מיועדים לעסקים. אם אתם צרכנים לפי חוק הגנת הצרכן, הזכויות שהחוק נותן לכם גוברות על מה שכתוב כאן.</p>`],
     ['t-deal', 'מה ההסכם בינינו', `<p>ההסכם בינינו הוא התנאים האלה, המחיר שמופיע בעמוד של המוצר ביום שהצטרפתם, ומה שסיכמנו איתכם בכתב, למשל בוואטסאפ או במייל. אם יש סתירה, מה שסיכמנו איתכם בכתב קובע.</p>
+${signupOpen(cfg) ? `<p>לכל מוצר יש גם הסכם קצר, שמסכימים לו בהרשמה: ${toranSoon(cfg) ? `<a href="${TEDER_CONTRACT}">ההסכם של תדר</a>. הוא חלק מההסכם, ואם יש סתירה בינו לבין התנאים האלה, הוא קובע` : `<a href="${TEDER_CONTRACT}">ההסכם של תדר</a> ו<a href="${TORAN_CONTRACT}">ההסכם של תורן</a>. הם חלק מההסכם, ואם יש סתירה בין אחד מהם לבין התנאים האלה, ההסכם של המוצר קובע`}.</p>` : ''}
 <p>מדיניות הפרטיות ועמוד אבטחת המידע הם חלק מההסכם. הם מסבירים מה קורה למידע שלכם ושל הלקוחות שלכם.</p>`],
     ['t-what', 'מה השירות', `<p><b>תורן</b> עונה ללקוחות של החנות שלכם, מתוך מה שכתוב באתר שלכם: מוצרים, מחירים, מלאי ודפי המדיניות. שאלה שאין עליה תשובה באתר הוא מעביר אליכם. מה שתורן עושה היום, ומה שהוא עוד לא עושה, כתוב <a href="/toran">בעמוד של תורן</a>. אנחנו מתחייבים רק למה שכתוב שם שהוא עושה היום.</p>
 <p><b>תדר</b> כותב ומעצב מצגות בעברית ${tederNets(cfg)}, ומפרסם אותן בחשבונות שלכם רק אחרי שאישרתם כל אחת.</p>
@@ -114,6 +120,75 @@ ${ul([
     ['t-law', 'דין וסמכות שיפוט', `<p>על התנאים האלה חל הדין הישראלי. בכל מחלוקת, הסמכות היא רק לבתי המשפט המוסמכים ב${cfg.t('legal.court')}. לפני שפונים לבית משפט, בואו ננסה לפתור את זה בשיחה.</p>
 <p>אם סעיף אחד כאן לא תקף, שאר התנאים נשארים בתוקף. ויתור שלנו על משהו פעם אחת לא אומר שוויתרנו עליו בפעם הבאה. אתם לא יכולים להעביר את ההסכם לאחר בלי הסכמה שלנו בכתב.</p>`],
     ['t-contact', 'יצירת קשר', `<p>${who(cfg)}. מייל ${mail(cfg)}, או ${waWords(cfg, 'בוואטסאפ')}.</p>`],
+  ],
+});
+
+// ---------------------------------------------------------------- the products' short contracts
+
+// One short page for each product, what a customer accepts when signing up (the owner, 2026-11-01: "write short
+// contracts for teder and toran. a customer accepts it when signing up"). It says the deal itself: what the product
+// does, the price, paying, the setup fee, stopping, who answers for what. Everything else stays in the terms and the
+// privacy policy, which it makes part of the deal; where they differ, the contract decides. Its date is
+// legal.contractsUpdated, part of the terms version accounts stores on sign-up. Every price is from the config. DRAFT
+// for the owner, and a lawyer, to approve.
+const contractLede = (cfg, product, joining) => `ההסכם הזה הוא בין ${who(cfg)}, לבין העסק ש${joining}. כשמסמנים בהרשמה "קראתי והסכמתי", הוא מחייב את שנינו. מה שלא כתוב כאן כתוב <a href="/terms">בתנאי השימוש</a> ו<a href="/privacy">במדיניות הפרטיות</a>, שגם הם חלק מההסכם. אם יש סתירה ביניהם לבין ההסכם הזה, ההסכם של ${product} קובע.`;
+
+// How a customer pays, said the same way in both contracts. With a payment provider, by card in the account; until
+// then, a bank transfer whose details we send.
+const payClause = (cfg, product, opens) => `<p>משלמים מראש, בתחילת כל חודש${payProvider(cfg) ? ', בכרטיס אשראי, בעמוד התשלום שבחשבון' : ', בהעברה בנקאית. את הסכום ואת פרטי ההעברה אנחנו שולחים לכם'}. ${product} ${opens} כשהתשלום ${payProvider(cfg) ? 'מאושר' : 'מגיע אלינו'}, ועל כל תשלום אתם מקבלים חשבונית.</p>
+<p>אם תשלום לא הגיע במועד, נכתוב לכם. אם הוא לא מגיע תוך 14 יום מההודעה, ${product} נעצר עד שישולם.</p>`;
+
+const sharedClauses = (cfg) => [
+  ['c-limit', 'הגבלת האחריות', '<p>אנחנו לא אחראים לנזק עקיף, כמו מכירה שלא נסגרה או רווח שלא הרווחתם. בכל מקרה, האחריות שלנו מוגבלת לסכום ששילמתם לנו בשלושת החודשים שלפני האירוע, חוץ ממה שהחוק לא מתיר להגביל.</p>'],
+  ['c-change', 'שינויים', '<p>על שינוי במחיר או בהסכם נודיע לכם לפחות 30 יום מראש, במייל או בוואטסאפ. אם הוא לא מתאים לכם, אפשר להפסיק לפני שהוא מתחיל.</p>'],
+  ['c-law', 'דין ויצירת קשר', `<p>על ההסכם חל הדין הישראלי, והסמכות היא לבתי המשפט ב${cfg.t('legal.court')}. ${who(cfg)}. מייל ${mail(cfg)}, או ${waWords(cfg, 'בוואטסאפ')}.</p>`],
+];
+
+export const tederContract = (cfg) => doc(cfg, {
+  path: TEDER_CONTRACT,
+  date: 'legal.contractsUpdated',
+  toc: false,
+  title: 'ההסכם של תדר',
+  description: 'ההסכם הקצר שמסכימים לו כשפותחים מנוי לתדר: מה תדר עושה, המחיר, התשלום, דמי ההקמה, הביטול ומי אחראי על מה.',
+  lede: contractLede(cfg, 'תדר', 'פותח מנוי לתדר'),
+  sections: [
+    ['c-what', 'מה תדר עושה', `<p>תדר כותב ומעצב בשבילכם מצגות בעברית ${tederNets(cfg)}, מהמקורות שבחרתם בחשבון. כל מצגת מחכה לאישור שלכם, ועולה לחשבונות שלכם רק אחרי שאישרתם אותה. אנחנו לא מתחייבים למספר צפיות, עוקבים או מכירות.</p>`],
+    ['c-price', 'המחיר', `<p>${tederPriceLine(cfg)} החבילה שבחרתם בהרשמה היא החבילה שלכם. כדי לעבור חבילה כותבים לנו, והמחיר החדש מתחיל בחודש שאחרי.</p>`],
+    ['c-pay', 'תשלום', payClause(cfg, 'תדר', 'נפתח')],
+    ['c-setup', 'דמי הקמה', '<p>משלמים אותם פעם אחת, עם החודש הראשון. הם מכסים את פתיחת החשבון ואת המצגות הראשונות לדוגמה. דמי ההקמה לא מוחזרים.</p>'],
+    ['c-stop', 'ביטול', '<p>אין התחייבות. מבטלים בחשבון, בכל זמן. תדר ממשיך לעבוד עד סוף התקופה ששילמתם, ואחרי זה לא מחייבים אתכם יותר. על התקופה שכבר שולמה לא מחזירים כסף. אם חוק הגנת הצרכן חל עליכם, הזכויות שהוא נותן לכם נשמרות.</p>'],
+    ['c-yours', 'מה עליכם', ul([
+      'לאשר רק מצגת שמתאימה לכם. מה שאישרתם הוא באחריותכם, כמו פוסט שהייתם מעלים בעצמכם.',
+      'לתת לנו רק תמונות, טקסטים ולוגו שמותר לכם להשתמש בהם.',
+      `לשמור על החשבונות שלכם ${tederNets(cfg, 'in')} לפי הכללים של כל רשת.`,
+    ])],
+    ['c-ours', 'מה עלינו', '<p>להכין מצגות מהמקורות שבחרתם, ולא לפרסם שום דבר בלי האישור שלכם. אם משהו עלה בטעות, נעזור להוריד אותו ונגיד לכם מה קרה. המצגות שהכנו בשבילכם שייכות לכם. התבניות, הסגנונות והתוכנה נשארים שלנו.</p>'],
+    ...sharedClauses(cfg),
+  ],
+});
+
+export const toranContract = (cfg) => doc(cfg, {
+  path: TORAN_CONTRACT,
+  date: 'legal.contractsUpdated',
+  toc: false,
+  title: 'ההסכם של תורן',
+  description: 'ההסכם הקצר שמסכימים לו כשמצטרפים לתורן: מה תורן עושה, המחיר, התשלום, דמי ההקמה, ההפסקה ומי אחראי על מה.',
+  lede: contractLede(cfg, 'תורן', 'מצטרף לתורן'),
+  sections: [
+    ['c-what', 'מה תורן עושה', '<p>תורן הוא בוט שעונה בשמכם ללקוחות של החנות שלכם, בוואטסאפ ובערוצים שחיברתם, מתוך מה שכתוב באתר שלכם ומהתשובות ששמרתם. בתחילת כל שיחה הוא אומר ללקוח שהוא בוט. שאלה שאין לו עליה תשובה, בקשה להנחה או להחזר, ולקוח שמבקש בן אדם, הוא מעביר אליכם. מה שתורן עושה היום כתוב <a href="/toran">בעמוד של תורן</a>, ואנחנו מתחייבים רק לזה.</p>'],
+    ['c-price', 'המחיר', `<p>${toranPriceLine(cfg)}</p><p>כל חבילה מכסה מספר שיחות בחודש. על שיחה נוספת אין חיוב נפרד, ואת מה ש-Meta גובה על ההודעות אנחנו משלמים. מתי חנות עוברת חבילה, ואיך מודיעים לה מראש, כתוב בעמוד של תורן.</p>`],
+    ['c-pay', 'תשלום', payClause(cfg, 'תורן', 'מתחיל לענות')],
+    ['c-setup', 'דמי הקמה', '<p>משלמים אותם פעם אחת, עם החודש הראשון. הם מכסים את החיבור של תורן לחנות ולערוצים שלכם. אחרי שהתחלנו לבנות את החיבור, הם לא מוחזרים.</p>'],
+    ['c-stop', 'הפסקה', `<p>אין התחייבות. כדי להפסיק, ${waWords(cfg, 'כותבים לנו')} או שולחים מייל ל-${mail(cfg)}. תורן ממשיך עד סוף החודש ששילמתם, ואז נעצר. על חלק מחודש לא מחזירים כסף. מספר הוואטסאפ של החנות נשאר שלכם. את השיחות אנחנו שומרים עוד ${cfg.t('price.keepDays')} יום, כדי שתוכלו לייצא אותן, ואחר כך מוחקים אותן.</p>`],
+    ['c-yours', 'מה עליכם', ul([
+      'לדאוג שמה שכתוב באתר שלכם נכון ומעודכן: מחירים, מלאי, משלוחים והחזרות. תשובה של תורן מתוך האתר שלכם היא כמו מה שהאתר עצמו אומר.',
+      'לענות על השאלות שתורן מעביר אליכם.',
+      'לשלוח הודעות שיווק רק למי שהסכים לקבל אותן, כמו שדורש סעיף 30א לחוק התקשורת.',
+      'לעמוד בכללים של WhatsApp ושל Meta לעסקים, ובכללים של כל ערוץ שחיברתם.',
+      'המידע של הלקוחות שלכם בשליטתכם, ואנחנו מחזיקים אותו בשבילכם, כמו שכתוב <a href="/privacy">במדיניות הפרטיות</a>.',
+    ])],
+    ['c-ours', 'מה עלינו', '<p>שתורן יענה רק מתוך מה שכתוב אצלכם, לא ימציא מחיר או הבטחה, ויעביר אליכם מה שהוא לא יודע. הוא יכול לטעות, ולכן כל השיחות מחכות לכם בתיבה אחת, ואפשר לענות בעצמכם בכל רגע. התוכן שלכם והשיחות עם הלקוחות שלכם שייכים לכם. התוכנה, השם תורן והסימן שלו שייכים לנו.</p>'],
+    ...sharedClauses(cfg),
   ],
 });
 

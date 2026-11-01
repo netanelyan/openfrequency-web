@@ -68,6 +68,8 @@ export const FACTS = {
   // The date of the privacy page once Teder's sample is asked for by a WhatsApp code (teder.demoBy "whatsapp"), which
   // adds Teder to the demos that learn the number from the message: set to the day the switch is turned on. Without it
   // the real build stops, so the switch cannot go out under the old date.
+  // The date of the products' short contracts (/teder/contract, /toran/contract, legal.mjs), which sign-up asks to accept.
+  'legal.contractsUpdated': { label: 'תאריך ההסכמים הקצרים של תדר ותורן, YYYY-MM-DD', kind: 'text' },
   'legal.privacyWaUpdated': { label: 'תאריך מדיניות הפרטיות כשהמצגת לדוגמה של תדר מבקשים בקוד בוואטסאפ, YYYY-MM-DD', kind: 'text', unless: (raw) => raw.teder?.demoBy !== 'whatsapp' },
   'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
   'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },

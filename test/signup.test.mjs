@@ -178,8 +178,8 @@ test('with "open", the FAQ and the support export say how to sign up and cancel'
 test('with "open", the terms carry Teder\'s self-serve section and their own date; Toran\'s stay', () => {
   const closed = main(built.closed.pages['terms/index.html']);
   const terms = main(built.open.pages['terms/index.html']);
-  assert.match(terms, /עודכן לאחרונה ב-30 באוקטובר 2026/);
-  assert.equal(config.legal.signupUpdated, '2026-10-30', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION)');
+  assert.match(terms, /עודכן לאחרונה ב-1 בנובמבר 2026/);
+  assert.equal(config.legal.signupUpdated, '2026-11-01', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION)');
   assert.match(terms, /<li><a href="#t-stop">הפסקה וביטול<\/a><\/li><li><a href="#t-teder-sub">המנוי לתדר<\/a><\/li>/);
   const sub = text(section(terms, 't-teder-sub'));
   for (const words of [
@@ -204,7 +204,10 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
   // The general sections point Teder to its own; Toran's rules are kept word for word.
   assert.match(text(section(terms, 't-stop')), /את תדר מבטלים בחשבון[\s\S]*בתורן, כדי להפסיק, כותבים לנו[\s\S]*בתורן, דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם/);
   assert.ok(text(section(terms, 't-price')).includes(PAY.manual.price));
-  for (const id of ['t-answers', 't-yours', 't-teder', 't-who', 't-deal', 't-what', 't-account']) assert.equal(section(terms, id), section(closed, id), id);
+  for (const id of ['t-answers', 't-yours', 't-teder', 't-who', 't-what', 't-account']) assert.equal(section(terms, id), section(closed, id), id);
+  // The deal names Teder's short contract, the one sign-up asks to accept, only while sign-up is open.
+  assert.match(section(terms, 't-deal'), /href="\/teder\/contract"/);
+  assert.doesNotMatch(section(closed, 't-deal'), /\/contract/);
   // The other legal pages keep their own date (the privacy page's is legal.privacyWaUpdated while Teder's sample is
   // asked for on WhatsApp).
   assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-31 באוקטובר 2026/);

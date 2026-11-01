@@ -18,7 +18,7 @@ import teder from './src/pages/teder.mjs';
 import faq from './src/pages/faq.mjs';
 import join from './src/pages/join.mjs';
 import { thanks, thanksAgain, thanksTeder, thanksWaitlist, tryAgain, notFound } from './src/pages/after.mjs';
-import { terms, privacy, security, accessibility } from './src/pages/legal.mjs';
+import { terms, privacy, security, accessibility, tederContract, toranContract } from './src/pages/legal.mjs';
 import { supportExport } from './src/support.mjs';
 
 const draft = process.argv.includes('--draft');
@@ -26,12 +26,14 @@ const draft = process.argv.includes('--draft');
 const banner = draft && process.argv.includes('--banner');
 const OUT = process.env.SITE_OUT ? path.resolve(process.env.SITE_OUT) : path.join(ROOT, 'dist'); // SITE_OUT: the tests' own folder
 
-const PAGES = [home, toran, teder, faq, join, terms, privacy, security, accessibility, thanks, thanksAgain, thanksTeder, tryAgain, notFound];
+const PAGES = [home, toran, teder, faq, join, terms, tederContract, privacy, security, accessibility, thanks, thanksAgain, thanksTeder, tryAgain, notFound];
 const DRAFT_PAGES = [];
 
 const cfg = { ...readConfig(draft), banner };
 // Toran's waitlist has its own thank-you, for a post without JS, while Toran is soon (products.toran).
 if (toranSoon(cfg)) PAGES.splice(PAGES.indexOf(thanksTeder) + 1, 0, thanksWaitlist);
+// Toran's contract carries its prices, so it is built only once Toran is sold (while it is soon, no page has a way to buy it).
+else PAGES.splice(PAGES.indexOf(tederContract) + 1, 0, toranContract);
 console.log(`Toran is ${toranSoon(cfg) ? 'soon: shown, not sold, with a waitlist' : 'live'} (products.toran in site.config.json)`);
 console.log(`Teder's sample is asked for ${tederByWa(cfg) ? 'by a code sent to us on WhatsApp' : 'with a typed WhatsApp number'} (teder.demoBy in site.config.json)`);
 

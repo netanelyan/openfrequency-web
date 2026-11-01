@@ -114,7 +114,8 @@ test('with "soon", Teder is offered exactly as with "live"', () => {
   assert.equal(door(soon.pages['index.html']), door(live.pages['index.html']), "Teder's door on the home page");
   // Every link to Teder is still there, word for word (Teder comes first in the menus, and the question box may send
   // to Teder's demo where it sent to Toran's, so the order and the count can grow).
-  for (const file of Object.keys(live.pages)) {
+  // Toran's contract is built only once Toran is sold (it shows Toran's price), so it is the one page "live" has alone.
+  for (const file of Object.keys(live.pages).filter((f) => f !== 'toran/contract/index.html')) {
     const now = anchors(soon.pages[file], '/teder');
     for (const a of anchors(live.pages[file], '/teder')) assert.ok(now.includes(a), `${file}: the link to Teder "${a}"`);
   }
