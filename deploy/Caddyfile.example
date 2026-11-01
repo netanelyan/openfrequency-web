@@ -44,7 +44,8 @@ example.co.il {
 
 	handle {
 		# Pages are folders: /toran is /toran/index.html. A page is checked on every visit, so a deploy shows at
-		# once; the fonts keep for a year, the icons and the share image for a week.
+		# once; the fonts keep for a year, the icons and the share image for a week. /support.json (what Toran's
+		# support answers from, read by Toran once a day) is checked like a page.
 		try_files {path} {path}/index.html
 		@fonts path /fonts/*
 		@images path /favicon.svg /apple-touch-icon.png /icon-512.png /og/*

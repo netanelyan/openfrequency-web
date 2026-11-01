@@ -120,7 +120,27 @@ npm run draft        # the same, with each missing fact shown as a visible [plac
 npm run serve        # dist/ on http://127.0.0.1:4730
 npm run shots        # docs/screenshots: every page at 390px and 1440px, light and dark (add --menu for the phone menu)
 npm run og           # assets/og: the share images a sent link shows (OpenFrequency, Toran, Teder), 1200x630
+npm run support -- <file.json>   # our support's knowledge as a file (below); stdout without a file
 ```
+
+## Our support's knowledge: /support.json
+
+Toran answers the people who write to OpenFrequency as our support (a company store there), from one JSON
+file made from the same config and page modules as the site (`src/support.mjs`): the plans with their sentences, the
+/toran and /teder price sections, the questions of /faq, the legal pages, and the status, what Toran does today and
+what not yet. `support.json` in this repo says what is true today where the site describes the product at launch: its
+`today` list and its answers replace the site's for Toran only. An answer whose question left /faq stops the export,
+and with it the real build.
+
+The real build publishes the export beside the pages as `dist/support.json`, so every deploy puts it at
+`https://openfrequency.co.il/support.json` (`deploy/Caddyfile.example` serves it like a page, with `no-cache`, and
+`deploy/deploy.sh` checks it answers 200 after the upload). Toran reads it there once
+a day and soon after it starts, and syncs it only when its content changed (openfrequency-toran, `docs/company.md`,
+`TORAN_SUPPORT_EXPORT_URL`); a draft has none, and a draft's `robots.txt` keeps Toran out too. It holds nothing the
+pages don't already say: their text, our WhatsApp number and email as the footer shows them, and the status.
+`npm run support -- <file.json>` writes the same object as a file, for `npm run company -- sync <file>` by hand.
+`test/support.test.mjs` builds the site and checks the published file against the export and against the checks
+Toran's sync makes.
 
 ## Leads
 
@@ -239,7 +259,8 @@ The strip of businesses under the home page's doors is our own businesses, and s
 
 | Path | What |
 | --- | --- |
-| `build.mjs` | renders `src/pages` into `dist/`, inlines the CSS, checks the facts and the copy |
+| `build.mjs` | renders `src/pages` into `dist/`, inlines the CSS, checks the facts and the copy, writes `dist/support.json` |
+| `src/support.mjs`, `scripts/support-export.mjs` | our support's knowledge for Toran, published as `/support.json` and written by `npm run support` |
 | `src/layout.mjs` | the head, the sticky glass header, the footer |
 | `src/style.css` | Teder's tokens (light, dark, Increase Contrast, Reduce Transparency) and the site's components |
 | `src/pages/` | one module per page: home, `/toran`, `/teder`, `/faq`, and where a form lands without JS |

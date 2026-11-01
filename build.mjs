@@ -1,7 +1,8 @@
 // Builds the site into dist/.
 //
 //   node build.mjs           the real build: stops, and writes nothing, while any fact in site.config.json is empty
-//                            or a page fails the copy lint
+//                            or a page fails the copy lint. Beside the pages, support.json: what our support (Toran)
+//                            answers from, read by Toran once a day (src/support.mjs)
 //   node build.mjs --draft   the same pages, marked noindex, with each missing fact shown as a visible [placeholder]
 //                            where a sentence needs it, and left out where a page can do without it
 //   node build.mjs --draft --banner   (npm run dev) also the banner that counts the missing facts, and every
@@ -18,6 +19,7 @@ import faq from './src/pages/faq.mjs';
 import join from './src/pages/join.mjs';
 import { thanks, thanksAgain, thanksTeder, thanksWaitlist, tryAgain, notFound } from './src/pages/after.mjs';
 import { terms, privacy, security, accessibility } from './src/pages/legal.mjs';
+import { supportExport } from './src/support.mjs';
 
 const draft = process.argv.includes('--draft');
 // The draft banner, and the placeholders the public draft leaves out, only for us: npm run dev.
@@ -91,6 +93,20 @@ const errors = [...files].flatMap(([file, html]) => lint(file, html, { draft }))
 if (!draft && cfg.missing.size) {
   errors.unshift(...[...cfg.missing].map(([key, label]) => `site.config.json: "${key}" is empty (${label})`));
 }
+// Our support's knowledge, published beside the pages as /support.json: the same object `npm run support` writes
+// (src/support.mjs), made from this build's own config, so it says what these pages say (Toran's channels included,
+// when they come from Toran). Toran reads it there once a day and syncs it when it changed (openfrequency-toran,
+// docs/company.md). Only the real build has it: a draft's placeholders are never what our support answers from, and
+// with a fact empty the build stops anyway. An answer of support.json whose question left /faq stops the build, as it
+// stops the export.
+let support = null;
+if (!draft && !cfg.missing.size) {
+  try {
+    support = JSON.stringify(supportExport(cfg), null, 2) + '\n';
+  } catch (e) {
+    errors.push(e.message);
+  }
+}
 if (errors.length) {
   console.error(`Not built. ${errors.length} to fix:\n` + errors.map((e) => '  ' + e).join('\n'));
   process.exit(1);
@@ -101,6 +117,7 @@ for (const [file, html] of files) {
   fs.mkdirSync(path.dirname(path.join(OUT, file)), { recursive: true });
   fs.writeFileSync(path.join(OUT, file), html);
 }
+if (support) fs.writeFileSync(path.join(OUT, 'support.json'), support);
 
 const copy = (from, to) => { fs.mkdirSync(path.dirname(path.join(OUT, to)), { recursive: true }); fs.copyFileSync(path.join(ROOT, from), path.join(OUT, to)); };
 for (const f of ['heebo-hebrew.woff2', 'heebo-latin.woff2', 'HEEBO-LICENSE.txt', 'space-mono-700-latin.woff2', 'SPACE-MONO-LICENSE.txt']) copy('assets/fonts/' + f, 'fonts/' + f);
@@ -160,5 +177,5 @@ for (const f of fs.readdirSync(path.join(ROOT, 'assets/toran-example/demo'))) co
 }
 
 const kb = (n) => (n / 1024).toFixed(1) + ' KB';
-console.log(`${draft ? 'Draft' : 'Built'}: ${files.size} page${files.size === 1 ? '' : 's'} in dist/ (CSS ${kb(css.length)} inlined)`);
+console.log(`${draft ? 'Draft' : 'Built'}: ${files.size} page${files.size === 1 ? '' : 's'} in dist/ (CSS ${kb(css.length)} inlined)${support ? `, and support.json for Toran (${kb(Buffer.byteLength(support))})` : ''}`);
 if (draft && cfg.missing.size) console.log(`Missing, shown as placeholders:\n` + [...cfg.missing].map(([k, l]) => `  ${k} (${l})`).join('\n'));

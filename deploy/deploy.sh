@@ -11,8 +11,9 @@
 #    back at the one before.
 # 3. The lead endpoint (server/lead.mjs) goes to /opt/openfrequency-web, and the service restarts only if it changed.
 #    The file it replaces is kept beside it as lead.mjs.prev.
-# 4. The live site and the endpoint are checked over HTTPS: the pages, and /api/readyz, which reads the database. If the
-#    endpoint that was just replaced is not ready within 30 seconds, lead.mjs.prev goes back and the deploy fails.
+# 4. The live site and the endpoint are checked over HTTPS: the pages, /support.json (the build's support export, which
+#    Toran reads once a day: src/support.mjs), and /api/readyz, which reads the database. If the endpoint that was just
+#    replaced is not ready within 30 seconds, lead.mjs.prev goes back and the deploy fails.
 #
 # Once on the VPS, before the first deploy (the deploy user needs sudo for the restart):
 #   sudo mkdir -p /var/www/openfrequency-web/releases /opt/openfrequency-web/server
@@ -67,7 +68,7 @@ fi
 
 echo "== check https://$DOMAIN"
 sleep 1
-for p in / /toran /teder; do
+for p in / /toran /teder /support.json; do
   code=$(curl -s -o /dev/null -w '%{http_code}' "https://$DOMAIN$p")
   echo "$p $code"
   [ "$code" = 200 ] || { echo "not 200. To go back: DEPLOY_HOST=$HOST ./deploy/rollback.sh pages"; exit 1; }

@@ -1,5 +1,5 @@
 {
-  "_note": "Read only by scripts/support-export.mjs, for Toran answering OpenFrequency's own support. Where the site describes the product as it will be at launch, these say what is true today. today replaces toran.today for the agent; each answer replaces the site's answer to the FAQ question with exactly that text. {demo.time} and the like are site.config.json facts. Delete an entry once the site and the product agree.",
+  "_note": "Read only by src/support.mjs, which makes the support export from it and the site (published by the real build at /support.json, a different file from this one, which Toran reads once a day; and written by npm run support), for Toran answering OpenFrequency's own support. Where the site describes the product as it will be at launch, these say what is true today. today replaces toran.today for the agent; each answer replaces the site's answer to the FAQ question with exactly that text. {demo.time} and the like are site.config.json facts. Delete an entry once the site and the product agree.",
   "today": [
     "קורא חנות על Shopify, על WooCommerce או על Wix: מוצרים, מחירים, מבצעים, מידות, צבעים, מלאי ודפי המדיניות.",
     "עונה במייל של החנות. מעבירים אליו את המייל של שירות הלקוחות, והוא עונה משם בשם החנות.",
