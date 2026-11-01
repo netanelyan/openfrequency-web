@@ -71,6 +71,9 @@ export const FACTS = {
   // The date of the products' short contracts (/teder/contract, /toran/contract, legal.mjs), which sign-up asks to accept.
   'legal.contractsUpdated': { label: 'תאריך ההסכמים הקצרים של תדר ותורן, YYYY-MM-DD', kind: 'text' },
   'legal.privacyWaUpdated': { label: 'תאריך מדיניות הפרטיות כשהמצגת לדוגמה של תדר מבקשים בקוד בוואטסאפ, YYYY-MM-DD', kind: 'text', unless: (raw) => raw.teder?.demoBy !== 'whatsapp' },
+  // The accessibility statement's own date: what it says about the site changes with the site, apart from the terms and
+  // the other legal pages (2026-11-01: the page is light, and dark is the header's button, no longer the device's).
+  'legal.accessibilityUpdated': { label: 'תאריך העדכון של הצהרת הנגישות, YYYY-MM-DD', kind: 'text' },
   'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
   'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },
   // Teder's two plans, the same product with a different number of slideshows: the full one (teder.*) and the small one

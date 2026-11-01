@@ -16,8 +16,9 @@ The first entry in `site.config.json` is the one switch for whether Toran is on 
 ```
 
 - `"soon"` (now, until Meta approves WhatsApp): Toran stays on show, marked "בקרוב", and nobody can buy it, start it or
-  ask for its demo. Teder comes first and is offered exactly as before. Every page reads the switch: the home page (Toran's
-  door with the badge and a link to the waitlist, its lines in the future, the question box's answers about Toran),
+  ask for its demo. Teder comes first and is offered exactly as before. Every page reads the switch: the home page (Teder's
+  headline, Toran's one line with the badge, its green door with the badge and one button to the waitlist, "שמרו לי
+  מקום", its lines in the future, and no section on Toran as the owner's assistant),
   `/toran` (a "בקרוב" bar on top, what it will do, no price, and the waitlist form where the demo form was), `/join`
   (Toran's card shown and not tickable, Teder's steps, price and questions), `/faq` (Teder first, Toran's answers in
   the future, its demo questions out), the menus and footer, the meta and Open Graph lines, `/toran/example` (no price,
@@ -67,8 +68,9 @@ switch for whether the site sends people there is `signup` in `site.config.json`
 slideshows: `teder.small` (490 ₪ a month, 990 ₪ setup, 15 slideshows, 4 redos) and `teder` itself (790 ₪, 1,490 ₪,
 40, 10), VAT excluded. `/teder` shows a card for each, and with sign-up open each card's button goes to
 `https://accounts.openfrequency.co.il/signup?p=teder&plan=small` (or `plan=full`); the other sign-up buttons send no
-plan, and accounts lets the business choose. Every sentence that says the price (`/join`, the FAQ, the question box,
-the terms, under each sign-up button) is `tederPriceLine` in `src/sections.mjs`, both plans with their setup fees.
+plan, and accounts lets the business choose. Every sentence that says the price (`/join`, the FAQ, the home page's door,
+the terms, under each sign-up button) is `tederPriceLine` in `src/sections.mjs`, both plans with their setup fees; the
+home page's door, shut on a phone, says the lowest monthly price and VAT (`tederFrom`).
 accounts sells the same two plans (`plan=full` and `plan=small`) and tells Teder the size of each workspace's month.
 
 **Paying: `payment`.** The switch for how a business that signed up pays, and what every page that says so tells it
@@ -102,7 +104,7 @@ keeps one per number, as it always has. `"whatsapp"` (now, since our number answ
 demo, with a code (`REQ-XXXXXX`) and a button that opens WhatsApp to the same demo number (`TORAN_DEMO_WA`) with the
 message `היי, אשמח לדמו של תדר לחנות <store>.` and, on its second line, `הקוד מהאתר: <code>`. The number that sends it
 is the one the sample goes to, so it proves itself, and Toran keeps one demo per number per product (below, "Leads").
-The line under the button, the thank-you and the home page's question box say so, and the privacy page says that Teder
+The line under the button and the thank-you say so, and the privacy page says that Teder
 too learns the number from the message, that Meta carries the demo number's messages and that those chats are kept as
 Toran's are; nothing else on the site changes, and the join form keeps its number field. `test/teder-demo.test.mjs`
 builds both and checks that every other page is the same, byte for byte. Before turning it on: `TORAN_DEMO_WA` set on
@@ -262,13 +264,13 @@ The strip of businesses under the home page's doors is our own businesses, and s
 | `build.mjs` | renders `src/pages` into `dist/`, inlines the CSS, checks the facts and the copy, writes `dist/support.json` |
 | `src/support.mjs`, `scripts/support-export.mjs` | our support's knowledge for Toran, published as `/support.json` and written by `npm run support` |
 | `src/layout.mjs` | the head, the sticky glass header, the footer |
-| `src/style.css` | Teder's tokens (light, dark, Increase Contrast, Reduce Transparency) and the site's components |
+| `src/style.css` | Teder's tokens (light, dark, Increase Contrast, Reduce Transparency) and the site's components; light is the default, dark only by the visitor's choice (`data-theme="dark"`, set by the head and `site.js`) |
 | `src/pages/` | one module per page: home, `/toran`, `/teder`, `/faq`, and where a form lands without JS |
 | `src/teder.mjs` | Teder's real slides (a cover per subject) and its phone, shared by the home page and `/teder` |
 | `scripts/showcase.mjs` | Brings the cover of each of Teder's slideshows from `private/showcase` into `assets/teder/showcase`, checking each photo's licence |
 | `assets/brand/` | the marks, copied from openfrequency-toran; never redrawn |
 | `assets/fonts/` | Heebo (OFL), self-hosted, so no visitor's address goes to Google |
-| `src/site.js` | the motion, and the question box (Toran answering about OpenFrequency) |
+| `src/site.js` | the motion, light or dark (the header's button), and the accessibility panel |
 | `src/forms.mjs`, `src/form.js` | the two forms, every word they can show, and the script that sends them |
 | `server/lead.mjs` | the lead endpoint |
 | `deploy/` | the Caddyfile, the endpoint's systemd service, its nightly backup and alert units, its env file, and the deploy and rollback scripts |

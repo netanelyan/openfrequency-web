@@ -34,8 +34,11 @@ test('the copy lint stops on a market claim, with or without a prefix letter, an
 
 test('the home page says what the products are, not where they rank, and the strip says the businesses are ours', () => {
   const home = pages['index.html'];
+  // While Toran is soon the headline is Teder's, which is on sale (site.test.mjs has the headline with Toran live).
   const h1 = text(/<h1 id="hero-h">([\s\S]*?)<\/h1>/.exec(home)[1]);
-  assert.equal(h1, 'מצגות לרשתות ותשובות ללקוחות, בעברית');
+  const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf8'));
+  assert.equal(config.products.toran, 'soon');
+  assert.equal(h1, `מצגות בעברית ${config.teder.facebook ? 'לטיקטוק, לאינסטגרם ולפייסבוק' : 'לטיקטוק ולאינסטגרם'}`);
   for (const [file, html] of Object.entries(pages)) assert.doesNotMatch(text(html), /המוביל|עסקים שעובדים עם/, file);
   const strip = /<section class="clients-sec"[\s\S]*?<\/section>/.exec(home)[0];
   assert.equal(text(/<h2 id="clients-h"[^>]*>([\s\S]*?)<\/h2>/.exec(strip)[1]), 'העסקים של OpenFrequency');

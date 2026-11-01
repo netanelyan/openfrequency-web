@@ -1,18 +1,22 @@
 // The home page: OpenFrequency and its two products. The first screen says what we make, with our mark large and
-// faint behind it, and opens a door to each product in its own material: Toran's chat answering on glass, Teder's
-// real slides playing on its violet; on a phone the line under the headline is left out (style.css), since the doors
-// say it. Then what holds for every store, the businesses we run ourselves, what we do in a
-// store like yours, Toran as the owner's assistant, and Toran answering questions about us. Each product has its own
-// page (/toran, /teder), and the questions have theirs (/faq).
-// While Toran is soon (products.toran in site.config.json), Teder's door comes first and Toran's carries "בקרוב", with
-// the way to its waitlist instead of a demo; every line about Toran says what it will do.
+// faint behind it, and opens a door to each product in its own colour: Teder's real slides playing on its violet,
+// Toran's chat answering on its green; on a phone the lines under the headline are left out (style.css), since the
+// doors say them. Then what holds for every store, the businesses we run ourselves, what we do in a store like yours,
+// and the assistant. Each product has its own page (/toran, /teder), the questions have theirs (/faq), and anyone can
+// ask Toran itself about us on WhatsApp (the support button, layout.mjs).
+// While Toran is soon (products.toran in site.config.json), the first screen sells Teder (the owner, 2026-11-01: "The
+// hero: sell Teder, which you can buy now, and give Toran one line with the badge"): the headline is Teder's, its door
+// comes first with its price, and Toran has one line with "בקרוב" and a door as finished as Teder's, in its own green,
+// whose one button saves a place on its waitlist ("שמרו לי מקום", /toran#waitlist). Every line about Toran says what
+// it will do, and the section on Toran as the owner's assistant waits for Toran.
 // While sign-up is open (signup), Teder's door sends to accounts' sign-up with the price under it, and the sample
 // slideshow is the line after.
 import fs from 'node:fs';
 import path from 'node:path';
 import { CHANNELS, ROOT, esc, mark, glyphOnly, signupOpen, tederNets, toranSoon, assistantSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
-import { TEDER_DEMO, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, askBox, askSoon, askTeder, tederPriceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
+import { TORAN_SAVE } from '../forms.mjs';
+import { TEDER_DEMO, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, tederFrom, tederStart, toranStart } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -35,16 +39,17 @@ const doorTop = (id, face, name, short, say) => `<div class="door-top">${face}<d
 const soonBadge = '<span class="soon">בקרוב</span>';
 const hero = (cfg) => {
   const soon = toranSoon(cfg);
-  const toranDoor = `<article class="door toran-door glass" aria-labelledby="door-toran" data-door>
+  const glyph = (name) => `<span class="wave" aria-hidden="true">${glyphOnly(name)}</span>`;
+  const toranDoor = `<article class="door toran-door" aria-labelledby="door-toran" data-door>
 ${soon
-    ? doorTop('toran', mark('toran', 48), `תורן ${soonBadge}`, 'יענה ללקוחות של החנות 24/7', 'יענה ללקוחות של החנות מתוך מה שכתוב באתר, ומה שלא כתוב שם ישאל אתכם. אנחנו פותחים אותו בקרוב.')
-    : doorTop('toran', mark('toran', 48), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
+    ? doorTop('toran', glyph('toran'), `תורן ${soonBadge}`, 'יענה ללקוחות של החנות 24/7', 'יענה ללקוחות של החנות מתוך מה שכתוב באתר, ומה שלא כתוב שם ישאל אתכם.')
+    : doorTop('toran', glyph('toran'), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
 <div class="door-in" id="door-toran-in">
 ${soon
-    ? '<div class="door-act"><a class="btn" href="/toran#waitlist">לקבל עדכון כשתורן נפתח</a><a class="btn" href="/toran">מה תורן יעשה</a></div>'
+    ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/toran#waitlist">${TORAN_SAVE}</a></div>\n<p class="start-alt">נכתוב לכם פעם אחת, כשתורן נפתח.</p></div>`
     : signupOpen(cfg)
-      ? toranStart(cfg, { wrap: 'start door-start', act: 'door-act', price: false, more: `<a class="btn" href="/toran">${TORAN_DEMO}</a><a class="btn" href="/toran#demo">${TORAN_TRY}</a>` })
-      : '<div class="door-act"><a class="btn primary" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn" href="/toran">עוד על תורן</a></div>'}
+      ? toranStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', price: false, more: `<a class="btn on-color" href="/toran">${TORAN_DEMO}</a><a class="btn on-color" href="/toran#demo">${TORAN_TRY}</a>` })
+      : '<div class="door-act"><a class="btn light" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn on-color" href="/toran">עוד על תורן</a></div>'}
 <div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
 <p class="pop" data-pop>${mark('toran', 28)}<span class="pop-h"><b>תורן</b><small>בטלפון שלכם, 02:16</small></span><span class="pop-t">לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?</span></p>
@@ -52,10 +57,10 @@ ${soon
 </div>
 </article>`;
   const tederDoor = `<article class="door teder-door" aria-labelledby="door-teder" data-door>
-${doorTop('teder', `<span class="wave" aria-hidden="true">${glyphOnly('teder')}</span>`, 'תדר', `מצגות ${tederNets(cfg)}`, `כותב ומעצב מצגות בעברית ${tederNets(cfg)}. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.`)}
+${doorTop('teder', glyph('teder'), 'תדר', tederFrom(cfg) || `מצגות ${tederNets(cfg)}`, `כותב ומעצב מצגות בעברית ${tederNets(cfg)}. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.`)}
 <div class="door-in" id="door-teder-in">
 ${signupOpen(cfg)
-    ? tederStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', price: false, more: `<a class="btn on-color" href="/teder">${TEDER_DEMO}</a><a class="btn on-color" href="/teder#demo">${TEDER_SAMPLE}</a>` })
+    ? tederStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', more: `<a class="btn on-color" href="/teder">${TEDER_DEMO}</a><a class="btn on-color" href="/teder#demo">${TEDER_SAMPLE}</a>` })
     : '<div class="door-act"><a class="btn light" href="/teder#demo">לנסות את תדר על החנות שלכם</a><a class="btn on-color" href="/teder">עוד על תדר</a></div>'}
 ${reel}
 </div>
@@ -64,33 +69,16 @@ ${reel}
 <section class="co-hero" aria-labelledby="hero-h">
 <div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
 <div class="wrap">
-<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>
-<p class="lede">${soon
-    ? `תדר כותב ומעצב לכם מצגות בעברית ${tederNets(cfg)}. תורן, שיענה ללקוחות שלכם 24/7 ${inList(CHANNELS)} מתוך מה שכתוב באתר, נפתח בקרוב.`
-    : `תדר כותב ומעצב לכם מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`}</p>
+${soon ? `<h1 id="hero-h"><span class="hl">מצגות בעברית</span> ${tederNets(cfg)}</h1>
+<p class="lede">תדר כותב ומעצב את המצגות, ומפרסם כל אחת רק אחרי שמישהו אישר אותה.</p>
+<p class="co-soon">${soonBadge} תורן יענה ללקוחות שלכם 24/7 ${inList(CHANNELS)}, מתוך מה שכתוב באתר.</p>` : `<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>
+<p class="lede">תדר כותב ומעצב לכם מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.</p>`}
 <div class="doors">
 ${soon ? `${tederDoor}\n${toranDoor}` : `${toranDoor}\n${tederDoor}`}
 </div>
 </div>
 </section>`;
 };
-
-const ask = (cfg) => `
-<section class="sec ask-sec" id="ask" aria-labelledby="ask-h">
-<div class="wrap">
-<div class="try-text">
-<h2 id="ask-h">תשאלו את תורן עלינו</h2>
-<p class="lede">כאן תורן עונה בשביל OpenFrequency, מתוך מה שכתוב באתר הזה. בחנות שלכם הוא יענה ככה מתוך האתר שלכם.</p>
-<p>תורן לא ממציא תשובות. כל מה שהוא עונה כתוב באתר, ומה שלא כתוב שם, הוא שואל אתכם.</p>
-<p class="ask-note">זו הדגמה בדפדפן, עם תשובות שכתבנו מראש מתוך האתר הזה.</p>
-</div>
-${askBox(cfg)}
-${askTeder(cfg)}
-${toranSoon(cfg)
-    ? `${cfg.has('teder.monthly') ? `<template id="ask-price">תדר עולה ${tederPriceLine(cfg)} תורן עוד לא פתוח, ואת המחיר שלו נפרסם כשהוא ייפתח.</template>` : ''}\n${askSoon(cfg)}`
-    : cfg.has('price.plans.store.monthly') && cfg.has('teder.monthly') ? `<template id="ask-price">תורן עולה ${toranPriceLine(cfg)} תדר עולה ${tederPriceLine(cfg)}</template>` : ''}
-</div>
-</section>`;
 
 // Before the businesses that work with us: what holds for every store, said once, each a thing the products do.
 const BADGES = [
@@ -120,7 +108,9 @@ const trust = (cfg) => `
 </section>`;
 
 // Toran for the owner (openfrequency-toran src/assistant): the owner writes to Toran from their own WhatsApp and asks
-// about the store; Toran answers from the conversations and the site, and acts only after "כן".
+// about the store; Toran answers from the conversations and the site, and acts only after "כן". Shown once Toran is
+// live: while it is soon, this whole section was a promise about a product nobody can buy yet, and it went (the owner,
+// 2026-11-01: "The mobile page is very long ... Cutting a section or two will help").
 const OWNER_CHAT = [
   ['me', '20:41', 'מה קרה היום?'],
   ['them', '20:41', 'היום פנו 23 לקוחות: 17 בוואטסאפ, 4 באינסטגרם ו-2 במייל. עניתי לבד ל-21. שתי שאלות מחכות לכם.'],
@@ -135,11 +125,9 @@ const assistant = (cfg) => `
 <section class="sec owner-sec" id="owner" aria-labelledby="owner-h">
 <div class="wrap owner-grid">
 <div class="owner-text">
-${toranSoon(cfg) ? `<p class="kicker">העוזר האישי שלכם ${soonBadge}</p>
-<h2 id="owner-h">תורן יענה גם <span class="hl">לכם</span></h2>
-<p class="lede">כשתורן ייפתח, תוכלו לכתוב לו מהוואטסאפ שלכם, והוא יענה לכם על החנות: מי פנה, מה שאלו, ומה מחכה לכם. הוא יעשה משהו רק אחרי שתכתבו לו כן.</p>` : `<p class="kicker">העוזר האישי שלכם</p>
+<p class="kicker">העוזר האישי שלכם</p>
 <h2 id="owner-h">תורן עונה גם <span class="hl">לכם</span></h2>
-<p class="lede">כתבו לתורן מהוואטסאפ שלכם, והוא עונה לכם על החנות: מי פנה, מה שאלו, ומה מחכה לכם. הוא עושה משהו רק אחרי שכתבתם לו כן.</p>`}
+<p class="lede">כתבו לתורן מהוואטסאפ שלכם, והוא עונה לכם על החנות: מי פנה, מה שאלו, ומה מחכה לכם. הוא עושה משהו רק אחרי שכתבתם לו כן.</p>
 <ul class="checks">
 <li><b>מה קרה היום.</b> כמה לקוחות פנו, בכל ערוץ, ועל כמה הוא ענה לבד.</li>
 <li><b>מה מחכה לכם.</b> השאלות שהוא העביר אליכם, עם הלקוח שמחכה לתשובה.</li>
@@ -211,9 +199,11 @@ export default (cfg) => ({
     : `תדר כותב ומעצב מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,
   // "Who we are" is in the footer (layout.mjs), on every page.
   body: (() => {
+    // The question box that was last (Toran answering about us from answers written in advance) went too: the support
+    // button on every page is Toran itself, on WhatsApp, and the answers are on /faq.
     const teder = assistantSoon(cfg) ? tederDashboard(cfg) : tederAssistant(cfg);
     return (toranSoon(cfg)
-      ? [hero(cfg), trust(cfg), clients(), niches(cfg), teder, assistant(cfg), ask(cfg)]
-      : [hero(cfg), trust(cfg), clients(), niches(cfg), assistant(cfg), teder, ask(cfg)]).join('\n');
+      ? [hero(cfg), trust(cfg), clients(), niches(cfg), teder]
+      : [hero(cfg), trust(cfg), clients(), niches(cfg), assistant(cfg), teder]).join('\n');
   })(),
 });

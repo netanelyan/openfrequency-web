@@ -154,7 +154,7 @@ The site lives inside the Teder owner-site world, pinned by the owner's brief: a
 
 Depth is rationed. Glass is reserved for what floats (the header capsule) and for the stages a product fragment stands on. Every other surface is a tile one tone step off the wallpaper, with no line and no shadow. The one dark surface in the light theme is the footer panel; the one colour field is Teder's violet. The home page is the company's: a door to each product in its own material, Toran's chat on glass and Teder's real slides on its violet. On a phone both doors start shut, each its mark, its name, one short line and a round chevron button that opens it (the whole top row is the target). Behind the home page's headline our own mark stands large, half see-through, pushed toward the left edge. There are no photographs of our own; the only ones are the covers inside Teder's slides.
 
-The page is Hebrew, right to left, phone first, and in light and dark from the same tokens. It honours Increase Contrast and Reduce Transparency by making the glass and tiles nearly solid, and Reduce Motion by showing everything in place.
+The page is Hebrew, right to left, phone first, and in light and dark from the same tokens. Light is the default whatever the device prefers; dark is the visitor's choice, a sun and moon button in the header, kept in the browser and put back before the page paints. It honours Increase Contrast and Reduce Transparency by making the glass and tiles nearly solid, and Reduce Motion by showing everything in place.
 
 **Key Characteristics:**
 - Hue-less silver wallpaper (a fixed radial plus linear gradient over the wallpaper base)
@@ -261,7 +261,7 @@ Surfaces have one radius: 18px for tiles, glass stages, photo frames, chats, the
 - **Form message:** a warn-ground strip with a 12px radius holding the reason and a WhatsApp way out. On success the form is replaced by a "done" block with a heading.
 
 ### Navigation
-- **Header capsule:** sticky, 10px from the top, a 60px glass pill. The OpenFrequency mark and name sit at the start and the small primary demo button at the end.
+- **Header capsule:** sticky, 10px from the top, a 60px glass pill. The OpenFrequency mark and name sit at the start; at the end the light-or-dark button (a 44px round icon button, a moon in light and a sun in dark) and, from 700px, the small primary tools button, which on a phone is the menu's last button instead.
 - **Desk (900px+):** a centred segmented nav on fill, with 38px pill links. The current link is a solid segment with a 1px shadow.
 - **Phone:** a 44px menu button opens a solid sheet (22px radius) with 52px links at 18px. It closes on an outside tap, a link or Escape.
 
@@ -278,7 +278,7 @@ Surfaces have one radius: 18px for tiles, glass stages, photo frames, chats, the
 ### Product Fragments (signature, data-ui)
 - **Chat:** a WhatsApp conversation as one phone shows it, with a sheet header (avatar or mark, name, a "דוגמה" tag), the chat ground, and sent and received bubbles with a 3px tail corner and times. It plays in once on arrival: messages appear in order (opacity plus 8px rise, 350–450ms), and each reply is preceded by Toran's three typing dots. Every chat is invented and says so.
 - **Held stage:** "how it goes." Three statements scroll past a sticky glass stage whose UI card changes state. The statement in view goes to ink and the others to quiet. States cross-fade with a 16px rise over 350–500ms. Without script or with reduced motion, each state sits under its statement.
-- **Question box:** a chat window beside its heading: the made-up store's header, the doodled ground, a row of questions to tap and an input bar with a round send button in Toran's green. A question goes in as the customer's message, the answer follows Toran's typing dots, and a centred system line under it says "answered alone" (with the page it came from) or "passed to you" (with why). The window keeps the last few exchanges.
+- **Doors:** the home page's two product cards, each a solid field in its product's colour (Teder's violet, Toran's green) with the glyph in white, a white first button in the product's ink and translucent second ones, a line under the buttons (Teder's price; while Toran is soon, what its waitlist does) and the product's phone cut by the bottom edge. While Toran is soon its door keeps the "בקרוב" badge and has one button, to its waitlist. On a phone each starts shut as its name and one short line.
 - **Phone:** a dark frame with 46px top corners, an island, and the screen inside, cut off by the bottom edge of its door. Toran's door holds the sample chat; Teder's plays the cover of each subject like stories, a bar filling across the top of each over 3.2s, with two of them fanned behind it.
 - **Trust badges:** five pills in a centred row under the doors; below 700px a two-column grid of 12px-radius tiles at 14px, the odd one across the row.
 - **Pop:** a notification card that sticks out over a phone's edge, sheet-coloured with an 18px radius and a soft shadow: what reaches the owner. On Toran's phone it drops in after the chat has played (the question Toran couldn't answer); on Teder's it's the slide waiting for approval. Below 700px Teder's card waits above the phone instead of over the screen, so the slide's words stay readable.

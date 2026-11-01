@@ -1,6 +1,9 @@
 // Every built page, checked for accessibility in a real browser: axe-core against WCAG 2.0 A and AA (the rules the
 // Israeli standard 5568 is built on, which /accessibility says the site follows), at a phone's width (390px) and a
 // computer's (1440px), in light and in dark. One violation fails the test, with the rule, the page and the element.
+// Light is the site's default whatever the device prefers, so it is checked on a device that prefers dark; dark is
+// the visitor's choice (the header's button, kept as of-theme), so it is checked with that choice saved, on a device
+// that prefers light.
 //
 // The browser is Playwright's own Chromium when it is installed (npx playwright-core install chromium, as CI does),
 // else the installed Chrome. With neither the test fails: a check that did not run is not a pass (deploy.sh also stops
@@ -18,12 +21,14 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { AxeBuilder } from '@axe-core/playwright';
+import { THEME_KEY } from '../src/layout.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'of-a11y-'));
 const SKIP = new Set(['toran/example/index.html']);
 const WIDTHS = [[390, 844], [1440, 900]];
-const SCHEMES = ['light', 'dark'];
+// [the theme checked, what the device prefers, the choice saved in the browser]
+const SCHEMES = [['light', 'dark', null], ['dark', 'light', 'dark']];
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2', '.txt': 'text/plain', '.xml': 'application/xml' };
 let server, browser, origin;
@@ -77,16 +82,19 @@ test('every page passes axe (WCAG 2.0 A and AA) on a phone and a computer, light
   assert.ok(pages.length >= 14, `every page was built (${pages.length})`);
   const found = [];
   for (const [width, height] of WIDTHS) {
-    for (const colorScheme of SCHEMES) {
+    for (const [theme, colorScheme, saved] of SCHEMES) {
       const context = await browser.newContext({ viewport: { width, height }, colorScheme, bypassCSP: true });
+      if (saved) await context.addInitScript(([k, v]) => localStorage.setItem(k, v), [THEME_KEY, saved]);
       const page = await context.newPage();
       for (const p of pages) {
         await page.goto(origin + p, { waitUntil: 'load' });
+        // The page is in the theme being checked, not the device's.
+        assert.equal(await page.evaluate(() => document.documentElement.getAttribute('data-theme') || 'light'), theme, `${p} ${width}px: the page is ${theme}`);
         // The first screen's entrances (site.js) settle before the colours are read.
         await page.waitForTimeout(700);
         const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
         for (const v of violations) {
-          for (const n of v.nodes.slice(0, 3)) found.push(`${p} ${width}px ${colorScheme}: ${v.id} (${v.impact}) ${n.target.join(' ')}: ${n.failureSummary.split('\n').slice(1).join(' ').trim()}`);
+          for (const n of v.nodes.slice(0, 3)) found.push(`${p} ${width}px ${theme}: ${v.id} (${v.impact}) ${n.target.join(' ')}: ${n.failureSummary.split('\n').slice(1).join(' ').trim()}`);
         }
       }
       await context.close();

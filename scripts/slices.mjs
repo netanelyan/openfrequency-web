@@ -12,6 +12,8 @@ const step = width < 600 ? 900 : 1000;
 const server = await serve(0);
 const browser = await chromium.launch({ channel: 'chrome' });
 const ctx = await browser.newContext({ viewport: { width, height: 900 }, deviceScaleFactor: width < 600 ? 2 : 1, colorScheme: scheme, bypassCSP: true });
+// The site is light whatever the device prefers; dark is the visitor's choice, saved as the header's button saves it.
+if (scheme === 'dark') await ctx.addInitScript(() => localStorage.setItem('of-theme', 'dark'));
 const pg = await ctx.newPage();
 await pg.goto(`http://127.0.0.1:${server.address().port}${p}`, { waitUntil: 'networkidle' });
 await pg.waitForTimeout((await pg.$('[data-hero-chat]')) ? 6500 : 800);

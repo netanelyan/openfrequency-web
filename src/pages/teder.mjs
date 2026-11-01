@@ -1,13 +1,15 @@
 // Teder's page, in the shape of Toran's, on its own violet: the headline and a button down to the demo form, beside its
-// slideshows under a tab for each platform it posts to; the one screen where the day's slideshows wait for approval;
-// what it does alone and what is left for you; its two plans; and the demo form at the end. What it does comes from
+// slideshows under a tab for each platform it posts to; what it does alone and what is left for you; its two plans; and
+// the demo form at the end. (The screen where the day's slideshows wait for approval is on the home page; here it said
+// again what the first screen, the list and the plans already say, and on a phone it was 840px of a long page: the
+// owner, 2026-11-01, "The mobile page is very long".) What it does comes from
 // openfrequency-teder's README ("What it does", "Publishing").
 // While sign-up is open (signup in site.config.json), the first screen's button goes to accounts' sign-up, each plan's
 // card has its own (with the plan picked), and the form at the end is the second way, a sample slideshow first. The
 // lists say what a business that set Teder up on its own does: it picks the sources and connects its accounts.
 // Facebook is in every list while teder.facebook is on (lib.mjs tederNets).
 import { facebookOn, mark, signupOpen, tederNets } from '../lib.mjs';
-import { approvals, platformWindow } from '../teder.mjs';
+import { platformWindow } from '../teder.mjs';
 import { demoForm } from '../forms.mjs';
 import { TEDER_SAMPLE, sampleLine, tederPricing, tederStart } from '../sections.mjs';
 
@@ -45,17 +47,6 @@ ${mark('teder', 72, 'תדר')}
 ${open ? tederStart(cfg, { wrap: 'start hero-cta', cls: 'btn light', price: false, more: `<a class="btn on-color" href="#demo">${TEDER_SAMPLE}</a>` }) : '<a class="btn primary hero-cta" href="#demo">לנסות את תדר על החנות שלכם</a>'}
 </div>
 ${platformWindow(cfg)}
-</div>
-</section>
-
-<section class="sec" id="approve" aria-labelledby="approve-h">
-<div class="wrap side">
-<div>
-<h2 id="approve-h">כל המצגות של היום במסך אחד</h2>
-<p class="lede">המצגות של היום מחכות לכם במסך אחד, כל אחת עם המקום שבו היא תעלה. לחיצה אחת מאשרת מצגת, והיא עולה בשעה שנקבעה.</p>
-<p class="quiet">מצגת שלא אישרתם לא עולה.</p>
-</div>
-<div class="stage glass">${approvals(cfg)}</div>
 </div>
 </section>
 

@@ -1,7 +1,7 @@
 // The switch in site.config.json, teder.demoBy, built both ways from a copy of the config (the real one is not
 // touched, and neither is dist/): "form" is the site as it was, word for word, /teder's form asking for the store's
 // address and a WhatsApp number; "whatsapp" asks for the address only and is answered like Toran's demo, with a code
-// to send us on WhatsApp, so the number proves itself. Only /teder and the home page's question box change; the join
+// to send us on WhatsApp, so the number proves itself. Only /teder changes (and the privacy page, below); the join
 // form keeps its number. The privacy page says Teder learns the number from the message too, under its own date
 // (legal.privacyWaUpdated), and a "whatsapp" build without that date stops. The endpoint's side (by=whatsapp, the code, the handover to Toran) is in lead.test.mjs.
 import { test, before, after } from 'node:test';
@@ -80,8 +80,8 @@ test('the switch is a fact with two values, the config says "whatsapp" (our numb
   assert.match(gone.b.stderr + gone.b.stdout, /"teder\.demoBy" is not there/);
 });
 
-test('the switch changes /teder, the question box and the privacy page only: every other page is the same either way, byte for byte', () => {
-  for (const [form, wa, changes] of [[built.form, built.wa, ['index.html', 'teder/index.html', 'privacy/index.html']], [built.formLive, built.waLive, ['teder/index.html', 'privacy/index.html']]]) {
+test('the switch changes /teder and the privacy page only: every other page is the same either way, byte for byte', () => {
+  for (const [form, wa, changes] of [[built.form, built.wa, ['teder/index.html', 'privacy/index.html']], [built.formLive, built.waLive, ['teder/index.html', 'privacy/index.html']]]) {
     assert.deepEqual(Object.keys(wa).sort(), Object.keys(form).sort(), 'the same pages');
     for (const file of Object.keys(form)) {
       if (changes.includes(file)) assert.notEqual(wa[file], form[file], file);
@@ -99,7 +99,6 @@ test('with "form", /teder is as it was: its form takes the address and a WhatsAp
   // With Toran soon no thank-you with a code anywhere; with Toran live, /teder carries Toran's, as before.
   assert.equal(codeTemplates(built.form['teder/index.html']), 0);
   assert.match(template(built.formLive['teder/index.html'], 'done-code'), /<p data-teder hidden>/, "Toran's, with the join page's Teder line");
-  assert.match(template(built.form['index.html'], 'ask-a-demo'), /שולחים את הכתובת של החנות ומספר וואטסאפ, ואנחנו שולחים לכם אותה\./);
   // On /teder, every part of the page but the form and the thank-you templates is the same in both modes.
   const rest = (html) => html.replace(/<form class="demo"[^>]*data-form="teder"[\s\S]*?<\/form>/, '').replace(/<template id="done-code">[\s\S]*?<\/template>\n?/, '');
   assert.equal(rest(built.wa['teder/index.html']), rest(built.form['teder/index.html']));
@@ -145,13 +144,6 @@ test('with "whatsapp", /teder\'s thank-you is one line, to send the ready messag
   const js = fs.readFileSync(path.join(ROOT, 'src/form.js'), 'utf8');
   assert.match(js, /copy\(body\.code \? 'done-code'/);
   assert.match(js, /querySelector\('\[data-wa-say\]'\)[\s\S]*querySelector\('\[data-no-wa\]'\)[\s\S]*hidden = false/);
-});
-
-test('with "whatsapp", the question box says how to get Teder\'s sample: the address, then a message with a code on WhatsApp', () => {
-  const answer = template(built.wa['index.html'], 'ask-a-demo');
-  assert.match(answer, /שולחים את הכתובת של החנות, ואחר כך הודעה מוכנה עם קוד בוואטסאפ\. לשם נשלח לכם את הלינק למצגת\./);
-  assert.doesNotMatch(answer, /מספר וואטסאפ/);
-  assert.match(answer, /href="\/teder#demo"/);
 });
 
 test('with "whatsapp", the privacy page says Teder learns the number from the message too, Meta carries the demo number, and the page has the day of the switch', () => {

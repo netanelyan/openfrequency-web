@@ -1,4 +1,4 @@
-// The site's script: the motion and the question box. Every part checks that its elements are on
+// The site's script: the motion, light or dark, and the accessibility panel. Every part checks that its elements are on
 // the page, and every part leaves the page whole without it: the content is in the HTML, visible, and script only
 // times its arrival or adds what changes by the minute.
 (function () {
@@ -15,6 +15,24 @@
   if (menu) {
     d.addEventListener('click', function (e) { if (menu.open && (!menu.contains(e.target) || e.target.closest('nav a'))) menu.open = false; });
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); } });
+  }
+
+  // Light or dark: the header's button (layout.mjs themeButton) turns dark on and off, and the choice is kept in this
+  // browser under of-theme, which the head reads before the page paints. Without storage it still works for the visit.
+  var theme = d.querySelector('[data-theme-toggle]');
+  if (theme) {
+    var tColor = d.querySelector('meta[name=theme-color]');
+    var tSet = function (dark) {
+      root.setAttribute('data-theme', dark ? 'dark' : 'light');
+      theme.setAttribute('aria-pressed', dark ? 'true' : 'false');
+      if (tColor) tColor.setAttribute('content', dark ? '#111113' : '#eeeff2');
+    };
+    tSet(root.getAttribute('data-theme') === 'dark');
+    theme.addEventListener('click', function () {
+      var dark = root.getAttribute('data-theme') !== 'dark';
+      tSet(dark);
+      try { localStorage.setItem('of-theme', dark ? 'dark' : 'light'); } catch (e) {}
+    });
   }
 
   // The accessibility panel: each switch is a class on <html> (a-big, a-contrast, a-links, a-still), kept in this
@@ -134,84 +152,6 @@
     box.classList.add('tabbed');
     pick(box.querySelector('[aria-selected=true]') || tabs[0]);
   });
-
-  // The question box: Toran answering for OpenFrequency, from what this site says. Every suggested question has an
-  // answer; anything else gets Toran's real line for a question it can't answer.
-  var box = d.getElementById('ask-q'), out = d.querySelector('[data-ask-out]'), ex = d.querySelector('[data-ask-ex]');
-  if (box && out) {
-    var link = function (href, w) { return ' <a class="lnk" href="' + href + '">' + w + '</a>'; };
-    var A = {
-      toran: ['תורן עונה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל, מתוך מה שכתוב באתר שלה: מוצרים, מחירים, מלאי ודפי המדיניות. מה שלא כתוב שם, הוא שואל אתכם ומעביר את התשובה ללקוח.' + link('/toran', 'לעמוד של תורן'), 'מהעמוד של תורן'],
-      teder: ['תדר כותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם, וכל מצגת עולה רק אחרי שמישהו אישר אותה.' + link('/teder', 'לעמוד של תדר'), 'מהעמוד של תדר'],
-      demo: ['שולחים לנו את הכתובת של החנות ומספר וואטסאפ. אנחנו בונים דמו מהמוצרים ומדפי המדיניות שבאתר שלכם, ושולחים לכם לינק. כותבים לו כמו לקוח, ורואים מה הוא עונה.' + link('/toran#demo', 'לנסות את תורן על החנות שלכם'), 'מהעמוד של תורן'],
-      store: ['כן. תורן עובד עם חנויות על Shopify, על WooCommerce ועל Wix. בחנות על Wix הוא קורא את 150 המוצרים החדשים ביותר.', 'מהעמוד של תורן'],
-      // The prices come from the page (home.mjs, #ask-price), which the build writes from the config.
-      price: [(d.getElementById('ask-price') || { innerHTML: '' }).innerHTML.trim() + link('/join', 'להצטרף'), 'מהעמודים של תורן ושל תדר'],
-      wrong: ['תורן לא ממציא תשובות. הוא עונה רק ממה שכתוב באתר של החנות, וכשאין לו תשובה הוא שואל אתכם במקום לנחש. בשבועיים הראשונים אנחנו גם עוברים איתכם על כל שיחה ומתקנים מה שצריך.', 'מהשאלות באתר'],
-      number: ['כן. הלקוחות ממשיכים לכתוב לאותו מספר, ואנחנו מחברים אותו ל-WhatsApp Business Platform של Meta יחד איתכם.', 'מהשאלות באתר'],
-      install: ['לדמו לא צריך להתקין כלום. תורן קורא את מה שכבר מופיע באתר. כדי לחבר את המספר של החנות צריך חשבון עסקי ב-Meta, ואת החיבור עושים יחד.', 'מהשאלות באתר'],
-      night: ['כן. תורן עונה 24/7, ומה שהוא לא יודע מחכה לכם לבוקר.', 'מהעמוד של תורן'],
-      who: ['אנחנו OpenFrequency. בנינו את תורן, שעונה ללקוחות של חנויות אונליין, ואת תדר, שכותב ומעצב מצגות בעברית לטיקטוק ולאינסטגרם.', 'מעמוד הבית'],
-    };
-    // The page brings its own answers where the config decides them (sections.mjs, <template id="ask-a-KEY">): Teder's
-    // platforms always, and while Toran is soon every answer about Toran.
-    var own = function (k) { var t = d.getElementById('ask-a-' + k); return t ? t.innerHTML.trim() : null; };
-    Object.keys(A).forEach(function (k) { if (own(k)) A[k][0] = own(k); });
-    var KEEP = 'את זה אני לא יודע. אני בודק עם הצוות, ואחזור אליך כאן.';
-    var WHY = 'בחנות אמיתית השאלה הייתה עוברת לבעלים בוואטסאפ. כאן זו הדגמה, אז היא לא נשלחת.';
-    var EN = ["Toran answers a store's customers on WhatsApp, Instagram, Messenger and email, from what's on the store's site, in Hebrew or in English." + link('/toran#demo', 'Try Toran on your store'), 'ענה לבד, באנגלית'];
-    if (own('en')) EN[0] = own('en');
-    var has = function (q, words) { return words.some(function (w) { return q.indexOf(w) > -1; }); };
-    var answer = function (raw) {
-      var q = ' ' + raw.toLowerCase() + ' ';
-      if (/[a-z]/.test(q) && !/[֐-׿]/.test(q)) return EN;
-      if (has(q, ['טועה', 'טעות', 'ממציא', 'להמציא', 'לא נכון', 'לנחש', 'משקר'])) return A.wrong;
-      if (has(q, ['wix', 'woo', 'shopify', 'וויקס', 'ויקס', 'שופיפיי', 'פלטפורמ', 'אתר שלי', 'החנות שלי על'])) return A.store;
-      if (has(q, ['עולה', 'מחיר', 'כמה זה', '₪', 'שקל', 'לשלם', 'תשלום', 'חודשי', 'יקר'])) return A.price;
-      if (has(q, ['דמו', 'לנסות', 'להתחיל', 'מתחילים'])) return A.demo;
-      if (has(q, ['להתקין', 'התקנה', 'קוד באתר'])) return A.install;
-      if (has(q, ['המספר', 'מספר של', 'מספר שלי', 'וואטסאפ עסקי'])) return A.number;
-      if (has(q, ['לילה', 'בלילה', 'שעות', '24'])) return A.night;
-      if (has(q, ['תדר', 'מצגת', 'מצגות', 'טיקטוק', 'אינסטגרם', 'פייסבוק', 'תוכן'])) return A.teder;
-      if (has(q, ['תורן', 'וואטסאפ', 'לקוחות', 'שירות'])) return A.toran;
-      if (has(q, ['מי אתם', 'openfrequency', 'החברה', 'אתם'])) return A.who;
-      return { keep: KEEP, why: WHY };
-    };
-    var esc = function (s) { return s.replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-    var add = function (cls, html) {
-      var li = d.createElement('li');
-      li.className = cls;
-      li.innerHTML = html;
-      out.appendChild(li);
-      out.scrollTop = out.scrollHeight;
-      return li;
-    };
-    // A question goes into the chat as the customer's message; the answer follows Toran's typing dots, with a line
-    // under it on where it came from, or why it went to the store. The chat keeps the last few exchanges.
-    var send = function (raw) {
-      var q = raw.trim();
-      if (!q) return;
-      while (out.children.length > 9) out.removeChild(out.firstChild);
-      add('msg me', esc(q) + '<time aria-hidden="true">עכשיו</time>');
-      var a = answer(q), alone = Array.isArray(a);
-      var reply = function () {
-        add('msg them' + (still ? '' : ' answer-in'), (alone ? a[0] : esc(a.keep)) + '<time aria-hidden="true">עכשיו</time>');
-        add('sys', alone ? '<span class="ui-s alone">ענה לבד</span>' + a[1] : '<span class="ui-s yours">לא כתוב באתר</span>' + a.why);
-      };
-      if (still) return reply();
-      var typing = add('msg them typing', '<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>');
-      setTimeout(function () { typing.remove(); reply(); }, 900);
-    };
-    var form = d.querySelector('[data-ask-form]');
-    if (form) {
-      form.hidden = false;
-      form.addEventListener('submit', function (e) { e.preventDefault(); send(box.value); box.value = ''; });
-    }
-    if (ex) {
-      ex.hidden = false;
-      each('button', function (b) { b.addEventListener('click', function () { send(b.textContent); }); }, ex);
-    }
-  }
 
   // Teder's phone shows its slides like stories: one at a time, a bar filling across the top for each.
   each('[data-reel]', function (reel) {

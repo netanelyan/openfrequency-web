@@ -5,7 +5,7 @@ import { FACTS, ROOT, esc, mark, tederNets, toranSoon } from './lib.mjs';
 import { formCopy } from './forms.mjs';
 import { LOGOS } from './logos.mjs';
 
-// The two scripts, comments and indentation out: site.js on every page (motion and the question box), form.js only
+// The two scripts, comments and indentation out: site.js on every page (motion, light or dark, accessibility), form.js only
 // where there is a form.
 const squeeze = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8')
   .split('\n').filter((l) => !/^\s*\/\//.test(l)).map((l) => l.trim()).filter(Boolean).join('\n');
@@ -26,6 +26,14 @@ const TOOLS = 'https://accounts.openfrequency.co.il/';
 
 const menuIcon = `<svg class="i open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg><svg class="i close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 
+// Light or dark (the owner, 2026-11-01: "make light mode the default, and an easy option to switch to dark mode"). The
+// page is light whatever the device prefers; this button, in the header of every page, turns dark on and off, and
+// site.js keeps the choice in this browser (THEME_KEY), which the head puts back before the page paints. A moon while
+// light, a sun while dark; one name, pressed while dark.
+export const THEME_KEY = 'of-theme';
+export const THEME_COLOR = { light: '#eeeff2', dark: '#111113' };
+const themeButton = `<button class="theme" type="button" data-theme-toggle aria-pressed="false" aria-label="מצב כהה"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg></button>`;
+
 function header(cfg, current) {
   const here = (href) => (href === current ? ' aria-current="page"' : '');
   const PRODUCTS = products(cfg);
@@ -43,7 +51,7 @@ function header(cfg, current) {
 <div class="bar">
 <a class="brand" href="/"${current === '/' ? ' aria-current="page"' : ''}>${mark('openfrequency', 32)}<b>OpenFrequency</b></a>
 <nav class="nav" aria-label="ראשי">${nav}</nav>
-<a class="btn primary sm cta" href="${TOOLS}">לניהול הכלים</a>
+<div class="bar-end">${themeButton}<a class="btn primary sm cta" href="${TOOLS}">לניהול הכלים</a></div>
 <details class="menu"><summary aria-label="תפריט">${menuIcon}</summary><nav aria-label="ראשי">${sheet}</nav></details>
 </div>
 </header>`;
@@ -82,8 +90,9 @@ ${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a
 // In the head, before anything paints: the page is told script runs, so the parts that rise in wait for it. If
 // site.js never arrives, the flag comes off after three seconds and everything simply shows.
 // The accessibility switches this browser saved (the panel, in site.js) go on here too, so the page never paints
-// without them.
-const early = `<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.ofSite)document.documentElement.classList.remove('js')},3000);try{var a=JSON.parse(localStorage.getItem('of-a11y'))||{};['big','contrast','links','still'].forEach(function(k){if(a[k]===true)document.documentElement.classList.add('a-'+k)})}catch(e){}</script>`;
+// without them, and so does dark, when it is what this browser chose (the header's button): the page is light
+// otherwise, and the browser's own bar with it (theme-color).
+const early = `<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.ofSite)document.documentElement.classList.remove('js')},3000);try{var a=JSON.parse(localStorage.getItem('of-a11y'))||{};['big','contrast','links','still'].forEach(function(k){if(a[k]===true)document.documentElement.classList.add('a-'+k)})}catch(e){}try{if(localStorage.getItem('${THEME_KEY}')==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name=theme-color]').setAttribute('content','${THEME_COLOR.dark}')}}catch(e){}</script>`;
 
 // The accessibility panel: four switches and the way to the statement. It waits for site.js, which shows it; without
 // script the page is the same page, and the statement is in the footer.
@@ -140,9 +149,8 @@ export function page(cfg, css, { path, title, description, body, noindex = false
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
-${share(cfg, path, title, description, image)}${noindex || cfg.draft ? '<meta name="robots" content="noindex">\n' : ''}<meta name="color-scheme" content="light dark">
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#eeeff2">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111113">
+${share(cfg, path, title, description, image)}${noindex || cfg.draft ? '<meta name="robots" content="noindex">\n' : ''}<meta name="color-scheme" content="light">
+<meta name="theme-color" content="${THEME_COLOR.light}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <style>${css}</style>

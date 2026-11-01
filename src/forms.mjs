@@ -55,10 +55,13 @@ ${status(id)}
 
 // Toran's waitlist, while Toran is soon (products.toran in site.config.json): one field, a phone or an email, saved as a
 // 'waitlist' lead (server/lead.mjs) and sent to the owner as "רשימת המתנה לתורן". Nothing else is asked or promised.
+// Its button says what the home page's Toran door says (the owner's words, 2026-11-01), so whoever came from there
+// presses the words they came for.
+export const TORAN_SAVE = 'שמרו לי מקום';
 export function waitlistForm(cfg, page, id = 'waitlist-form') {
   return `${open(cfg, 'waitlist', page, 'demo waitlist', id)}
 <label class="f wide">טלפון או מייל<input name="contact" type="text" autocomplete="email" dir="ltr" required></label>
-<button class="btn" type="submit">לקבל עדכון</button>
+<button class="btn" type="submit">${TORAN_SAVE}</button>
 <p class="when">נכתוב לכם פעם אחת, כשתורן נפתח.</p>
 ${status(id)}
 </form>`;

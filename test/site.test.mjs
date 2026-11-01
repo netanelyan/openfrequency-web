@@ -39,8 +39,7 @@ before(() => {
 });
 after(() => fs.rmSync(dir, { recursive: true, force: true }));
 
-// What a visitor can see and follow: the page without its scripts and styles (the question box's own answers live in
-// site.js, and the page's templates replace the ones about Toran while it is soon; tested below).
+// What a visitor can see and follow: the page without its scripts and styles.
 const visible = (html) => html.replace(/<script>[\s\S]*?<\/script>/g, '').replace(/<style>[\s\S]*?<\/style>/g, '');
 const hrefs = (html) => [...visible(html).matchAll(/href="([^"]*)"/g)].map((m) => m[1].replace(/&amp;/g, '&'));
 const decoded = (h) => { try { return decodeURIComponent(h); } catch { return h; } };
@@ -102,9 +101,17 @@ test('with "soon", Toran keeps its pages with a "בקרוב" badge and its waitl
     for (const m of meta) assert.doesNotMatch(m, /תורן (עונה|אחד עונה)|בוחרים בתורן/, `${file}: "${m}"`);
   }
   assert.match(pages['toran/index.html'], /<meta name="description" content="[^"]*נפתח בקרוב\.">/);
-  // The question box: every answer of site.js that sends to Toran's demo or says it answers today is replaced.
-  for (const k of ['toran', 'demo', 'store', 'number', 'install', 'night', 'who', 'en']) assert.match(home, new RegExp(`<template id="ask-a-${k}">`), `ask-a-${k}`);
-  assert.doesNotMatch(/<template id="ask-price">[\s\S]*?<\/template>/.exec(home)[0], new RegExp(price(config.price.plans.store.monthly)), "the box doesn't give Toran's price");
+  // The first screen sells Teder (the owner, 2026-11-01: "The hero: sell Teder, which you can buy now, and give Toran
+  // one line with the badge"): Teder's headline, Toran's one line with the badge, and Toran's door, in its own green
+  // (spacing.test.mjs), with one button, which saves a place on the waitlist. The section on Toran as the owner's
+  // assistant and the question box are gone.
+  const hero = /<section class="co-hero"[\s\S]*?<\/section>/.exec(home)[0];
+  assert.match(hero, /<h1 id="hero-h"><span class="hl">מצגות בעברית<\/span> לטיקטוק/);
+  assert.equal((hero.match(/<p class="co-soon"><span class="soon">בקרוב<\/span> /g) || []).length, 1, "Toran's one line, with the badge");
+  const toranDoor = /<article class="door toran-door"[\s\S]*?<\/article>/.exec(home)[0];
+  assert.deepEqual([...toranDoor.matchAll(/<a class="btn[^"]*" href="([^"]*)">([^<]*)<\/a>/g)].map((m) => [m[1], m[2]]), [['/toran#waitlist', 'שמרו לי מקום']]);
+  assert.doesNotMatch(home, /id="owner"|id="ask"|data-ask|ask-a-/, 'no section on Toran for the owner, no question box');
+  assert.match(toran, /<button class="btn" type="submit">שמרו לי מקום<\/button>/, "the waitlist's button says what the door said");
 });
 
 test('with "soon", Teder is offered exactly as with "live"', () => {
@@ -112,9 +119,8 @@ test('with "soon", Teder is offered exactly as with "live"', () => {
   assert.equal(main(soon.pages['teder/index.html']), main(live.pages['teder/index.html']), "Teder's page");
   const door = (html) => /<article class="door teder-door[\s\S]*?<\/article>/.exec(html)[0];
   assert.equal(door(soon.pages['index.html']), door(live.pages['index.html']), "Teder's door on the home page");
-  // Every link to Teder is still there, word for word (Teder comes first in the menus, and the question box may send
-  // to Teder's demo where it sent to Toran's, so the order and the count can grow).
-  // Toran's contract is built only once Toran is sold (it shows Toran's price), so it is the one page "live" has alone.
+  // Every link to Teder is still there, word for word (Teder comes first in the menus, so the order and the count can
+  // grow). Toran's contract is built only once Toran is sold (it shows Toran's price), so it is the one page "live" has alone.
   for (const file of Object.keys(live.pages).filter((f) => f !== 'toran/contract/index.html')) {
     const now = anchors(soon.pages[file], '/teder');
     for (const a of anchors(live.pages[file], '/teder')) assert.ok(now.includes(a), `${file}: the link to Teder "${a}"`);
@@ -140,7 +146,10 @@ test('with "soon", the support export says Toran opens soon and Teder is availab
 test('with "live", the ways into Toran are back', () => {
   const { pages, support } = built.live;
   const home = visible(pages['index.html']);
-  assert.match(home, /<a class="btn primary" href="\/toran#demo">לנסות את תורן על החנות שלכם<\/a>/);
+  // On Toran's green door its first button is white, as on Teder's violet.
+  assert.match(home, /<a class="btn light" href="\/toran#demo">לנסות את תורן על החנות שלכם<\/a>/);
+  assert.match(home, /<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית<\/span><\/h1>/, 'the headline about both products');
+  assert.match(home, /id="owner"/, 'Toran for the owner is back');
   assert.ok(home.indexOf('toran-door') < home.indexOf('teder-door'), "Toran's door comes first");
   const toran = visible(pages['toran/index.html']);
   assert.match(toran, /<a class="btn primary hero-cta" href="#demo">לנסות את תורן על החנות שלכם<\/a>/);
@@ -152,8 +161,7 @@ test('with "live", the ways into Toran are back', () => {
   assert.match(visible(pages['toran/example/index.html']), /href="\/toran#demo"/);
   for (const [file, html] of Object.entries(pages)) {
     const v = visible(html);
-    // The question box's Teder answer and who we are come from the config either way (askTeder); nothing else.
-    assert.doesNotMatch(v, /data-form="waitlist"|class="soon-bar"|\/toran#waitlist|ask-a-(?!teder"|who")/, `${file}: something of the waitlist`);
+    assert.doesNotMatch(v, /data-form="waitlist"|class="soon-bar"|\/toran#waitlist|class="co-soon"/, `${file}: something of the waitlist`);
   }
   assert.ok(!pages['thanks/waitlist/index.html'], 'no waitlist thank-you');
   assert.equal(support.products, undefined);

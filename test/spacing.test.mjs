@@ -16,7 +16,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
-import { SUPPORT_TEXT } from '../src/layout.mjs';
+import { SUPPORT_TEXT, THEME_KEY } from '../src/layout.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'of-spacing-'));
@@ -34,6 +34,14 @@ function serve(dir) {
     res.writeHead(file ? 200 : 404, { 'Content-Type': TYPES[path.extname(send)] || 'application/octet-stream' });
     res.end(fs.readFileSync(send));
   });
+}
+
+// A browser in light or in dark: light is the site's own default (on a device that prefers dark, to be sure of it), dark
+// is the visitor's choice, saved the way the header's button saves it.
+async function themed(theme, opts) {
+  const ctx = await browser.newContext({ ...opts, colorScheme: theme === 'dark' ? 'light' : 'dark' });
+  if (theme === 'dark') await ctx.addInitScript((k) => localStorage.setItem(k, 'dark'), THEME_KEY);
+  return ctx;
 }
 
 async function launch() {
@@ -87,7 +95,7 @@ test('in a browser, two buttons that can be seen are never closer than 8px, on e
   const found = [];
   for (const [width, height] of [[390, 844], [360, 780], [1440, 900]]) {
     for (const colorScheme of ['light', 'dark']) {
-      const ctx = await browser.newContext({ viewport: { width, height }, colorScheme, reducedMotion: 'reduce' });
+      const ctx = await themed(colorScheme, { viewport: { width, height }, reducedMotion: 'reduce' });
       const page = await ctx.newPage();
       for (const p of pages) {
         await page.goto(origin + p);
@@ -156,4 +164,61 @@ test("in a browser, /teder's two top buttons stand apart, and the support button
     assert.equal(got.sideways, false, `${width}: nothing scrolls sideways`);
     await ctx.close();
   }
+});
+
+// The home page's first screen (the owner, 2026-11-01: "Make Toran's card as polished as Teder's. Give it its full color
+// (the green), not grey ... A real action instead of a blank"), with both doors open, as a phone shows them after a tap:
+// each door in its product's colour, apart from the other, its buttons apart from each other, and Toran's with one
+// button, to its waitlist. And the header's light-or-dark button on every page, inside the bar and apart from its
+// neighbours (the menu on a phone, the tools button on a computer).
+test("in a browser, the home page's doors stand apart in their own colours, Toran's with one button to its waitlist, and the theme button sits apart in every page's header", async () => {
+  const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')})`;
+  const css = fs.readFileSync(path.join(ROOT, 'src/style.css'), 'utf8');
+  const token = (name) => new RegExp(`--${name}: (#[0-9a-f]{6});`).exec(css)[1];
+  const found = [];
+  for (const [width, height] of [[390, 844], [360, 780], [1440, 900]]) {
+    for (const theme of ['light', 'dark']) {
+      const ctx = await themed(theme, { viewport: { width, height }, reducedMotion: 'reduce' });
+      const page = await ctx.newPage();
+      await page.goto(`${origin}/`);
+      await page.evaluate(() => document.querySelectorAll('.door.shut .door-open').forEach((b) => b.click()));
+      const home = await page.evaluate(() => {
+        const box = (e) => e.getBoundingClientRect().toJSON();
+        const doors = [...document.querySelectorAll('.door')].map((d) => ({
+          cls: d.className, box: box(d), bg: getComputedStyle(d).backgroundColor,
+          btns: [...d.querySelectorAll('.btn')].map((b) => ({ text: b.textContent.trim(), href: b.getAttribute('href'), box: box(b) })),
+        }));
+        return { doors, sideways: document.documentElement.scrollWidth > window.innerWidth };
+      });
+      const apart = (A, B) => Math.max(Math.max(B.left - A.right, A.left - B.right), Math.max(B.top - A.bottom, A.top - B.bottom));
+      const at = `${width} ${theme}`;
+      const [teder, toran] = home.doors;
+      if (!/teder-door/.test(teder?.cls) || !/toran-door/.test(toran?.cls)) { found.push(`${at}: Teder's door first, then Toran's (${home.doors.map((d) => d.cls)})`); continue; }
+      if (teder.bg !== rgb(token('teder'))) found.push(`${at}: Teder's door is ${teder.bg}`);
+      if (toran.bg !== rgb(token('toran'))) found.push(`${at}: Toran's door is ${toran.bg}, not its green`);
+      if (apart(teder.box, toran.box) < 8) found.push(`${at}: the doors are ${Math.round(apart(teder.box, toran.box))}px apart`);
+      if (toran.btns.length !== 1 || toran.btns[0].text !== 'שמרו לי מקום' || toran.btns[0].href !== '/toran#waitlist') found.push(`${at}: Toran's door has ${JSON.stringify(toran.btns.map((b) => [b.text, b.href]))}`);
+      for (const d of home.doors) {
+        for (let i = 0; i < d.btns.length; i++) for (let j = i + 1; j < d.btns.length; j++) {
+          const g = apart(d.btns[i].box, d.btns[j].box);
+          if (g < 8) found.push(`${at}: "${d.btns[i].text}" and "${d.btns[j].text}" are ${Math.round(g)}px apart`);
+        }
+      }
+      if (home.sideways) found.push(`${at}: the home page scrolls sideways`);
+      for (const p of pages.filter((x) => x !== '/toran/example/')) {
+        await page.goto(origin + p);
+        const bar = await page.evaluate(() => {
+          const shown = (e) => e && getComputedStyle(e).display !== 'none' ? e.getBoundingClientRect().toJSON() : null;
+          const t = document.querySelector('.bar .theme');
+          return { bar: shown(document.querySelector('.bar')), theme: shown(t), label: t?.getAttribute('aria-label'), pressed: t?.getAttribute('aria-pressed'), menu: shown(document.querySelector('.menu summary')), cta: shown(document.querySelector('.bar .cta')) };
+        });
+        if (!bar.theme) { found.push(`${at} ${p}: no theme button in the header`); continue; }
+        if (bar.label !== 'מצב כהה' || bar.pressed !== String(theme === 'dark')) found.push(`${at} ${p}: the theme button says "${bar.label}", pressed ${bar.pressed}`);
+        if (bar.theme.left < bar.bar.left || bar.theme.right > bar.bar.right) found.push(`${at} ${p}: the theme button is outside the bar`);
+        for (const [name, r] of [['the menu', bar.menu], ['the tools button', bar.cta]]) if (r && apart(bar.theme, r) < 8) found.push(`${at} ${p}: the theme button and ${name} are ${Math.round(apart(bar.theme, r))}px apart`);
+      }
+      await ctx.close();
+    }
+  }
+  assert.deepEqual(found, [], found.join('\n'));
 });

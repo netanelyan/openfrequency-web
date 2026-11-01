@@ -82,6 +82,9 @@
   /* on Teder's violet field: the button's ink and its hover */
   --teder-ink: #3d1f9a;
   --teder-hover: #f1ecff;
+  /* on Toran's green door, the same: 6.5:1 on the white button */
+  --toran-ink: #0c6b49;
+  --toran-hover: #e7f5ee;
   --of: #2747d6;
   --warn: #a44200;
   --warn-bg: #fff4e5;
@@ -115,65 +118,61 @@
   --top: 76px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --toran-name: #5fd6a6;
-    --teder-name: #b9a2ff;
-    --bg: #111113;
-    --wall: radial-gradient(120% 80% at 85% -10%, #2c2c30 0%, rgba(44, 44, 48, 0) 55%),
-      linear-gradient(160deg, #1c1c1f 0%, #0b0b0d 30%, #2a2a2e 52%, #0e0e10 76%, #1f1f22 100%);
-    --surface: rgba(44, 44, 48, 0.55);
-    --surface-hi: rgba(58, 58, 62, 0.55);
-    --edge: rgba(255, 255, 255, 0.1);
-    --rim: rgba(255, 255, 255, 0.14);
-    --shadow-tile: 0 1px 2px rgba(0, 0, 0, 0.3), 0 14px 36px -14px rgba(0, 0, 0, 0.7);
-    --tile: rgba(255, 255, 255, 0.06);
-    --tile-2: rgba(255, 255, 255, 0.1);
-    --fill: rgba(118, 118, 128, 0.24);
-    --fill-2: rgba(118, 118, 128, 0.32);
-    --seg-on: #636366;
-    --field: rgba(0, 0, 0, 0.3);
-    --line: rgba(255, 255, 255, 0.08);
-    --line-2: rgba(255, 255, 255, 0.16);
-    --ink: #f5f5f7;
-    --ink-2: #d2d2d7;
-    --ink-3: #a1a1a6;
-    --ink-p: #b8b8bd;
-    --accent: #2997ff;
-    --accent-p: #2997ff;
-    --ok: #30d158;
-    --warn: #ff9f0a;
-    --warn-bg: #2d1f08;
-    --bar-float: rgba(30, 30, 32, 0.78);
-    --sheet: #1e1e20;
-    --bar-edge: rgba(255, 255, 255, 0.1);
-    --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4);
-    --bubble: #144d37;
-    --bubble-them: #2c2c2e;
-    --chat-ground: #0b141a;
-    --doodle: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><g fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path transform='translate(14 14)' d='M5 8h14l-1 12H6z M9 8V6a3 3 0 0 1 6 0v2'/><path transform='translate(92 22) rotate(-12 12 12)' d='M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z'/><path transform='translate(150 70) rotate(10 12 12)' d='M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z'/><path transform='translate(40 88) rotate(8 12 12)' d='M3 7l9-4 9 4v10l-9 4-9-4z M3 7l9 4 9-4 M12 11v10'/><path transform='translate(110 140) rotate(-8 12 12)' d='M4 5h16v11H9l-5 4z'/><g transform='translate(18 160)'><circle cx='12' cy='12' r='8'/><path d='M12 8v4l3 2'/></g></g></svg>");
-    --night: #000000;
-  }
+/* Light is the default, whatever the device prefers; dark is the visitor's own choice, the sun and moon in the header
+   (layout.mjs themeButton), kept in this browser and put back in the head before the page paints (data-theme). */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --toran-name: #5fd6a6;
+  --teder-name: #b9a2ff;
+  --bg: #111113;
+  --wall: radial-gradient(120% 80% at 85% -10%, #2c2c30 0%, rgba(44, 44, 48, 0) 55%),
+    linear-gradient(160deg, #1c1c1f 0%, #0b0b0d 30%, #2a2a2e 52%, #0e0e10 76%, #1f1f22 100%);
+  --surface: rgba(44, 44, 48, 0.55);
+  --surface-hi: rgba(58, 58, 62, 0.55);
+  --edge: rgba(255, 255, 255, 0.1);
+  --rim: rgba(255, 255, 255, 0.14);
+  --shadow-tile: 0 1px 2px rgba(0, 0, 0, 0.3), 0 14px 36px -14px rgba(0, 0, 0, 0.7);
+  --tile: rgba(255, 255, 255, 0.06);
+  --tile-2: rgba(255, 255, 255, 0.1);
+  --fill: rgba(118, 118, 128, 0.24);
+  --fill-2: rgba(118, 118, 128, 0.32);
+  --seg-on: #636366;
+  --field: rgba(0, 0, 0, 0.3);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-2: rgba(255, 255, 255, 0.16);
+  --ink: #f5f5f7;
+  --ink-2: #d2d2d7;
+  --ink-3: #a1a1a6;
+  --ink-p: #b8b8bd;
+  --accent: #2997ff;
+  --accent-p: #2997ff;
+  --ok: #30d158;
+  --warn: #ff9f0a;
+  --warn-bg: #2d1f08;
+  --bar-float: rgba(30, 30, 32, 0.78);
+  --sheet: #1e1e20;
+  --bar-edge: rgba(255, 255, 255, 0.1);
+  --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --bubble: #144d37;
+  --bubble-them: #2c2c2e;
+  --chat-ground: #0b141a;
+  --doodle: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><g fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path transform='translate(14 14)' d='M5 8h14l-1 12H6z M9 8V6a3 3 0 0 1 6 0v2'/><path transform='translate(92 22) rotate(-12 12 12)' d='M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z'/><path transform='translate(150 70) rotate(10 12 12)' d='M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z'/><path transform='translate(40 88) rotate(8 12 12)' d='M3 7l9-4 9 4v10l-9 4-9-4z M3 7l9 4 9-4 M12 11v10'/><path transform='translate(110 140) rotate(-8 12 12)' d='M4 5h16v11H9l-5 4z'/><g transform='translate(18 160)'><circle cx='12' cy='12' r='8'/><path d='M12 8v4l3 2'/></g></g></svg>");
+  --night: #000000;
 }
 
 /* Increase Contrast: the quiet text comes up, and the glass and tiles go nearly solid. */
 @media (prefers-contrast: more) {
   :root { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: #c7c7cc; --line-2: #8e8e93; --bar-float: #fafafc; --bar-edge: #8e8e93; --surface: rgba(255, 255, 255, 0.94); --surface-hi: rgba(255, 255, 255, 0.94); --edge: #c7c7cc; --tile: #ffffff; }
-}
-@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
-  :root { --ink-2: #f5f5f7; --ink-3: #d2d2d7; --ink-p: #f5f5f7; --line: #545458; --line-2: #8e8e93; --bar-float: #1e1e20; --bar-edge: #8e8e93; --surface: rgba(29, 29, 31, 0.96); --surface-hi: rgba(29, 29, 31, 0.96); --edge: #545458; --tile: #1d1d1f; }
+  :root[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #d2d2d7; --ink-p: #f5f5f7; --line: #545458; --line-2: #8e8e93; --bar-float: #1e1e20; --bar-edge: #8e8e93; --surface: rgba(29, 29, 31, 0.96); --surface-hi: rgba(29, 29, 31, 0.96); --edge: #545458; --tile: #1d1d1f; }
 }
 /* Reduce Transparency, or a browser without backdrop blur: the glass is solid. */
 @media (prefers-reduced-transparency: reduce) {
   :root { --bar-float: #fafafc; --surface: #ffffff; --surface-hi: #ffffff; --tile: #f7f7f9; --fill: #e8e8ed; --fill-2: #dcdce1; --field: #ffffff; }
-}
-@media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: dark) {
-  :root { --bar-float: #1e1e20; --surface: #1d1d1f; --surface-hi: #1d1d1f; --tile: #1c1c1e; --fill: #2c2c2e; --fill-2: #3a3a3c; --field: #161617; }
+  :root[data-theme="dark"] { --bar-float: #1e1e20; --surface: #1d1d1f; --surface-hi: #1d1d1f; --tile: #1c1c1e; --fill: #2c2c2e; --fill-2: #3a3a3c; --field: #161617; }
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :root { --bar-float: #fafafc; --surface: rgba(255, 255, 255, 0.9); --surface-hi: rgba(255, 255, 255, 0.9); }
-  @media (prefers-color-scheme: dark) { :root { --bar-float: #1e1e20; --surface: rgba(29, 29, 31, 0.92); --surface-hi: rgba(29, 29, 31, 0.92); } }
+  :root[data-theme="dark"] { --bar-float: #1e1e20; --surface: rgba(29, 29, 31, 0.92); --surface-hi: rgba(29, 29, 31, 0.92); }
 }
 
 /* ------------------------------------------------------------ the page and the browser's own surfaces */
@@ -251,8 +250,8 @@ p:last-child { margin-bottom: 0; }
 :is(h1, h2, h3) .pn { text-decoration: underline 0.07em color-mix(in srgb, var(--pn) 60%, transparent); text-underline-offset: 0.2em; text-decoration-skip-ink: none; }
 .pn.toran { --pn: var(--toran-name); }
 .pn.teder { --pn: var(--teder-name); }
-/* on Teder's violet the line is white */
-.teder-field .pn, .teder-door .pn { --pn: #fff; }
+/* on Teder's violet and Toran's green door the line is white */
+.teder-field .pn, .teder-door .pn, .toran-door .pn { --pn: #fff; }
 .mark.inline { display: inline-block; vertical-align: -0.18em; margin-inline-end: 0.3em; --s: 1.05em; }
 
 /* ------------------------------------------------------------ buttons and fields */
@@ -325,7 +324,21 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .brand b { font: 700 16px/1 var(--wordmark); letter-spacing: -0.04em; }
 .bar .brand .mark { transition: transform 0.4s var(--ease-out); }
 @media (hover: hover) { .bar .brand:hover .mark { transform: rotate(-8deg) scale(1.06); } }
-.bar .cta { margin-inline-start: auto; padding: 0 16px; flex: none; }
+.bar-end { display: flex; align-items: center; gap: 10px; flex: none; margin-inline-start: auto; }
+.bar .cta { padding: 0 16px; flex: none; }
+/* On a phone the bar keeps the brand, the theme and the menu: the tools are the menu's last button. Below 900px the
+   menu follows the theme, 8px from it. */
+@media (max-width: 699px) { .bar .cta { display: none; } }
+@media (max-width: 899px) { .bar-end { margin-inline-end: 4px; } }
+/* Light or dark, one tap: a moon in light, a sun in dark (site.js keeps the choice). It needs script, so it shows
+   only once the head has marked the page .js. */
+.theme { display: none; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--ink); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color 0.2s ease, transform 0.16s var(--ease-out); }
+.js .theme { display: grid; }
+.theme:active { transform: scale(0.94); }
+.theme svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.theme .sun, [data-theme="dark"] .theme .moon { display: none; }
+[data-theme="dark"] .theme .sun { display: block; }
+@media (hover: hover) { .theme:hover { background: var(--fill); } }
 .nav { display: none; }
 .menu { flex: none; }
 .menu summary { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; list-style: none; cursor: pointer; color: var(--ink); }
@@ -357,11 +370,12 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .menu nav > .btn { width: 100%; }
 .menu a[aria-current='page'] { box-shadow: inset 0 0 0 2px var(--accent-fill); }
 @media (hover: hover) { .menu summary:hover { background: var(--fill); } .menu .prod:hover, .sheet-links a:hover { background: var(--fill-2); } }
-@media (max-width: 389px) { .bar .cta { padding: 0 11px; font-size: 13px; } .brand { gap: 6px; } .brand b { font-size: 15px; } }
+@media (max-width: 389px) { .brand { gap: 6px; } .brand b { font-size: 15px; } }
 @media (max-width: 359px) { .brand b { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
 @media (min-width: 900px) {
   .bar { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; height: 64px; padding-inline: 14px 10px; }
-  .bar .cta { justify-self: end; min-height: 44px; padding: 0 20px; }
+  .bar-end { justify-self: end; }
+  .bar .cta { min-height: 44px; padding: 0 20px; }
   .nav { display: flex; align-items: center; gap: 2px; }
   .nav a { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px; color: var(--ink-2); font-size: 15px; font-weight: 500; text-decoration: none; transition: background-color 0.2s ease, color 0.2s ease; }
   .nav a .mark { border-radius: 7px; transition: transform 0.3s var(--ease-out); }
@@ -628,21 +642,22 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .hero :is(h1, .lede) .hl { --hl: var(--toran); }
 .teder-hero :is(h1, .lede) .hl { --hl: var(--teder); }
 .teder-field h1 .hl { --hl: #fff; }
-@media (prefers-color-scheme: dark) {
-  .co-hero h1 .hl { background: linear-gradient(transparent 58%, rgb(110 135 255 / 0.42) 58%, rgb(110 135 255 / 0.42) 92%, transparent 92%); }
-  .hero :is(h1, .lede) .hl { background: linear-gradient(transparent 58%, rgb(60 200 140 / 0.36) 58%, rgb(60 200 140 / 0.36) 92%, transparent 92%); }
-  .teder-hero :is(h1, .lede) .hl { background: linear-gradient(transparent 58%, rgb(170 140 255 / 0.4) 58%, rgb(170 140 255 / 0.4) 92%, transparent 92%); }
-}
+[data-theme="dark"] .co-hero h1 .hl { background: linear-gradient(transparent 58%, rgb(110 135 255 / 0.42) 58%, rgb(110 135 255 / 0.42) 92%, transparent 92%); }
+[data-theme="dark"] .hero :is(h1, .lede) .hl { background: linear-gradient(transparent 58%, rgb(60 200 140 / 0.36) 58%, rgb(60 200 140 / 0.36) 92%, transparent 92%); }
+[data-theme="dark"] .teder-hero :is(h1, .lede) .hl { background: linear-gradient(transparent 58%, rgb(170 140 255 / 0.4) 58%, rgb(170 140 255 / 0.4) 92%, transparent 92%); }
 .co-hero .lede { margin-top: 18px; max-width: 40ch; }
-/* On a phone the line under the headline is left out: the doors right below say the same, each in one short line,
-   and the first screen shows them instead. From 700px (doors open) it stays. */
-@media (max-width: 699px) { .co-hero .lede { display: none; } }
+/* While Toran is soon, its one line under Teder's, with the badge. */
+.co-soon { margin: 14px 0 0; max-width: 56ch; color: var(--ink-2); }
+.co-soon .soon { margin-inline-end: 6px; font-size: 12px; vertical-align: 1px; }
+/* On a phone the lines under the headline are left out: the doors right below say the same, each in one short line
+   (Toran's with its badge), and the first screen shows them instead. From 700px (doors open) they stay. */
+@media (max-width: 699px) { .co-hero .lede, .co-soon { display: none; } }
 /* The mark's dots alone, large, faint and turned 30 degrees behind the headline, pushed toward the left edge. The doors' glass blurs them. */
 .co-bg { position: absolute; z-index: -1; top: -190px; left: clamp(-300px, calc(50% - 820px), -100px); color: var(--of); opacity: 0.2; pointer-events: none; }
 .co-bg svg { display: block; width: clamp(620px, 62vw, 940px); height: auto; transform: rotate(30deg); }
 @media (max-width: 899px) { .co-bg { top: -20px; left: -260px; opacity: 0.16; } .co-bg svg { width: 680px; } }
-@media (prefers-color-scheme: dark) { .co-bg { color: #8ea2ff; opacity: 0.22; } }
-@media (prefers-color-scheme: dark) and (max-width: 899px) { .co-bg { opacity: 0.16; } }
+[data-theme="dark"] .co-bg { color: #8ea2ff; opacity: 0.22; }
+@media (max-width: 899px) { [data-theme="dark"] .co-bg { opacity: 0.16; } }
 /* Businesses that work with us: a strip under the doors that moves on its own (clients.mjs). Two identical lists move
    by one list's width, so the loop has no seam; it stops under the pointer or on focus, and stands still for anyone
    who asked for less motion, as a row they can scroll. */
@@ -697,20 +712,28 @@ label.f[hidden], .demo .when[hidden] { display: none; }
   .door-open svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s var(--ease-out); }
   .door-open[aria-expanded="true"] svg { transform: rotate(180deg); }
   .door-open:focus-visible { outline: 3px solid var(--accent-fill); outline-offset: 2px; }
-  .teder-door .door-open { background: rgba(255, 255, 255, 0.18); color: #fff; }
-  .teder-door .door-open:focus-visible { outline-color: #fff; }
+  :is(.teder-door, .toran-door) .door-open { background: rgba(255, 255, 255, 0.18); color: #fff; }
+  :is(.teder-door, .toran-door) .door-open:focus-visible { outline-color: #fff; }
   .door.shut { padding-bottom: var(--pad); }
   .door.shut .door-in, .door.shut .door-say { display: none; }
   .door.shut .door-sum { display: block; }
 }
+/* Each door in its product's own colour, Teder's violet and Toran's green, with the glyph in white on it. */
 .teder-door { background: var(--teder); color: #fff; }
-.teder-door h2, .teder-door p { color: #fff; }
+.toran-door { background: var(--toran); color: #fff; }
+:is(.teder-door, .toran-door) :is(h2, p) { color: #fff; }
 .wave { display: block; flex: none; color: #fff; }
-.teder-door .door-top .wave { width: 48px; }
+.door-top .wave { width: 48px; }
 .wave svg { display: block; width: 100%; height: auto; }
 .btn.light { background: #fff; color: var(--teder-ink); }
 .btn.on-color { background: rgba(255, 255, 255, 0.16); color: #fff; }
 @media (hover: hover) { .btn.light:hover { background: var(--teder-hover); } .btn.on-color:hover { background: rgba(255, 255, 255, 0.26); } }
+/* On the green, the white button's ink is Toran's, and a second button is darker than the green rather than lighter,
+   so its white words keep 4.5:1. */
+.toran-door .btn.light { color: var(--toran-ink); }
+.toran-door .btn.on-color { background: rgba(0, 0, 0, 0.18); }
+.toran-door :is(.start-price, .start-alt) { color: #fff; }
+@media (hover: hover) { .toran-door .btn.light:hover { background: var(--toran-hover); } .toran-door .btn.on-color:hover { background: rgba(0, 0, 0, 0.26); } }
 
 /* A phone, cut by the door's bottom edge: a dark frame, the island, and the screen inside. */
 .phone-sit { position: relative; width: min(100%, 330px); height: clamp(360px, 34vw, 420px); margin: auto auto 0; padding-top: 8px; }
@@ -740,8 +763,8 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .bars i.run::after { animation: bar 3.2s linear forwards; }
 @keyframes bar { to { transform: none; } }
 .reel-sit .pop { top: auto; bottom: 26px; inset-inline-start: auto; inset-inline-end: clamp(-70px, -5vw, -12px); width: min(232px, 100%); }
-.teder-door .pop, .teder-door .pop b { color: var(--ink); }
-.teder-door .pop small { color: var(--ink-3); }
+:is(.teder-door, .toran-door) :is(.pop, .pop b) { color: var(--ink); }
+:is(.teder-door, .toran-door) .pop small { color: var(--ink-3); }
 .reel-sit .fan { position: absolute; inset: 0; }
 /* On a phone the slides' words sit where the card would cover them, so the card waits above the phone instead, and the
    phone keeps its full height under it. */
@@ -767,33 +790,6 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .ui-s.alone { background: color-mix(in srgb, var(--toran) 18%, transparent); color: var(--ink); }
 .ui-s.yours { background: color-mix(in srgb, var(--accent-fill) 18%, transparent); color: var(--ink); }
 .ui-s.fixed { background: var(--warn-bg); color: var(--warn); }
-
-/* ------------------------------------------------------------ ask it: a chat window that answers */
-
-.ask-sec .wrap { display: grid; gap: 28px; }
-.try-text h2 { margin-bottom: 16px; }
-.try-text p + p { margin-top: 14px; }
-.chat.try { max-width: none; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--line); }
-.try .msgs { height: clamp(300px, 34vw, 380px); overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth; }
-.try .msg { max-width: 84%; }
-.msgs .sys { align-self: center; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 8px; max-width: 92%; margin-block: 2px 6px; padding: 6px 12px; border-radius: 12px; background: var(--sheet); color: var(--ink-2); font-size: 13px; line-height: 1.4; text-align: center; box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.1); }
-.ask-ex { display: flex; gap: 8px; overflow-x: auto; padding: 10px 12px; background: var(--sheet); border-top: 1px solid var(--line); scrollbar-width: none; }
-.ask-ex button { flex: none; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--bubble-them); color: var(--ink); font: 500 14px/1 var(--text); cursor: pointer; transition: background-color 0.2s ease, transform 0.16s var(--ease-out); }
-.ask-ex button:active { transform: scale(0.97); }
-@media (hover: hover) { .ask-ex button:hover { background: var(--fill-2); } }
-.ask-bar { display: flex; gap: 8px; align-items: center; padding: 0 12px 12px; background: var(--sheet); }
-.ask-bar input { flex: 1; min-width: 0; min-height: 46px; padding: 0 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--bubble-them); }
-.ask-bar .send { display: grid; place-items: center; flex: none; width: 46px; height: 46px; border: 0; border-radius: 50%; background: var(--toran); color: #fff; cursor: pointer; transition: transform 0.16s var(--ease-out), filter 0.2s ease; }
-.ask-bar .send:active { transform: scale(0.94); }
-@media (hover: hover) { .ask-bar .send:hover { filter: brightness(1.1); } }
-.ask-bar .send svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.ask-note { max-width: 62ch; color: var(--ink-p); font-size: var(--fs-small); }
-.answer-in { animation: answer-in 0.42s var(--ease-out); }
-@keyframes answer-in { from { opacity: 0; transform: translateY(10px) scale(0.98); } }
-@media (min-width: 900px) {
-  .ask-sec .wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 64px; align-items: center; }
-}
-
 
 /* ------------------------------------------------------------ Teder's page: its own field of colour */
 
@@ -832,7 +828,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .cover-topic { margin: 0; padding-inline: 2px; color: var(--ink); font-size: 15px; line-height: 1.4; }
 .cover-from { margin: -4px 0 0; padding-inline: 2px; color: var(--ink-3); font-size: 12px; line-height: 1.6; }
 .cover-from a { color: inherit; }
-@media (prefers-color-scheme: dark) { .cover-subject::before { background: #a487ff; } }
+[data-theme="dark"] .cover-subject::before { background: #a487ff; }
 @media (max-width: 559px) {
   .cover { padding: 8px 8px 10px; gap: 8px; }
   .cover-subject { font-size: 15px; }
@@ -860,7 +856,8 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .checks li { position: relative; padding-inline-start: 34px; line-height: 1.5; }
 .checks li::before { content: ''; position: absolute; inset-inline-start: 0; top: 0.05em; width: 24px; height: 24px; border-radius: 50%; background: color-mix(in srgb, var(--pc) 16%, transparent); }
 .checks li::after { content: ''; position: absolute; inset-inline-start: 9px; top: calc(0.05em + 5px); width: 5px; height: 10px; border-right: 2.4px solid var(--pc); border-bottom: 2.4px solid var(--pc); transform: rotate(45deg); }
-@media (prefers-color-scheme: dark) { .price-sec.teder { --pc: #a487ff; } .price-sec.toran { --pc: #3fcf95; } }
+[data-theme="dark"] .price-sec.teder { --pc: #a487ff; }
+[data-theme="dark"] .price-sec.toran { --pc: #3fcf95; }
 @media (min-width: 800px) {
   .price-card { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 48px; align-items: start; }
   .price-incl { padding-inline-start: 40px; border-inline-start: 1px solid var(--line); }
@@ -902,7 +899,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
    along the bottom edge, cut by it. */
 .foot { padding: clamp(40px, 6vw, 80px) var(--gut) var(--gut); }
 .foot-in { position: relative; overflow: hidden; container-type: inline-size; max-width: var(--max); margin-inline: auto; padding: clamp(28px, 4vw, 48px) clamp(22px, 4vw, 48px) 0; border-radius: calc(var(--r) + 6px); background: var(--night); color: var(--night-ink-2); }
-@media (prefers-color-scheme: dark) { .foot-in { background: #1a1a1c; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); } }
+[data-theme="dark"] .foot-in { background: #1a1a1c; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
 .foot-cols { display: grid; gap: 32px; }
 .foot h2 { margin-bottom: 14px; color: var(--night-ink-2); font: 600 13px/1.2 var(--text); letter-spacing: 0.02em; }
 .foot ul { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
@@ -1036,9 +1033,7 @@ html.a-big body { zoom: 1.2; }
 html.a-links a { text-decoration: underline !important; text-decoration-thickness: 2px !important; text-underline-offset: 3px; }
 html.a-still *, html.a-still *::before, html.a-still *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 html.a-contrast { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: #8e8e93; --line-2: #424245; --bar-float: #ffffff; --bar-edge: #424245; --surface: #ffffff; --surface-hi: #ffffff; --edge: #424245; --tile: #ffffff; }
-@media (prefers-color-scheme: dark) {
-  html.a-contrast { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p: #f5f5f7; --line: #8e8e93; --line-2: #d2d2d7; --bar-float: #000000; --bar-edge: #d2d2d7; --surface: #000000; --surface-hi: #000000; --edge: #d2d2d7; --tile: #000000; }
-}
+html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p: #f5f5f7; --line: #8e8e93; --line-2: #d2d2d7; --bar-float: #000000; --bar-edge: #d2d2d7; --surface: #000000; --surface-hi: #000000; --edge: #d2d2d7; --tile: #000000; }
 
 /* The legal pages: one column of reading, the sections listed at the top. */
 .legal h1 { font-size: var(--fs-display); }
@@ -1192,7 +1187,7 @@ html.a-contrast { --ink-2: #1d1d1f; --ink-3: #424245; --ink-p: #1d1d1f; --line: 
    bar runs along the top and the page becomes the outline of a page, until the next one paints. On a quick
    connection none of it shows. With reduced motion (or the still switch) both stay, still. */
 :root { --sk-hi: rgba(255, 255, 255, 0.6); }
-@media (prefers-color-scheme: dark) { :root { --sk-hi: rgba(255, 255, 255, 0.07); } }
+:root[data-theme="dark"] { --sk-hi: rgba(255, 255, 255, 0.07); }
 .loadbar { position: fixed; inset-inline: 0; top: 0; height: 3px; z-index: 90; pointer-events: none; opacity: 0; transition: opacity 0.15s ease-out; }
 .loadbar::before { content: ''; position: absolute; inset: 0; background: var(--accent-fill); transform: scaleX(0); transform-origin: right; }
 html.is-loading .loadbar { opacity: 1; }
