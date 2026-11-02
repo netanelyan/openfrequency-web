@@ -102,7 +102,7 @@ test('every page: light in its markup, the button in the header, the cookie read
   // The privacy page names the cookie, where it reaches and for how long, under its own date (legal.privacyUpdated).
   const privacy = html['/privacy/'].replace(/<[^>]+>/g, '');
   assert.doesNotMatch(privacy, /האתר הזה לא שם עוגיות|באתר הזה אין עוגיות/);
-  assert.ok(privacy.includes('האתר הזה שם עוגייה אחת, ורק אם לחצתם על כפתור המצב הכהה בראש העמוד. היא זוכרת אם בחרתם מצב כהה או בהיר.'));
+  assert.ok(privacy.includes('האתר הזה שם עוגייה אחת, ורק אם החלפתם בין מצב בהיר לכהה, כאן, בתדר, בתורן או בחשבון שלכם. היא זוכרת מה בחרתם.'));
   assert.ok(privacy.includes('מצב כהה או בהיר, of-theme: זוכרת אם בחרתם מצב כהה או בהיר, עד שנה. היא נשמרת לכל הכתובות של openfrequency.co.il'));
   assert.match(privacy, /עודכן לאחרונה ב-2 בנובמבר 2026/);
   const js = fs.readFileSync(path.join(ROOT, 'src/site.js'), 'utf8');
