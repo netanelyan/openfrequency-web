@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { AxeBuilder } from '@axe-core/playwright';
 import { THEME_KEY } from '../src/layout.mjs';
+import { listenFree } from './ports.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'of-a11y-'));
@@ -67,7 +68,7 @@ before(async () => {
     if (rel.endsWith('.html') && !SKIP.has(rel)) pages.push('/' + rel.replace(/(^|\/)index\.html$/, '$1'));
   }
   server = serve(out);
-  await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
+  await listenFree(server);
   origin = `http://127.0.0.1:${server.address().port}`;
   browser = await launch();
 });

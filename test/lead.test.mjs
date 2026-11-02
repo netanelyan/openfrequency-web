@@ -11,10 +11,13 @@ import { spawn } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
 import { storeHost, mobile, email, validate, newCode, toranWaLink, tederWaLink, waAddress, open, purge, KEEP_MONTHS } from '../server/lead.mjs';
 import { spawnSync } from 'node:child_process';
+import { basePort, listenFree } from './ports.mjs';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'of-leads-'));
 const DB = path.join(dir, 'leads.db');
-const PORT = 4790 + Math.floor(Math.random() * 100);
+// The lead servers' ports: a base and the base plus 100 up to plus 700, none of them a port fetch refuses (5060 and
+// 5061 fall in this range; test/ports.mjs).
+const PORT = basePort(4790, 100, [0, 100, 200, 300, 400, 500, 600, 700]);
 const base = `http://127.0.0.1:${PORT}`;
 
 let twilio; // the fake: records each WhatsApp message it is asked to send, and can be told to fail
@@ -58,7 +61,7 @@ before(async () => {
       res.end('{"sid":"SM1","status":"queued"}');
     });
   });
-  await new Promise((ok) => twilio.listen(0, '127.0.0.1', ok));
+  await listenFree(twilio);
   toran = http.createServer((req, res) => {
     let b = '';
     req.on('data', (c) => (b += c));
@@ -71,7 +74,7 @@ before(async () => {
       res.end(bad ? '{"ok":false,"error":"bad"}' : '{"ok":true}');
     });
   });
-  await new Promise((ok) => toran.listen(0, '127.0.0.1', ok));
+  await listenFree(toran);
   proc = await start(PORT, DB);
 });
 
@@ -565,7 +568,7 @@ test('with Resend set and no Twilio, each lead is emailed to the owner and marke
       res.end('{"id":"e1"}');
     });
   });
-  await new Promise((ok) => resend.listen(0, '127.0.0.1', ok));
+  await listenFree(resend);
   const port = PORT + 200;
   const db = path.join(dir, 'mail.db');
   const p = await start(port, db, {

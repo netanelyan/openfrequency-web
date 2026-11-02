@@ -17,6 +17,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { SUPPORT_TEXT, THEME_KEY } from '../src/layout.mjs';
+import { listenFree } from './ports.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'of-spacing-'));
@@ -67,7 +68,7 @@ before(async () => {
     html[p] = fs.readFileSync(path.join(out, f), 'utf8');
   }
   server = serve(path.resolve(out));
-  await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
+  await listenFree(server);
   origin = `http://127.0.0.1:${server.address().port}`;
   browser = await launch();
 });

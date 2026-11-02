@@ -20,6 +20,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { THEME_COLOR, THEME_KEY, ofThemeCookie, ofThemeRead } from '../src/layout.mjs';
+import { listenFree } from './ports.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = fs.mkdtempSync(path.join(os.tmpdir(), 'of-theme-'));
@@ -53,7 +54,7 @@ before(async () => {
     res.writeHead(file ? 200 : 404, { 'Content-Type': TYPES[path.extname(send)] || 'application/octet-stream' });
     res.end(fs.readFileSync(send));
   });
-  await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
+  await listenFree(server);
   origin = `http://127.0.0.1:${server.address().port}`;
   browser = await launch();
   assert.ok(browser, 'no browser for the theme check (install one: npx playwright-core install chromium)');
