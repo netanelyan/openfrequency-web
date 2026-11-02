@@ -62,6 +62,11 @@ switch for whether the site sends people there is `signup` in `site.config.json`
   (`TERMS_VERSION` in openfrequency-accounts `src/accounts/signup.js`), so the two change together. With Toran live,
   `/join` keeps its form first and adds Teder's sign-up after it.
 
+This is one of three switches for one thing: accounts' `OF_SIGNUP` and `OF_SIGNUP_PRODUCTS` say whether `/signup` takes
+people, and Teder's `OF_SIGNUP_OPEN` whether a store's demo page sends them there. Change them together (openfrequency-teder,
+`docs/operator-notes.md`, "One sign-up switch in three places"): `/support.json` says what this one is (its `signup`), and
+Teder checks the three against each other each time it starts.
+
 `test/signup.test.mjs` builds both ways and checks them.
 
 **Teder's two plans.** Teder is sold as a small plan and a full one, the same product with a different number of
@@ -139,7 +144,9 @@ The real build publishes the export beside the pages as `dist/support.json`, so 
 `deploy/deploy.sh` checks it answers 200 after the upload). Toran reads it there once
 a day and soon after it starts, and syncs it only when its content changed (openfrequency-toran, `docs/company.md`,
 `TORAN_SUPPORT_EXPORT_URL`); a draft has none, and a draft's `robots.txt` keeps Toran out too. It holds nothing the
-pages don't already say: their text, our WhatsApp number and email as the footer shows them, and the status.
+pages don't already say: their text, our WhatsApp number and email as the footer shows them, and the status. Its
+`signup` says, for each product, whether the site sends people to accounts' sign-up: `{ "teder": "open", "toran":
+"closed" }` today (Teder while `signup` is `"open"`, Toran only then and once it is live), which Teder reads at start.
 `npm run support -- <file.json>` writes the same object as a file, for `npm run company -- sync <file>` by hand.
 `test/support.test.mjs` builds the site and checks the published file against the export and against the checks
 Toran's sync makes.

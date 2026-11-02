@@ -20,6 +20,11 @@
 // While Toran is soon (products.toran in site.config.json), the export follows the site: Toran is not for sale, so
 // there are no Toran plans or Toran price section, the status says it opens soon and Teder is available, and the
 // questions are /faq's own soon answers (support.json's answers describe a Toran that is running, so they wait).
+//
+// It also says, for each product, whether the site sends people to accounts' sign-up ("signup": "open" or "closed"):
+// Teder while site.config.json's "signup" is "open", Toran only then and once it is no longer soon. Sign-up is one
+// switch in three places (this, accounts' OF_SIGNUP and OF_SIGNUP_PRODUCTS, Teder's OF_SIGNUP_OPEN), and Teder reads
+// this field once at start to check that the three agree (openfrequency-teder, docs/operator-notes.md).
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SIGNUP_URL, ils, signupOpen, toranSoon } from './lib.mjs';
@@ -118,6 +123,8 @@ export function supportExport(cfg) {
     // this in its prompt, above every other passage, since the site's own pages describe the product at launch.
     status: pages[0].text,
     ...(soon ? { products: { toran: 'soon', teder: 'live' } } : {}),
+    // Where each product's ways in on the site lead: accounts' sign-up ("open"), or not ("closed").
+    signup: { teder: signupOpen(cfg) ? 'open' : 'closed', toran: signupOpen(cfg) && !soon ? 'open' : 'closed' },
     domain: cfg.get('domain'),
     url: `${origin}/`,
     name: 'OpenFrequency',

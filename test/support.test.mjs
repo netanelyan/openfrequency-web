@@ -35,6 +35,7 @@ const built = {};
 before(() => {
   built.committed = build('committed', {});
   built.live = build('live', { signup: 'closed', products: { toran: 'live' }, teder: { demoBy: 'form' } });
+  built.open = build('open', { signup: 'open', products: { toran: 'live' } });
   built.draft = build('draft', {}, true);
 });
 after(() => fs.rmSync(dir, { recursive: true, force: true }));
@@ -78,12 +79,28 @@ test('the real build publishes support.json: the export of `npm run support`, ap
 test('support.json holds only what the site already says: its pages, our number and email as the pages show them, and the status', () => {
   for (const b of [built.committed, built.live]) {
     const d = JSON.parse(b.published);
-    assert.deepEqual(Object.keys(d).filter((k) => k !== 'products'), ['status', 'domain', 'url', 'name', 'contact', 'tone', 'plans', 'faq', 'pages', 'generatedAt']);
+    assert.deepEqual(Object.keys(d).filter((k) => k !== 'products'), ['status', 'signup', 'domain', 'url', 'name', 'contact', 'tone', 'plans', 'faq', 'pages', 'generatedAt']);
     assert.deepEqual(Object.keys(d.contact), ['whatsapp', 'email']);
     assert.ok(b.html.includes(`wa.me/${d.contact.whatsapp}`), 'our WhatsApp number is on the pages');
     assert.ok(b.html.includes(d.contact.email), 'our email is on the pages');
     for (const p of d.pages) assert.ok(p.url.startsWith(`https://${config.domain}`), `${p.title}: a page of the site (${p.url})`);
     for (const f of d.faq) assert.equal(f.url, `https://${config.domain}/faq`);
+  }
+});
+
+// Teder reads this once at start to check its own sign-up switch (OF_SIGNUP_OPEN) against the site's and accounts'
+// (openfrequency-teder, docs/operator-notes.md): "open" exactly when the site's ways in to that product go to sign-up.
+test('support.json says for each product whether the site sends people to sign-up: Teder with "signup" open, Toran only once it is live too', () => {
+  const signup = (b) => JSON.parse(b.published).signup;
+  assert.deepEqual(signup(built.committed), { teder: config.signup === 'open' ? 'open' : 'closed', toran: config.signup === 'open' && config.products.toran !== 'soon' ? 'open' : 'closed' });
+  assert.deepEqual(signup(built.live), { teder: 'closed', toran: 'closed' });
+  assert.deepEqual(signup(built.open), { teder: 'open', toran: 'open' });
+  // "open" is where the pages' own buttons lead, and "closed" where none of them does.
+  for (const b of [built.committed, built.live, built.open]) {
+    const s = signup(b);
+    for (const p of ['teder', 'toran']) {
+      assert.equal(b.html.includes(`accounts.openfrequency.co.il/signup?p=${p}`), s[p] === 'open', `${p}: ${s[p]}, and the pages ${s[p] === 'open' ? 'do not link' : 'link'} its sign-up`);
+    }
   }
 });
 
