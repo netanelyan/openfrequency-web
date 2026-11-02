@@ -26,12 +26,28 @@ const TOOLS = 'https://accounts.openfrequency.co.il/';
 
 const menuIcon = `<svg class="i open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg><svg class="i close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 
-// Light or dark (the owner, 2026-11-01: "make light mode the default, and an easy option to switch to dark mode"). The
-// page is light whatever the device prefers; this button, in the header of every page, turns dark on and off, and
-// site.js keeps the choice in this browser (THEME_KEY), which the head puts back before the page paints. A moon while
-// light, a sun while dark; one name, pressed while dark.
+// Light or dark (the owner, 2026-11-01: "make light mode the default, and an easy option to switch to dark mode";
+// 2026-11-02: "make sure that every repo starts on light mode. changing it on one subdomain changes it on all of the
+// subdomains"). The page is light whatever the device prefers; this button, in the header of every page, turns dark on
+// and off, and the choice is the cookie THEME_KEY, which teder., accounts. and Toran's pages read and write too: set
+// for all of openfrequency.co.il, a choice made on one follows the visitor to the others. The head puts it on <html>
+// (data-theme) before the page paints. A moon while light, a sun while dark; one name, pressed while dark.
 export const THEME_KEY = 'of-theme';
 export const THEME_COLOR = { light: '#eeeff2', dark: '#111113' };
+// The cookie that keeps a choice, the same in the four repos: "dark" or "light", for a year, on every path, Lax; for
+// the whole domain on openfrequency.co.il and its subdomains, for this host alone anywhere else (a test server, a
+// preview), and Secure over https. Both functions go into the head as they are written (their source), so the head and
+// site.js use the very functions the tests run: old-style JavaScript, a semicolon at the end of every line.
+export function ofThemeCookie(value, loc) {
+  var host = loc.hostname, ours = host === 'openfrequency.co.il' || /\.openfrequency\.co\.il$/.test(host);
+  return 'of-theme=' + (value === 'dark' ? 'dark' : 'light') + (ours ? '; Domain=.openfrequency.co.il' : '') + '; Path=/; Max-Age=31536000; SameSite=Lax' + (loc.protocol === 'https:' ? '; Secure' : '');
+}
+// What the cookie says: null with no cookie, "dark" for dark, and "light" for anything else.
+export function ofThemeRead(cookie) {
+  var m = /(?:^|;\s*)of-theme=([^;]*)/.exec(cookie || '');
+  return m ? (m[1] === 'dark' ? 'dark' : 'light') : null;
+}
+const inline = (fn) => String(fn).replace(/\s*\n\s*/g, '');
 const themeButton = `<button class="theme" type="button" data-theme-toggle aria-pressed="false" aria-label="מצב כהה"><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg></button>`;
 
 function header(cfg, current) {
@@ -90,9 +106,11 @@ ${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a
 // In the head, before anything paints: the page is told script runs, so the parts that rise in wait for it. If
 // site.js never arrives, the flag comes off after three seconds and everything simply shows.
 // The accessibility switches this browser saved (the panel, in site.js) go on here too, so the page never paints
-// without them, and so does dark, when it is what this browser chose (the header's button): the page is light
-// otherwise, and the browser's own bar with it (theme-color).
-const early = `<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.ofSite)document.documentElement.classList.remove('js')},3000);try{var a=JSON.parse(localStorage.getItem('of-a11y'))||{};['big','contrast','links','still'].forEach(function(k){if(a[k]===true)document.documentElement.classList.add('a-'+k)})}catch(e){}try{if(localStorage.getItem('${THEME_KEY}')==='dark'){document.documentElement.setAttribute('data-theme','dark');document.querySelector('meta[name=theme-color]').setAttribute('content','${THEME_COLOR.dark}')}}catch(e){}</script>`;
+// without them, and so does the theme: dark when the cookie says so (the header's button, here or on any of our
+// subdomains), light otherwise, and the browser's own bar and colour scheme with it (the two metas). Until 2026-11-02
+// the choice was kept in localStorage under the same name: with no cookie yet, a choice kept there becomes the cookie,
+// once, and the old key goes either way.
+const early = `<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.ofSite)document.documentElement.classList.remove('js')},3000);try{var a=JSON.parse(localStorage.getItem('of-a11y'))||{};['big','contrast','links','still'].forEach(function(k){if(a[k]===true)document.documentElement.classList.add('a-'+k)})}catch(e){}${inline(ofThemeCookie)}${inline(ofThemeRead)}(function(){var t=null;try{t=ofThemeRead(document.cookie)}catch(e){}if(t===null){try{var s=localStorage.getItem('${THEME_KEY}');if(s==='dark'||s==='light'){t=s;document.cookie=ofThemeCookie(s,location)}}catch(e){}}try{localStorage.removeItem('${THEME_KEY}')}catch(e){}t=t==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t);if(t==='dark'){document.querySelector('meta[name=theme-color]').setAttribute('content','${THEME_COLOR.dark}');document.querySelector('meta[name=color-scheme]').setAttribute('content','dark')}})()</script>`;
 
 // The accessibility panel: four switches and the way to the statement. It waits for site.js, which shows it; without
 // script the page is the same page, and the statement is in the footer.
@@ -143,7 +161,7 @@ export function page(cfg, css, { path, title, description, body, noindex = false
     ? `<p class="draft" role="note">טיוטה. חסרים עוד ${cfg.missing.size} פרטים ב-site.config.json, והאתר לא ייבנה בלעדיהם.</p>`
     : '';
   return `<!doctype html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

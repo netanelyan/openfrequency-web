@@ -155,14 +155,15 @@ test('with "whatsapp", the privacy page says Teder learns the number from the me
     assert.match(html, /שיחות במספר הדמו, על תורן ועל תדר: 6 חודשים מההודעה האחרונה\./);
     assert.match(html, /עודכן לאחרונה ב-15 בנובמבר 2026/);
   }
-  // With "form", the page as it was, under the legal pages' own date.
+  // With "form", the page as it was, under its own date (legal.privacyUpdated, the theme cookie, later than the legal
+  // pages' 30 October).
   for (const pages of [built.form, built.formLive]) {
     const html = said(pages['privacy/index.html']);
     assert.match(html, /\. בדמו של תורן, את מספר הנייד אנחנו מקבלים מההודעה/);
     assert.match(html, /Meta: הודעות הוואטסאפ כשמספר החנות מחובר, והפרסום והנתונים ב-Instagram\./);
     assert.match(html, /שיחות במספר הדמו של תורן: 6 חודשים/);
     assert.doesNotMatch(html, /תדר, את מספר הנייד|15 בנובמבר/);
-    assert.match(html, /עודכן לאחרונה ב-30 באוקטובר 2026/);
+    assert.match(html, /עודכן לאחרונה ב-2 בנובמבר 2026/);
   }
   // The other legal pages keep their date either way.
   for (const file of ['terms/index.html', 'security/index.html', 'accessibility/index.html']) assert.equal(built.wa[file], built.form[file], file);

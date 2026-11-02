@@ -71,6 +71,9 @@ export const FACTS = {
   // The date of the products' short contracts (/teder/contract, /toran/contract, legal.mjs), which sign-up asks to accept.
   'legal.contractsUpdated': { label: 'תאריך ההסכמים הקצרים של תדר ותורן, YYYY-MM-DD', kind: 'text' },
   'legal.privacyWaUpdated': { label: 'תאריך מדיניות הפרטיות כשהמצגת לדוגמה של תדר מבקשים בקוד בוואטסאפ, YYYY-MM-DD', kind: 'text', unless: (raw) => raw.teder?.demoBy !== 'whatsapp' },
+  // The privacy page's own date (2026-11-02: the site sets its first cookie, of-theme, the light or dark choice shared
+  // with teder., accounts. and toran.); the page shows the later of it and the date its state brings (legal.mjs).
+  'legal.privacyUpdated': { label: 'תאריך מדיניות הפרטיות, YYYY-MM-DD', kind: 'text' },
   // The accessibility statement's own date: what it says about the site changes with the site, apart from the terms and
   // the other legal pages (2026-11-01: the page is light, and dark is the header's button, no longer the device's).
   'legal.accessibilityUpdated': { label: 'תאריך העדכון של הצהרת הנגישות, YYYY-MM-DD', kind: 'text' },

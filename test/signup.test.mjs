@@ -211,9 +211,9 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
   // The deal names Teder's short contract, the one sign-up asks to accept, only while sign-up is open.
   assert.match(section(terms, 't-deal'), /href="\/teder\/contract"/);
   assert.doesNotMatch(section(closed, 't-deal'), /\/contract/);
-  // The other legal pages keep their own date (the privacy page's is legal.privacyWaUpdated while Teder's sample is
-  // asked for on WhatsApp).
-  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-31 באוקטובר 2026/);
+  // The other legal pages keep their own date (the privacy page's is the later of legal.privacyWaUpdated, while Teder's
+  // sample is asked for on WhatsApp, and legal.privacyUpdated, the theme cookie).
+  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-2 בנובמבר 2026/);
 });
 
 test('the terms promise only the take-downs we can do: published posts stay on the customer\'s accounts, TikTok is theirs to delete', () => {

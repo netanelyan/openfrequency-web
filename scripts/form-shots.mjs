@@ -37,8 +37,8 @@ const browser = await chromium.launch({ channel: 'chrome' });
 
 async function at(width, scheme, js = true) {
   const ctx = await browser.newContext({ viewport: { width, height: 900 }, deviceScaleFactor: width < 600 ? 2 : 1, colorScheme: scheme, javaScriptEnabled: js });
-  // The site is light whatever the device prefers; dark is the visitor's choice, saved as the header's button saves it.
-  if (scheme === 'dark') await ctx.addInitScript(() => localStorage.setItem('of-theme', 'dark'));
+  // The site is light whatever the device prefers; dark is the visitor's choice, the cookie the header's button sets.
+  if (scheme === 'dark') await ctx.addCookies([{ name: 'of-theme', value: 'dark', url: base }]);
   const pg = await ctx.newPage();
   await pg.goto(base + '/toran');
   // The draft has no WhatsApp number yet; give the forms a made-up one so the fallback link can be seen.

@@ -17,21 +17,27 @@
     d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); } });
   }
 
-  // Light or dark: the header's button (layout.mjs themeButton) turns dark on and off, and the choice is kept in this
-  // browser under of-theme, which the head reads before the page paints. Without storage it still works for the visit.
+  // Light or dark: the header's button (layout.mjs themeButton) turns dark on and off, at once, the two metas with it,
+  // and keeps the choice in the cookie of-theme, which every page of openfrequency.co.il and its subdomains reads before
+  // it paints (the head's ofThemeCookie and ofThemeRead). Without cookies it still works for the visit. A page the
+  // browser kept and shows again on Back takes the cookie as it is now, which another of our pages may have changed.
   var theme = d.querySelector('[data-theme-toggle]');
   if (theme) {
-    var tColor = d.querySelector('meta[name=theme-color]');
+    var tColor = d.querySelector('meta[name=theme-color]'), tScheme = d.querySelector('meta[name=color-scheme]');
     var tSet = function (dark) {
       root.setAttribute('data-theme', dark ? 'dark' : 'light');
       theme.setAttribute('aria-pressed', dark ? 'true' : 'false');
       if (tColor) tColor.setAttribute('content', dark ? '#111113' : '#eeeff2');
+      if (tScheme) tScheme.setAttribute('content', dark ? 'dark' : 'light');
     };
     tSet(root.getAttribute('data-theme') === 'dark');
     theme.addEventListener('click', function () {
       var dark = root.getAttribute('data-theme') !== 'dark';
       tSet(dark);
-      try { localStorage.setItem('of-theme', dark ? 'dark' : 'light'); } catch (e) {}
+      try { d.cookie = ofThemeCookie(dark ? 'dark' : 'light', location); } catch (e) {}
+    });
+    addEventListener('pageshow', function (e) {
+      if (e.persisted) { try { tSet(ofThemeRead(d.cookie) === 'dark'); } catch (er) {} }
     });
   }
 

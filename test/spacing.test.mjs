@@ -37,10 +37,10 @@ function serve(dir) {
 }
 
 // A browser in light or in dark: light is the site's own default (on a device that prefers dark, to be sure of it), dark
-// is the visitor's choice, saved the way the header's button saves it.
+// is the visitor's choice, the cookie the header's button sets.
 async function themed(theme, opts) {
   const ctx = await browser.newContext({ ...opts, colorScheme: theme === 'dark' ? 'light' : 'dark' });
-  if (theme === 'dark') await ctx.addInitScript((k) => localStorage.setItem(k, 'dark'), THEME_KEY);
+  if (theme === 'dark') await ctx.addCookies([{ name: THEME_KEY, value: 'dark', url: origin }]);
   return ctx;
 }
 

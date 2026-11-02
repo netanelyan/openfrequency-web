@@ -29,8 +29,8 @@ for (const p of paths) {
   for (const [w, h, scale] of [[390, 844, 2], [1440, 900, 1]]) {
     for (const scheme of ['light', 'dark']) {
       const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: scale, colorScheme: scheme, locale: 'he-IL', bypassCSP: true });
-      // The site is light whatever the device prefers; dark is the visitor's choice, saved as the header's button saves it.
-      if (scheme === 'dark') await ctx.addInitScript(() => localStorage.setItem('of-theme', 'dark'));
+      // The site is light whatever the device prefers; dark is the visitor's choice, the cookie the header's button sets.
+      if (scheme === 'dark') await ctx.addCookies([{ name: 'of-theme', value: 'dark', url: base }]);
       const pg = await ctx.newPage();
       await pg.goto(base + p, { waitUntil: 'networkidle' });
       await pg.evaluate(() => document.fonts.ready);

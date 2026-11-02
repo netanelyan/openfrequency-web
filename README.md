@@ -271,7 +271,7 @@ The strip of businesses under the home page's doors is our own businesses, and s
 | `build.mjs` | renders `src/pages` into `dist/`, inlines the CSS, checks the facts and the copy, writes `dist/support.json` |
 | `src/support.mjs`, `scripts/support-export.mjs` | our support's knowledge for Toran, published as `/support.json` and written by `npm run support` |
 | `src/layout.mjs` | the head, the sticky glass header, the footer |
-| `src/style.css` | Teder's tokens (light, dark, Increase Contrast, Reduce Transparency) and the site's components; light is the default, dark only by the visitor's choice (`data-theme="dark"`, set by the head and `site.js`) |
+| `src/style.css` | Teder's tokens (light, dark, Increase Contrast, Reduce Transparency) and the site's components; light is the default, dark only by the visitor's choice (`data-theme="dark"`, set by the head and `site.js` from the cookie `of-theme`, which openfrequency-teder, -accounts and -toran share: `Domain=.openfrequency.co.il`, so a choice on one follows the visitor to the others) |
 | `src/pages/` | one module per page: home, `/toran`, `/teder`, `/faq`, and where a form lands without JS |
 | `src/teder.mjs` | Teder's real slides (a cover per subject) and its phone, shared by the home page and `/teder` |
 | `scripts/showcase.mjs` | Brings the cover of each of Teder's slideshows from `private/showcase` into `assets/teder/showcase`, checking each photo's licence |

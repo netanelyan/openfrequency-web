@@ -11,6 +11,8 @@ openfrequency-toran for its made-up store, kli-cheres.example ("כלי חרס ש
   button are out (no price and no OpenFrequency number are set yet), and so is the line offering to take the page down; the styles are inlined, the fonts and icons
   are this site's, the product pictures are the ones Toran draws for the made-up store (demo/), and the script keeps only
   the docked button (no tracking).
+- The page is light only, as every page of the site is whatever the device prefers: the brand tokens' one rule for a
+  device that prefers dark (a lighter link blue, which on this light page fell under 4.5:1) is out (2026-11-02).
 
 It is not indexed (the page's own robots meta) and not linked from the menu. To redo it after Toran's page
 changes, render the store again and repeat the same edits.

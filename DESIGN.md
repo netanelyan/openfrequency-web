@@ -24,6 +24,7 @@ colors:
   hairline: "rgba(0, 0, 0, 0.08)"
   sheet: "#fafafc"
   night: "#1d1d1f"
+  footer-grey: "#dcdce1"
   night-ink: "#f5f5f7"
   night-ink-quiet: "#c7c7cc"
   toran-green: "#0f7a54"
@@ -152,9 +153,9 @@ components:
 
 The site lives inside the Teder owner-site world, pinned by the owner's brief: a silver wallpaper with no hue of its own, frosted glass with a lit edge, the system typeface with Heebo behind it, pill buttons, and one action blue. Inside that world the page is quiet so the product can be loud. The colour, the detail and the motion belong to working fragments of Toran (marked `data-ui`): a WhatsApp chat with its own bubbles, greens and times; a settings card that changes state; a chat window where Toran answers questions about OpenFrequency itself. Everything around those fragments is silver surfaces of the same tone, five type sizes and generous space.
 
-Depth is rationed. Glass is reserved for what floats (the header capsule) and for the stages a product fragment stands on. Every other surface is a tile one tone step off the wallpaper, with no line and no shadow. The one dark surface in the light theme is the footer panel; the one colour field is Teder's violet. The home page is the company's: a door to each product in its own material, Toran's chat on glass and Teder's real slides on its violet. On a phone both doors start shut, each its mark, its name, one short line and a round chevron button that opens it (the whole top row is the target). Behind the home page's headline our own mark stands large, half see-through, pushed toward the left edge. There are no photographs of our own; the only ones are the covers inside Teder's slides.
+Depth is rationed. Glass is reserved for what floats (the header capsule) and for the stages a product fragment stands on. Every other surface is a tile one tone step off the wallpaper, with no line and no shadow. The footer panel is a light grey in the light theme, with white for its accents (an edge inside it, the line over the legal line, our name along its bottom), and the night panel in dark; the one colour field is Teder's violet. The home page is the company's: a door to each product in its own material, Toran's chat on glass and Teder's real slides on its violet. On a phone both doors start shut, each its mark, its name, one short line and a round chevron button that opens it (the whole top row is the target). Behind the home page's headline our own mark stands large, half see-through, pushed toward the left edge. There are no photographs of our own; the only ones are the covers inside Teder's slides.
 
-The page is Hebrew, right to left, phone first, and in light and dark from the same tokens. Light is the default whatever the device prefers; dark is the visitor's choice, a sun and moon button in the header, kept in the browser and put back before the page paints. It honours Increase Contrast and Reduce Transparency by making the glass and tiles nearly solid, and Reduce Motion by showing everything in place.
+The page is Hebrew, right to left, phone first, and in light and dark from the same tokens. Light is the default whatever the device prefers; dark is the visitor's choice, a sun and moon button in the header, kept in the cookie `of-theme` that the site, Teder, Toran and accounts share across openfrequency.co.il (a choice on one is the choice on all) and put back before the page paints. It honours Increase Contrast and Reduce Transparency by making the glass and tiles nearly solid, and Reduce Motion by showing everything in place.
 
 **Key Characteristics:**
 - Hue-less silver wallpaper (a fixed radial plus linear gradient over the wallpaper base)
@@ -181,7 +182,8 @@ A hue-less silver and ink system with one action blue, three brand-mark colours,
 - **Ink** (ink): headings and body (dark #f5f5f7). **Ink Secondary** (ink-secondary): inactive nav, definitions. **Ink Quiet** (ink-quiet): the quiet text, which covers captions, table heads, footer labels and dimmed step text (5.7:1). **Ink Faint** (ink-faint): placeholders, message times, typing dots and neutral status dots only.
 - **Tile** and **Fill**: translucent white tiles one step off the wallpaper; grey fills for pills and segmented controls. Their dark values are white at 6% and 10%, and grey at 24% and 32%.
 - **Sheet** (sheet): the solid surface for the open phone menu, chat headers, UI cards and the menu sheet (dark #1e1e20).
-- **Night** (night): the footer panel, with Night Ink and Night Ink Quiet on it (dark #000000).
+- **Footer Grey** (footer-grey): the footer panel in light, with Ink and Ink Secondary on it (12.3:1 and 7.3:1) and white for its accents.
+- **Night** (night): the footer panel in dark, with Night Ink and Night Ink Quiet on it (15.5:1 and 10.0:1).
 
 ### Product palette (inside data-ui only)
 - **Sent Bubble**, **Received Bubble** and **Chat Ground** are WhatsApp's own colours (dark #144d37, #2c2c2e, #0b141a). They never leave a chat fragment.
@@ -271,7 +273,7 @@ Surfaces have one radius: 18px for tiles, glass stages, photo frames, chats, the
 - **Eval table:** a real table with tabular figures and odd rows striped on tile at 12% radius corners. Zeros are OK green. On a phone it stays a table with short heads.
 - **FAQ tiles:** details tiles with lead questions and a drawn plus that turns to minus. An open tile fills action blue with white text.
 - **Header:** the glass capsule. From 900px the pages sit in the middle, each product behind its 22px mark, a hairline before the rest; the current page is ink with a short bar under it. On a phone the menu is a solid sheet: the two products as 68px rows with their marks and what each does, then the other pages as two pills, then the demo.
-- **Footer:** one night panel at the content width, radius 24px: who we are, the products with their marks, the site's pages, and how to reach us, in four columns from 1000px; then the legal line over a hairline, and the wordmark at 12.6cqi in 7% white, cut by the panel's bottom edge.
+- **Footer:** one panel at the content width, radius 24px, footer grey with a 1px white edge inside it in light and night in dark: who we are, the products with their marks, the site's pages, and how to reach us, in four columns from 1000px; then the legal line over a line (white in light, a 10% white hairline in dark), and the wordmark at 13.4cqi (white in light, 7% white in dark), cut by the panel's bottom edge.
 - **Closing field:** a full-bleed night section with the demo dialog (sheet, 18px) open beside the line.
 - **Teder field:** one violet field at 18px holding the wave mark and the waitlist form.
 

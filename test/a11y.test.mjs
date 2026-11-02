@@ -2,7 +2,7 @@
 // Israeli standard 5568 is built on, which /accessibility says the site follows), at a phone's width (390px) and a
 // computer's (1440px), in light and in dark. One violation fails the test, with the rule, the page and the element.
 // Light is the site's default whatever the device prefers, so it is checked on a device that prefers dark; dark is
-// the visitor's choice (the header's button, kept as of-theme), so it is checked with that choice saved, on a device
+// the visitor's choice (the header's button, kept in the cookie of-theme), so it is checked with that cookie, on a device
 // that prefers light.
 //
 // The browser is Playwright's own Chromium when it is installed (npx playwright-core install chromium, as CI does),
@@ -84,7 +84,7 @@ test('every page passes axe (WCAG 2.0 A and AA) on a phone and a computer, light
   for (const [width, height] of WIDTHS) {
     for (const [theme, colorScheme, saved] of SCHEMES) {
       const context = await browser.newContext({ viewport: { width, height }, colorScheme, bypassCSP: true });
-      if (saved) await context.addInitScript(([k, v]) => localStorage.setItem(k, v), [THEME_KEY, saved]);
+      if (saved) await context.addCookies([{ name: THEME_KEY, value: saved, url: origin }]);
       const page = await context.newPage();
       for (const p of pages) {
         await page.goto(origin + p, { waitUntil: 'load' });
