@@ -131,7 +131,6 @@ copy('assets/brand/png/openfrequency-512.png', 'icon-512.png');
 for (const name of ['openfrequency', 'teder', 'toran']) copy(`assets/brand/png/${name}-180.png`, `mail/${name}.png`);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/og'))) if (f.endsWith('.png')) copy('assets/og/' + f, 'og/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/showcase'), { recursive: true })) if (f.endsWith('.jpg')) copy('assets/teder/showcase/' + f, 'teder/showcase/' + f);
-for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/assistant'))) copy('assets/teder/assistant/' + f, 'teder/assistant/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/clients'))) copy('assets/clients/' + f, 'clients/' + f);
 // The page a store gets from Toran, for a made-up store, as Toran rendered it (assets/toran-example/README.md). Its
 // price card is written here from site.config.json (the Store plan, VAT, the setup fee), so the example never shows

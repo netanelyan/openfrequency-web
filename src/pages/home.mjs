@@ -11,9 +11,7 @@
 // it will do, and the section on Toran as the owner's assistant waits for Toran.
 // While sign-up is open (signup), Teder's door sends to accounts' sign-up with the price under it, and the sample
 // slideshow is the line after.
-import fs from 'node:fs';
-import path from 'node:path';
-import { CHANNELS, ROOT, esc, mark, glyphOnly, signupOpen, tederNets, toranSoon, assistantSoon } from '../lib.mjs';
+import { CHANNELS, mark, glyphOnly, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { TORAN_SAVE } from '../forms.mjs';
 import { TEDER_DEMO, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, tederFrom, tederStart, toranStart } from '../sections.mjs';
@@ -140,40 +138,10 @@ const assistant = (cfg) => `
 </div>
 </section>`;
 
-// The same assistant for Teder: the slideshows that are ready come to the owner's WhatsApp, and the owner approves or
-// asks for a fix in a message. The three covers are Teder's own, from its made-up demo account (assets/teder/assistant,
-// written by scripts/showcase.mjs from what Teder hands over); no store's slideshow, and nothing about views or sales.
-const THUMBS = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/teder/assistant.json'), 'utf8'));
-const thumbs = `<span class="thumbs">${THUMBS.map((t) => `<span class="thumb"><img src="/teder/assistant/${t.n}.jpg" width="90" height="160" alt="מצגת ${t.n}: ${esc(t.alt)}" loading="lazy"><b aria-hidden="true">${t.n}</b></span>`).join('')}</span>`;
-const TEDER_CHAT = [
-  ['them', '09:02', `3 מצגות חדשות מוכנות. איזו לאשר?${thumbs}`],
-  ['me', '09:15', 'אשר את 1 ו-3, את 2 תעשה קצר יותר'],
-  ['them', '09:15', 'אישרתי את 1 ו-3. את 2 אקצר ואשלח לכם שוב לאישור.'],
-  ['them', '18:30', 'המצגת על השרך מחכה בטיוטות של טיקטוק. מוסיפים סאונד ומפרסמים.'],
-  ['me', '21:04', 'איך היה השבוע?'],
-  ['them', '21:04', 'השבוע עלו 4 מצגות לטיקטוק ולאינסטגרם, ואחת עוד מחכה לכם בטיוטות. ביום ראשון אשלח לכם 3 חדשות לאישור.'],
-];
-const tederAssistant = (cfg) => `
-<section class="sec owner-sec teder-owner" id="owner-teder" aria-labelledby="owner-teder-h">
-<div class="wrap owner-grid">
-<div class="owner-text">
-<p class="kicker">${toranSoon(cfg) ? 'העוזר שלכם בוואטסאפ' : 'אותו עוזר, גם לתדר'}</p>
-<h2 id="owner-teder-h">את המצגות של תדר מאשרים <span class="hl">בוואטסאפ</span></h2>
-<p class="lede">${toranSoon(cfg) ? '' : 'העוזר שכותב לכם על החנות עובד גם עם תדר. '}כשמצגות מוכנות, הוא שולח לכם אותן לוואטסאפ, ושם מאשרים, מבקשים תיקון ומקבלים תזכורת לפרסם. אין אפליקציה חדשה ללמוד.</p>
-<ul class="checks">
-<li><b>מאשרים לפי מספר.</b> כותבים לו "אשר את 1 ו-3", ורק מה שאישרתם עולה.</li>
-<li><b>מבקשים תיקון במילים שלכם.</b> "את 2 תעשה קצר יותר", ותדר מכין גרסה חדשה ושולח לכם אותה שוב לאישור.</li>
-<li><b>תזכורת כשמצגת מחכה.</b> המצגת עולה לטיוטות של טיקטוק, והוא כותב לכם כשנשאר רק להוסיף סאונד ולפרסם.</li>
-<li><b>מה היה השבוע.</b> כמה מצגות עלו, מה מחכה לכם, ומתי יגיעו החדשות.</li>
-</ul>
-</div>
-<div class="phone owner-phone">${chat({ id: 'teder-chat', who: 'תורן', sub: 'העוזר שלכם', face: mark('toran', 38), msgs: TEDER_CHAT, names: { me: 'אתם', them: 'העוזר' } })}</div>
-</div>
-</section>`;
-
-// While the assistant is soon (products.assistant), Teder's approvals are shown where they happen today: Teder's own
-// screen, with the day's slideshows, one click each or all at once, a rejection with a reason that comes back
-// rewritten, and the approved one waiting in TikTok's drafts. The WhatsApp way is one line, marked "בקרוב".
+// Teder's approvals, where they happen: Teder's own screen, with the day's slideshows, one click each or all at once,
+// a rejection with a reason that comes back rewritten, and the approved one waiting in TikTok's drafts. It is the only
+// way (the owner, 2026-11-02: "managing teder through whatsapp, only through the dashboard"), so the line that promised
+// approving on WhatsApp "soon", the products.assistant switch and the WhatsApp section it turned on are gone.
 const tederDashboard = (cfg) => `
 <section class="sec owner-sec teder-owner" id="owner-teder" aria-labelledby="owner-teder-h">
 <div class="wrap owner-grid">
@@ -185,7 +153,6 @@ const tederDashboard = (cfg) => `
 <li><b>מאשרים בלחיצה.</b> כל מצגת לבד, או את כל המצגות של היום בבת אחת.</li>
 <li><b>מצגת שלא מתאימה חוזרת מתוקנת.</b> דוחים אותה, כותבים במילים שלכם מה לשנות, ותדר כותב גרסה חדשה לאישור.</li>
 <li><b>מה שאישרתם מחכה בטיוטות של טיקטוק.</b> נשאר רק להוסיף סאונד ולפרסם.</li>
-<li><b>לאשר מהוואטסאפ ${soonBadge}</b> העוזר ישלח לכם את המצגות לוואטסאפ, ותאשרו שם בהודעה.</li>
 </ul>
 </div>
 <div class="stage glass">${approvals(cfg)}</div>
@@ -202,7 +169,7 @@ export default (cfg) => ({
   body: (() => {
     // The question box that was last (Toran answering about us from answers written in advance) went too: the support
     // button on every page is Toran itself, on WhatsApp, and the answers are on /faq.
-    const teder = assistantSoon(cfg) ? tederDashboard(cfg) : tederAssistant(cfg);
+    const teder = tederDashboard(cfg);
     return (toranSoon(cfg)
       ? [hero(cfg), trust(cfg), clients(), niches(cfg), teder]
       : [hero(cfg), trust(cfg), clients(), niches(cfg), assistant(cfg), teder]).join('\n');

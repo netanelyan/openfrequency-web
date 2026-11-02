@@ -33,10 +33,12 @@ itself doesn't read the switch (only `server/lead.mjs` is deployed to the server
 Toran demo post, though no page sends one while Toran is soon.
 
 
-**The assistant on WhatsApp** has its own switch, `"assistant"` in the same object. It waits for our WhatsApp number to be
-connected at Meta, not for Toran's sale. `"soon"` (now): the home page shows Teder's approvals on Teder's own screen (one
-click, all at once, a rejection that comes back rewritten, TikTok's drafts), with approving on WhatsApp as one line marked
-"בקרוב". `"live"`: the section about approving Teder's slideshows on WhatsApp comes back as it was.
+**Teder is approved on its dashboard only** (the owner, 2026-11-02: "managing teder through whatsapp, only through the
+dashboard"). The home page shows Teder's approvals on Teder's own screen (one click, all at once, a rejection that comes
+back rewritten, TikTok's drafts), and that is the only version: the line that promised approving on WhatsApp "בקרוב",
+the `"assistant"` switch that would have brought back a section about approving Teder on WhatsApp, that section and its
+three covers (`assets/teder/assistant/`) are gone. The support export's status says where Teder's posts are approved
+(`src/support.mjs`), since a Teder customer who writes to our WhatsApp reaches our support.
 
 ## Sign-up: open or closed
 

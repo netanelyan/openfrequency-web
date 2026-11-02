@@ -34,6 +34,9 @@ import { TORAN, TEDER } from './pages/faq.mjs';
 import { NO_REFUND } from './sections.mjs';
 import { terms, privacy, security, accessibility } from './pages/legal.mjs';
 
+// Teder's own dashboard, where its customers approve their slideshows (openfrequency-teder, behind accounts' sign-in).
+export const TEDER_APP = 'https://teder.openfrequency.co.il';
+
 const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: ' ' };
 /** Page HTML as the plain text a person would read: links keep their address (on `origin`), headings and items their own lines. */
 export function toText(html, origin) {
@@ -100,11 +103,15 @@ export function supportExport(cfg) {
     const p = def(cfg);
     return { kind, title: p.title.replace(/ \| OpenFrequency$/, ''), url: origin + p.path, text: text(p.body) };
   });
+  // Where Teder is managed, in both states (the owner, 2026-11-02: "managing teder through whatsapp, only through the
+  // dashboard"): a customer of Teder who writes "אשר את 1" to our WhatsApp reaches this support, which says where.
+  const tederWhere = `את המצגות של תדר מאשרים, דוחים ומתקנים רק בלוח הבקרה של תדר: ${TEDER_APP}. בוואטסאפ אי אפשר לאשר מצגות, ותדר לא שולח לשם הודעות.`;
   // While Toran is soon: what is open and what is not, said plainly, for the agent to put above everything else.
   const soonStatus = [
     signupOpen(cfg)
       ? 'תדר פתוח: אפשר לפתוח בו חשבון עכשיו ולהקים אותו לבד ב-' + SIGNUP_URL + ', או לקבל קודם מצגת לדוגמה מהחנות דרך הטופס ב-' + `${origin}/teder#demo` + ' או ב-' + `${origin}/join` + '.'
       : 'תדר פתוח: אפשר להצטרף אליו עכשיו, ולקבל מצגת לדוגמה מהחנות דרך הטופס ב-' + `${origin}/teder#demo` + ' או ב-' + `${origin}/join` + '.',
+    tederWhere,
     'תורן עוד לא פתוח לחנויות, ואנחנו פותחים אותו בקרוב. עד אז אין לו דמו, אין לו מחיר, ואי אפשר להצטרף אליו או להתחיל איתו.',
     'מי שרוצה לדעת כשתורן נפתח משאיר טלפון או מייל ב-' + `${origin}/toran#waitlist` + ', ואנחנו כותבים לו כשהוא נפתח.',
     'מה שכתוב על תורן באתר הוא מה שהוא יעשה כשייפתח.',
@@ -112,7 +119,7 @@ export function supportExport(cfg) {
   const pages = [
     soon
       ? { kind: 'about', title: 'מה פתוח עכשיו: תדר פתוח, תורן נפתח בקרוב', url: `${origin}/toran`, text: soonStatus }
-      : { kind: 'about', title: 'מה תורן עושה היום, ומה עוד לא', url: `${origin}/toran`, text: `מה תורן עושה היום:\n${today.map((x) => `- ${x}`).join('\n')}\n\nמה עוד לא עובד בתורן:\n${notYet.map((x) => `- ${x}`).join('\n')}` },
+      : { kind: 'about', title: 'מה תורן עושה היום, ומה עוד לא', url: `${origin}/toran`, text: `מה תורן עושה היום:\n${today.map((x) => `- ${x}`).join('\n')}\n\nמה עוד לא עובד בתורן:\n${notYet.map((x) => `- ${x}`).join('\n')}\n\n${tederWhere}` },
     { kind: 'about', title: 'מי אנחנו', url: origin, text: `${cfg.get('about.who')}\n${cfg.get('about.why')}` },
     ...pricing.map((p) => ({ kind: 'payment', title: p.title, url: p.url, text: p.text })),
     ...legal,

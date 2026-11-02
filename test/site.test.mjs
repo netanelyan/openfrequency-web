@@ -133,6 +133,26 @@ test('with "soon", Teder is offered exactly as with "live"', () => {
   assert.deepEqual(soon.support.plans, live.support.plans.filter((p) => p.product === 'teder'));
 });
 
+// Teder is managed on its dashboard only (the owner, 2026-11-02: "managing teder through whatsapp, only through the
+// dashboard"): the home page shows Teder's approvals on Teder's screen alone, with no line about approving on WhatsApp
+// "בקרוב", no WhatsApp chat with covers, and no products.assistant switch to bring one back; our support, which a Teder
+// customer reaches on WhatsApp, says where the posts are approved.
+test('Teder is approved on its dashboard only: no WhatsApp approval on the home page, either way, and our support says where', () => {
+  for (const [state, { pages, support }] of Object.entries(built)) {
+    const home = visible(pages['index.html']);
+    const teder = /<section class="sec owner-sec teder-owner" id="owner-teder"[\s\S]*?<\/section>/.exec(home)[0];
+    assert.match(teder, /<h2 id="owner-teder-h">כל מצגת של <span class="pn teder">תדר<\/span> <span class="hl">מחכה לאישור שלכם<\/span><\/h2>/, `${state}: the dashboard's section`);
+    assert.match(teder, /class="stage glass"/, `${state}: Teder's screen`);
+    const checks = /<ul class="checks">[\s\S]*?<\/ul>/.exec(teder)[0];
+    assert.equal((checks.match(/<li>/g) || []).length, 3, `${state}: three lines, all about the dashboard`);
+    assert.doesNotMatch(teder, /וואטסאפ|class="soon"/, `${state}: nothing about WhatsApp, nothing "בקרוב"`);
+    assert.doesNotMatch(home, /id="teder-chat"|class="thumbs"|\/teder\/assistant\/|מאשרים <span class="hl">בוואטסאפ/, `${state}: no WhatsApp chat about Teder`);
+    assert.match(support.status, /את המצגות של תדר מאשרים, דוחים ומתקנים רק בלוח הבקרה של תדר: https:\/\/teder\.openfrequency\.co\.il\. בוואטסאפ אי אפשר לאשר מצגות, ותדר לא שולח לשם הודעות\./, `${state}: our support says where`);
+  }
+  assert.equal(config.products.assistant, undefined, 'no products.assistant in site.config.json');
+  assert.ok(!fs.existsSync(path.join(ROOT, 'assets/teder/assistant')), 'the WhatsApp example\'s covers are gone');
+});
+
 test('with "soon", the support export says Toran opens soon and Teder is available', () => {
   const s = built.soon.support;
   assert.deepEqual(s.products, { toran: 'soon', teder: 'live' });

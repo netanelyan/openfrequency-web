@@ -20,7 +20,8 @@ export const FACTS = {
   // The switch: whether Toran is on sale. 'live' is the site as it was; 'soon' keeps Toran on show with a "בקרוב"
   // badge, and every way to buy it, start it or ask for its demo becomes a waitlist (README, "Toran: live or soon").
   'products.toran': { label: 'תורן פתוח למכירה (live) או בקרוב (soon)', kind: ['live', 'soon'] },
-  'products.assistant': { label: 'העוזר בוואטסאפ שלנו פועל (live) או בקרוב (soon)', kind: ['live', 'soon'] },
+  // products.assistant, the WhatsApp assistant's switch, is gone (the owner, 2026-11-02: "managing teder through
+  // whatsapp, only through the dashboard"): Teder's approvals are on its dashboard only, and the home page shows that.
   // Whether a business can sign up to Teder on its own, at accounts' /signup, and pay there. 'closed' is the site as it
   // was (Teder's ways in are the free sample); 'open' sends them to sign-up with the price beside it, keeps the sample
   // as the second way, and shows the self-serve terms (README, "Sign-up: open or closed").
@@ -154,9 +155,6 @@ export function readConfig(draft) {
 
 // While products.toran is 'soon', Toran is shown but not sold: no demo, no price, no way to start it, only a waitlist.
 export const toranSoon = (cfg) => cfg.get('products.toran') === 'soon';
-// The assistant on our WhatsApp number (Teder's approvals in a message, Toran's owner line) waits for that number to be
-// connected at Meta, apart from whether Toran is sold: products.assistant "soon" until then, "live" after.
-export const assistantSoon = (cfg) => cfg.get('products.assistant') === 'soon';
 // While signup is 'open', Teder's main ways in go to accounts' sign-up, where a business opens its account and pays.
 // p=teder is a hint for the form; accounts ignores what it doesn't read.
 export const signupOpen = (cfg) => cfg.get('signup') === 'open';
