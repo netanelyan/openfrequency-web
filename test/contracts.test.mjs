@@ -44,7 +44,10 @@ test('Teder\'s contract: numbered, dated, its prices from the config, and the te
   assert.ok(!h.includes('<nav class="legal-toc"'), 'short enough to read through: no list of sections');
   assert.match(t, /1\. מה תדר עושה/);
   assert.match(t, /10\. דין ויצירת קשר/);
-  assert.match(t, /עודכן לאחרונה ב-1 בנובמבר 2026/, 'legal.contractsUpdated');
+  assert.match(t, /עודכן לאחרונה ב-3 בנובמבר 2026/, 'legal.contractsUpdated');
+  // A new month's payment: 72 hours after the paid month ends, then Teder stops until it is paid (2026-11-03).
+  assert.ok(t.includes('לפני שהחודש ששילמתם נגמר, נזכיר לכם לשלם על החודש הבא. אם התשלום הזה לא הגיע אלינו תוך 72 שעות מסוף החודש ששילמתם, תדר נעצר עד שישולם.'), 'the 72 hours');
+  assert.doesNotMatch(t, /14 יום מההודעה/);
   for (const n of [config.teder.monthly, config.teder.setup, config.teder.small.monthly, config.teder.small.setup]) assert.ok(t.includes(ils(n)), ils(n));
   assert.match(t, /לא כולל מע״מ/);
   assert.match(t, /דמי ההקמה לא מוחזרים/);

@@ -59,7 +59,10 @@ test('the privacy page says a lead reaches us by email, and what we keep for an 
   assert.ok(part('p-share').includes('Resend , ארצות הברית: מיילים של כניסה לשירות, המיילים שתורן מקבל ועונה עליהם, והמייל שמגיע אלינו על כל טופס.'));
   assert.ok(part('p-customers').includes('את שם העסק, שכותבים בהרשמה. כשצריך מספר עוסק וכתובת לחשבונית, אנחנו מבקשים אותם מכם.'));
   assert.ok(!part('p-customers').includes('פרטים לחשבונית'));
-  assert.match(privacy, /עודכן לאחרונה ב-2 בנובמבר 2026/, 'legal.privacyUpdated, the day the site\'s one cookie (of-theme) was added, later than legal.privacyWaUpdated');
+  assert.match(privacy, /עודכן לאחרונה ב-3 בנובמבר 2026/, 'legal.privacyUpdated, the day the social accounts\' permissions were given 3 days after a stop, later than legal.privacyWaUpdated');
+  // The social accounts' permissions: kept until they are disconnected, or until 3 days after the service stops (the
+  // owner, 2026-11-03, "Yes 3 days": Teder disconnects them STOP_GRACE_DAYS after a stop).
+  assert.ok(part('p-keep').includes('הרשאות של חשבונות ברשתות: עד שמנתקים אותן, או עד 3 ימים אחרי שהשירות נעצר.'));
 });
 
 test("a form's message region is in the page from the start, empty, and never hidden", () => {

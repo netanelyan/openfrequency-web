@@ -181,8 +181,8 @@ test('with "open", the FAQ and the support export say how to sign up and cancel'
 test('with "open", the terms carry Teder\'s self-serve section and their own date; Toran\'s stay', () => {
   const closed = main(built.closed.pages['terms/index.html']);
   const terms = main(built.open.pages['terms/index.html']);
-  assert.match(terms, /עודכן לאחרונה ב-1 בנובמבר 2026/);
-  assert.equal(config.legal.signupUpdated, '2026-11-01', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION)');
+  assert.match(terms, /עודכן לאחרונה ב-3 בנובמבר 2026/);
+  assert.equal(config.legal.signupUpdated, '2026-11-03', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION)');
   assert.match(terms, /<li><a href="#t-stop">הפסקה וביטול<\/a><\/li><li><a href="#t-teder-sub">המנוי לתדר<\/a><\/li>/);
   const sub = text(section(terms, 't-teder-sub'));
   for (const words of [
@@ -212,8 +212,20 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
   assert.match(section(terms, 't-deal'), /href="\/teder\/contract"/);
   assert.doesNotMatch(section(closed, 't-deal'), /\/contract/);
   // The other legal pages keep their own date (the privacy page's is the later of legal.privacyWaUpdated, while Teder's
-  // sample is asked for on WhatsApp, and legal.privacyUpdated, the theme cookie).
-  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-2 בנובמבר 2026/);
+  // sample is asked for on WhatsApp, and legal.privacyUpdated, the social accounts kept 3 days after a stop).
+  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-3 בנובמבר 2026/);
+});
+
+// A new month's payment has 72 hours after the paid month ends (the owner, 2026-11-03: "A user has 72 hours to pay for
+// a new month once their subscription has ended"), in the terms both ways and in each product's contract; the 14 days
+// "מההודעה" are gone everywhere.
+test('the terms: a new month not paid within 72 hours of the end of the paid month stops the service until it is paid', () => {
+  for (const b of [built.closed, built.open]) {
+    const part = text(section(main(b.pages['terms/index.html']), 't-price'));
+    assert.ok(part.includes('לפני שהחודש ששילמתם נגמר, נזכיר לכם לשלם על החודש הבא. אם התשלום הזה לא הגיע אלינו תוך 72 שעות מסוף החודש ששילמתם, השירות נעצר עד שישולם.'), part);
+    assert.ok(part.includes('ביטול חיוב מול חברת האשראי על שירות שקיבלתם הוא הפרה של ההסכם'), 'the rest of the paragraph stays');
+    assert.doesNotMatch(text(main(b.pages['terms/index.html'])), /14 יום מההודעה|לא הוסדר/);
+  }
 });
 
 test('the terms promise only the take-downs we can do: published posts stay on the customer\'s accounts, TikTok is theirs to delete', () => {
