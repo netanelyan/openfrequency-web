@@ -105,7 +105,7 @@ test('every page: light in its markup, the button in the header, the cookie read
   assert.doesNotMatch(privacy, /האתר הזה לא שם עוגיות|באתר הזה אין עוגיות/);
   assert.ok(privacy.includes('האתר הזה שם עוגייה אחת, ורק אם החלפתם בין מצב בהיר לכהה, כאן, בתדר, בתורן או בחשבון שלכם. היא זוכרת מה בחרתם.'));
   assert.ok(privacy.includes('מצב כהה או בהיר, of-theme: זוכרת אם בחרתם מצב כהה או בהיר, עד שנה. היא נשמרת לכל הכתובות של openfrequency.co.il'));
-  assert.match(privacy, /עודכן לאחרונה ב-3 בנובמבר 2026/);
+  assert.match(privacy, /עודכן לאחרונה ב-4 בנובמבר 2026/);
   const js = fs.readFileSync(path.join(ROOT, 'src/site.js'), 'utf8');
   assert.ok(js.includes('d.cookie = ofThemeCookie(') && js.includes('ofThemeRead(d.cookie)'), "site.js writes and reads the cookie with the head's functions");
   assert.ok(js.includes(THEME_COLOR.dark) && js.includes(THEME_COLOR.light), 'site.js keeps the same colours as the head');

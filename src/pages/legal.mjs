@@ -196,7 +196,9 @@ export const toranContract = (cfg) => doc(cfg, {
 
 // The page's date is the later of the day its state brings (legal.privacyWaUpdated or legal.updated, above) and its own,
 // legal.privacyUpdated, the day it last changed on its own (2026-11-02, the site's one cookie, of-theme, the light or
-// dark choice; 2026-11-03, the social accounts' permissions kept until 3 days after the service stops).
+// dark choice; 2026-11-03, the social accounts' permissions kept until 3 days after the service stops; 2026-11-04, the
+// reminders to pay sent on WhatsApp too, to the number the account was paid from and the one linked to it, stopped by
+// "הפסק": openfrequency-accounts src/web/daily.js and openfrequency-toran src/billing/remind.ts).
 const privacyDate = (cfg) => {
   const state = tederByWa(cfg) ? 'legal.privacyWaUpdated' : 'legal.updated';
   return (cfg.get('legal.privacyUpdated') || '') > (cfg.get(state) || '') ? 'legal.privacyUpdated' : state;
@@ -223,7 +225,8 @@ ${ul([
   'יומן פעולות: מי שינה מה ומתי. ביומן אין סיסמאות, קודים או טוקנים.',
   'את פרטי החנות: הכתובת, השם, ומה שתורן קרא באתר שלכם.',
   'את שם העסק, שכותבים בהרשמה. כשצריך מספר עוסק וכתובת לחשבונית, אנחנו מבקשים אותם מכם.',
-])}`],
+])}
+<p>אנחנו שולחים תזכורות לשלם על החודש הבא גם בוואטסאפ, למספר שממנו שילמתם על החשבון ולמספר שחיברתם אליו. אם תענו "הפסק", נפסיק לשלוח אותן בוואטסאפ, והן ימשיכו להגיע במייל.</p>`],
     ['p-end', 'הלקוחות שכותבים לחנות', `<p>כשלקוח כותב לחנות ותורן עונה, נשמרים מספר הטלפון או המייל שלו, ההודעות בשיחה, ושם, סוג וגודל של קובץ שצירף. את הקובץ עצמו תורן לא שומר.</p>
 <p>כדי לנסח תשובה, תורן שולח ל-Anthropic את המידע של החנות ואת ההודעות האחרונות בשיחה. אנחנו לא משתמשים בשיחות כדי לאמן מודלים, ולא מוכרים אותן.</p>
 <p>אם החנות חיברה לתורן את מערכת ההזמנות שלה ולקוח שואל על הזמנה שלו, תורן קורא ממנה את הסטטוס של ההזמנה, את חברת המשלוחים, את מספר המעקב ואת הקישור למעקב. הוא מראה הזמנה רק ללקוח שהמייל או הטלפון שלו תואמים לה, והפרטים האלה נשמרים עם השיחה, כל עוד היא נשמרת.</p>
