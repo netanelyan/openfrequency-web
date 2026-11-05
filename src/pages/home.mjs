@@ -4,6 +4,11 @@
 // doors say them. Then what holds for every store, the businesses we run ourselves, what we do in a store like yours,
 // and the assistant. Each product has its own page (/toran, /teder), the questions have theirs (/faq), and anyone can
 // ask Toran itself about us on WhatsApp (the support button, layout.mjs).
+// On a phone each screen leads with one thing (the owner, 2026-11-05: "The mobile pages (each) has too many
+// information, too many things jump to the eyes at the same time. Even the main page."): the first screen is the
+// headline and Teder's door with its two buttons, Toran's door shut under it; the mark behind the headline, its marker
+// and the badges aren't shown (each badge's fact is on another page: /teder, /security, the footer's free demo), the
+// strip of businesses stands still as a row to swipe, and Teder's approvals keep their three lines a tap away (style.css).
 // While Toran is soon (products.toran in site.config.json), the first screen sells Teder (the owner, 2026-11-01: "The
 // hero: sell Teder, which you can buy now, and give Toran one line with the badge"): the headline is Teder's, its door
 // comes first with its price, and Toran has one line with "בקרוב" and a door as finished as Teder's, in its own green,
@@ -15,7 +20,7 @@
 import { mark, glyphOnly, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { TORAN_SAVE } from '../forms.mjs';
-import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, tederFrom, tederPriceLine, toranStart } from '../sections.mjs';
+import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, foldButton, tederFrom, tederPriceLine, toranStart } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -33,24 +38,27 @@ const DOOR_CHAT = [
 
 // A door's top row: the mark, the name, and what it does. On a phone the door starts shut (site.js), showing the name
 // and one short line, and the round button at the row's end (the whole row is its target) opens it; without script, or
-// from 700px, the door is open and the button isn't there.
+// from 700px, the door is open and the button isn't there. A door's buttons sit outside what the round button opens
+// (Toran's waitlist button while it is soon aside), so a phone's first screen has the headline and one door to act on
+// (the owner, 2026-11-05: "too many things jump to the eyes at the same time"); Teder's full price line waits with the
+// rest of the door.
 const doorTop = (id, face, name, short, say) => `<div class="door-top">${face}<div><h2 id="door-${id}">${name}</h2><p class="door-sum">${short}</p><p class="door-say">${say}</p></div><button type="button" class="door-open" aria-expanded="true" aria-controls="door-${id}-in" aria-labelledby="door-${id}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg></button></div>`;
 
 const soonBadge = '<span class="soon">בקרוב</span>';
 const hero = (cfg) => {
   const soon = toranSoon(cfg);
   const glyph = (name) => `<span class="wave" aria-hidden="true">${glyphOnly(name)}</span>`;
+  // Toran's buttons once it is sold, outside the shut part like Teder's; while it is soon its one button, to the
+  // waitlist, is inside, so Teder's are the first screen's only ones.
+  const toranAct = signupOpen(cfg)
+    ? toranStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', price: false, more: `<a class="btn on-color" href="/toran">${TORAN_DEMO}</a><a class="btn on-color" href="/toran#demo">${TORAN_TRY}</a>` })
+    : '<div class="door-act"><a class="btn light" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn on-color" href="/toran">עוד על תורן</a></div>';
   const toranDoor = `<article class="door toran-door" aria-labelledby="door-toran" data-door>
 ${soon
     ? doorTop('toran', glyph('toran'), `תורן ${soonBadge}`, 'יענה ללקוחות של החנות 24/7', 'יענה ללקוחות של החנות מתוך מה שכתוב באתר, ומה שלא כתוב שם ישאל אתכם.')
     : doorTop('toran', glyph('toran'), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
-<div class="door-in" id="door-toran-in">
-${soon
-    ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/toran#waitlist">${TORAN_SAVE}</a></div>\n<p class="start-alt">נכתוב לכם פעם אחת, כשתורן נפתח.</p></div>`
-    : signupOpen(cfg)
-      ? toranStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', price: false, more: `<a class="btn on-color" href="/toran">${TORAN_DEMO}</a><a class="btn on-color" href="/toran#demo">${TORAN_TRY}</a>` })
-      : '<div class="door-act"><a class="btn light" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn on-color" href="/toran">עוד על תורן</a></div>'}
-<div class="phone-sit" data-play>
+${soon ? '' : `${toranAct}\n`}<div class="door-in" id="door-toran-in">
+${soon ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/toran#waitlist">${TORAN_SAVE}</a></div>\n<p class="start-alt">נכתוב לכם פעם אחת, כשתורן נפתח.</p></div>\n` : ''}<div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
 <p class="pop" data-pop>${mark('toran', 28)}<span class="pop-h"><b>תורן</b><small>בטלפון שלכם, 02:16</small></span><span class="pop-t">לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?</span></p>
 </div>
@@ -58,11 +66,11 @@ ${soon
 </article>`;
   const tederDoor = `<article class="door teder-door" aria-labelledby="door-teder" data-door>
 ${doorTop('teder', glyph('teder'), 'תדר', tederFrom(cfg) || `מצגות ${tederNets(cfg)}`, `כותב ומעצב מצגות בעברית ${tederNets(cfg)}. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.`)}
-<div class="door-in" id="door-teder-in">
 ${signupOpen(cfg)
     ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/teder#demo">${TEDER_SAMPLE}</a><a class="btn on-color" href="/teder">${SIGNUP_LABEL}</a></div>
 <p class="start-price">${tederPriceLine(cfg)}</p></div>`
     : '<div class="door-act"><a class="btn light" href="/teder#demo">לנסות את תדר על החנות שלכם</a><a class="btn on-color" href="/teder">עוד על תדר</a></div>'}
+<div class="door-in" id="door-teder-in">
 ${reel}
 </div>
 </article>`;
@@ -141,19 +149,22 @@ const assistant = (cfg) => `
 // Teder's approvals, where they happen: Teder's own screen, with the day's slideshows, one click each or all at once,
 // a rejection with a reason that comes back rewritten, and the approved one waiting in TikTok's drafts. It is the only
 // way (the owner, 2026-11-02: "managing teder through whatsapp, only through the dashboard"), so the line that promised
-// approving on WhatsApp "soon", the products.assistant switch and the WhatsApp section it turned on are gone.
+// approving on WhatsApp "soon", the products.assistant switch and the WhatsApp section it turned on are gone. On a phone
+// its three lines wait behind "עוד פרטים" (a fold, sections.mjs) and the kicker isn't shown: the heading, its line and
+// the screen say it.
 const tederDashboard = (cfg) => `
 <section class="sec owner-sec teder-owner" id="owner-teder" aria-labelledby="owner-teder-h">
 <div class="wrap owner-grid">
-<div class="owner-text">
+<div class="owner-text fold" data-fold>
 <p class="kicker">לפני שמשהו עולה</p>
 <h2 id="owner-teder-h">כל מצגת של תדר <span class="hl">מחכה לאישור שלכם</span></h2>
 <p class="lede">המצגות של היום מחכות לכם במסך אחד של תדר. רואים כל אחת, מאשרים, ורק מה שאישרתם עולה.</p>
-<ul class="checks">
+<ul class="checks fold-x" id="owner-teder-more">
 <li><b>מאשרים בלחיצה.</b> כל מצגת לבד, או את כל המצגות של היום בבת אחת.</li>
 <li><b>מצגת שלא מתאימה חוזרת מתוקנת.</b> דוחים אותה, כותבים במילים שלכם מה לשנות, ותדר כותב גרסה חדשה לאישור.</li>
 <li><b>מה שאישרתם מחכה בטיוטות של טיקטוק.</b> נשאר רק להוסיף סאונד ולפרסם.</li>
 </ul>
+${foldButton('owner-teder-more', 'עוד פרטים')}
 </div>
 <div class="stage glass">${approvals(cfg)}</div>
 </div>

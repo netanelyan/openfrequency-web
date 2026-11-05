@@ -144,8 +144,10 @@ test('Teder is approved on its dashboard only: no WhatsApp approval on the home 
     const teder = /<section class="sec owner-sec teder-owner" id="owner-teder"[\s\S]*?<\/section>/.exec(home)[0];
     assert.match(teder, /<h2 id="owner-teder-h">כל מצגת של <span class="pn teder">תדר<\/span> <span class="hl">מחכה לאישור שלכם<\/span><\/h2>/, `${state}: the dashboard's section`);
     assert.match(teder, /class="stage glass"/, `${state}: Teder's screen`);
-    const checks = /<ul class="checks">[\s\S]*?<\/ul>/.exec(teder)[0];
+    // On a phone the three lines wait behind "עוד פרטים" (a fold, test/phone.test.mjs).
+    const checks = /<ul class="checks fold-x" id="owner-teder-more">[\s\S]*?<\/ul>/.exec(teder)[0];
     assert.equal((checks.match(/<li>/g) || []).length, 3, `${state}: three lines, all about the dashboard`);
+    assert.match(teder, /<button type="button" class="fold-btn" aria-expanded="true" aria-controls="owner-teder-more" hidden><span class="f-more">עוד פרטים<\/span>/, `${state}: the lines' button`);
     assert.doesNotMatch(teder, /וואטסאפ|class="soon"/, `${state}: nothing about WhatsApp, nothing "בקרוב"`);
     assert.doesNotMatch(home, /id="teder-chat"|class="thumbs"|\/teder\/assistant\/|מאשרים <span class="hl">בוואטסאפ/, `${state}: no WhatsApp chat about Teder`);
     assert.match(support.status, /את המצגות של תדר מאשרים, דוחים ומתקנים רק בלוח הבקרה של תדר: https:\/\/teder\.openfrequency\.co\.il\. בוואטסאפ אי אפשר לאשר מצגות, ותדר לא שולח לשם הודעות\./, `${state}: our support says where`);

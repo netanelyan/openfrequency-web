@@ -1229,3 +1229,83 @@ html.sk-on #main > :not(.sk-page) { display: none; }
 .btn.primary[aria-busy='true']::after { border-color: var(--accent-ink) var(--accent-ink) var(--accent-ink) transparent; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .btn[aria-busy='true']::after { border-color: var(--ink-3); opacity: 0.6; } }
+
+/* ------------------------------------------------------------ on a phone: one thing per screen
+   The owner, 2026-11-05: "The mobile pages (each) has too many information, too many things jump to the eyes at the
+   same time. Even the main page." Up to 699px each screen leads with one headline and one button. What is secondary is
+   a tap away (a fold, or a door) or left out where another part of the page says it (.desk); what only adds motion or
+   colour isn't drawn; the page's product colour is its one accent, and the rest is the page's inks. From 700px nothing
+   here applies, and the desk is as it was. */
+
+/* A fold (sections.mjs foldButton, site.js): its button shows only on a phone, and only with script. */
+.fold-btn { display: none; }
+@media (max-width: 699px) {
+  .desk { display: none; }
+  .fold.shut .fold-x { display: none; }
+  .fold-btn:not([hidden]) { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 16px; padding: 0 14px 0 18px; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); font: 600 15px/1 var(--text); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color 0.2s ease, transform 0.16s var(--ease-out); }
+  .fold-btn:active { transform: scale(0.97); }
+  .fold-btn svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s var(--ease-out); }
+  .fold-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .fold-btn[aria-expanded="true"]:has(.f-less) .f-more, .fold-btn[aria-expanded="false"] .f-less { display: none; }
+  .fold-btn:focus-visible { outline: 3px solid var(--accent-fill); outline-offset: 2px; }
+}
+@media (max-width: 699px) and (hover: hover) { .fold-btn:hover { background: var(--fill-2); } }
+
+@media (max-width: 699px) {
+  /* The home page's first screen: the headline in ink, with no mark behind it and no marker under it, then Teder's
+     door with its two buttons across it, one under the other; shut, its full price line waits inside with the slides,
+     and its short line is balanced over two lines. On Toran's green, "בקרוב" is white in the green's own ink (6.5:1). */
+  .co-bg { display: none; }
+  .co-hero h1 .hl, [data-theme="dark"] .co-hero h1 .hl { padding-inline: 0; background: none; }
+  .door-sum { text-wrap: balance; }
+  .door .door-act .btn { flex: 1 1 100%; }
+  .door.shut .door-start .start-price { display: none; }
+  .toran-door .soon { background: #fff; color: var(--toran-ink); }
+  /* The badges: each one's fact is on another page (home.mjs). */
+  .trust-sec { display: none; }
+  /* The businesses stand still, a row to swipe, the way they are for anyone who asked for less motion; the doors keep
+     the room of a section above them. */
+  .clients-sec { padding-top: 72px; }
+  .clients { overflow-x: auto; -webkit-mask-image: none; mask-image: none; direction: rtl; scrollbar-width: none; scroll-snap-type: x proximity; scroll-padding-inline: var(--gut); }
+  .clients::-webkit-scrollbar { display: none; }
+  .clients-row { animation: none; padding-inline: var(--gut); }
+  .clients-list[aria-hidden], .clients-list li[aria-hidden] { display: none; }
+  .client { scroll-snap-align: start; }
+  /* What it does in a store like yours: "בקרוב" and the product's name in the page's inks, the ticks grey; the blue
+     button is the card's one colour. */
+  .niche-sec { --pc: var(--ink-3); }
+  .niche-card .soon { background: var(--fill); color: var(--ink-2); }
+  .niche-card .checks b { color: inherit; }
+  /* Teder's approvals: the heading without the kicker over it; its three lines open under "עוד פרטים". */
+  .owner-text .kicker { display: none; }
+  .owner-text .lede { margin-bottom: 0; }
+  .owner-text .checks { margin-top: 22px; }
+
+  /* A product's first screen: its buttons across the width, one under the other; the line under the headline with no
+     marker of its own. While Toran is soon its banner is one line on a tile, and the badge the one orange. */
+  .teder-field .start-act .btn, .ch-hero .start-act .btn { flex: 1 1 100%; }
+  .ch-hero a.hero-cta { width: 100%; }
+  .hero .lede .hl, [data-theme="dark"] .hero .lede .hl { padding-inline: 0; background: none; }
+  .soon-bar p { background: var(--tile); }
+  .soon-bar .soon { background: var(--warn-bg); }
+  /* What it does alone and what is left to you: the dots in the quiet ink, since each list's heading says whose it is. */
+  .rows .dot, .rows.yours .dot { background: var(--ink-3); }
+
+  /* The join page: its button across the width, as on the product pages; the steps numbered in the page's ink, so
+     the blue stays the button's. */
+  .join-start > .btn { justify-self: stretch; }
+  .after-steps li::before { background: var(--fill-2); color: var(--ink); }
+
+  /* The questions: a calmer list, in the body's size. */
+  .faq { gap: 10px; }
+  .faq summary { min-height: 60px; padding: 14px 18px; font-size: 17px; }
+  .faq details p { padding: 0 18px 18px; }
+
+  /* A thank-you, or a page that says what went wrong: the message alone on the first screen, the footer under it. */
+  .after { min-height: calc(100vh - var(--top)); min-height: calc(100svh - var(--top)); }
+
+  /* The legal pages: the sections' list shut under its one line, "מה יש בעמוד הזה". */
+  .legal-toc:has(> .fold-btn:not([hidden])) { padding: 6px 20px; }
+  .legal-toc .fold-btn:not([hidden]) { display: flex; justify-content: space-between; width: 100%; margin: 0; padding: 0; background: none; font-size: 17px; }
+  .legal-toc.fold:not(.shut) ol { margin: 6px 0 12px; }
+}

@@ -41,7 +41,7 @@ test('Teder\'s contract: numbered, dated, its prices from the config, and the te
   const h = pages['soon/teder/contract/index.html'];
   const t = text(h);
   assert.match(text(h.match(/<h1 id="legal-h">[\s\S]*?<\/h1>/)[0]), /^ההסכם של תדר$/);
-  assert.ok(!h.includes('<nav class="legal-toc"'), 'short enough to read through: no list of sections');
+  assert.ok(!h.includes('<nav class="legal-toc'), 'short enough to read through: no list of sections');
   assert.match(t, /1\. מה תדר עושה/);
   assert.match(t, /10\. דין ויצירת קשר/);
   assert.match(t, /עודכן לאחרונה ב-3 בנובמבר 2026/, 'legal.contractsUpdated');

@@ -11,7 +11,7 @@
 // too learns the number from that message, Meta carries the demo number's messages (the switch goes on once our number
 // answers there), and the page has its own date, legal.privacyWaUpdated, the day the switch was turned on.
 import { SIGNUP_URL, esc, facebookOn, payProvider, signupOpen, tederByWa, tederNets, toranSoon } from '../lib.mjs';
-import { tederPriceLine, toranPriceLine, waWords } from '../sections.mjs';
+import { foldButton, tederPriceLine, toranPriceLine, waWords } from '../sections.mjs';
 
 const updated = (cfg, key = 'legal.updated') => {
   const v = cfg.get(key);
@@ -29,6 +29,8 @@ export const TORAN_CONTRACT = '/toran/contract';
 
 // A page: the heading, the date, the sections listed at the top, then the sections. sections: [id, heading, html].
 // toc false: no list at the top (a contract short enough to read through), and the headings numbered instead.
+// On a phone the list at the top is shut under its one line, "מה יש בעמוד הזה", and opens with a tap (a fold,
+// sections.mjs), so the page's first screen is its heading, its line, its date and the first section.
 function doc(cfg, { path, title, description, lede, sections, date = 'legal.updated', toc = true }) {
   const head = (h, i) => (toc ? h : `${i + 1}. ${h}`);
   return {
@@ -41,7 +43,7 @@ function doc(cfg, { path, title, description, lede, sections, date = 'legal.upda
 <h1 id="legal-h">${title}</h1>
 <p class="lede">${lede}</p>
 <p class="legal-date">עודכן לאחרונה ב-${updated(cfg, date)}</p>
-${toc ? `<nav class="legal-toc" aria-label="בעמוד הזה"><ol>${sections.map(([id, h]) => `<li><a href="#${id}">${h}</a></li>`).join('')}</ol></nav>` : ''}
+${toc ? `<nav class="legal-toc fold" aria-label="בעמוד הזה" data-fold>${foldButton('legal-toc-list', 'מה יש בעמוד הזה', '')}<ol class="fold-x" id="legal-toc-list">${sections.map(([id, h]) => `<li><a href="#${id}">${h}</a></li>`).join('')}</ol></nav>` : ''}
 ${sections.map(([id, h, html], i) => `<section class="legal-part" aria-labelledby="${id}"><h2 id="${id}">${head(h, i)}</h2>${html}</section>`).join('\n')}
 </div>
 </section>`,

@@ -8,10 +8,13 @@
 // card has its own (with the plan picked), and the form at the end is the second way, a sample slideshow first. The
 // lists say what a business that set Teder up on its own does: it picks the sources and connects its accounts.
 // Facebook is in every list while teder.facebook is on (lib.mjs tederNets).
+// On a phone (the owner, 2026-11-05: "too many things jump to the eyes at the same time") the first screen's line is its
+// first sentence (the sizes are in the list, "מכין כל מצגת בגודל של טיקטוק ובגודל של אינסטגרם"), each list keeps three
+// rows with the rest behind "עוד 2", and the price card's notes wait behind "עוד פרטים" (sections.mjs, a fold).
 import { facebookOn, mark, signupOpen, tederNets } from '../lib.mjs';
 import { platformWindow } from '../teder.mjs';
 import { demoForm } from '../forms.mjs';
-import { TEDER_SAMPLE, sampleLine, tederPricing, tederStart } from '../sections.mjs';
+import { TEDER_SAMPLE, rowList, sampleLine, tederPricing, tederStart } from '../sections.mjs';
 
 const alone = (cfg, open) => [
   'כותב את המצגת בקול של החשבון, לפי מדריך הכתיבה שלו',
@@ -26,7 +29,6 @@ const yours = (cfg, open) => [
   'לדחות מצגת שלא מתאימה, לכתוב למה, ולקבל גרסה חדשה',
   'בטיקטוק, להוסיף סאונד ולפרסם את המצגת מהטיוטות',
 ];
-const rows = (items, cls = '') => `<ul class="rows${cls ? ' ' + cls : ''}">${items.map((s) => `<li><span class="dot" aria-hidden="true"></span><span>${s}</span></li>`).join('')}</ul>`;
 
 export default (cfg) => {
   const open = signupOpen(cfg);
@@ -43,7 +45,7 @@ export default (cfg) => {
 <div class="thero-text">
 ${mark('teder', 72, 'תדר')}
 <h1 id="hero-h"><span class="hl">מצגות אוטומטיות</span> בעברית ${tederNets(cfg)}</h1>
-<p class="lede">תדר כותב ומעצב את המצגות, ומפרסם כל אחת רק אחרי שמישהו אישר אותה. אותה מצגת יוצאת בגודל של טיקטוק ובגודל של אינסטגרם.</p>
+<p class="lede">תדר כותב ומעצב את המצגות, ומפרסם כל אחת רק אחרי שמישהו אישר אותה.<span class="desk"> אותה מצגת יוצאת בגודל של טיקטוק ובגודל של אינסטגרם.</span></p>
 ${open ? tederStart(cfg, { wrap: 'start hero-cta', cls: 'btn light', price: false, more: `<a class="btn on-color" href="#demo">${TEDER_SAMPLE}</a>` }) : '<a class="btn primary hero-cta" href="#demo">לנסות את תדר על החנות שלכם</a>'}
 </div>
 ${platformWindow(cfg)}
@@ -54,8 +56,8 @@ ${platformWindow(cfg)}
 <div class="wrap">
 <div class="sec-head"><h2 id="alone-h">מה הוא עושה לבד, ומה נשאר לכם</h2></div>
 <div class="two">
-<div><h3>עושה לבד</h3>${rows(alone(cfg, open))}</div>
-<div><h3>נשאר לכם</h3>${rows(yours(cfg, open), 'yours')}</div>
+${rowList('עושה לבד', alone(cfg, open), { id: 'alone-list' })}
+${rowList('נשאר לכם', yours(cfg, open), { cls: 'yours', id: 'yours-list' })}
 </div>
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>

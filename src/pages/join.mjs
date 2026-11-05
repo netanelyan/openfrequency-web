@@ -10,6 +10,9 @@
 // the account is open and the product opens once the payment reaches us; "provider", it is paid by card on the payment
 // page in the account and opens once the payment is confirmed. While sign-up is open, Teder's price says its setup fee
 // is not refunded, as the terms do.
+// On a phone (the owner, 2026-11-05: "too many things jump to the eyes at the same time") the first screen's line is
+// its first sentence, with the button and the price under it: the steps below say how it is set up, and the form's
+// Toran card and the waitlist line say Toran opens soon.
 import { mark, payProvider, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
 import { NO_REFUND, tederPriceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
@@ -79,7 +82,7 @@ export default (cfg) => {
 <section class="sec join-hero" aria-labelledby="hero-h">
 <div class="wrap narrow">
 ${soon ? `<h1 id="hero-h">מתחילים עם תדר</h1>
-<p class="lede">פותחים חשבון ומקימים את תדר בעצמכם. בוחרים מקורות, עוברים על המצגות לדוגמה שהוא מכין, ומעלים לאוויר. תורן נפתח בקרוב.</p>
+<p class="lede">פותחים חשבון ומקימים את תדר בעצמכם.<span class="desk"> בוחרים מקורות, עוברים על המצגות לדוגמה שהוא מכין, ומעלים לאוויר. תורן נפתח בקרוב.</span></p>
 ${tederStart(cfg, { wrap: 'start join-start' })}` : `<h1 id="hero-h">מתחילים עם תורן, עם תדר או עם שניהם</h1>
 <p class="lede">פותחים חשבון ומקימים בעצמכם, לפי הצעדים.</p>
 ${toranStart(cfg, { wrap: 'start join-start' })}

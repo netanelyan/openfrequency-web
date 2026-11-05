@@ -90,6 +90,17 @@
     btn.addEventListener('click', function () { set(door.classList.contains('shut')); });
   });
 
+  // On a phone a fold keeps the rest of a long list, or the fine print, a tap away (sections.mjs foldButton): it starts
+  // shut and its button shows. From 700px the stylesheet shows everything and never the button.
+  each('[data-fold]', function (fold) {
+    var btn = fold.querySelector('.fold-btn');
+    if (!btn) return;
+    var set = function (open) { fold.classList.toggle('shut', !open); btn.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    btn.hidden = false;
+    set(false);
+    btn.addEventListener('click', function () { set(fold.classList.contains('shut')); });
+  });
+
   // A chat stage marked data-play plays once as it comes into view: messages arrive in their order, and each answer
   // is preceded by Toran's three typing dots. Messages the layout hides (the second exchange on a phone) sit out.
   var play = function (stage) {

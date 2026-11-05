@@ -7,6 +7,29 @@ export const waWords = (cfg, words) => {
   return wa ? `<a href="https://wa.me/${wa}">${words}</a>` : words;
 };
 
+// ---------------------------------------------------------------- on a phone, the rest a tap away
+
+// A phone (up to 699px) shows a long list or the fine print a tap away (the owner, 2026-11-05: "The mobile pages (each)
+// has too many information, too many things jump to the eyes at the same time"): the container is marked fold and
+// data-fold, what waits is marked fold-x, and the button says how much more there is. site.js shuts each fold and shows
+// its button; from 700px, or without script, the button isn't there and everything shows (style.css .fold). more: the
+// shut button's words; less: its words once open, or none for a button that sits above what it opens, like a heading.
+export const FOLD_LESS = 'פחות';
+const chevron = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>';
+export const foldButton = (id, more, less = FOLD_LESS) => `<button type="button" class="fold-btn" aria-expanded="true" aria-controls="${id}" hidden><span class="f-more">${more}</span>${less ? `<span class="f-less">${less}</span>` : ''}${chevron}</button>`;
+// "עוד 2": the words for a list's button, by how many items wait.
+export const moreOf = (n, what = '') => `עוד ${n}${what ? ` ${what}` : ''}`;
+
+// What a product does alone and what it leaves to you (/teder, /toran): a heading and its rows. On a phone a list of
+// more than three keeps three, and the rest wait behind "עוד 2" (a fold); id names the list for its button. after: what
+// follows the list in the same column.
+const KEEP = 3;
+export const rowList = (h, items, { cls = '', id = '', after = '' } = {}) => {
+  const fold = Boolean(id) && items.length > KEEP;
+  const lis = items.map((s, i) => `<li${fold && i >= KEEP ? ' class="fold-x"' : ''}><span class="dot" aria-hidden="true"></span><span>${s}</span></li>`).join('');
+  return `<div${fold ? ' class="fold" data-fold' : ''}><h3>${h}</h3><ul class="rows${cls ? ' ' + cls : ''}"${fold ? ` id="${id}"` : ''}>${lis}</ul>${fold ? foldButton(id, moreOf(items.length - KEEP)) : ''}${after}</div>`;
+};
+
 // ---------------------------------------------------------------- the price
 
 const vatOf = (cfg) => (cfg.get('price.vat') === 'included' ? 'כולל מע״מ' : cfg.get('price.vat') === 'excluded' ? 'לא כולל מע״מ' : cfg.ph('price.vat'));
@@ -99,7 +122,8 @@ function termsLine(cfg, toran) {
 // Teder's two plans, every number from site.config.json (teder.small and teder): a card each with its monthly price,
 // its slideshows and redos and its setup fee, and while sign-up is open that the fee is not refunded (NO_REFUND) and its
 // own button to accounts' sign-up with that plan picked (&plan=small or full); then what both include, beside how paying works and, with sign-up closed, the way
-// in (cta); and the terms line. alt: a line under it (the sample). Left out of the public draft until both prices are set.
+// in (cta); and the terms line. alt: a line under it (the sample). On a phone the notes under what both include wait
+// behind "עוד פרטים" (a fold). Left out of the public draft until both prices are set.
 export function tederPricing(cfg, { includes, notes = [], cta = null, alt = '', id = 'price' }) {
   if (!TEDER_PLANS.every(([, k]) => cfg.has(`${k}.monthly`)) && !cfg.banner) return '';
   const open = signupOpen(cfg);
@@ -122,10 +146,10 @@ ${open ? `<a class="btn primary" href="${esc(signupUrl('teder', plan))}">להצ�
 <div class="plans">${TEDER_PLANS.map(card).join('\n')}</div>
 <p class="plan-more">צריכים יותר מ-${count(cfg, 'teder.slideshows')} מצגות בחודש? ${waWords(cfg, 'כתבו לנו בוואטסאפ')}.</p>
 <div class="price-card plan-both glass">
-<div class="price-incl">
+<div class="price-incl${notes.length ? ' fold" data-fold' : '"'}>
 <h3>מה יש בשתי החבילות</h3>
 <ul class="checks">${includes.map((x) => `<li>${x}</li>`).join('')}</ul>
-${notes.map((x) => `<p class="incl-note">${x}</p>`).join('')}
+${notes.length ? `<div class="fold-x" id="${id}-fine">${notes.map((x) => `<p class="incl-note">${x}</p>`).join('')}</div>\n${foldButton(`${id}-fine`, 'עוד פרטים')}` : ''}
 </div>
 <div class="price-main">
 <p class="price-name">${mark('teder', 36)}<b>תדר</b></p>

@@ -7,10 +7,14 @@
 // a channel works before it does. The owners' questions are on /faq.
 // While Toran is soon (products.toran in site.config.json) the page shows what it will do: a "בקרוב" banner on top,
 // every line in the future, no price, and the waitlist where the demo form was.
+// On a phone (the owner, 2026-11-05: "too many things jump to the eyes at the same time") the banner is its one line,
+// without its link (the first screen's button goes to the same waitlist), the first screen's line is its first sentence
+// (the chat's note under the tabs says the rest: the same answer in every channel), the inbox's "זו דוגמה" is the tag on
+// the inbox itself, and the first screen's button spans the width. The lists stay whole: their rows are short.
 import { CHANNELS, mark, signupOpen, signupUrl, toranSoon } from '../lib.mjs';
 import { channelWindow, inList, inbox, liveChannels } from '../channels.mjs';
 import { demoForm, waitlistForm } from '../forms.mjs';
-import { TORAN_SIGNUP_LABEL, TORAN_TRY, toranPricing, toranStart } from '../sections.mjs';
+import { TORAN_SIGNUP_LABEL, TORAN_TRY, rowList, toranPricing, toranStart } from '../sections.mjs';
 
 // What it answers alone comes from the shapes of question in Toran's eval (openfrequency-toran, docs/milestones.md,
 // milestone 3); what it leaves to the owner is what that eval checks it hands off.
@@ -26,7 +30,6 @@ const YOURS = [
   'בקשה להנחה או להחזר כספי',
   'איפה הזמנה מסוימת נמצאת',
 ];
-const rows = (items, cls = '') => `<ul class="rows${cls ? ' ' + cls : ''}">${items.map((s) => `<li><span class="dot" aria-hidden="true"></span><span>${s}</span></li>`).join('')}</ul>`;
 
 // The page while Toran is soon. The channels are the ones it will answer in, all four, with no "בקרוב" on each: the
 // whole of Toran is.
@@ -41,7 +44,7 @@ const soonPage = (cfg) => {
     body: `
 <section class="soon-bar" aria-labelledby="soon-h">
 <div class="wrap">
-<p id="soon-h"><span class="soon">בקרוב</span> <b>תורן עוד לא פתוח לחנויות.</b> <a href="#waitlist">לקבל עדכון כשהוא נפתח</a></p>
+<p id="soon-h"><span class="soon">בקרוב</span> <b>תורן עוד לא פתוח לחנויות.</b><span class="desk"> <a href="#waitlist">לקבל עדכון כשהוא נפתח</a></span></p>
 </div>
 </section>
 
@@ -49,7 +52,7 @@ const soonPage = (cfg) => {
 <div class="wrap">
 <div class="hero-head">${mark('toran', 72, 'תורן')}<h1 id="hero-h"><span class="hl">תורן אחד</span> יענה ללקוחות שלכם ${where}</h1></div>
 <div class="hero-text">
-<p class="lede">תורן יקרא את האתר של החנות ויענה ללקוחות <span class="hl" dir="ltr">24/7</span>, מתוך מה שכתוב בו. בכל מקום שיכתבו לו, הוא יענה אותו דבר, כי זו אותה חנות.</p>
+<p class="lede">תורן יקרא את האתר של החנות ויענה ללקוחות <span class="hl" dir="ltr">24/7</span>, מתוך מה שכתוב בו.<span class="desk"> בכל מקום שיכתבו לו, הוא יענה אותו דבר, כי זו אותה חנות.</span></p>
 <a class="btn hero-cta" href="#waitlist">לקבל עדכון כשתורן נפתח</a>
 </div>
 ${channelWindow(cfg, { all: true })}
@@ -61,7 +64,7 @@ ${channelWindow(cfg, { all: true })}
 <div>
 <h2 id="inbox-h">כל השיחות בתיבה אחת</h2>
 <p class="lede">מה שלקוחות יכתבו ${where} יגיע לרשימה אחת אצלכם. ליד כל שיחה תראו מאיפה היא הגיעה ומה קרה איתה: תורן ענה לבד, היא מחכה לכם, או שתיקנתם והוא למד.</p>
-<p class="quiet">זו דוגמה של התיבה.</p>
+<p class="quiet desk">זו דוגמה של התיבה.</p>
 </div>
 <div class="stage glass">${inbox()}</div>
 </div>
@@ -71,8 +74,8 @@ ${channelWindow(cfg, { all: true })}
 <div class="wrap">
 <div class="sec-head"><h2 id="alone-h">מה הוא יענה לבד, ומה ישאיר לכם</h2></div>
 <div class="two">
-<div><h3>יענה לבד</h3>${rows(ALONE)}</div>
-<div><h3>ישאיר לכם</h3>${rows(YOURS, 'yours')}<p class="quiet">כשאין באתר תשובה, הוא יגיד ללקוח שהוא בודק, במקום לנחש, וישלח לכם את השאלה. מה שתענו הוא יזכור לפעם הבאה.</p></div>
+${rowList('יענה לבד', ALONE)}
+${rowList('ישאיר לכם', YOURS, { cls: 'yours', after: '<p class="quiet">כשאין באתר תשובה, הוא יגיד ללקוח שהוא בודק, במקום לנחש, וישלח לכם את השאלה. מה שתענו הוא יזכור לפעם הבאה.</p>' })}
 </div>
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
@@ -104,7 +107,7 @@ export default (cfg) => {
 <div class="wrap">
 <div class="hero-head">${mark('toran', 72, 'תורן')}<h1 id="hero-h"><span class="hl">תורן אחד</span> עונה ללקוחות שלכם ${where}</h1></div>
 <div class="hero-text">
-<p class="lede">תורן קורא את האתר של החנות ועונה ללקוחות <span class="hl" dir="ltr">24/7</span>, מתוך מה שכתוב בו. בכל מקום שכותבים לו, הוא עונה אותו דבר, כי זו אותה חנות.</p>
+<p class="lede">תורן קורא את האתר של החנות ועונה ללקוחות <span class="hl" dir="ltr">24/7</span>, מתוך מה שכתוב בו.<span class="desk"> בכל מקום שכותבים לו, הוא עונה אותו דבר, כי זו אותה חנות.</span></p>
 ${signupOpen(cfg) ? toranStart(cfg, { wrap: 'start hero-cta', price: false, more: `<a class="btn" href="#demo">${TORAN_TRY}</a>` }) : '<a class="btn primary hero-cta" href="#demo">לנסות את תורן על החנות שלכם</a>'}
 </div>
 ${channelWindow(cfg)}
@@ -126,8 +129,8 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 <div class="wrap">
 <div class="sec-head"><h2 id="alone-h">מה הוא עונה לבד, ומה הוא משאיר לכם</h2></div>
 <div class="two">
-<div><h3>עונה לבד</h3>${rows(ALONE)}</div>
-<div><h3>משאיר לכם</h3>${rows(YOURS, 'yours')}<p class="quiet">כשאין באתר תשובה, הוא אומר ללקוח שהוא בודק, במקום לנחש, ושולח לכם את השאלה. מה שתענו הוא יזכור לפעם הבאה.</p></div>
+${rowList('עונה לבד', ALONE)}
+${rowList('משאיר לכם', YOURS, { cls: 'yours', after: '<p class="quiet">כשאין באתר תשובה, הוא אומר ללקוח שהוא בודק, במקום לנחש, ושולח לכם את השאלה. מה שתענו הוא יזכור לפעם הבאה.</p>' })}
 </div>
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
