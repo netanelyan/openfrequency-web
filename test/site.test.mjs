@@ -106,7 +106,7 @@ test('with "soon", Toran keeps its pages with a "בקרוב" badge and its waitl
   // (spacing.test.mjs), with one button, which saves a place on the waitlist. The section on Toran as the owner's
   // assistant and the question box are gone.
   const hero = /<section class="co-hero"[\s\S]*?<\/section>/.exec(home)[0];
-  assert.match(hero, /<h1 id="hero-h"><span class="hl">מצגות בעברית<\/span> לטיקטוק/);
+  assert.match(hero, /<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית<\/span><\/h1>/);
   // The headline stands alone (the owner, 2026-11-05): no line under it; Toran's "בקרוב" is on its door.
   assert.doesNotMatch(hero, /<p class="(lede|co-soon)"/, 'no lines under the headline');
   const toranDoor = /<article class="door toran-door"[\s\S]*?<\/article>/.exec(home)[0];

@@ -1309,3 +1309,8 @@ html.sk-on #main > :not(.sk-page) { display: none; }
   .legal-toc .fold-btn:not([hidden]) { display: flex; justify-content: space-between; width: 100%; margin: 0; padding: 0; background: none; font-size: 17px; }
   .legal-toc.fold:not(.shut) ol { margin: 6px 0 12px; }
 }
+
+/* On a phone a field is never under 16px: an iPhone zooms the page in on tapping a smaller one (the owner, 2026-11-05,
+   "make zooming in on mobile not available"). Pinch-zoom itself stays: blocking it fails WCAG 1.4.4 and the
+   accessibility statement, and Safari ignores user-scalable=no anyway. */
+@media (max-width: 699px) { input, select, textarea { font-size: max(16px, 1em) !important; } }

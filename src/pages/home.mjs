@@ -20,7 +20,7 @@
 import { mark, glyphOnly, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { TORAN_SAVE } from '../forms.mjs';
-import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, foldButton, tederFrom, tederPriceLine, toranStart } from '../sections.mjs';
+import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, foldButton, tederPriceLine, toranStart } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -55,7 +55,7 @@ const hero = (cfg) => {
     : '<div class="door-act"><a class="btn light" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn on-color" href="/toran">עוד על תורן</a></div>';
   const toranDoor = `<article class="door toran-door" aria-labelledby="door-toran" data-door>
 ${soon
-    ? doorTop('toran', glyph('toran'), `תורן ${soonBadge}`, 'יענה ללקוחות של החנות 24/7', 'יענה ללקוחות של החנות מתוך מה שכתוב באתר, ומה שלא כתוב שם ישאל אתכם.')
+    ? doorTop('toran', glyph('toran'), `תורן ${soonBadge}`, 'יענה ללקוחות של החנות 24/7, מתוך מה שכתוב באתר.', 'מה שלא כתוב שם, הוא ישאל אתכם.')
     : doorTop('toran', glyph('toran'), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
 ${soon ? '' : `${toranAct}\n`}<div class="door-in" id="door-toran-in">
 ${soon ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/toran#waitlist">${TORAN_SAVE}</a></div>\n<p class="start-alt">נכתוב לכם פעם אחת, כשתורן נפתח.</p></div>\n` : ''}<div class="phone-sit" data-play>
@@ -65,7 +65,7 @@ ${soon ? `<div class="start door-start"><div class="door-act"><a class="btn ligh
 </div>
 </article>`;
   const tederDoor = `<article class="door teder-door" aria-labelledby="door-teder" data-door>
-${doorTop('teder', glyph('teder'), 'תדר', tederFrom(cfg) || `מצגות ${tederNets(cfg)}`, `כותב ומעצב מצגות בעברית ${tederNets(cfg)}. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.`)}
+${doorTop('teder', glyph('teder'), 'תדר', `כותב ומעצב מצגות בעברית ${tederNets(cfg)}.`, 'כל מצגת יוצאת רק אחרי שמישהו אישר אותה.')}
 ${signupOpen(cfg)
     ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/teder#demo">${TEDER_SAMPLE}</a><a class="btn on-color" href="/teder">${SIGNUP_LABEL}</a></div>
 <p class="start-price">${tederPriceLine(cfg)}</p></div>`
@@ -78,7 +78,7 @@ ${reel}
 <section class="co-hero" aria-labelledby="hero-h">
 <div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
 <div class="wrap">
-${soon ? `<h1 id="hero-h"><span class="hl">מצגות בעברית</span> ${tederNets(cfg)}</h1>` : `<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>
+${soon ? `<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>` : `<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>
 <p class="lede">תדר כותב ומעצב לכם מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.</p>`}
 <div class="doors">
 ${soon ? `${tederDoor}\n${toranDoor}` : `${toranDoor}\n${tederDoor}`}

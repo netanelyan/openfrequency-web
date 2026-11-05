@@ -133,7 +133,8 @@ test('with "open", Teder\'s first screens have sign-up, the demo and the sample 
   assert.ok(door.includes(`<a class="btn light" href="/teder#demo">מצגת לדוגמה לחנות שלכם</a><a class="btn on-color" href="/teder">להצטרף לתדר</a></div>\n<p class="start-price">`));
   assert.ok(!door.includes(SIGNUP), "the door's join button leads to /teder, not to sign-up");
   assert.ok(text(door).includes(`${config.teder.small.monthly.toLocaleString('he-IL')} ₪ לחודש ל-${config.teder.small.slideshows} מצגות, או ${price} ל-${config.teder.slideshows} מצגות, לא כולל מע״מ.`), 'both plans and VAT on the door');
-  assert.match(door, new RegExp(`<p class="door-sum">מ-${config.teder.small.monthly} ₪ לחודש, לא כולל מע״מ</p>`), "the shut door's line");
+  // Shut, the door says what Teder is in one sentence (the owner, 2026-11-05); the price is under its buttons.
+  assert.match(door, /<p class="door-sum">כותב ומעצב מצגות בעברית לטיקטוק[^<]*\.<\/p>/, "the shut door's line");
 });
 
 test('with "open", /join starts with sign-up and its price, then the sample form, and its steps are sign-up\'s', () => {
