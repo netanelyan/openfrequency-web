@@ -42,7 +42,7 @@ const DOOR_CHAT = [
 // (Toran's waitlist button while it is soon aside), so a phone's first screen has the headline and one door to act on
 // (the owner, 2026-11-05: "too many things jump to the eyes at the same time"); Teder's full price line waits with the
 // rest of the door.
-const doorTop = (id, face, name, short, say) => `<div class="door-top">${face}<div><h2 id="door-${id}">${name}</h2><p class="door-sum">${short}</p><p class="door-say">${say}</p></div><button type="button" class="door-open" aria-expanded="true" aria-controls="door-${id}-in" aria-labelledby="door-${id}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg></button></div>`;
+const doorTop = (id, face, name, short, say) => `<div class="door-top">${face}<div><h2 id="door-${id}">${name}</h2><p class="door-sum">${short}</p>${say ? `<p class="door-say">${say}</p>` : ''}</div><button type="button" class="door-open" aria-expanded="true" aria-controls="door-${id}-in" aria-labelledby="door-${id}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg></button></div>`;
 
 const soonBadge = '<span class="soon">בקרוב</span>';
 const hero = (cfg) => {
@@ -55,7 +55,7 @@ const hero = (cfg) => {
     : '<div class="door-act"><a class="btn light" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn on-color" href="/toran">עוד על תורן</a></div>';
   const toranDoor = `<article class="door toran-door" aria-labelledby="door-toran" data-door>
 ${soon
-    ? doorTop('toran', glyph('toran'), `תורן ${soonBadge}`, 'יענה ללקוחות של החנות 24/7, מתוך מה שכתוב באתר.', 'מה שלא כתוב שם, הוא ישאל אתכם.')
+    ? doorTop('toran', glyph('toran'), `תורן ${soonBadge}`, 'יענה בשבילכם ללקוחות של החנות 24/7, לפי מה שכתוב באתר שלכם.', '')
     : doorTop('toran', glyph('toran'), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
 ${soon ? '' : `${toranAct}\n`}<div class="door-in" id="door-toran-in">
 ${soon ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/toran#waitlist">${TORAN_SAVE}</a></div>\n<p class="start-alt">נכתוב לכם פעם אחת, כשתורן נפתח.</p></div>\n` : ''}<div class="phone-sit" data-play>
@@ -65,7 +65,7 @@ ${soon ? `<div class="start door-start"><div class="door-act"><a class="btn ligh
 </div>
 </article>`;
   const tederDoor = `<article class="door teder-door" aria-labelledby="door-teder" data-door>
-${doorTop('teder', glyph('teder'), 'תדר', `כותב ומעצב מצגות בעברית ${tederNets(cfg)}.`, 'כל מצגת יוצאת רק אחרי שמישהו אישר אותה.')}
+${doorTop('teder', glyph('teder'), 'תדר', `מכין לחנות שלכם מצגות בעברית ${tederNets(cfg)}, ומעלה רק את מה שאישרתם.`, '')}
 ${signupOpen(cfg)
     ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/teder#demo">${TEDER_SAMPLE}</a><a class="btn on-color" href="/teder">${SIGNUP_LABEL}</a></div>
 <p class="start-price">${tederPriceLine(cfg)}</p></div>`
