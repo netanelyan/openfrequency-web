@@ -9,12 +9,13 @@
 // comes first with its price, and Toran has one line with "בקרוב" and a door as finished as Teder's, in its own green,
 // whose one button saves a place on its waitlist ("שמרו לי מקום", /toran#waitlist). Every line about Toran says what
 // it will do, and the section on Toran as the owner's assistant waits for Toran.
-// While sign-up is open (signup), Teder's door sends to accounts' sign-up with the price under it, and the sample
-// slideshow is the line after.
-import { CHANNELS, mark, glyphOnly, signupOpen, tederNets, toranSoon } from '../lib.mjs';
+// While sign-up is open (signup), Teder's door has two buttons (the owner, 2026-11-05): the sample slideshow for your
+// store, and "להצטרף לתדר", which leads to /teder (whose own "להצטרף לתדר" is the one that goes to accounts' sign-up),
+// with the price under them. The headline stands alone, with no lines under it (the owner, 2026-11-05).
+import { mark, glyphOnly, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { TORAN_SAVE } from '../forms.mjs';
-import { TEDER_DEMO, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, tederFrom, tederStart, toranStart } from '../sections.mjs';
+import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, tederFrom, tederPriceLine, toranStart } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -59,7 +60,8 @@ ${soon
 ${doorTop('teder', glyph('teder'), 'תדר', tederFrom(cfg) || `מצגות ${tederNets(cfg)}`, `כותב ומעצב מצגות בעברית ${tederNets(cfg)}. כל מצגת יוצאת רק אחרי שמישהו אישר אותה.`)}
 <div class="door-in" id="door-teder-in">
 ${signupOpen(cfg)
-    ? tederStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', more: `<a class="btn on-color" href="/teder">${TEDER_DEMO}</a><a class="btn on-color" href="/teder#demo">${TEDER_SAMPLE}</a>` })
+    ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/teder#demo">${TEDER_SAMPLE}</a><a class="btn on-color" href="/teder">${SIGNUP_LABEL}</a></div>
+<p class="start-price">${tederPriceLine(cfg)}</p></div>`
     : '<div class="door-act"><a class="btn light" href="/teder#demo">לנסות את תדר על החנות שלכם</a><a class="btn on-color" href="/teder">עוד על תדר</a></div>'}
 ${reel}
 </div>
@@ -68,9 +70,7 @@ ${reel}
 <section class="co-hero" aria-labelledby="hero-h">
 <div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
 <div class="wrap">
-${soon ? `<h1 id="hero-h"><span class="hl">מצגות בעברית</span> ${tederNets(cfg)}</h1>
-<p class="lede">תדר כותב ומעצב את המצגות, ומפרסם כל אחת רק אחרי שמישהו אישר אותה.</p>
-<p class="co-soon">${soonBadge} תורן יענה ללקוחות שלכם 24/7 ${inList(CHANNELS)}, מתוך מה שכתוב באתר.</p>` : `<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>
+${soon ? `<h1 id="hero-h"><span class="hl">מצגות בעברית</span> ${tederNets(cfg)}</h1>` : `<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>
 <p class="lede">תדר כותב ומעצב לכם מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.</p>`}
 <div class="doors">
 ${soon ? `${tederDoor}\n${toranDoor}` : `${toranDoor}\n${tederDoor}`}
@@ -161,7 +161,7 @@ const tederDashboard = (cfg) => `
 
 export default (cfg) => ({
   path: '/',
-  title: 'OpenFrequency, תורן ותדר',
+  title: 'מצגות בעברית לטיקטוק ולאינסטגרם לחנויות | OpenFrequency',
   description: toranSoon(cfg)
     ? `תדר כותב ומעצב מצגות בעברית ${tederNets(cfg)}. תורן, שיענה ללקוחות של החנות 24/7 מתוך מה שכתוב באתר, נפתח בקרוב.`
     : `תדר כותב ומעצב מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,

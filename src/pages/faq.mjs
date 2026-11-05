@@ -91,8 +91,13 @@ ${items.map(([q, a]) => `<details name="faq"><summary><span>${q}</span><span cla
 </div>
 </section>`;
 
+// The questions again as schema.org FAQPage, word for word what the page shows, without the markup.
+const plain = (html) => html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+const faqData = (cfg) => [{ '@type': 'FAQPage', mainEntity: [...TEDER(cfg), ...TORAN(cfg)].filter(Boolean).map(([q, a]) => ({ '@type': 'Question', name: plain(q), acceptedAnswer: { '@type': 'Answer', text: plain(a) } })) }];
+
 export default (cfg) => ({
   path: '/faq',
+  ld: faqData(cfg),
   title: 'שאלות על תורן ועל תדר | OpenFrequency',
   description: toranSoon(cfg)
     ? 'מה ששואלים אותנו על תדר ועל תורן: איך תדר עובד וכמה הוא עולה, ומה תורן יעשה כשייפתח.'

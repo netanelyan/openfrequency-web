@@ -117,6 +117,9 @@ test('an Israeli mobile is kept as 9725XXXXXXXX', () => {
   assert.equal(mobile('050-123-4567'), '972501234567');
   assert.equal(mobile('+972 50 123 4567'), '972501234567');
   assert.equal(mobile('0501234567'), '972501234567');
+  // Pasted from a phone's contacts or from WhatsApp: direction marks around it, a non-breaking hyphen inside.
+  assert.equal(mobile('‪+972 54‑1234567‬'), '972541234567');
+  assert.equal(mobile('⁨050‐123‐4567⁩'), '972501234567');
   assert.equal(mobile('03-1234567'), null);
   assert.equal(mobile('12345'), null);
 });
@@ -335,6 +338,7 @@ test('a bad address or number says which field', async () => {
 test("Toran's waitlist takes a phone or an email, and the store's address only if it is a real one", () => {
   assert.deepEqual(validate({ source: 'waitlist', contact: '050-123-4567', page: '/toran' }), { lead: { source: 'waitlist', store: null, contact: '972501234567', page: '/toran' }, sources: ['waitlist'] });
   assert.equal(validate({ source: 'waitlist', contact: ' Owner@Shop.co.il ' }).lead.contact, 'owner@shop.co.il');
+  assert.equal(validate({ source: 'waitlist', contact: '‪+972 52-765-4321‬' }).lead.contact, '972527654321', 'a number pasted from WhatsApp');
   assert.equal(validate({ source: 'waitlist', contact: 'owner@shop.co.il', store: 'www.shop.co.il' }).lead.store, 'shop.co.il');
   assert.equal(validate({ source: 'waitlist', contact: 'owner@shop.co.il', store: 'not a store' }).lead.store, null);
   for (const bad of ['', '123', 'owner@', 'owner@shop', 'a b@shop.co.il', '<x>@shop.co.il', 'x'.repeat(250) + '@shop.co.il']) {

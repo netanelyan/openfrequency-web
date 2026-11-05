@@ -32,6 +32,9 @@ export const FACTS = {
   payment: { label: 'איך משלמים: פרטי תשלום שאנחנו שולחים במייל (manual) או בכרטיס, בעמוד התשלום בחשבון (provider)', kind: ['manual', 'provider'], renamed: { online: 'provider' } },
   domain: { label: 'הדומיין', kind: 'text' },
   whatsapp: { label: 'מספר הוואטסאפ שלנו', kind: 'text' },
+  // Our own profiles, full addresses: the home page's schema.org Organization gives them as sameAs (layout.mjs data).
+  'social.instagram': { label: 'הכתובת של האינסטגרם שלנו', kind: 'text' },
+  'social.tiktok': { label: 'הכתובת של הטיקטוק שלנו', kind: 'text' },
   'demo.time': { label: 'זמן הכנת דמו', kind: 'text' },
   'about.who': { label: 'משפט על מי אנחנו', kind: 'text' },
   'about.why': { label: 'משפט על למה בנינו את תורן', kind: 'text' },

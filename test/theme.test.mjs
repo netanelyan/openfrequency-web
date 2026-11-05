@@ -99,7 +99,7 @@ test('every page: light in its markup, the button in the header, the cookie read
   const statement = html['/accessibility/'].replace(/<[^>]+>/g, '');
   assert.match(statement, /האתר מוצג בצבעים בהירים\. בכפתור עם הירח בראש כל עמוד עוברים למצב כהה/);
   assert.doesNotMatch(statement, /הגדרות המערכת שלכם: מצב כהה/);
-  assert.match(statement, /עודכן לאחרונה ב-1 בנובמבר 2026/);
+  assert.match(statement, /עודכן לאחרונה ב-4 בנובמבר 2026/);
   // The privacy page names the cookie, where it reaches and for how long, under its own date (legal.privacyUpdated).
   const privacy = html['/privacy/'].replace(/<[^>]+>/g, '');
   assert.doesNotMatch(privacy, /האתר הזה לא שם עוגיות|באתר הזה אין עוגיות/);

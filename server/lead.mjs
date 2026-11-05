@@ -196,9 +196,10 @@ export function storeHost(s) {
   }
 }
 
-// An Israeli mobile, in any of the ways people write it, as 9725XXXXXXXX.
+// An Israeli mobile, in any of the ways people write it, as 9725XXXXXXXX. A number pasted from a phone's contacts or
+// from WhatsApp can carry invisible direction marks and other hyphens (U+2010 to U+2015); they go like the spaces.
 export function mobile(s) {
-  const d = String(s || '').replace(/[\s\-().]/g, '').replace(/^\+/, '');
+  const d = String(s || '').replace(/[\s\-().​‎‏‪-‮⁦-⁩‐-―]/g, '').replace(/^\+/, '');
   if (!/^\d+$/.test(d)) return null;
   if (/^05\d{8}$/.test(d)) return '972' + d.slice(1);
   if (/^9725\d{8}$/.test(d)) return d;

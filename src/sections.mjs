@@ -77,7 +77,7 @@ ${demo ? `<p class="start-alt">רוצים קודם לראות אותו עונה 
 // that screen sells Teder. The demo shows the product working; the sample (Teder) or the demo form (Toran) is the
 // store's own.
 export const TEDER_DEMO = 'לראות דמו';
-export const TEDER_SAMPLE = 'מצגת לדוגמה מהחנות שלכם';
+export const TEDER_SAMPLE = 'מצגת לדוגמה לחנות שלכם';
 export const TORAN_DEMO = 'לראות דמו';
 export const TORAN_TRY = 'לנסות על החנות שלכם';
 

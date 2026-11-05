@@ -6,6 +6,8 @@
 import { esc, mark } from './lib.mjs';
 
 export const CLIENTS = [
+  // We run on our own tools too; no logo file, so the card shows our mark.
+  { name: 'OpenFrequency', url: '/', line: 'תדר ותורן לחנויות אונליין' },
   { name: 'חנות השופט', url: 'https://hashofet.com', logo: 'hashofet.png', pad: 3, line: 'חולצות כדורגל לקבוצות, לנבחרות ורטרו' },
   { name: 'BrickDeal', url: 'https://brickdealil.com', logo: 'brickdeal.svg', line: 'דילים על אבני בנייה תואמות מאליאקספרס' },
   { name: 'טיול+', url: 'https://www.tiyulplus.com', logo: 'tiyulplus.svg', pad: 9, line: 'סוכן נסיעות חכם לישראלים' },
@@ -17,9 +19,14 @@ const card = (c, hidden) => `<li${hidden ? ' aria-hidden="true"' : ''}><a class=
 
 // A strip that moves on its own and pauses under the pointer or the keyboard. The row is two identical lists side by
 // side, moved by exactly one list's width, so the loop has no seam. Each list repeats the businesses until it is
-// wider than a wide screen; only the first copy is read out and reachable by Tab.
+// wider than the widest screen (WIDEST: a 32:9 ultrawide, 5120px, zoomed out to 67%); narrower than the screen, an
+// empty stretch slid in at the end of each loop (6 cards, 1,824px, on a 1920px screen; 15 cards on a 5120px one).
+// STEP is a card and the gap after it (.client, .clients-list in style.css). Only the first copy is read out and
+// reachable by Tab.
+const WIDEST = 7680;
+const STEP = 290 + 14;
 export function clients() {
-  const reps = Math.max(1, Math.ceil(6 / CLIENTS.length));
+  const reps = Math.max(1, Math.ceil(WIDEST / STEP / CLIENTS.length));
   const list = (hidden) => Array.from({ length: reps }, (_, r) => CLIENTS.map((c) => card(c, hidden || r > 0)).join('')).join('');
   return `
 <section class="clients-sec" aria-labelledby="clients-h">

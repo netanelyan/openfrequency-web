@@ -6,6 +6,10 @@
   "payment": "manual",
   "domain": "openfrequency.co.il",
   "whatsapp": "972552536259",
+  "social": {
+    "instagram": "https://www.instagram.com/getopenfrequency/",
+    "tiktok": "https://www.tiktok.com/@getopenfrequency"
+  },
   "demo": {
     "time": "שעה"
   },
@@ -90,6 +94,6 @@
     "contractsUpdated": "2026-11-03",
     "privacyWaUpdated": "2026-10-31",
     "privacyUpdated": "2026-11-04",
-    "accessibilityUpdated": "2026-11-01"
+    "accessibilityUpdated": "2026-11-04"
   }
 }

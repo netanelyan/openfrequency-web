@@ -106,7 +106,7 @@ test('with "open", Teder\'s first screens have sign-up, the demo and the sample 
   const hero = /<div class="start hero-cta">[\s\S]*?<\/div>/.exec(teder)[0];
   assert.match(hero, new RegExp(`<a class="btn light" href="${SIGNUP.replace(/[?.]/g, '\\$&')}">להצטרף לתדר</a>`));
   assert.ok(!text(hero).includes(price), 'no price in the first screen');
-  assert.match(hero, /<a class="btn on-color" href="#demo">מצגת לדוגמה מהחנות שלכם<\/a>/);
+  assert.match(hero, /<a class="btn on-color" href="#demo">מצגת לדוגמה לחנות שלכם<\/a>/);
   assert.doesNotMatch(teder, /href="#demo">לנסות את תדר על החנות שלכם/);
   // Each plan's card has its own button, to sign-up with that plan picked; the card both share keeps the sample and
   // says how paying works while no payment provider is connected.
@@ -128,7 +128,10 @@ test('with "open", Teder\'s first screens have sign-up, the demo and the sample 
   // and, shut on a phone, the lowest monthly price with VAT is its short line (the owner, 2026-11-01: "The hero: sell
   // Teder, which you can buy now"; until then the door, like /teder's top, had no price).
   const door = /<article class="door teder-door[\s\S]*?<\/article>/.exec(main(pages['index.html']))[0];
-  assert.ok(door.includes(`<a class="btn light" href="${SIGNUP}">להצטרף לתדר</a><a class="btn on-color" href="/teder">לראות דמו</a><a class="btn on-color" href="/teder#demo">מצגת לדוגמה מהחנות שלכם</a></div>\n<p class="start-price">`));
+  // Its two buttons (the owner, 2026-11-05): the sample for your store, and "להצטרף לתדר" to /teder, whose own button
+  // is the one to sign-up; nothing on the door goes to sign-up itself.
+  assert.ok(door.includes(`<a class="btn light" href="/teder#demo">מצגת לדוגמה לחנות שלכם</a><a class="btn on-color" href="/teder">להצטרף לתדר</a></div>\n<p class="start-price">`));
+  assert.ok(!door.includes(SIGNUP), "the door's join button leads to /teder, not to sign-up");
   assert.ok(text(door).includes(`${config.teder.small.monthly.toLocaleString('he-IL')} ₪ לחודש ל-${config.teder.small.slideshows} מצגות, או ${price} ל-${config.teder.slideshows} מצגות, לא כולל מע״מ.`), 'both plans and VAT on the door');
   assert.match(door, new RegExp(`<p class="door-sum">מ-${config.teder.small.monthly} ₪ לחודש, לא כולל מע״מ</p>`), "the shut door's line");
 });

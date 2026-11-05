@@ -90,7 +90,7 @@ function footer(cfg, current) {
 ${cfg.has('about.who') || cfg.banner ? `<h2 id="f-who">מי אנחנו</h2><p>${cfg.t('about.who')}</p><p class="foot-why">${cfg.t('about.why')}</p>` : ''}
 </div>
 <nav aria-labelledby="f-prod"><h2 id="f-prod">המוצרים</h2><ul>
-${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}">${mark(name, 28)}<span><b>${label}</b><small>${what}</small></span></a></li>`).join('\n')}
+${PRODUCTS.map(([href, name, label, what]) => `<li><a class="prod" href="${href}">${mark(name, 32)}<span><b>${label}</b><small>${what}</small></span></a></li>`).join('\n')}
 </ul></nav>
 <nav aria-labelledby="f-site"><h2 id="f-site">באתר</h2><ul>
 ${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('')}<li><a href="/terms">תנאי שימוש</a></li><li><a href="/privacy">פרטיות</a></li><li><a href="/security">אבטחת מידע</a></li><li><a href="/accessibility">נגישות</a></li>
@@ -156,7 +156,24 @@ function share(cfg, path, title, description, image) {
 `;
 }
 
-export function page(cfg, css, { path, title, description, body, noindex = false, forms = false, image = 'openfrequency' }) {
+// What a search engine reads about the page beside its text (schema.org JSON-LD): on the home page who we are and the
+// site's name (what Google shows over the result), with our own profiles (social in site.config.json) as sameAs, then
+// what a page adds of its own (the questions on /faq). A data block is not a script, so the CSP leaves it alone; "<"
+// is escaped so nothing in it can close the tag.
+function data(cfg, path, ld = []) {
+  const origin = `https://${cfg.get('domain') || 'openfrequency.co.il'}`;
+  const sameAs = ['instagram', 'tiktok'].map((k) => cfg.get(`social.${k}`)).filter(Boolean);
+  const items = [
+    ...(path === '/' ? [
+      { '@type': 'Organization', '@id': `${origin}/#org`, name: 'OpenFrequency', url: `${origin}/`, logo: `${origin}/icon-512.png`, ...(sameAs.length ? { sameAs } : {}) },
+      { '@type': 'WebSite', '@id': `${origin}/#site`, name: 'OpenFrequency', url: `${origin}/`, inLanguage: 'he', publisher: { '@id': `${origin}/#org` } },
+    ] : []),
+    ...ld,
+  ];
+  return items.length ? `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': items }).replace(/</g, '\\u003c')}</script>\n` : '';
+}
+
+export function page(cfg, css, { path, title, description, body, noindex = false, forms = false, image = 'openfrequency', ld }) {
   const missing = cfg.banner && cfg.missing.size
     ? `<p class="draft" role="note">טיוטה. חסרים עוד ${cfg.missing.size} פרטים ב-site.config.json, והאתר לא ייבנה בלעדיהם.</p>`
     : '';
@@ -171,7 +188,7 @@ ${share(cfg, path, title, description, image)}${noindex || cfg.draft ? '<meta na
 <meta name="theme-color" content="${THEME_COLOR.light}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<style>${css}</style>
+${noindex ? '' : data(cfg, path, ld)}<style>${css}</style>
 ${early}
 </head>
 <body>

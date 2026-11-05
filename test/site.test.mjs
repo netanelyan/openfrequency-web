@@ -107,7 +107,8 @@ test('with "soon", Toran keeps its pages with a "בקרוב" badge and its waitl
   // assistant and the question box are gone.
   const hero = /<section class="co-hero"[\s\S]*?<\/section>/.exec(home)[0];
   assert.match(hero, /<h1 id="hero-h"><span class="hl">מצגות בעברית<\/span> לטיקטוק/);
-  assert.equal((hero.match(/<p class="co-soon"><span class="soon">בקרוב<\/span> /g) || []).length, 1, "Toran's one line, with the badge");
+  // The headline stands alone (the owner, 2026-11-05): no line under it; Toran's "בקרוב" is on its door.
+  assert.doesNotMatch(hero, /<p class="(lede|co-soon)"/, 'no lines under the headline');
   const toranDoor = /<article class="door toran-door"[\s\S]*?<\/article>/.exec(home)[0];
   assert.deepEqual([...toranDoor.matchAll(/<a class="btn[^"]*" href="([^"]*)">([^<]*)<\/a>/g)].map((m) => [m[1], m[2]]), [['/toran#waitlist', 'שמרו לי מקום']]);
   assert.doesNotMatch(home, /id="owner"|id="ask"|data-ask|ask-a-/, 'no section on Toran for the owner, no question box');
