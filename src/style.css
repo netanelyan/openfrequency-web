@@ -700,10 +700,11 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .door-top h2 { font-size: var(--fs-lead); line-height: 1.2; }
 .door-top p { margin: 6px 0 0; color: var(--ink-2); }
 .door-act { display: flex; flex-wrap: wrap; gap: 10px; }
-/* The door's inside is laid out as part of the door; on a phone a shut door shows only its top row, with a short line
-   in place of the long one, and opens under a tap anywhere on that row (home.mjs doorTop, site.js). */
+/* The door's inside is laid out as part of the door; on a phone a shut door shows only its top row, with its one line
+   of what the product does, and opens under a tap anywhere on that row (home.mjs doorTop, site.js). The line shows on
+   every screen: it was hidden outside a shut phone door, so a desk showed no line at all (the owner, 2026-11-06). */
 .door-in { display: contents; }
-.door-sum, .door-open { display: none; }
+.door-open { display: none; }
 @media (max-width: 699px) {
   .door-top { position: relative; }
   .door-top > div { flex: 1; min-width: 0; }
@@ -716,7 +717,6 @@ label.f[hidden], .demo .when[hidden] { display: none; }
   :is(.teder-door, .toran-door) .door-open:focus-visible { outline-color: #fff; }
   .door.shut { padding-bottom: var(--pad); }
   .door.shut .door-in, .door.shut .door-say { display: none; }
-  .door.shut .door-sum { display: block; }
 }
 /* Each door in its product's own colour, Teder's violet and Toran's green, with the glyph in white on it. */
 .teder-door { background: var(--teder); color: #fff; }
@@ -973,6 +973,24 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .auto dt { font-weight: 700; }
 .auto dd { margin: 0; color: var(--ink-2); }
 @media (min-width: 700px) { .auto > div { grid-template-columns: 180px minmax(0, 1fr); gap: 24px; } }
+
+/* /teder's "למה דווקא אותנו" (pages/teder.mjs why): the heading and its line against a list of reasons, each a bold
+   line and its sentences, odd rows on a tile and nothing else, so it reads as one list and not six cards. From 900px
+   the heading stays in view beside the list, as the questions' group headings do. */
+.why { display: grid; gap: 4px; margin: 0; }
+.why > div { padding: 16px 20px; border-radius: var(--r-m); }
+.why > div:nth-child(odd) { background: var(--tile); }
+.why dt { font-weight: 700; }
+.why dd { margin: 4px 0 0; max-width: 62ch; color: var(--ink-2); }
+/* A prefix letter and the Latin name after it ("ב-ChatGPT") stay on one line. */
+.nw { white-space: nowrap; }
+@media (min-width: 900px) {
+  .why-grid { display: grid; grid-template-columns: minmax(0, 0.5fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+  .why-grid .sec-head { position: sticky; top: calc(var(--top) + 24px); margin-bottom: 0; }
+}
+/* How the slideshows (and Toran) are meant to pay for themselves: a heading, its paragraph, and what the report shows. */
+.ret-sec h2 + .lede { margin-top: 14px; }
+.ret-sec .lede + p { margin-top: 14px; max-width: 62ch; color: var(--ink-2); }
 
 .side { display: grid; gap: 28px; align-items: center; }
 @media (min-width: 900px) { .side { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; } .side .stage { justify-self: end; } }

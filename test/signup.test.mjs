@@ -135,6 +135,9 @@ test('with "open", Teder\'s first screens have sign-up, the demo and the sample 
   assert.ok(text(door).includes(`${config.teder.small.monthly.toLocaleString('he-IL')} ₪ לחודש ל-${config.teder.small.slideshows} מצגות, או ${price} ל-${config.teder.slideshows} מצגות, לא כולל מע״מ.`), 'both plans and VAT on the door');
   // Shut, the door says what Teder is in one sentence (the owner, 2026-11-05); the price is under its buttons.
   assert.match(door, /<p class="door-sum">מכין לחנות שלכם מצגות בעברית לטיקטוק[^<]*\.<\/p>/, "the shut door's line");
+  // And on every screen, not only on a shut phone door: a desk showed the door with no line at all (2026-11-06).
+  const css = fs.readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  assert.ok(![...css.matchAll(/([^{}]*)\{[^}]*display:\s*none/g)].some((m) => /\.door-sum/.test(m[1])), "no rule hides the door's line");
 });
 
 test('with "open", /join starts with sign-up and its price, then the sample form, and its steps are sign-up\'s', () => {

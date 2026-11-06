@@ -1,7 +1,7 @@
 // Toran's page, built around where customers write: one agent and one inbox, whichever channel the customer picks.
 // The headline, a button down to the demo form, and the tabs with the window that changes with them, the same question
-// and answer in each; the owner's one inbox; what it answers alone and what it leaves for you; the price; and the demo
-// form at the end.
+// and answer in each; the owner's one inbox; what it answers alone and what it leaves for you; what it is meant to pay
+// back (payBack); the price; and the demo form at the end.
 // Which channels Toran answers in is toran.channels in site.config.json, or Toran's own /channels.json when
 // toran.channelsFrom is "toran" (build.mjs); every sentence that names them is built from it, so the page never says
 // a channel works before it does. The owners' questions are on /faq.
@@ -30,6 +30,18 @@ const YOURS = [
   'בקשה להנחה או להחזר כספי',
   'איפה הזמנה מסוימת נמצאת',
 ];
+
+// What Toran is meant to pay back (the owner, 2026-11-06: each product an investment that comes back in customers and
+// time, not only a cost), with no figure: right above the waitlist while it is soon, in the future, and right above the
+// price once it is live. It answers at night and on Shabbat because nothing in openfrequency-toran holds a reply: its
+// quiet time (src/core/clock.ts customerQuiet) is for the store's automatic messages alone (src/auto/send.ts).
+const payBack = (soon) => `
+<section class="sec ret-sec" id="return" aria-labelledby="return-h">
+<div class="wrap narrow">
+<h2 id="return-h">מה תורן אמור להחזיר</h2>
+<p class="lede">שאלה שנשארת בלי תשובה עד הבוקר היא לפעמים קנייה שלא קרתה. ${soon ? 'תורן יענה מיד, גם בלילה ובשבת, מתוך מה שכתוב באתר, ויעביר' : 'תורן עונה מיד, גם בלילה ובשבת, מתוך מה שכתוב באתר, ומעביר'} אליכם רק את מה שצריך אתכם. ככה הוא אמור להחזיר את עצמו: בקניות שלא הולכות לאיבוד ובזמן שלכם שמתפנה.</p>
+</div>
+</section>`;
 
 // The page while Toran is soon. The channels are the ones it will answer in, all four, with no "בקרוב" on each: the
 // whole of Toran is.
@@ -80,7 +92,7 @@ ${rowList('ישאיר לכם', YOURS, { cls: 'yours', after: '<p class="quiet">�
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
-
+${payBack(true)}
 <section class="sec close-sec" id="waitlist" aria-labelledby="waitlist-h">
 <div class="wrap narrow">
 <h2 id="waitlist-h">רוצים לדעת כשתורן נפתח?</h2>
@@ -135,6 +147,7 @@ ${rowList('משאיר לכם', YOURS, { cls: 'yours', after: '<p class="quiet">�
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
+${payBack(false)}
 ${toranPricing(cfg, { cta: signupOpen(cfg) ? [signupUrl('toran'), TORAN_SIGNUP_LABEL] : ['#demo', 'לנסות את תורן על החנות שלכם'], includes: [
   `עונה ללקוחות 24/7 ${soon.length ? `בכל הערוצים הפעילים, ${inList(live)}` : inList(live)}, מתוך מה שכתוב באתר שלכם`,
   'תזכורות על עגלה נטושה, למי שהסכים לקבל מכם הודעות, כלולות במחיר',

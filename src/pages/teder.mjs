@@ -1,6 +1,10 @@
 // Teder's page, in the shape of Toran's, on its own violet: the headline and a button down to the demo form, beside its
-// slideshows under a tab for each platform it posts to; what it does alone and what is left for you; its two plans; and
-// the demo form at the end. (The screen where the day's slideshows wait for approval is on the home page; here it said
+// slideshows under a tab for each platform it posts to; what it does alone and what is left for you; why Teder and not
+// a slideshow made by hand in ChatGPT (#why); how the slideshows are meant to pay for themselves, right above the price
+// (the owner, 2026-11-06: an investment that comes back in customers and an audience, not only a cost; no figure, and
+// the price card's note that we promise the process and not the views stays as it is; what the monthly report shows is
+// what openfrequency-teder's src/notify/email.js monthlyEmail writes); its two plans; and the demo
+// form at the end. (The screen where the day's slideshows wait for approval is on the home page; here it said
 // again what the first screen, the list and the plans already say, and on a phone it was 840px of a long page: the
 // owner, 2026-11-01, "The mobile page is very long".) What it does comes from
 // openfrequency-teder's README ("What it does", "Publishing").
@@ -14,7 +18,7 @@
 import { facebookOn, mark, signupOpen, tederNets } from '../lib.mjs';
 import { platformWindow } from '../teder.mjs';
 import { demoForm } from '../forms.mjs';
-import { TEDER_SAMPLE, rowList, sampleLine, tederPricing, tederStart } from '../sections.mjs';
+import { TEDER_SAMPLE, foldButton, moreOf, rowList, sampleLine, tederPricing, tederStart } from '../sections.mjs';
 
 const alone = (cfg, open) => [
   'כותב את המצגת בקול של החשבון, לפי מדריך הכתיבה שלו',
@@ -29,6 +33,26 @@ const yours = (cfg, open) => [
   'לדחות מצגת שלא מתאימה, לכתוב למה, ולקבל גרסה חדשה',
   'בטיקטוק, להוסיף סאונד ולפרסם את המצגת מהטיוטות',
 ];
+
+// "Why not make it myself in ChatGPT?" (the owner, 2026-11-06), as a list of what happens around the text, each from
+// openfrequency-teder: the formats from the 25 TikTok photo posts read slide by slide (docs/decisions.md, "What spreads
+// on TikTok", 2026-10-27); each fact's quote on the post's card and "לא ממקור, כדאי לבדוק" beside a fact from the
+// model's own knowledge (src/sources/model.js, src/web/pages.js factsBlock); photographs only under a licence that
+// allows a business to post them (src/images: Pexels, Unsplash, and Commons and Openverse without NC, ND or the Public
+// Domain Mark); the sources read again for each day's posts and the closing slide to the store (src/pipeline/closing.js);
+// Instagram and Facebook at the slot, TikTok in its drafts with a reminder at the slot, and the monthly email
+// (src/notify/email.js). TikTok's sound and its posting stay the customer's, as the list above says, so the second
+// item says so too. On a phone three wait behind "עוד 3" (a fold).
+const why = (cfg, open) => [
+  ['פורמטים שכבר עובדים בטיקטוק.', 'קראנו שקף אחרי שקף 25 מצגות אמיתיות מטיקטוק, 20 מהן עם יותר מחצי מיליון צפיות ו-6 מהן בעברית, ובנינו את הפורמטים של תדר לפיהן: תמונה חדה אחת בכל שקף, שורה קצרה עליה, ושער של כמה מילים שעוצר את הגלילה.'],
+  ['מצגת שלמה, מוכנה לפרסום.', 'ChatGPT נותן לכם טקסט. אחריו עוד צריך לעצב את השקפים, למצוא תמונות, להתאים את הגודל לטיקטוק ולאינסטגרם ולכתוב כיתוב. תדר עושה את כל זה. לכם נשאר לאשר, ובטיקטוק גם להוסיף סאונד ולפרסם מהטיוטות.'],
+  ['עובדות שאפשר לבדוק.', 'כל עובדה במצגת מגיעה עם הציטוט מהמקור שלה, ואתם רואים אותו לפני שאתם מאשרים. עובדה שאין לה מקור מסומנת "לא ממקור, כדאי לבדוק". <span class="nw">ב-ChatGPT</span> קשה לדעת מה נכון ומה הומצא.'],
+  ['תמונות שמותר לפרסם.', 'התמונות מגיעות ממאגרים עם רישיון שימוש, כמו Wikimedia Commons.'],
+  ['מה שקורה עכשיו בתחום שלכם.', `תדר קורא כל יום את המקורות ${open ? 'שבחרתם' : 'שאישרנו'}, אז המצגות מדברות על מה שחדש אצל הקהל שלכם. השקף האחרון שולח את מי שצפה אל החנות.`],
+  ['עולה בזמן שקבעתם.', `מצגת שאישרתם עולה ${facebookOn(cfg) ? 'לאינסטגרם ולפייסבוק' : 'לאינסטגרם'} בימים ובשעות שבחרתם. בטיקטוק היא מחכה לכם בטיוטות, ובשעה שלה מגיעה תזכורת לפרסם. בכל חודש מגיע אליכם דוח תוצאות במייל.`],
+];
+const KEEP = 3;
+const whyList = (items) => `<div class="fold" data-fold><dl class="why" id="why-list">${items.map(([t, s], i) => `<div${i >= KEEP ? ' class="fold-x"' : ''}><dt>${t}</dt><dd>${s}</dd></div>`).join('')}</dl>${foldButton('why-list', moreOf(items.length - KEEP))}</div>`;
 
 export default (cfg) => {
   const open = signupOpen(cfg);
@@ -60,6 +84,21 @@ ${rowList('עושה לבד', alone(cfg, open), { id: 'alone-list' })}
 ${rowList('נשאר לכם', yours(cfg, open), { cls: 'yours', id: 'yours-list' })}
 </div>
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
+</div>
+</section>
+
+<section class="sec why-sec" id="why" aria-labelledby="why-h">
+<div class="wrap why-grid">
+<div class="sec-head"><h2 id="why-h">למה דווקא אותנו</h2><p class="lede">"למה שלא אכין מצגת לבד <span class="nw">ב-ChatGPT</span>?" אפשר, ולפעמים זה יוצא טוב. ההבדל הוא בכל מה שקורה מסביב לטקסט, כל שבוע מחדש.</p></div>
+${whyList(why(cfg, open))}
+</div>
+</section>
+
+<section class="sec ret-sec" id="return" aria-labelledby="return-h">
+<div class="wrap narrow">
+<h2 id="return-h">איך המצגות מחזירות את עצמן</h2>
+<p class="lede">כל מצגת נגמרת בשקף ששולח את מי שצפה בה אל החנות שלכם. מי שעוקב אחריכם ${tederNets(cfg, 'in')} רואה אתכם כמה פעמים בשבוע, ומכיר אתכם כשהוא מחפש לקנות. ככה החבילה אמורה להחזיר את עצמה: בלקוחות שמגיעים מהרשתות ובקהל שגדל סביב החנות.</p>
+<p>בדוח החודשי רואים כמה מצגות עלו, כמה פעמים צפו בהן וכמה לייקים הן קיבלו, ואיזו מצגת נצפתה יותר מכולן.</p>
 </div>
 </section>
 
