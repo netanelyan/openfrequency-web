@@ -19,7 +19,9 @@
 // it can't (deploy/deploy.sh checks it after each restart).
 //
 // The operator: GET /internal/leads gives the last 30 days' leads to Toran, for the dashboard on accounts' /admin; from
-// this machine only, with OF_INTERNAL_TOKEN, never through Caddy (below, "the operator's lead centre").
+// this machine only, with OF_INTERNAL_TOKEN, never through Caddy (below, "the operator's lead centre"). GET
+// /internal/waitlist and POST /internal/waitlist/send give accounts' /admin/waitlist the whole waitlist and a message
+// to it; GET|POST /api/unsubscribe is the link in that message (below, "the waitlist, and a message to it").
 //
 // Environment (on the server, in /etc/openfrequency-web/lead.env, never in the repo):
 //   PORT                 default 4720
@@ -464,6 +466,109 @@ function internalLeads(req, res, db) {
   json(200, { leads: recentLeads(db) });
 }
 
+// ---------------------------------------------------------------- the waitlist, and a message to it
+
+// GET /internal/waitlist: everyone on Toran's waitlist (every row the privacy period keeps, not only the last 30
+// days), newest first, for accounts' /admin/waitlist. POST /internal/waitlist/send {subject, text}: the message, by
+// email, to each email on it, through Resend from LEAD_EMAIL_FROM, each with its own link to leave the list; it
+// answers at once with how many it will go to and the phones (WhatsApp can't be sent from here: accounts shows each
+// one a wa.me link with the text). Both are internal: this machine, OF_INTERNAL_TOKEN, as /internal/leads.
+// The same subject and text again within 10 minutes (a double click) is refused, so nobody gets it twice.
+export function waitlist(db) {
+  return db.prepare("SELECT id, contact, store, created_at FROM leads WHERE source = 'waitlist' AND contact != '' ORDER BY id DESC").all()
+    .map((r) => ({ id: r.id, contact: r.contact, store: r.store || null, createdAt: r.created_at }));
+}
+
+// A row's link to leave the list: its id and an HMAC of it with OF_INTERNAL_TOKEN, so nobody can remove anyone else.
+export const unsubToken = (id, contact) => crypto.createHmac('sha256', String(env.OF_INTERNAL_TOKEN || '')).update(`unsub:${id}:${contact}`).digest('base64url').slice(0, 24);
+export const unsubLink = (row) => `${env.SITE_ORIGIN || 'https://openfrequency.co.il'}/api/unsubscribe?id=${row.id}&t=${unsubToken(row.id, row.contact)}`;
+
+export function broadcastMail(row, subject, text) {
+  const link = unsubLink(row);
+  return {
+    from: env.LEAD_EMAIL_FROM,
+    to: [row.contact],
+    subject,
+    text: `${text}\n\n—\nקיבלתם את המייל כי נרשמתם באתר openfrequency.co.il לעדכון על תורן.\nלהסרה מהרשימה: ${link}`,
+    headers: { 'List-Unsubscribe': `<${link}>` },
+  };
+}
+
+const sent = new Map(); // subject + text -> ms, the last 10 minutes
+const pause = (ms) => new Promise((ok) => setTimeout(ok, ms));
+
+async function sendBroadcast(rows, subject, text, gapMs) {
+  let ok = 0;
+  for (const row of rows) {
+    try {
+      const res = await fetch(`${env.RESEND_API || 'https://api.resend.com'}/emails`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(broadcastMail(row, subject, text)),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!res.ok) throw new Error(`Resend ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      ok++;
+    } catch (e) {
+      console.error(`waitlist message to lead ${row.id}: not sent (${e.message})`);
+    }
+    await pause(gapMs); // Resend's default limit is a few requests a second
+  }
+  console.log(`waitlist message "${subject}": ${ok} of ${rows.length} emails sent`);
+}
+
+async function internalWaitlist(req, res, db, { gapMs = 600, send = false } = {}) {
+  const json = (status, body) => {
+    res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+    res.end(JSON.stringify(body));
+  };
+  const no = internalRefusal(req);
+  if (no) return json(...no);
+  const all = waitlist(db);
+  if (!send && req.method === 'GET') return json(200, { waitlist: all });
+  if (!send || req.method !== 'POST') return json(405, { error: 'method' });
+  let f;
+  try {
+    f = JSON.parse(await readBody(req));
+  } catch {
+    return json(400, { error: 'bad' });
+  }
+  const subject = typeof f?.subject === 'string' ? f.subject.trim().replace(/\s+/g, ' ').slice(0, 150) : '';
+  const text = typeof f?.text === 'string' ? f.text.trim().slice(0, 5000) : '';
+  if (!subject || !text) return json(400, { error: 'empty' });
+  const now = Date.now();
+  for (const [k, t] of sent) if (now - t > 600_000) sent.delete(k);
+  const key = `${subject}\n${text}`;
+  if (sent.has(key)) return json(409, { error: 'again' });
+  const emails = all.filter((r) => r.contact.includes('@'));
+  const phones = all.filter((r) => !r.contact.includes('@')).map((r) => r.contact);
+  if (emails.length && !(env.RESEND_API_KEY && env.LEAD_EMAIL_FROM)) return json(503, { error: 'no_mail' });
+  sent.set(key, now);
+  sendBroadcast(emails, subject, text, gapMs);
+  json(200, { emails: emails.length, phones });
+}
+
+// GET /api/unsubscribe?id&t, from the link in a waitlist message: a page with one button, because mail scanners open
+// links by themselves; its POST deletes the row (secure_delete, so nothing of it stays in the file).
+const unsubPage = (status, res, body) => {
+  res.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'" });
+  res.end(`<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>הסרה מהרשימה</title><body style="font:18px/1.5 system-ui,sans-serif;max-width:32rem;margin:15vh auto;padding:0 16px;text-align:center">${body}<p><a href="/">ל-OpenFrequency</a></p></body></html>`);
+};
+
+function unsubscribe(req, res, db, url) {
+  const id = Number(url.searchParams.get('id'));
+  const t = String(url.searchParams.get('t') || '');
+  const row = Number.isInteger(id) ? db.prepare("SELECT id, contact FROM leads WHERE id = ? AND source = 'waitlist'").get(id) : null;
+  const good = row && String(env.OF_INTERNAL_TOKEN || '').length >= 32 && t.length === 24 && crypto.timingSafeEqual(Buffer.from(t), Buffer.from(unsubToken(row.id, row.contact)));
+  if (!good) return unsubPage(row || req.method === 'GET' ? 200 : 404, res, '<h1>אתם כבר לא ברשימה</h1>');
+  if (req.method === 'POST') {
+    db.prepare('DELETE FROM leads WHERE id = ?').run(row.id);
+    console.log(`waitlist: lead ${row.id} left the list`);
+    return unsubPage(200, res, '<h1>הסרנו אתכם מהרשימה</h1><p>לא נשלח לכם יותר עדכונים.</p>');
+  }
+  unsubPage(200, res, `<h1>להסיר אתכם מרשימת העדכונים על תורן?</h1><form method="post"><button style="font:inherit;padding:.6em 1.4em">להסיר אותי</button></form>`);
+}
+
 // ---------------------------------------------------------------- HTTP
 
 function clientIp(req) {
@@ -516,7 +621,7 @@ function reply(req, res, status, body) {
   res.end();
 }
 
-export function createServer(db) {
+export function createServer(db, { gapMs } = {}) {
   return http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x');
     if (url.pathname === '/api/health') { res.writeHead(200, { 'Content-Type': 'text/plain' }); res.end('ok'); return; }
@@ -534,6 +639,8 @@ export function createServer(db) {
       return;
     }
     if (url.pathname === '/internal/leads') return internalLeads(req, res, db);
+    if (url.pathname === '/internal/waitlist' || url.pathname === '/internal/waitlist/send') return internalWaitlist(req, res, db, { gapMs, send: url.pathname.endsWith('/send') });
+    if (url.pathname === '/api/unsubscribe' && (req.method === 'GET' || req.method === 'POST')) return unsubscribe(req, res, db, url);
     if (url.pathname !== '/api/lead') { res.writeHead(404); res.end(); return; }
     if (req.method !== 'POST') { res.writeHead(405, { Allow: 'POST' }); res.end(); return; }
 
