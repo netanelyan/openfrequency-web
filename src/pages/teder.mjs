@@ -35,7 +35,8 @@ const yours = (cfg, open) => [
 ];
 
 // "Why not make it myself in ChatGPT?" (the owner, 2026-11-06), as a list of what happens around the text, each from
-// openfrequency-teder: the formats from the 25 TikTok photo posts read slide by slide (docs/decisions.md, "What spreads
+// openfrequency-teder: the formats from the 25 TikTok photo posts read slide by slide (20 of them over 500K views, so
+// together over ten million, which is the figure the page gives: the owner, 2026-11-06, "drop the number") (docs/decisions.md, "What spreads
 // on TikTok", 2026-10-27); each fact's quote on the post's card and "לא ממקור, כדאי לבדוק" beside a fact from the
 // model's own knowledge (src/sources/model.js, src/web/pages.js factsBlock); photographs only under a licence that
 // allows a business to post them (src/images: Pexels, Unsplash, and Commons and Openverse without NC, ND or the Public
@@ -44,10 +45,10 @@ const yours = (cfg, open) => [
 // (src/notify/email.js). TikTok's sound and its posting stay the customer's, as the list above says, so the second
 // item says so too. On a phone three wait behind "עוד 3" (a fold).
 const why = (cfg, open) => [
-  ['פורמטים שכבר עובדים בטיקטוק.', 'קראנו שקף אחרי שקף 25 מצגות אמיתיות מטיקטוק, 20 מהן עם יותר מחצי מיליון צפיות ו-6 מהן בעברית, ובנינו את הפורמטים של תדר לפיהן: תמונה חדה אחת בכל שקף, שורה קצרה עליה, ושער של כמה מילים שעוצר את הגלילה.'],
+  ['פורמטים שכבר עובדים בטיקטוק.', 'פירקנו שקף אחרי שקף מצגות מטיקטוק שהגיעו יחד ליותר מעשרה מיליון צפיות, גם בעברית, ובנינו את הפורמטים של תדר לפיהן: תמונה חדה אחת בכל שקף, שורה קצרה עליה, ושער של כמה מילים שעוצר את הגלילה.'],
   ['מצגת שלמה, מוכנה לפרסום.', 'ChatGPT נותן לכם טקסט. אחריו עוד צריך לעצב את השקפים, למצוא תמונות, להתאים את הגודל לטיקטוק ולאינסטגרם ולכתוב כיתוב. תדר עושה את כל זה. לכם נשאר לאשר, ובטיקטוק גם להוסיף סאונד ולפרסם מהטיוטות.'],
   ['עובדות שאפשר לבדוק.', 'כל עובדה במצגת מגיעה עם הציטוט מהמקור שלה, ואתם רואים אותו לפני שאתם מאשרים. עובדה שאין לה מקור מסומנת "לא ממקור, כדאי לבדוק". <span class="nw">ב-ChatGPT</span> קשה לדעת מה נכון ומה הומצא.'],
-  ['תמונות שמותר לפרסם.', 'התמונות מגיעות ממאגרים עם רישיון שימוש, כמו Wikimedia Commons.'],
+  ['תמונות אמיתיות שמותר לפרסם.', 'התמונות מגיעות ממאגרים עם רישיון שימוש, כמו Wikimedia Commons. תדר לא מייצר תמונות ב-AI.'],
   ['מה שקורה עכשיו בתחום שלכם.', `תדר קורא כל יום את המקורות ${open ? 'שבחרתם' : 'שאישרנו'}, אז המצגות מדברות על מה שחדש אצל הקהל שלכם. השקף האחרון שולח את מי שצפה אל החנות.`],
   ['עולה בזמן שקבעתם.', `מצגת שאישרתם עולה ${facebookOn(cfg) ? 'לאינסטגרם ולפייסבוק' : 'לאינסטגרם'} בימים ובשעות שבחרתם. בטיקטוק היא מחכה לכם בטיוטות, ובשעה שלה מגיעה תזכורת לפרסם. בכל חודש מגיע אליכם דוח תוצאות במייל.`],
 ];
@@ -96,7 +97,8 @@ ${whyList(why(cfg, open))}
 
 <section class="sec ret-sec" id="return" aria-labelledby="return-h">
 <div class="wrap narrow">
-<h2 id="return-h">איך המצגות מחזירות את עצמן</h2>
+<h2 id="return-h">השקעה בחנות שלכם</h2>
+<p class="ret-sub">איך המצגות מחזירות את עצמן</p>
 <p class="lede">כל מצגת נגמרת בשקף ששולח את מי שצפה בה אל החנות שלכם. מי שעוקב אחריכם ${tederNets(cfg, 'in')} רואה אתכם כמה פעמים בשבוע, ומכיר אתכם כשהוא מחפש לקנות. ככה החבילה אמורה להחזיר את עצמה: בלקוחות שמגיעים מהרשתות ובקהל שגדל סביב החנות.</p>
 <p>בדוח החודשי רואים כמה מצגות עלו, כמה פעמים צפו בהן וכמה לייקים הן קיבלו, ואיזו מצגת נצפתה יותר מכולן.</p>
 </div>

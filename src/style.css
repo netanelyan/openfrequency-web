@@ -989,7 +989,8 @@ label.f[hidden], .demo .when[hidden] { display: none; }
   .why-grid .sec-head { position: sticky; top: calc(var(--top) + 24px); margin-bottom: 0; }
 }
 /* How the slideshows (and Toran) are meant to pay for themselves: a heading, its paragraph, and what the report shows. */
-.ret-sec h2 + .lede { margin-top: 14px; }
+.ret-sec h2 + .lede, .ret-sub + .lede { margin-top: 14px; }
+.ret-sub { margin: 6px 0 0; font-size: var(--fs-lead); font-weight: 600; color: var(--ink-2); }
 .ret-sec .lede + p { margin-top: 14px; max-width: 62ch; color: var(--ink-2); }
 
 .side { display: grid; gap: 28px; align-items: center; }
