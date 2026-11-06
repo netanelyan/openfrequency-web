@@ -1,6 +1,8 @@
 // Where a form lands without JS: a thank-you for each form, one for a number that already asked for a demo, and a
 // page for when it didn't go through (an invalid field, the rate limit, or the endpoint down, which Caddy sends here
-// too). None of them is indexed.
+// too). None of them is indexed. Each has one thing to do next, its one blue button (the owner, 2026-11-06: "every
+// screen should have one action. main button should look the most important"); the way home is the header's mark,
+// so a second button to the home page is left out, and so are the 404's buttons to pages the header's menu has.
 import { esc, toranSoon } from '../lib.mjs';
 import { waAny } from '../forms.mjs';
 
@@ -11,7 +13,7 @@ export const thanks = plain('/thanks', 'קיבלנו את הכתובת של הח
 <div class="wrap narrow" data-rise>
 <h1>קיבלנו את הכתובת של החנות</h1>
 <p class="lede">${cfg.has('demo.time') || cfg.banner ? `תוך ${cfg.t('demo.time')} נשלח` : 'כשהדמו מוכן, נשלח'} לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, WooCommerce או Wix, נכתוב לכם ונגיד מה אפשר.</p>
-<div class="actions"><a class="btn" href="/">לעמוד הבית</a></div>
+<div class="actions"><a class="btn primary" href="/">לעמוד הבית</a></div>
 </div>
 </section>`);
 
@@ -29,7 +31,7 @@ export const thanksTeder = plain('/thanks/teder', 'קיבלנו את הכתוב�
 <div class="wrap narrow" data-rise>
 <h1>קיבלנו את הכתובת של החנות</h1>
 <p class="lede">כשהמצגת לדוגמה מוכנה, נשלח לכם אותה לוואטסאפ, בגודל של טיקטוק ושל אינסטגרם.</p>
-<div class="actions"><a class="btn" href="/teder">חזרה לתדר</a></div>
+<div class="actions"><a class="btn primary" href="/teder">חזרה לתדר</a></div>
 </div>
 </section>`);
 
@@ -38,7 +40,7 @@ export const thanksAgain = plain('/thanks/already', 'כבר קיבלנו בקש�
 <div class="wrap narrow" data-rise>
 <h1>כבר קיבלנו בקשה מהמספר הזה</h1>
 <p class="lede">יש לנו כבר בקשה לדמו מהמספר הזה, והלינק יגיע לוואטסאפ שלו.${hasWa(cfg) ? ' לדמו לחנות נוספת, אפשר לכתוב לנו בוואטסאפ.' : ''}</p>
-<div class="actions">${waButton(cfg, 'לכתוב לנו בוואטסאפ')}<a class="btn" href="/">לעמוד הבית</a></div>
+<div class="actions">${waButton(cfg, 'לכתוב לנו בוואטסאפ') || '<a class="btn primary" href="/">לעמוד הבית</a>'}</div>
 </div>
 </section>`);
 
@@ -60,7 +62,7 @@ export const thanksWaitlist = plain('/thanks/waitlist', 'רשמנו אתכם', (
 <div class="wrap narrow" data-rise>
 <h1>רשמנו אתכם</h1>
 <p class="lede">כשתורן נפתח, נכתוב לכם לטלפון או למייל שהשארתם. בינתיים אפשר להכיר את תדר.</p>
-<div class="actions"><a class="btn" href="/teder">לתדר</a><a class="btn" href="/">לעמוד הבית</a></div>
+<div class="actions"><a class="btn primary" href="/teder">לתדר</a></div>
 </div>
 </section>`);
 
@@ -69,7 +71,7 @@ export const notFound = (cfg) => ({ ...plain('/404', 'הדף הזה לא קיי�
 <section class="sec after">
 <div class="wrap narrow" data-rise>
 <h1>הדף הזה לא קיים</h1>
-<p class="lede">אולי הקישור השתנה, ואולי משהו אצלנו נשבר. מכאן אפשר להמשיך:</p>
-<div class="actions"><a class="btn primary" href="/">לעמוד הבית</a><a class="btn" href="/toran">תורן</a><a class="btn" href="/teder">תדר</a><a class="btn" href="/faq">שאלות</a></div>
+<p class="lede">אולי הקישור השתנה, ואולי משהו אצלנו נשבר.</p>
+<div class="actions"><a class="btn primary" href="/">לעמוד הבית</a></div>
 </div>
 </section>`)(cfg), file: '404.html' });

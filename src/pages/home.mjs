@@ -49,7 +49,9 @@ const hero = (cfg) => {
   const soon = toranSoon(cfg);
   const glyph = (name) => `<span class="wave" aria-hidden="true">${glyphOnly(name)}</span>`;
   // Toran's buttons once it is sold, outside the shut part like Teder's; while it is soon its one button, to the
-  // waitlist, is inside, so Teder's are the first screen's only ones.
+  // waitlist, is inside, so Teder's are the first screen's only ones. It stays white: the home page informs about both
+  // products, so each door keeps its own main button (the owner, 2026-11-06: "home page is different, because it is
+  // informative", and the white "שמרו לי מקום" of 2026-11-01).
   const toranAct = signupOpen(cfg)
     ? toranStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', price: false, more: `<a class="btn on-color" href="/toran">${TORAN_DEMO}</a><a class="btn on-color" href="/toran#demo">${TORAN_TRY}</a>` })
     : '<div class="door-act"><a class="btn light" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn on-color" href="/toran">עוד על תורן</a></div>';

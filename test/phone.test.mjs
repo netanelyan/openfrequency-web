@@ -226,3 +226,43 @@ test("from 700px the phone's cuts aren't made: the sentences left out on a phone
   }
   await ctx.close();
 });
+
+// One action per screen (the owner, 2026-11-06: "dont give users too many things to do, or options. follow hicks law.
+// every screen should have one action. main button should look the most important, advanced options hidden until
+// someone needs them, and if an option isnt relevant dont show it"), on a phone and on a desk: no page's first screen
+// shows more than one main button (the filled blue, or the white one on a product's colour); a thank-you page and the
+// 404 have one button and it is the main one; and no form offers a choice that can't be taken. /join, while Toran is
+// soon, asks for Teder's sample with nothing to pick, and with script its WhatsApp field shows and is required.
+test('every screen has one main button: at most one on any first screen, phone and desk; one and only one after a form; nothing to pick that cannot be picked', async () => {
+  const found = [];
+  for (const [width, height] of [[390, 844], [1440, 900]]) {
+    const ctx = await themed('light', { viewport: { width, height } });
+    const page = await ctx.newPage();
+    for (const p of pages) {
+      await page.goto(`${origin}${p}`);
+      const got = await page.evaluate(() => {
+        const shown = (e) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden';
+        const first = (e) => { const r = e.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
+        const main = [...document.querySelectorAll('main .btn')].filter(shown);
+        return {
+          top: main.filter((e) => first(e) && e.matches('.primary, .light')).map((e) => e.textContent.trim()),
+          all: main.map((e) => [e.textContent.trim(), e.matches('.primary')]),
+          off: [...document.querySelectorAll('main input:disabled, main .pick.off')].length,
+        };
+      });
+      // The home page is the exception: it informs about both products, and each door keeps its own main button (the
+      // owner, 2026-11-06: "home page is different, because it is informative").
+      if (got.top.length > 1 && p !== '/') found.push(`${width} ${p}: ${got.top.length} main buttons on the first screen ${JSON.stringify(got.top)}`);
+      if (got.off) found.push(`${width} ${p}: ${got.off} choices that can't be taken`);
+      if (['/thanks/', '/thanks/teder/', '/thanks/already/', '/thanks/waitlist/', '/404.html'].includes(p) && !(got.all.length === 1 && got.all[0][1])) found.push(`${width} ${p}: its buttons are ${JSON.stringify(got.all)}, not one main one`);
+    }
+    await page.goto(`${origin}/join/`);
+    const join = await page.evaluate(() => {
+      const f = document.querySelector('form[data-form=join]');
+      return { picks: Boolean(f.querySelector('.picks')), contact: f.elements.contact.closest('label').hidden === false && f.elements.contact.required, teder: f.elements.teder.value };
+    });
+    if (join.picks || !join.contact || join.teder !== '1') found.push(`${width} /join: ${JSON.stringify(join)} (no picker, the number shown and required, Teder asked for)`);
+    await ctx.close();
+  }
+  assert.deepEqual(found, []);
+});

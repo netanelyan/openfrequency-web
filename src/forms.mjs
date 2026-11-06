@@ -56,12 +56,12 @@ ${status(id)}
 // Toran's waitlist, while Toran is soon (products.toran in site.config.json): one field, a phone or an email, saved as a
 // 'waitlist' lead (server/lead.mjs) and sent to the owner as "רשימת המתנה לתורן". Nothing else is asked or promised.
 // Its button says what the home page's Toran door says (the owner's words, 2026-11-01), so whoever came from there
-// presses the words they came for.
+// presses the words they came for; it is the blue one, the one thing to do on /toran while Toran is soon.
 export const TORAN_SAVE = 'שמרו לי מקום';
 export function waitlistForm(cfg, page, id = 'waitlist-form') {
   return `${open(cfg, 'waitlist', page, 'demo waitlist', id)}
 <label class="f wide">טלפון או מייל<input name="contact" type="text" autocomplete="email" dir="ltr" required></label>
-<button class="btn" type="submit">${TORAN_SAVE}</button>
+<button class="btn primary" type="submit">${TORAN_SAVE}</button>
 <p class="when">נכתוב לכם פעם אחת, כשתורן נפתח.</p>
 ${status(id)}
 </form>`;
@@ -71,20 +71,24 @@ ${status(id)}
 // that Teder's slideshow goes to. Toran is ticked to start with; a link to /join?p=teder ticks Teder instead. With JS
 // the number and each line under the button show only for what is ticked (form.js); without it all of them show, and
 // the endpoint asks for the number only when Teder is ticked.
-// While Toran is soon its card is there, marked "בקרוב", and can't be ticked; Teder is ticked to start with.
+// While Toran is soon there is nothing to pick (the owner, 2026-11-06: "if an option isnt relevant dont show it"): the
+// form asks for Teder's sample, Teder rides in a hidden field, and the number is asked for from the start. Until then
+// the picker showed Toran's card, marked "בקרוב", that couldn't be ticked, beside Teder's, ticked: a choice with one answer.
+// While sign-up is open the form is /join's second way, under sign-up's blue button, so its own button is a grey pill;
+// on a phone the two share the first screen.
 export function joinForm(cfg) {
   const soon = toranSoon(cfg);
-  const card = (name, label, what, on, off = false) => `<label class="pick${off ? ' off' : ''}"><input type="checkbox" name="${name === 'toran' ? 'toran' : 'teder'}" value="1"${on ? ' checked' : ''}${off ? ' disabled' : ''}><span class="pick-box">${mark(name, 44)}<span><b>${label}${off ? ' <span class="soon">בקרוב</span>' : ''}</b><small>${what}</small></span><span class="pick-tick" aria-hidden="true"></span></span></label>`;
+  const card = (name, label, what, on) => `<label class="pick"><input type="checkbox" name="${name === 'toran' ? 'toran' : 'teder'}" value="1"${on ? ' checked' : ''}><span class="pick-box">${mark(name, 44)}<span><b>${label}</b><small>${what}</small></span><span class="pick-tick" aria-hidden="true"></span></span></label>`;
   return `${open(cfg, 'join', '/join', 'demo join', 'join')}
-<fieldset class="picks"><legend>במה מתחילים</legend>
+${soon ? '<input type="hidden" name="teder" value="1">' : `<fieldset class="picks"><legend>במה מתחילים</legend>
 <div class="pick-row">
-${soon ? card('toran', 'תורן', 'יענה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל', false, true) : card('toran', 'תורן', 'עונה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל', true)}
-${card('teder', 'תדר', `כותב ומעצב מצגות בעברית ${tederNets(cfg)}`, soon)}
+${card('toran', 'תורן', 'עונה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל', true)}
+${card('teder', 'תדר', `כותב ומעצב מצגות בעברית ${tederNets(cfg)}`, false)}
 </div>
-</fieldset>
+</fieldset>`}
 ${storeField(false)}
-${contactField('הוואטסאפ שלכם, למצגת של תדר', false)}
-<button class="btn primary" type="submit">${!signupOpen(cfg) ? 'להצטרף' : soon ? 'לקבל מצגת לדוגמה' : 'לקבל דמו'}</button>
+${contactField(soon ? 'הוואטסאפ שלכם' : 'הוואטסאפ שלכם, למצגת של תדר', soon)}
+<button class="btn${signupOpen(cfg) ? '' : ' primary'}" type="submit">${!signupOpen(cfg) ? 'להצטרף' : soon ? 'לקבל מצגת לדוגמה' : 'לקבל דמו'}</button>
 ${soon ? '' : `<p class="when" data-for="toran">${toranWhen(cfg)}</p>`}
 <p class="when" data-for="teder">${tederWhen}</p>
 ${status('join')}
@@ -109,8 +113,8 @@ export function formCopy(cfg, forms = true) {
 `}<template id="done-teder"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>כשהמצגת לדוגמה מוכנה, נשלח לכם אותה לוואטסאפ, בגודל של טיקטוק ושל אינסטגרם.</p></div></template>
 ${toranSoon(cfg) ? `<template id="done-waitlist"><div class="done" tabindex="-1"><h3>רשמנו אתכם</h3><p>כשתורן נפתח, נכתוב לכם לטלפון או למייל שהשארתם.</p></div></template>
 <template id="msg-contact-waitlist"><p>צריך מספר נייד ישראלי, למשל 050-1234567, או כתובת מייל, כדי שנוכל לכתוב לכם כשתורן נפתח.</p></template>
-` : ''}<template id="msg-products"><p>${toranSoon(cfg) ? 'צריך לסמן את תדר. תורן עוד לא פתוח.' : 'צריך לבחור לפחות אחד, תורן או תדר.'}</p></template>
-<template id="msg-contact-join"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את המצגת של תדר.</p></template>
+` : `<template id="msg-products"><p>צריך לבחור לפחות אחד, תורן או תדר.</p></template>
+`}<template id="msg-contact-join"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את המצגת של תדר.</p></template>
 <template id="msg-store"><p>הכתובת של החנות לא נראית לנו נכונה. אפשר לכתוב אותה כמו בדפדפן, למשל shop.co.il.</p></template>
 <template id="msg-contact-teder"><p>צריך מספר נייד ישראלי, למשל 050-1234567, כדי שנוכל לשלוח לשם את המצגת.</p></template>
 <template id="msg-dup"><p>כבר קיבלנו מהמספר הזה בקשה כזאת, והתשובה תגיע לוואטסאפ שלו. לחנות נוספת, אפשר לכתוב לנו בוואטסאפ.</p>${wa}</template>

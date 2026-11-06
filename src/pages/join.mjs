@@ -1,8 +1,8 @@
 // The join page, for a store that hasn't picked a product yet: Toran, Teder or both on one form; what happens after it
-// is sent; three of the owners' questions; the price, once it is set; and the way in for stores already with us. The
+// is sent; three of the owners' questions; and the price, once it is set. The
 // forms at the end of /toran and /teder stay, for a visitor already on a product's page.
-// While Toran is soon (products.toran in site.config.json), the page is Teder's: Toran's card is there, marked
-// "בקרוב", and can't be ticked; the steps, the price and the questions are Teder's, with the way to Toran's waitlist.
+// While Toran is soon (products.toran in site.config.json), the page is Teder's: its form asks for Teder's sample with
+// nothing to pick (forms.mjs joinForm), and the steps, the price and the questions are Teder's.
 // While sign-up is open (signup in site.config.json), Teder's first action is the button to accounts' sign-up with its
 // price, the form follows as the second way, for a store that wants to see a sample slideshow first, and the steps are
 // sign-up's. With Toran live, the form stays first and Teder's sign-up button follows it.
@@ -11,14 +11,11 @@
 // page in the account and opens once the payment is confirmed. While sign-up is open, Teder's price says its setup fee
 // is not refunded, as the terms do.
 // On a phone (the owner, 2026-11-05: "too many things jump to the eyes at the same time") the first screen's line is
-// its first sentence, with the button and the price under it: the steps below say how it is set up, and the form's
-// Toran card and the waitlist line say Toran opens soon.
+// its first sentence, with the button and the price under it: the steps below say how it is set up.
 import { mark, payProvider, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
 import { NO_REFUND, tederPriceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
 import { TEDER, TORAN } from './faq.mjs';
-
-const TOOLS = 'https://accounts.openfrequency.co.il/';
 
 const AFTER = [
   ['אנחנו בונים לכם דמו מהאתר', 'תורן שעונה בתור החנות שלכם, מתוך המוצרים ודפי המדיניות שבאתר, או מצגת לדוגמה של תדר מהחנות שלכם.'],
@@ -77,7 +74,8 @@ export default (cfg) => {
   const signupFirst = open;
   const asked = open ? ASKED_SIGNUP : ASKED_SOON;
   const faq = soon ? TEDER(cfg).filter((x) => x && asked.includes(x[0])) : TORAN(cfg).filter((x) => x && ASKED.includes(x[0]));
-  const ways = `${soon ? '<p class="join-tools">רוצים לדעת כשתורן נפתח? <a href="/toran#waitlist">לקבל עדכון</a></p>\n' : ''}<p class="join-tools">כבר עובדים איתנו? <a href="${TOOLS}">לניהול הכלים</a></p>`;
+  // The form ends its section (the owner, 2026-11-06: "every screen should have one action"): the way in for stores
+  // already with us is the header's "לניהול הכלים", on this page too, and while Toran is soon its waitlist is on /toran.
   const first = signupFirst ? `
 <section class="sec join-hero" aria-labelledby="hero-h">
 <div class="wrap narrow">
@@ -96,7 +94,6 @@ ${soon ? `<h2 id="sample-h">רוצים קודם לראות מצגת מהחנות
 <p class="lede">משאירים את הכתובת של החנות ומספר וואטסאפ, ואנחנו מכינים לכם מצגת לדוגמה מהאתר שלכם.</p>` : `<h2 id="sample-h">רוצים קודם לראות דמו מהחנות שלכם?</h2>
 <p class="lede">בוחרים במה, משאירים את הכתובת של החנות, ואנחנו בונים לכם דמו מהאתר שלכם.</p>`}
 ${joinForm(cfg)}
-${ways}
 </div>
 </section>` : `
 <section class="sec join-hero" aria-labelledby="hero-h">
@@ -105,8 +102,7 @@ ${soon ? `<h1 id="hero-h">מתחילים עם תדר</h1>
 <p class="lede">משאירים את הכתובת של החנות ומספר וואטסאפ, ואנחנו מכינים לכם מצגת לדוגמה מהאתר שלכם. תורן נפתח בקרוב.</p>` : `<h1 id="hero-h">מתחילים עם תורן, עם תדר, או עם שניהם</h1>
 <p class="lede">בוחרים במה להתחיל, משאירים את הכתובת של החנות, ואנחנו בונים לכם דמו מהאתר שלכם.</p>`}
 ${joinForm(cfg)}
-${open ? `<p class="join-tools">את תדר אפשר גם לפתוח לבד, בחשבון, בלי לחכות לדמו.</p>\n${tederStart(cfg, { wrap: 'start join-start' })}\n` : ''}${ways}
-</div>
+${open ? `<p class="join-tools">את תדר אפשר גם לפתוח לבד, בחשבון, בלי לחכות לדמו.</p>\n${tederStart(cfg, { wrap: 'start join-start' })}\n` : ''}</div>
 </section>`;
   return {
     path: '/join',

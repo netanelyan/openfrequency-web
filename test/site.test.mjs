@@ -63,12 +63,9 @@ test('with "soon", no built page has a way to buy Toran, start it or ask for its
     // Toran's prices: none of its plans' monthly figures, nor its pricing section.
     for (const k of ['store', 'big']) assert.ok(!v.includes(`<span class="num">${price(config.price.plans[k].monthly)}</span>`) && !v.includes(`${price(config.price.plans[k].monthly)} ₪`), `${file}: Toran's ${k} price`);
     assert.ok(!/class="sec price-sec toran"/.test(v), `${file}: Toran's price section`);
-    // The join form's Toran card is there, can't be ticked and isn't.
-    const toranBox = /<input type="checkbox" name="toran"[^>]*>/.exec(v);
-    if (toranBox) {
-      assert.match(toranBox[0], /\sdisabled/, `${file}: Toran can be ticked`);
-      assert.doesNotMatch(toranBox[0], /\schecked/, `${file}: Toran is ticked`);
-    }
+    // No form shows Toran as a choice, not even one that can't be ticked (the owner, 2026-11-06: "if an option isnt
+    // relevant dont show it").
+    assert.doesNotMatch(v, /name="toran"/, `${file}: Toran to pick`);
   }
 });
 
@@ -85,8 +82,11 @@ test('with "soon", Toran keeps its pages with a "בקרוב" badge and its waitl
   const home = visible(pages['index.html']);
   assert.match(/<article class="door toran-door[\s\S]*?<\/article>/.exec(home)[0], /<span class="soon">בקרוב<\/span>[\s\S]*href="\/toran#waitlist"/, "Toran's door: the badge and the way to the waitlist");
   assert.ok(home.indexOf('teder-door') < home.indexOf('toran-door'), "Teder's door comes first");
-  assert.match(visible(pages['join/index.html']), /<b>תורן <span class="soon">בקרוב<\/span><\/b>/);
-  assert.match(visible(pages['join/index.html']), /href="\/toran#waitlist"/);
+  // /join is Teder's: nothing to pick, and neither the waitlist nor the tools beside its form (the header has both ways).
+  const join = main(pages['join/index.html']);
+  assert.doesNotMatch(join, /class="picks"|class="pick|במה מתחילים/, 'no picker on /join');
+  assert.match(join, /<input type="hidden" name="teder" value="1">/);
+  assert.doesNotMatch(join, /href="\/toran#waitlist"|class="join-tools"|לניהול הכלים/, 'no second way beside the form');
   assert.match(visible(pages['faq/index.html']), /<h2 id="faq-toran">[\s\S]*?<span class="soon">בקרוב<\/span><\/h2>/);
   assert.ok(pages['thanks/waitlist/index.html'], "the waitlist's thank-you without JS");
   for (const file of ['index.html', 'toran/index.html', 'join/index.html', 'faq/index.html']) {
@@ -111,8 +111,13 @@ test('with "soon", Toran keeps its pages with a "בקרוב" badge and its waitl
   assert.doesNotMatch(hero, /<p class="(lede|co-soon)"/, 'no lines under the headline');
   const toranDoor = /<article class="door toran-door"[\s\S]*?<\/article>/.exec(home)[0];
   assert.deepEqual([...toranDoor.matchAll(/<a class="btn[^"]*" href="([^"]*)">([^<]*)<\/a>/g)].map((m) => [m[1], m[2]]), [['/toran#waitlist', 'שמרו לי מקום']]);
+  // White, like Teder's first: the home page informs about both products (the owner, 2026-11-06).
+  assert.match(toranDoor, /<a class="btn light" href="\/toran#waitlist">/);
   assert.doesNotMatch(home, /id="owner"|id="ask"|data-ask|ask-a-/, 'no section on Toran for the owner, no question box');
-  assert.match(toran, /<button class="btn" type="submit">שמרו לי מקום<\/button>/, "the waitlist's button says what the door said");
+  assert.match(toran, /<button class="btn primary" type="submit">שמרו לי מקום<\/button>/, "the waitlist's button says what the door said");
+  // /toran's one thing to do is the waitlist: the first screen's button is blue, and the banner has no second link to it.
+  assert.match(toran, /<a class="btn primary hero-cta" href="#waitlist">/);
+  assert.doesNotMatch(/<section class="soon-bar"[\s\S]*?<\/section>/.exec(toran)[0], /<a /, 'no link in the banner');
 });
 
 test('with "soon", Teder is offered exactly as with "live"', () => {
@@ -127,8 +132,8 @@ test('with "soon", Teder is offered exactly as with "live"', () => {
     for (const a of anchors(live.pages[file], '/teder')) assert.ok(now.includes(a), `${file}: the link to Teder "${a}"`);
   }
   const join = visible(soon.pages['join/index.html']);
-  assert.match(join, /<input type="checkbox" name="teder" value="1" checked>/, 'Teder is ticked on /join, and can be');
-  assert.match(join, /<input name="contact" type="tel"/, "Teder's WhatsApp number");
+  assert.match(join, /<input type="hidden" name="teder" value="1">/, 'Teder is what /join asks for');
+  assert.match(join, /<input name="contact" type="tel"[^>]*required>/, "Teder's WhatsApp number, asked for from the start");
   assert.match(join, new RegExp(`${price(config.teder.monthly)} ₪ לחודש`), "Teder's price on /join");
   assert.deepEqual(soon.support.plans.map((p) => p.key), ['teder-small', 'teder']);
   assert.deepEqual(soon.support.plans, live.support.plans.filter((p) => p.product === 'teder'));

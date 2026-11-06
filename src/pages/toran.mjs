@@ -7,8 +7,9 @@
 // a channel works before it does. The owners' questions are on /faq.
 // While Toran is soon (products.toran in site.config.json) the page shows what it will do: a "בקרוב" banner on top,
 // every line in the future, no price, and the waitlist where the demo form was.
-// On a phone (the owner, 2026-11-05: "too many things jump to the eyes at the same time") the banner is its one line,
-// without its link (the first screen's button goes to the same waitlist), the first screen's line is its first sentence
+// The banner is its one line, without a link: the first screen's button, the page's one blue, goes to the same waitlist
+// (the owner, 2026-11-06: "every screen should have one action ... main button should look the most important").
+// On a phone (the owner, 2026-11-05: "too many things jump to the eyes at the same time") the first screen's line is its first sentence
 // (the chat's note under the tabs says the rest: the same answer in every channel), the inbox's "זו דוגמה" is the tag on
 // the inbox itself, and the first screen's button spans the width. The lists stay whole: their rows are short.
 import { CHANNELS, mark, signupOpen, signupUrl, toranSoon } from '../lib.mjs';
@@ -57,7 +58,7 @@ const soonPage = (cfg) => {
     body: `
 <section class="soon-bar" aria-labelledby="soon-h">
 <div class="wrap">
-<p id="soon-h"><span class="soon">בקרוב</span> <b>תורן עוד לא פתוח לחנויות.</b><span class="desk"> <a href="#waitlist">לקבל עדכון כשהוא נפתח</a></span></p>
+<p id="soon-h"><span class="soon">בקרוב</span> <b>תורן עוד לא פתוח לחנויות.</b></p>
 </div>
 </section>
 
@@ -66,7 +67,7 @@ const soonPage = (cfg) => {
 <div class="hero-head">${mark('toran', 72, 'תורן')}<h1 id="hero-h"><span class="hl">תורן אחד</span> יענה ללקוחות שלכם ${where}</h1></div>
 <div class="hero-text">
 <p class="lede">תורן יקרא את האתר של החנות ויענה ללקוחות <span class="hl" dir="ltr">24/7</span>, מתוך מה שכתוב בו.<span class="desk"> בכל מקום שיכתבו לו, הוא יענה אותו דבר, כי זו אותה חנות.</span></p>
-<a class="btn hero-cta" href="#waitlist">לקבל עדכון כשתורן נפתח</a>
+<a class="btn primary hero-cta" href="#waitlist">לקבל עדכון כשתורן נפתח</a>
 </div>
 ${channelWindow(cfg, { all: true })}
 </div>

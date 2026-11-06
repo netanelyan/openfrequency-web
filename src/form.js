@@ -10,17 +10,20 @@
   var forms = document.querySelectorAll('form[data-form]');
   // /join?p=teder (or toran) ticks that product alone, unless it can't be ticked (Toran, while it is soon).
   var p = new URLSearchParams(location.search).get('p');
+  // While Toran is soon there is no picker: Teder is a hidden field, always asked for, and there is nothing to tick.
   var jf = document.querySelector('form[data-form=join]');
-  if (jf && (p === 'teder' || p === 'toran') && !jf.elements[p].disabled) ['toran', 'teder'].forEach(function (k) { if (!jf.elements[k].disabled) jf.elements[k].checked = k === p; });
+  var box = function (k) { var x = jf.elements[k]; return x && x.type === 'checkbox' ? x : null; };
+  var asked = function (k) { var x = jf.elements[k]; return !!x && (x.type === 'hidden' || x.checked); };
+  if (jf && (p === 'teder' || p === 'toran') && box(p)) ['toran', 'teder'].forEach(function (k) { if (box(k)) box(k).checked = k === p; });
   // On the join page the WhatsApp number is Teder's, so it shows (and is asked for) only while Teder is ticked, and each
   // line under the button only while its product is.
   if (jf) {
     var sync = function () {
-      var teder = jf.elements.teder.checked, contact = jf.elements.contact;
+      var teder = asked('teder'), contact = jf.elements.contact;
       contact.closest('label').hidden = !teder;
       contact.required = teder;
       jf.elements.store.closest('label').classList.toggle('wide', !teder);
-      jf.querySelectorAll('[data-for]').forEach(function (x) { x.hidden = !jf.elements[x.getAttribute('data-for')].checked; });
+      jf.querySelectorAll('[data-for]').forEach(function (x) { x.hidden = !asked(x.getAttribute('data-for')); });
     };
     jf.addEventListener('change', sync);
     sync();

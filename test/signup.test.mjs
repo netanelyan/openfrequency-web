@@ -108,14 +108,15 @@ test('with "open", Teder\'s first screens have sign-up, the demo and the sample 
   assert.ok(!text(hero).includes(price), 'no price in the first screen');
   assert.match(hero, /<a class="btn on-color" href="#demo">מצגת לדוגמה לחנות שלכם<\/a>/);
   assert.doesNotMatch(teder, /href="#demo">לנסות את תדר על החנות שלכם/);
-  // Each plan's card has its own button, to sign-up with that plan picked; the card both share keeps the sample and
+  // Each plan's card has its own button, to sign-up with that plan picked; the card both share
   // says how paying works while no payment provider is connected.
   const plans = [...teder.matchAll(/<article class="plan glass">[\s\S]*?<\/article>/g)].map((m) => m[0]);
   assert.equal(plans.length, 2);
   assert.ok(plans[0].includes(`href="${SIGNUP}&amp;plan=small">להצטרף בחבילה הקטנה</a>`), "the small plan's button");
   assert.ok(plans[1].includes(`href="${SIGNUP}&amp;plan=full">להצטרף בחבילה המלאה</a>`), "the full plan's button");
   const card = /<div class="price-main">[\s\S]*?<\/div>/.exec(teder)[0];
-  assert.match(card, /href="#demo">לבקש מצגת לדוגמה/);
+  // No line down to the sample form: it is the next section, and its heading asks the same question.
+  assert.doesNotMatch(card, /href="#demo"/);
   assert.equal(priceNotes(teder), PAY.manual.card);
   assert.match(teder, /כדי להפסיק, מבטלים בחשבון, בכל זמן, והחיוב נעצר בסוף החודש שכבר שולם\./);
   // The sample form stays, at the end, as the second way.
@@ -147,8 +148,9 @@ test('with "open", /join starts with sign-up and its price, then the sample form
   assert.ok(signup > 0 && form > signup, 'the sign-up button comes before the form');
   assert.ok(text(join.slice(signup, form)).includes(price), 'the price beside it');
   assert.match(join, /<section class="sec" id="sample" aria-labelledby="sample-h">\n<div class="wrap narrow">\n<h2 id="sample-h">רוצים קודם לראות מצגת מהחנות שלכם\?<\/h2>/);
-  assert.match(join, /<button class="btn primary" type="submit">לקבל מצגת לדוגמה<\/button>/);
-  assert.match(join, /<input type="checkbox" name="teder" value="1" checked>/, 'Teder still ticked on the sample form');
+  // The second way, so a grey pill under sign-up's blue (the owner, 2026-11-06: "main button should look the most important").
+  assert.match(join, /<button class="btn" type="submit">לקבל מצגת לדוגמה<\/button>/);
+  assert.match(join, /<input type="hidden" name="teder" value="1">/, 'the sample form asks for Teder, with nothing to pick');
   assert.match(join, /מה קורה אחרי ההרשמה[\s\S]*נרשמים ומשלמים[\s\S]*בוחרים מקורות[\s\S]*עוברים על המצגות לדוגמה[\s\S]*מעלים לאוויר/);
   assert.ok(text(join).includes('איך מבטלים את תדר?'));
   assert.match(pages['join/index.html'], /<meta name="description" content="פותחים חשבון בתדר/);
@@ -163,7 +165,7 @@ test('with "open" and Toran live, sign-up is the first way in for both products,
   const form = join.indexOf('data-form="join"'), toran = join.indexOf(`href="${TORAN_SIGNUP}"`), teder = join.indexOf(`href="${SIGNUP}"`);
   assert.ok(toran > 0 && teder > 0 && form > toran && form > teder, 'both sign-up buttons come before the demo form');
   assert.match(join, /<input type="checkbox" name="toran" value="1" checked>/);
-  assert.match(join, /<button class="btn primary" type="submit">לקבל דמו<\/button>/);
+  assert.match(join, /<button class="btn" type="submit">לקבל דמו<\/button>/);
   assert.match(join, /מה קורה אחרי ההרשמה[\s\S]*נרשמים ומשלמים/);
   // Toran's page: the sign-up in the first screen and on the price card, the demo as the second way.
   const page = main(pages['toran/index.html']);

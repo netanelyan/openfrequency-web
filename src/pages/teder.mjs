@@ -9,7 +9,9 @@
 // owner, 2026-11-01, "The mobile page is very long".) What it does comes from
 // openfrequency-teder's README ("What it does", "Publishing").
 // While sign-up is open (signup in site.config.json), the first screen's button goes to accounts' sign-up, each plan's
-// card has its own (with the plan picked), and the form at the end is the second way, a sample slideshow first. The
+// card has its own (with the plan picked), and the form at the end is the second way, a sample slideshow first. The price
+// card has no line down to that form (the owner, 2026-11-06: "dont give users too many things to do, or options"): the form is the next
+// section, and its heading asks the line's own question. The
 // lists say what a business that set Teder up on its own does: it picks the sources and connects its accounts.
 // Facebook is in every list while teder.facebook is on (lib.mjs tederNets).
 // On a phone (the owner, 2026-11-05: "too many things jump to the eyes at the same time") the first screen's line is its
@@ -18,7 +20,7 @@
 import { facebookOn, mark, signupOpen, tederNets } from '../lib.mjs';
 import { platformWindow } from '../teder.mjs';
 import { demoForm } from '../forms.mjs';
-import { TEDER_SAMPLE, foldButton, moreOf, rowList, sampleLine, tederPricing, tederStart } from '../sections.mjs';
+import { TEDER_SAMPLE, foldButton, moreOf, rowList, tederPricing, tederStart } from '../sections.mjs';
 
 const alone = (cfg, open) => [
   'כותב את המצגת בקול של החשבון, לפי מדריך הכתיבה שלו',
@@ -106,7 +108,6 @@ ${whyList(why(cfg, open))}
 
 ${tederPricing(cfg, {
   cta: open ? null : ['#demo', 'לנסות את תדר על החנות שלכם'],
-  alt: open ? sampleLine('#demo') : '',
   includes: [
     `מצגות מוכנות לפרסום ${tederNets(cfg)}`,
     'בסגנון של העסק שלכם, וכל עובדה בהן נבדקת מול המקור',
