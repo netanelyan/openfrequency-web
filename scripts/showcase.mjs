@@ -16,8 +16,10 @@ import { chromium } from 'playwright-core';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FROM = path.join(ROOT, 'private/showcase');
 const TO = path.join(ROOT, 'assets/teder/showcase');
-// The order on the page, and what each account is about: our three accounts, then the made-up one.
-const SUBJECT = { 'ai-tips': 'בינה מלאכותית', football: 'כדורגל', money: 'כסף', demo: 'צמחי בית' };
+// The order on the page, and what each account is about: four made-up businesses of the kinds Teder is for, each cover
+// made by the engine as it is now (the owner, 2026-11-07: "we developed the engine past that"). The plant shop's is the
+// one shown as an Instagram and a Facebook post (src/teder.mjs SAMPLE).
+const SUBJECT = { coffee: 'קפה', bakery: 'מאפים', pets: 'חיות מחמד', plants: 'צמחי בית' };
 const ORDER = Object.keys(SUBJECT);
 // Twice the largest size each one is shown at.
 const SIZE = { instagram: [640, 800], tiktok: [540, 960] };
@@ -47,6 +49,7 @@ for (const pack of packs) {
     subject: SUBJECT[pack],
     dir,
     account: m.account,
+    count: m.count || null,
     handle: m.handle,
     topic: m.topic,
     fictional: m.handle.startsWith('@demo.'),

@@ -25,8 +25,8 @@ export const reel = `<div class="phone-sit reel-sit" aria-hidden="true">
 // Teder's page: its slideshows as each platform shows them, under tabs like Toran's channels (channels.mjs, tabBox):
 // on TikTok the phone playing the covers like stories, on Instagram a post of the made-up houseplant account's cover,
 // and (teder.facebook on) the same cover as a post on that account's Facebook Page, its text above the photo.
-const SAMPLE = COVERS.find((c) => c.pack === 'demo');
-const SHOW = { account: 'עציץ ושמש', handle: 'demo.atzitz', slides: 7 };
+const SAMPLE = COVERS.find((c) => c.pack === 'plants');
+const SHOW = { account: SAMPLE.account, handle: SAMPLE.handle.replace(/^@/, ''), slides: SAMPLE.count || 7 };
 const icon = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
 const ICONS = {
   heart: icon('M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z'),
@@ -36,7 +36,7 @@ const ICONS = {
   share: icon('M14 5l7 7-7 7v-4c-5 0-8 1.5-10 5 .8-5 3-9.5 10-10.5z'),
 };
 const facebookPost = () => `<figure class="igp fbp" data-ui aria-label="${esc(`${SHOW.account}, פייסבוק`)}">
-<div class="chat-top"><span class="ava" aria-hidden="true">ע</span><span><b>${esc(SHOW.account)}</b><small>עמוד לדוגמה · עכשיו</small></span></div>
+<div class="chat-top"><span class="ava" aria-hidden="true">${esc(SHOW.account[0])}</span><span><b>${esc(SHOW.account)}</b><small>עמוד לדוגמה · עכשיו</small></span></div>
 <p class="fbp-text">${esc(SAMPLE.topic)}</p>
 ${img(SAMPLE, 'ig', true)}
 <div class="fbp-act" aria-hidden="true"><span>${ICONS.like}לייק</span><span>${ICONS.comment}תגובה</span><span>${ICONS.share}שיתוף</span></div>
@@ -45,7 +45,7 @@ export const platformWindow = (cfg) => tabBox([
   // TikTok: the phone playing the covers like stories, on Teder's violet, as it stands on the home page.
   { key: 'tiktok', name: named('tiktok'), bare: true, window: `<div class="tt-stage">${reel}</div>` },
   { key: 'instagram', name: named('instagram'), window: `<figure class="igp" data-ui aria-label="${esc(`${SHOW.account}, אינסטגרם`)}">
-<div class="chat-top"><span class="ava" aria-hidden="true">ע</span><span><b dir="ltr">${SHOW.handle}</b><small>${esc(SHOW.account)} · חשבון לדוגמה</small></span></div>
+<div class="chat-top"><span class="ava" aria-hidden="true">${esc(SHOW.account[0])}</span><span><b dir="ltr">${SHOW.handle}</b><small>${esc(SHOW.account)} · חשבון לדוגמה</small></span></div>
 ${img(SAMPLE, 'ig', true)}
 <div class="igp-act" aria-hidden="true">${ICONS.heart}${ICONS.comment}${ICONS.send}<span class="igp-dots">${Array.from({ length: SHOW.slides }, (_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</span></div>
 <figcaption><b dir="ltr">${SHOW.handle}</b> ${esc(SAMPLE.topic)}</figcaption>
@@ -55,7 +55,7 @@ ${img(SAMPLE, 'ig', true)}
 
 // The approval screen: the slideshows of the day, each with where it goes out and what happened to it.
 const STATUS = { yours: 'מחכה לאישור', fixed: 'אושרה, תעלה ב-19:40', alone: 'עלתה' };
-const DAY = [['money', 'yours'], ['football', 'fixed'], ['ai-tips', 'alone'], ['demo', 'yours']];
+const DAY = [['coffee', 'yours'], ['bakery', 'fixed'], ['pets', 'alone'], ['plants', 'yours']];
 export const approvals = (cfg) => `<div class="inbox approvals" data-ui role="group" aria-label="המצגות של היום, דוגמה">
 <div class="inbox-top">${mark('teder', 28)}<b>המצגות של היום</b><span class="tag">דוגמה</span></div>
 <ul>
