@@ -162,8 +162,11 @@ test('with "open" and Toran live, sign-up is the first way in for both products,
   const { pages } = built.openLive;
   const TORAN_SIGNUP = SIGNUP.replace('p=teder', 'p=toran');
   const join = main(pages['join/index.html']);
-  const form = join.indexOf('data-form="join"'), toran = join.indexOf(`href="${TORAN_SIGNUP}"`), teder = join.indexOf(`href="${SIGNUP}"`);
-  assert.ok(toran > 0 && teder > 0 && form > toran && form > teder, 'both sign-up buttons come before the demo form');
+  // One main button on /join's first screen (the owner, 2026-11-06): the account, where the store picks Toran, Teder or
+  // both, before the demo form.
+  const form = join.indexOf('data-form="join"'), open = join.indexOf('<a class="btn primary" href="https://accounts.openfrequency.co.il/signup">לפתוח חשבון</a>');
+  assert.ok(open > 0 && form > open, 'the account before the demo form');
+  assert.ok(!join.includes(`href="${TORAN_SIGNUP}"`) && !join.includes(`href="${SIGNUP}"`), 'no second main button per product');
   assert.match(join, /<input type="checkbox" name="toran" value="1" checked>/);
   assert.match(join, /<button class="btn" type="submit">לקבל דמו<\/button>/);
   assert.match(join, /מה קורה אחרי ההרשמה[\s\S]*נרשמים ומשלמים/);
@@ -174,8 +177,11 @@ test('with "open" and Toran live, sign-up is the first way in for both products,
   assert.ok(page.includes(`<a class="btn primary" href="${TORAN_SIGNUP}&amp;plan=store">להצטרף בחבילת חנות</a>`));
   assert.ok(page.includes(`<a class="btn primary" href="${TORAN_SIGNUP}&amp;plan=big">להצטרף בחבילת חנות גדולה</a>`));
   assert.match(page, /<a class="btn" href="#demo">לנסות על החנות שלכם<\/a>/);
-  // The home page's door for Toran, on its green: the first button white, the others the green's own.
-  assert.ok(main(pages['index.html']).includes(`<a class="btn light" href="${TORAN_SIGNUP}">להצטרף לתורן</a><a class="btn on-color" href="/toran">לראות דמו</a><a class="btn on-color" href="/toran#demo">לנסות על החנות שלכם</a>`));
+  // The home page's door for Toran, Teder's twin on its green: the store's demo white, joining in the green's own
+  // colour (to /toran, as Teder's door goes to /teder), and the price under them.
+  const home = main(pages['index.html']);
+  assert.ok(home.includes('<a class="btn light" href="/toran#demo">לנסות על החנות שלכם</a><a class="btn on-color" href="/toran">להצטרף לתורן</a>'));
+  assert.ok(home.indexOf('teder-door') < home.indexOf('toran-door'), "Teder's door first");
 });
 
 test('with "open", the FAQ and the support export say how to sign up and cancel', () => {
@@ -193,8 +199,8 @@ test('with "open", the FAQ and the support export say how to sign up and cancel'
 test('with "open", the terms carry Teder\'s self-serve section and their own date; Toran\'s stay', () => {
   const closed = main(built.closed.pages['terms/index.html']);
   const terms = main(built.open.pages['terms/index.html']);
-  assert.match(terms, /עודכן לאחרונה ב-3 בנובמבר 2026/);
-  assert.equal(config.legal.signupUpdated, '2026-11-03', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION)');
+  assert.match(terms, /עודכן לאחרונה ב-8 בנובמבר 2026/);
+  assert.equal(config.legal.signupUpdated, '2026-11-08', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION), moved when Toran went on sale');
   assert.match(terms, /<li><a href="#t-stop">הפסקה וביטול<\/a><\/li><li><a href="#t-teder-sub">המנוי לתדר<\/a><\/li>/);
   const sub = text(section(terms, 't-teder-sub'));
   for (const words of [

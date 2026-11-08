@@ -1,6 +1,6 @@
 {
   "products": {
-    "toran": "soon"
+    "toran": "live"
   },
   "signup": "open",
   "payment": "manual",
@@ -92,8 +92,8 @@
     "host": "גרמניה",
     "leadMonths": 6,
     "updated": "2026-10-30",
-    "signupUpdated": "2026-11-03",
-    "contractsUpdated": "2026-11-03",
+    "signupUpdated": "2026-11-08",
+    "contractsUpdated": "2026-11-08",
     "privacyWaUpdated": "2026-10-31",
     "privacyUpdated": "2026-11-08",
     "accessibilityUpdated": "2026-11-04"

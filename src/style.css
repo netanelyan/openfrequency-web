@@ -1161,6 +1161,12 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 
 /* ---- Toran for the owner (home.mjs assistant) */
 .owner-sec { --pc: var(--toran); }
+/* Toran's abandoned carts on /toran (pages/toran.mjs #carts): its checks in Toran's green, the list under the lede. */
+.carts-sec { --pc: var(--toran); }
+[data-theme="dark"] .carts-sec { --pc: #3fcf95; }
+.carts-sec .checks { margin-top: 22px; }
+.carts-sec .checks b { color: var(--ink); }
+.carts-sec .quiet { margin-top: 22px; }
 .owner-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
 .owner-text .kicker { display: inline-block; margin: 0 0 14px; padding: 6px 14px; border-radius: 999px; background: color-mix(in srgb, var(--toran) 12%, transparent); color: var(--toran-name); font-size: 14px; font-weight: 700; }
 .owner-text h2 { font-size: clamp(32px, 4.4vw, 52px); line-height: 1.1; margin: 0 0 16px; }

@@ -193,9 +193,11 @@ export const toranContract = (cfg) => doc(cfg, {
     ['c-what', 'מה תורן עושה', '<p>תורן הוא בוט שעונה בשמכם ללקוחות של החנות שלכם, בוואטסאפ ובערוצים שחיברתם, מתוך מה שכתוב באתר שלכם ומהתשובות ששמרתם. בתחילת כל שיחה הוא אומר ללקוח שהוא בוט. שאלה שאין לו עליה תשובה, בקשה להנחה או להחזר, ולקוח שמבקש בן אדם, הוא מעביר אליכם. מה שתורן עושה היום כתוב <a href="/toran">בעמוד של תורן</a>, ואנחנו מתחייבים רק לזה.</p>'],
     // The store's own number reaches Toran through Kapso, which connects it to Meta's WhatsApp Business Platform with the
     // WhatsApp Business app still working on the phone (coexistence; the owner, 2026-11-08), and Instagram and Messenger
-    // through Zernio (built the same day, TORAN_DM_PROVIDER=zernio). Each provider's page shows its own terms, which are
-    // the provider's (the owner's default that day: name them as theirs).
-    ['c-connect', 'החיבור של הערוצים', '<p>את מספר הוואטסאפ של החנות מחברים לתורן דרך Kapso, חברה שמחברת מספרים של עסקים ל-WhatsApp של Meta. את אינסטגרם ואת עמוד הפייסבוק (למסנג׳ר) מחברים דרך Zernio, באותו אופן. בזמן החיבור מאשרים את התנאים של Meta לעסקים, ובדף של הספק גם את התנאים שלו, שהם בין החנות לבינו. המספר ממשיך לעבוד גם באפליקציית WhatsApp Business שבטלפון שלכם, והוא, החשבונות והעמוד נשארים שלכם. אפשר לנתק כל ערוץ בכל זמן מהחשבון בתורן.</p>'],
+    // through Zernio (built the same day, TORAN_DM_PROVIDER=zernio). The same evening the owner moved stores' WhatsApp to
+    // Zernio too ("yes, switch to zernio"), with Kapso kept for a number already connected through it, so both are
+    // named, and the connect page says which. Each provider's page shows its own terms, which are the provider's (the
+    // owner's default that day: name them as theirs).
+    ['c-connect', 'החיבור של הערוצים', '<p>את מספר הוואטסאפ של החנות, את אינסטגרם ואת עמוד הפייסבוק (למסנג׳ר) מחברים לתורן דרך ספק שמחבר עסקים לערוצים של Meta: Zernio, או Kapso, חברה שמחברת מספרים של עסקים ל-WhatsApp של Meta. בדף החיבור כתוב איזה מהם. בזמן החיבור מאשרים את התנאים של Meta לעסקים, ובדף של הספק גם את התנאים שלו, שהם בין החנות לבינו. המספר ממשיך לעבוד גם באפליקציית WhatsApp Business שבטלפון שלכם, והוא, החשבונות והעמוד נשארים שלכם. אפשר לנתק כל ערוץ בכל זמן מהחשבון בתורן.</p>'],
     ['c-price', 'המחיר', `<p>${toranPriceLine(cfg)}</p><p>כל חבילה מכסה מספר שיחות בחודש. על שיחה נוספת אין חיוב נפרד${toranMetaFees(cfg)} מתי חנות עוברת חבילה, ואיך מודיעים לה מראש, כתוב בעמוד של תורן.</p>`],
     ['c-pay', 'תשלום', payClause(cfg, 'תורן', 'מתחיל לענות')],
     ['c-setup', 'דמי הקמה', '<p>משלמים אותם פעם אחת, עם החודש הראשון. הם מכסים את החיבור של תורן לחנות ולערוצים שלכם. אחרי שהתחלנו לבנות את החיבור, הם לא מוחזרים.</p>'],
@@ -269,9 +271,9 @@ ${ul([
   '<b>Anthropic</b>, ארצות הברית: ניסוח התשובות של תורן והמצגות של תדר.',
   '<b>Twilio</b>, ארצות הברית: הודעות הוואטסאפ במספר הדמו, כשהמספר מחובר דרכה.',
   `<b>Meta</b>: הודעות הוואטסאפ ${tederByWa(cfg) ? 'במספר הדמו ובמספרים המחוברים של החנויות' : 'כשמספר החנות מחובר'}${toranSoon(cfg) ? '' : ', ההודעות באינסטגרם ובמסנג׳ר של החנויות שחיברו אותם'}, והפרסום והנתונים ב-Instagram.`,
-  ...(toranSoon(cfg) ? [] : ['<b>Kapso</b>: החיבור של מספר הוואטסאפ של החנות ל-Meta. ההודעות בין החנות ללקוחות שלה עוברות דרכה אל תורן וממנו.']),
+  ...(toranSoon(cfg) ? [] : ['<b>Kapso</b>: החיבור של מספר הוואטסאפ של החנות ל-Meta, בחנות שחוברה דרכה. ההודעות בין החנות ללקוחות שלה עוברות דרכה אל תורן וממנו.']),
   '<b>Resend</b>, ארצות הברית: מיילים של כניסה לשירות, המיילים שתורן מקבל ועונה עליהם, והמייל שמגיע אלינו על כל טופס.',
-  `<b>Zernio</b>: הפרסום של מצגות תדר ${tederNets(cfg, 'in')}, והנתונים שלהן.${toranSoon(cfg) ? '' : ' וגם החיבור של אינסטגרם ומסנג׳ר של החנות לתורן: ההודעות בינה לבין הלקוחות שלה בערוצים האלה עוברות דרכה.'}`,
+  `<b>Zernio</b>: הפרסום של מצגות תדר ${tederNets(cfg, 'in')}, והנתונים שלהן.${toranSoon(cfg) ? '' : ' וגם החיבור של הוואטסאפ, האינסטגרם והמסנג׳ר של החנות לתורן: ההודעות בינה לבין הלקוחות שלה בערוצים האלה עוברות דרכה.'}`,
   '<b>Morning (חשבונית ירוקה)</b>, ישראל: החשבוניות והקבלות. היא מקבלת את שם העסק, את הסכום ואת המייל של הבעלים של החשבון.',
   '<b>Google</b>: הפרסום ב-YouTube, כשמחברים אותו.',
   '<b>Brave</b>, ארצות הברית: חיפוש חנויות ומקורות. לא נשלח אליו מידע על אנשים.',

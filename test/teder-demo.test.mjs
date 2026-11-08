@@ -39,8 +39,8 @@ const built = {};
 before(() => {
   // As committed (Toran soon, sign-up open), and with Toran live and sign-up closed, where Toran's own thank-you with a
   // code is on the pages too.
-  built.form = build('form', 'form');
-  built.wa = build('whatsapp', 'whatsapp');
+  built.form = build('form', 'form', { products: { toran: 'soon' } });
+  built.wa = build('whatsapp', 'whatsapp', { products: { toran: 'soon' } });
   built.formLive = build('form-live', 'form', { signup: 'closed', products: { toran: 'live' } });
   built.waLive = build('whatsapp-live', 'whatsapp', { signup: 'closed', products: { toran: 'live' } });
 });

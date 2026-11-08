@@ -178,7 +178,9 @@ test('with "live", the ways into Toran are back', () => {
   assert.match(home, /<a class="btn light" href="\/toran#demo">לנסות את תורן על החנות שלכם<\/a>/);
   assert.match(home, /<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית<\/span><\/h1>/, 'the headline about both products');
   assert.match(home, /id="owner"/, 'Toran for the owner is back');
-  assert.ok(home.indexOf('toran-door') < home.indexOf('teder-door'), "Toran's door comes first");
+  // Teder's door stays first with Toran sold too, and on a phone it is the first screen's one door to act on (the
+  // owner, 2026-11-05); the home page informs about both, and Toran's door is Teder's twin (2026-11-08).
+  assert.ok(home.indexOf('teder-door') < home.indexOf('toran-door'), "Teder's door first");
   const toran = visible(pages['toran/index.html']);
   assert.match(toran, /<a class="btn primary hero-cta" href="#demo">לנסות את תורן על החנות שלכם<\/a>/);
   assert.match(toran, /data-form="demo"/);
@@ -207,9 +209,9 @@ test('Kapso, and who pays Meta, come with Toran on sale; the way out of our firs
   const terms = text(built.live, 'terms/index.html');
   assert.match(terms, /על תשובה ללקוח שכתב לכם Meta לא גובה כלום\. על הודעה שהחנות שולחת ביוזמתה, כמו תזכורת על עגלה נטושה, Meta גובה ישירות מהחנות/);
   assert.doesNotMatch(terms, /אנחנו משלמים/);
-  assert.match(text(built.live, 'privacy/index.html'), /Kapso: החיבור של מספר הוואטסאפ של החנות ל-Meta/);
+  assert.match(text(built.live, 'privacy/index.html'), /Kapso: החיבור של מספר הוואטסאפ של החנות ל-Meta, בחנות שחוברה דרכה/);
   const contract = text(built.live, 'toran/contract/index.html');
-  assert.match(contract, /דרך Kapso, חברה שמחברת מספרים של עסקים ל-WhatsApp של Meta/);
+  assert.match(contract, /דרך ספק שמחבר עסקים לערוצים של Meta: Zernio, או Kapso, חברה שמחברת מספרים של עסקים ל-WhatsApp של Meta/);
   assert.match(contract, /Meta גובה ישירות מהחנות/);
   assert.doesNotMatch(contract, /אנחנו משלמים/);
   for (const b of [built.soon, built.live]) assert.match(text(b, 'privacy/index.html'), /עם כפתור "הסירו אותי"\. כדי שלא נפנה שוב, לוחצים עליו/);

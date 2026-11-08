@@ -150,6 +150,22 @@ ${/* What we can show, and nothing invented (PRODUCT.md, "Evidence on Hand"; TOR
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
+${/* Abandoned carts as a feature of their own (the owner, 2026-11-08: "add abandonded cart reminders as a feature"),
+   as openfrequency-toran sends them (src/auto: one reminder a checkout, consent, quiet hours, none once paid) and
+   reports them (src/auto/report.ts: carts reminded, recovered and the money, per month). Meta bills a WhatsApp
+   reminder to the store itself, said plainly. */ ''}<section class="sec carts-sec" id="carts" aria-labelledby="carts-h">
+<div class="wrap narrow">
+<h2 id="carts-h">עגלה שננטשה, <span class="hl">חוזרת</span></h2>
+<p class="lede">לקוח שהשאיר מוצרים בעגלה ולא שילם מקבל מתורן תזכורת אחת, בוואטסאפ או במייל, עם קישור ישר לעגלה שלו.</p>
+<ul class="checks">
+<li><b>רק למי שהסכים.</b> התזכורת יוצאת רק ללקוח שאישר לקבל מכם הודעות, ובכל אחת יש דרך להפסיק.</li>
+<li><b>בשעה סבירה.</b> לא בלילה, לא בשבת ולא בחג. היא מחכה לבוקר.</li>
+<li><b>מי ששילם, לא מקבל.</b> אם ההזמנה נסגרה בינתיים, שום דבר לא יוצא.</li>
+<li><b>רואים מה חזר.</b> בכל חודש: כמה עגלות קיבלו תזכורת, כמה מהן חזרו, וכמה כסף הן החזירו.</li>
+</ul>
+<p class="quiet">מדליקים את זה בהגדרות, ובוחרים אחרי כמה זמן התזכורת יוצאת. במייל אין תוספת. בוואטסאפ Meta גובה על כל תזכורת ישירות מכם, לפי המחירון שלה.</p>
+</div>
+</section>
 ${payBack(false)}
 ${toranPricing(cfg, { cta: ['#demo', 'לנסות את תורן על החנות שלכם'], includes: [
   `עונה ללקוחות 24/7 ${soon.length ? `בכל הערוצים הפעילים, ${inList(live)}` : inList(live)}, מתוך מה שכתוב באתר שלכם`,

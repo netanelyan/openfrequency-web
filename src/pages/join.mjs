@@ -5,16 +5,18 @@
 // nothing to pick (forms.mjs joinForm), and the steps, the price and the questions are Teder's.
 // While sign-up is open (signup in site.config.json), Teder's first action is the button to accounts' sign-up with its
 // price, the form follows as the second way, for a store that wants to see a sample slideshow first, and the steps are
-// sign-up's. With Toran live, the form stays first and Teder's sign-up button follows it.
+// sign-up's. With Toran live and sign-up open, the first screen has one main button, "לפתוח חשבון", to accounts'
+// sign-up with nothing ticked, where the store picks Toran, Teder or both (the owner, 2026-11-06: "every screen should
+// have one action"); the demo form follows for who wants to see one first.
 // Sign-up's first step says how paying works (payment in site.config.json): "manual", we email the payment details once
 // the account is open and the product opens once the payment reaches us; "provider", it is paid by card on the payment
 // page in the account and opens once the payment is confirmed. While sign-up is open, Teder's price says its setup fee
 // is not refunded, as the terms do.
 // On a phone (the owner, 2026-11-05: "too many things jump to the eyes at the same time") the first screen's line is
 // its first sentence, with the button and the price under it: the steps below say how it is set up.
-import { mark, payProvider, signupOpen, tederNets, toranSoon } from '../lib.mjs';
+import { mark, payProvider, signupOpen, signupUrl, tederNets, toranSoon } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
-import { NO_REFUND, tederPriceLine, tederStart, toranPriceLine, toranStart } from '../sections.mjs';
+import { NO_REFUND, tederPriceLine, tederStart, toranPriceLine } from '../sections.mjs';
 import { TEDER, TORAN } from './faq.mjs';
 
 const AFTER = [
@@ -82,9 +84,8 @@ export default (cfg) => {
 ${soon ? `<h1 id="hero-h">מתחילים עם תדר</h1>
 <p class="lede">פותחים חשבון ומקימים את תדר בעצמכם.<span class="desk"> בוחרים מקורות, עוברים על המצגות לדוגמה שהוא מכין, ומעלים לאוויר. תורן נפתח בקרוב.</span></p>
 ${tederStart(cfg, { wrap: 'start join-start' })}` : `<h1 id="hero-h">מתחילים עם תורן, עם תדר או עם שניהם</h1>
-<p class="lede">פותחים חשבון ומקימים בעצמכם, לפי הצעדים.</p>
-${toranStart(cfg, { wrap: 'start join-start' })}
-${tederStart(cfg, { wrap: 'start join-start' })}`}
+<p class="lede">פותחים חשבון ובוחרים במה להתחיל.<span class="desk"> מקימים בעצמכם, לפי הצעדים, ואפשר להוסיף את המוצר השני מתי שתרצו.</span></p>
+<div class="start join-start"><a class="btn primary" href="${signupUrl()}">לפתוח חשבון</a></div>`}
 </div>
 </section>
 

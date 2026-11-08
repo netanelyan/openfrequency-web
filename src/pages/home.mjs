@@ -20,7 +20,7 @@
 import { mark, glyphOnly, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { TORAN_SAVE } from '../forms.mjs';
-import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, foldButton, tederPriceLine, toranStart } from '../sections.mjs';
+import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_SIGNUP_LABEL, TORAN_TRY, foldButton, tederPriceLine, toranPriceLine } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { NAMES, inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -52,15 +52,21 @@ const hero = (cfg) => {
   // waitlist, is inside, so Teder's are the first screen's only ones. It stays white: the home page informs about both
   // products, so each door keeps its own main button (the owner, 2026-11-06: "home page is different, because it is
   // informative", and the white "שמרו לי מקום" of 2026-11-01).
+  // Once Toran is sold its door is Teder's twin (the owner, 2026-11-08: "switch everything on the website, for toran to
+  // be on sale"): the store's own demo in white, joining in the green's own colour (to /toran, whose own button goes to
+  // accounts' sign-up, as Teder's door goes to /teder), and the price under them. Teder's door stays first, and on a
+  // phone Toran's buttons wait inside its shut door as its waitlist button did, so the first screen keeps one door to
+  // act on (the owner, 2026-11-05).
   const toranAct = signupOpen(cfg)
-    ? toranStart(cfg, { wrap: 'start door-start', cls: 'btn light', act: 'door-act', price: false, more: `<a class="btn on-color" href="/toran">${TORAN_DEMO}</a><a class="btn on-color" href="/toran#demo">${TORAN_TRY}</a>` })
+    ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/toran#demo">${TORAN_TRY}</a><a class="btn on-color" href="/toran">${TORAN_SIGNUP_LABEL}</a></div>
+<p class="start-price">${toranPriceLine(cfg)}</p></div>`
     : '<div class="door-act"><a class="btn light" href="/toran#demo">לנסות את תורן על החנות שלכם</a><a class="btn on-color" href="/toran">עוד על תורן</a></div>';
   const toranDoor = `<article class="door toran-door" aria-labelledby="door-toran" data-door>
 ${soon
     ? doorTop('toran', glyph('toran'), `תורן ${soonBadge}`, 'יענה בשבילכם ללקוחות של החנות 24/7, לפי מה שכתוב באתר שלכם.', '')
-    : doorTop('toran', glyph('toran'), 'תורן', 'עונה ללקוחות של החנות 24/7', 'עונה ללקוחות של החנות מתוך מה שכתוב באתר. מה שלא כתוב שם, הוא שואל אתכם.')}
-${soon ? '' : `${toranAct}\n`}<div class="door-in" id="door-toran-in">
-${soon ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/toran#waitlist">${TORAN_SAVE}</a></div>\n<p class="start-alt">נכתוב לכם פעם אחת, כשתורן נפתח.</p></div>\n` : ''}<div class="phone-sit" data-play>
+    : doorTop('toran', glyph('toran'), 'תורן', 'עונה ללקוחות של החנות 24/7, לפי מה שכתוב באתר שלכם.', '')}
+<div class="door-in" id="door-toran-in">
+${soon ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/toran#waitlist">${TORAN_SAVE}</a></div>\n<p class="start-alt">נכתוב לכם פעם אחת, כשתורן נפתח.</p></div>\n` : `${toranAct}\n`}<div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
 <p class="pop" data-pop>${mark('toran', 28)}<span class="pop-h"><b>תורן</b><small>בטלפון שלכם, 02:16</small></span><span class="pop-t">לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?</span></p>
 </div>
@@ -80,10 +86,10 @@ ${reel}
 <section class="co-hero" aria-labelledby="hero-h">
 <div class="co-bg" aria-hidden="true">${glyphOnly('openfrequency')}</div>
 <div class="wrap">
-${soon ? `<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>` : `<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>
-<p class="lede">תדר כותב ומעצב לכם מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות שלכם 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.</p>`}
+<h1 id="hero-h">מצגות לרשתות ותשובות ללקוחות, <span class="hl">בעברית</span></h1>
 <div class="doors">
-${soon ? `${tederDoor}\n${toranDoor}` : `${toranDoor}\n${tederDoor}`}
+${tederDoor}
+${toranDoor}
 </div>
 </div>
 </section>`;

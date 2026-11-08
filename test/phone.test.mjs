@@ -98,7 +98,7 @@ test("on a phone the home page's first screen is one headline and Teder's door w
           marker: getComputedStyle(document.querySelector('.co-hero h1 .hl')).backgroundImage,
           badges: shown(document.querySelector('.trust-sec')),
           strip: getComputedStyle(document.querySelector('.clients-row')).animationName,
-          soon: getComputedStyle(toran.querySelector('.soon')).backgroundColor,
+          soon: toran.querySelector('.soon') ? getComputedStyle(toran.querySelector('.soon')).backgroundColor : null,
         };
       });
       const at = `${width} ${theme}`;
@@ -111,14 +111,15 @@ test("on a phone the home page's first screen is one headline and Teder's door w
       if (got.marker !== 'none') found.push(`${at}: the headline has its marker (${got.marker})`);
       if (got.badges) found.push(`${at}: the badges show`);
       if (got.strip !== 'none') found.push(`${at}: the strip of businesses moves (${got.strip})`);
-      if (got.soon !== 'rgb(255, 255, 255)') found.push(`${at}: "בקרוב" on Toran's green is ${got.soon}`);
-      // Opened, Teder's door has its price line, and Toran's its one button.
+      // Toran is on sale since 2026-11-08: no "בקרוב" on its door.
+      if (got.soon !== null) found.push(`${at}: Toran's door still says "בקרוב" (${got.soon})`);
+      // Opened, Teder's door has its price line, and Toran's its two buttons, as Teder's (the store's demo, joining).
       await page.evaluate(() => document.querySelectorAll('.door.shut .door-open').forEach((b) => b.click()));
       const open = await page.evaluate(() => {
         const shown = (e) => Boolean(e) && e.getClientRects().length > 0;
         return { price: shown(document.querySelector('.teder-door .start-price')), toran: [...document.querySelectorAll('.toran-door .btn')].filter(shown).length };
       });
-      if (!open.price || open.toran !== 1) found.push(`${at}: opened, Teder's price shows ${open.price}, Toran's buttons ${open.toran}`);
+      if (!open.price || open.toran !== 2) found.push(`${at}: opened, Teder's price shows ${open.price}, Toran's buttons ${open.toran}`);
       await ctx.close();
     }
   }
@@ -259,9 +260,14 @@ test('every screen has one main button: at most one on any first screen, phone a
     await page.goto(`${origin}/join/`);
     const join = await page.evaluate(() => {
       const f = document.querySelector('form[data-form=join]');
-      return { picks: Boolean(f.querySelector('.picks')), contact: f.elements.contact.closest('label').hidden === false && f.elements.contact.required, teder: f.elements.teder.value };
+      return { picks: Boolean(f.querySelector('.picks')), contact: f.elements.contact.closest('label').hidden === false && f.elements.contact.required, teder: f.elements.teder.type === 'checkbox' ? f.elements.teder.checked : f.elements.teder.value };
     });
-    if (join.picks || !join.contact || join.teder !== '1') found.push(`${width} /join: ${JSON.stringify(join)} (no picker, the number shown and required, Teder asked for)`);
+    // With Toran on sale /join picks: Toran ticked first, the WhatsApp number (Teder's sample) hidden and not asked for
+    // until Teder is ticked, then shown and required.
+    if (!join.picks || join.contact || join.teder !== false) found.push(`${width} /join: ${JSON.stringify(join)} (the picker, Toran ticked, no number asked)`);
+    await page.evaluate(() => { const t = document.querySelector('form[data-form=join] input[name=teder]'); t.checked = true; t.dispatchEvent(new Event('change', { bubbles: true })); });
+    const tick = await page.evaluate(() => { const f = document.querySelector('form[data-form=join]'); return f.elements.contact.closest('label').hidden === false && f.elements.contact.required; });
+    if (!tick) found.push(`${width} /join: Teder ticked, the number isn't shown and required`);
     await ctx.close();
   }
   assert.deepEqual(found, []);

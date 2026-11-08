@@ -166,7 +166,8 @@ export const toranSoon = (cfg) => cfg.get('products.toran') === 'soon';
 export const signupOpen = (cfg) => cfg.get('signup') === 'open';
 // Accounts' sign-up, with the product the visitor came from ticked (?p=), and for Teder the plan they picked
 // (&plan=small or full; without it accounts lets them choose). Raw: escape it (esc) before it goes into an attribute.
-export const signupUrl = (product, plan = null) => `https://accounts.openfrequency.co.il/signup?p=${product}${plan ? `&plan=${plan}` : ''}`;
+// With no product, accounts' sign-up ticks nothing and the visitor picks Toran, Teder or both there (/join's one button).
+export const signupUrl = (product, plan = null) => `https://accounts.openfrequency.co.il/signup${product ? `?p=${product}${plan ? `&plan=${plan}` : ''}` : ''}`;
 export const SIGNUP_URL = signupUrl('teder');
 // Once a payment provider is connected (payment "provider" in site.config.json), a business pays by card on the payment
 // page in its account; until then ("manual") it opens its account and we email it the payment details.

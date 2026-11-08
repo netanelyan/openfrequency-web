@@ -169,10 +169,10 @@ test("in a browser, /teder's two top buttons stand apart, and the support button
 
 // The home page's first screen (the owner, 2026-11-01: "Make Toran's card as polished as Teder's. Give it its full color
 // (the green), not grey ... A real action instead of a blank"), with both doors open, as a phone shows them after a tap:
-// each door in its product's colour, apart from the other, its buttons apart from each other, and Toran's with one
-// button, to its waitlist. And the header's light-or-dark button on every page, inside the bar and apart from its
+// each door in its product's colour, apart from the other, its buttons apart from each other, and Toran's (on sale
+// since 2026-11-08) with the store's demo and joining, as Teder's. And the header's light-or-dark button on every page, inside the bar and apart from its
 // neighbours (the menu on a phone, the tools button on a computer).
-test("in a browser, the home page's doors stand apart in their own colours, Toran's with one button to its waitlist, and the theme button sits apart in every page's header", async () => {
+test("in a browser, the home page's doors stand apart in their own colours, Toran's with its two buttons as Teder's, and the theme button sits apart in every page's header", async () => {
   const rgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(', ')})`;
   const css = fs.readFileSync(path.join(ROOT, 'src/style.css'), 'utf8');
   const token = (name) => new RegExp(`--${name}: (#[0-9a-f]{6});`).exec(css)[1];
@@ -198,7 +198,8 @@ test("in a browser, the home page's doors stand apart in their own colours, Tora
       if (teder.bg !== rgb(token('teder'))) found.push(`${at}: Teder's door is ${teder.bg}`);
       if (toran.bg !== rgb(token('toran'))) found.push(`${at}: Toran's door is ${toran.bg}, not its green`);
       if (apart(teder.box, toran.box) < 8) found.push(`${at}: the doors are ${Math.round(apart(teder.box, toran.box))}px apart`);
-      if (toran.btns.length !== 1 || toran.btns[0].text !== 'שמרו לי מקום' || toran.btns[0].href !== '/toran#waitlist') found.push(`${at}: Toran's door has ${JSON.stringify(toran.btns.map((b) => [b.text, b.href]))}`);
+      // Toran on sale since 2026-11-08: Teder's twin, the store's demo and joining.
+      if (JSON.stringify(toran.btns.map((b) => [b.text, b.href])) !== JSON.stringify([['לנסות על החנות שלכם', '/toran#demo'], ['להצטרף לתורן', '/toran']])) found.push(`${at}: Toran's door has ${JSON.stringify(toran.btns.map((b) => [b.text, b.href]))}`);
       for (const d of home.doors) {
         for (let i = 0; i < d.btns.length; i++) for (let j = i + 1; j < d.btns.length; j++) {
           const g = apart(d.btns[i].box, d.btns[j].box);
