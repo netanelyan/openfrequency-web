@@ -26,6 +26,23 @@ The first entry in `site.config.json` is the one switch for whether Toran is on 
   available, no Toran plans).
 - `"live"`: the site as it was before the switch, word for word (`test/site.test.mjs` builds both and checks).
 
+**Selling Toran (prepared 2026-11-08, not switched).** Stores connect their own WhatsApp through Kapso (openfrequency-toran,
+`docs/connecting-channels.md`), so `"live"` now also changes three legal lines, each only while Toran is sold: the
+terms and Toran's contract say Meta charges nothing for an answer to a customer who wrote in and charges the store
+directly for a message it sends first (it used to say we pay Meta), the contract has "החיבור של הוואטסאפ" (Kapso, the
+number staying the store's and working in the app on the phone), and the privacy page names Kapso. `test/site.test.mjs`
+checks both ways. The launch, in order, once a first store has connected through Kapso:
+
+1. `site.config.json`: `products.toran` `"live"`; `toran.channels` `["whatsapp", "email"]`, so Instagram and Messenger
+   read "בקרוב" (Kapso is WhatsApp only; until now all four are claimed by the owner's choice of 2026-10-25); in
+   `toran.today` the line that says Toran answers on Instagram and Messenger, and in `toran.notYet` the line about
+   connecting the store's number, brought to what is true that day; `legal.contractsUpdated` and
+   `legal.privacyUpdated` set to the day (Toran's contract and the Kapso line are new that day).
+2. openfrequency-accounts: `TERMS_VERSION` in `src/accounts/signup.js` to the same day (the contracts are part of the
+   terms a sign-up accepts), and in its `.env` `OF_SIGNUP_PRODUCTS=teder,toran`, then `pm2 reload of-accounts`.
+3. This site: `npm test`, then `DEPLOY_HOST=tiyul-vps ./deploy/deploy.sh`.
+4. accounts' `/admin/waitlist`: the form opens with the launch message written; read it and send.
+
 The waitlist form takes a phone or an email and posts to the lead endpoint as `source: "waitlist"`; the owner gets it as
 "ליד חדש, רשימת המתנה לתורן", it is handed to no product, and a second sign-up from the same phone or email is thanked
 and not saved again. Without JS it lands on `/thanks/waitlist`, which is built only while Toran is soon. The endpoint

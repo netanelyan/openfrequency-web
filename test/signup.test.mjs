@@ -222,7 +222,7 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
   assert.doesNotMatch(section(closed, 't-deal'), /\/contract/);
   // The other legal pages keep their own date (the privacy page's is the later of legal.privacyWaUpdated, while Teder's
   // sample is asked for on WhatsApp, and legal.privacyUpdated, the reminders to pay on WhatsApp).
-  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-4 בנובמבר 2026/);
+  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-8 בנובמבר 2026/);
 });
 
 // A new month's payment has 72 hours after the paid month ends (the owner, 2026-11-03: "A user has 72 hours to pay for

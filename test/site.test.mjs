@@ -195,3 +195,22 @@ test('with "live", the ways into Toran are back', () => {
   assert.equal(support.products, undefined);
   assert.deepEqual(support.plans.map((p) => p.key), ['toran-store', 'toran-big', 'teder-small', 'teder']);
 });
+
+// Toran sold means a store's own number is connected through Kapso, with Meta billing the store (the owner, 2026-11-08):
+// the terms, Toran's contract and the privacy page say so only then. The first message to a store goes on WhatsApp from
+// our number with a "הסירו אותי" button either way, since that is what happens today.
+test('Kapso, and who pays Meta, come with Toran on sale; the way out of our first message is said either way', () => {
+  const text = (b, file) => main(b.pages[file]).replace(/<[^>]+>/g, '');
+  const soonTerms = text(built.soon, 'terms/index.html');
+  assert.match(soonTerms, /ואת מה ש-Meta גובה על ההודעות אנחנו משלמים/);
+  assert.doesNotMatch(text(built.soon, 'privacy/index.html'), /Kapso/);
+  const terms = text(built.live, 'terms/index.html');
+  assert.match(terms, /על תשובה ללקוח שכתב לכם Meta לא גובה כלום\. על הודעה שהחנות שולחת ביוזמתה, כמו תזכורת על עגלה נטושה, Meta גובה ישירות מהחנות/);
+  assert.doesNotMatch(terms, /אנחנו משלמים/);
+  assert.match(text(built.live, 'privacy/index.html'), /Kapso: החיבור של מספר הוואטסאפ של החנות ל-Meta/);
+  const contract = text(built.live, 'toran/contract/index.html');
+  assert.match(contract, /דרך Kapso, חברה שמחברת מספרים של עסקים ל-WhatsApp של Meta/);
+  assert.match(contract, /Meta גובה ישירות מהחנות/);
+  assert.doesNotMatch(contract, /אנחנו משלמים/);
+  for (const b of [built.soon, built.live]) assert.match(text(b, 'privacy/index.html'), /עם כפתור "הסירו אותי"\. כדי שלא נפנה שוב, לוחצים עליו/);
+});

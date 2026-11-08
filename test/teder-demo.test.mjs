@@ -163,7 +163,7 @@ test('with "whatsapp", the privacy page says Teder learns the number from the me
     assert.match(html, /Meta: הודעות הוואטסאפ כשמספר החנות מחובר, והפרסום והנתונים ב-Instagram\./);
     assert.match(html, /שיחות במספר הדמו של תורן: 6 חודשים/);
     assert.doesNotMatch(html, /תדר, את מספר הנייד|15 בנובמבר/);
-    assert.match(html, /עודכן לאחרונה ב-4 בנובמבר 2026/);
+    assert.match(html, /עודכן לאחרונה ב-8 בנובמבר 2026/);
   }
   // The other legal pages keep their date either way.
   for (const file of ['terms/index.html', 'security/index.html', 'accessibility/index.html']) assert.equal(built.wa[file], built.form[file], file);

@@ -60,7 +60,7 @@ test('the privacy page says a lead reaches us by email, and what we keep for an 
   assert.ok(part('p-share').includes('Resend , ארצות הברית: מיילים של כניסה לשירות, המיילים שתורן מקבל ועונה עליהם, והמייל שמגיע אלינו על כל טופס.'));
   assert.ok(part('p-customers').includes('את שם העסק, שכותבים בהרשמה. כשצריך מספר עוסק וכתובת לחשבונית, אנחנו מבקשים אותם מכם.'));
   assert.ok(!part('p-customers').includes('פרטים לחשבונית'));
-  assert.match(privacy, /עודכן לאחרונה ב-4 בנובמבר 2026/, 'legal.privacyUpdated, the day the reminders to pay on WhatsApp were added, later than legal.privacyWaUpdated');
+  assert.match(privacy, /עודכן לאחרונה ב-8 בנובמבר 2026/, 'legal.privacyUpdated, the day the first message to a store went on WhatsApp from our number, later than legal.privacyWaUpdated');
   // The reminders to pay on WhatsApp (2026-11-04): to the number the account was paid from and the one linked to it,
   // and "הפסק" stops them, while the emails go on (openfrequency-accounts src/web/daily.js, openfrequency-toran
   // src/billing/remind.ts).
