@@ -8,26 +8,21 @@
     "topic": "קפה אורגני",
     "fictional": false,
     "photo": {
-      "by": "Michael Burrows",
+      "by": "ØNSK",
       "provider": "Pexels",
-      "page": "https://www.pexels.com/photo/branch-of-coffee-tree-with-berries-in-sunny-park-7125446/"
+      "page": "https://www.pexels.com/photo/a-close-up-shot-of-coffee-cherries-7010603/"
     },
-    "alt": "6 דברים שלא ידעתם על קפה אורגני. מה עומד מאחורי התו שעל שקית הקפה שלכם"
+    "alt": "במקרה שאף אחד עוד לא סיפר לכם, ספשלטי לא תמיד אורגני"
   },
   {
     "pack": "bakery",
     "subject": "מאפים",
     "account": "המאפייה של השכונה",
-    "count": 8,
+    "count": 7,
     "handle": "@maafiya.shchuna",
-    "topic": "התפחת בצק בתנור כבוי",
+    "topic": "פירורי פאי, טריק בצק מלפני 100 שנה",
     "fictional": false,
-    "photo": {
-      "by": "Bora C",
-      "provider": "Pexels",
-      "page": "https://www.pexels.com/photo/homemade-bread-dough-rising-in-cloth-covered-bowls-37093836/"
-    },
-    "alt": "6 דברים שלא ידעתם על התפחת בצק. לכל מי שמחכה שהחלה תתפח כשהמטבח קר"
+    "alt": "הנה האמת האמיתית על בצק במקפיא. פירורי פאי, טריק בצק מלפני 100 שנה"
   },
   {
     "pack": "pets",
