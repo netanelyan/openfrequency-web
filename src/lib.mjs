@@ -15,7 +15,9 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 //   renamed: { old value: its new name }, a value the build refuses with the new name instead of the plain list
 const foundingOff = (raw) => raw.price?.founding?.on === false;
 // Where a customer can write to a store; the ones in toran.channels are live, the rest are shown as coming.
-export const CHANNELS = ['whatsapp', 'instagram', 'messenger', 'email'];
+// web: the chat on the store's own site (openfrequency-toran src/channels/web.ts), no provider and no Meta in between
+// (TORAN-READINESS.md P1-18).
+export const CHANNELS = ['whatsapp', 'instagram', 'messenger', 'email', 'web'];
 export const FACTS = {
   // The switch: whether Toran is on sale. 'live' is the site as it was; 'soon' keeps Toran on show with a "בקרוב"
   // badge, and every way to buy it, start it or ask for its demo becomes a waitlist (README, "Toran: live or soon").

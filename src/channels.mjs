@@ -9,7 +9,7 @@ import { CHANNELS, mark } from './lib.mjs';
 import { chat } from './chat.mjs';
 import { LOGOS } from './logos.mjs';
 
-export const NAMES = { whatsapp: 'וואטסאפ', instagram: 'אינסטגרם', messenger: 'מסנג׳ר', email: 'מייל', tiktok: 'טיקטוק', facebook: 'פייסבוק' };
+export const NAMES = { whatsapp: 'וואטסאפ', instagram: 'אינסטגרם', messenger: 'מסנג׳ר', email: 'מייל', web: 'צ׳אט באתר', tiktok: 'טיקטוק', facebook: 'פייסבוק' };
 // A channel's name with its mark in front.
 export const named = (c) => `${LOGOS[c]}${NAMES[c]}`;
 
@@ -49,6 +49,15 @@ ${top('ח', 'החנות שלכם', named('messenger'))}
 <div class="mail-subj"><small>${named('email')}<span aria-hidden="true"> · </span>נושא</small><b>שמלת פשתן ירוקה במידה M</b></div>
 <div class="mail-msg"><div class="mail-from"><span class="ava" aria-hidden="true">ל</span><span><b>לקוחה</b><small>אל החנות שלכם</small></span><time>02:14</time></div><p>${Q}</p></div>
 <div class="mail-msg"><div class="mail-from"><span class="ava store" aria-hidden="true">ח</span><span><b>החנות שלכם</b><small>אל לקוחה</small></span><time>02:14</time></div><p>${A}</p><p class="mail-sig">החנות שלכם<br><span dir="ltr">your-shop.co.il</span></p></div>
+</figure>`,
+
+  // The chat box in the corner of the store's own site, opened on a product page: no app between the customer and Toran.
+  web: () => `<figure class="chat web" data-ui aria-label="החנות שלכם, צ׳אט באתר">
+${top('ח', 'החנות שלכם', named('web'))}
+<ol class="msgs">
+<li class="msg me">${sr('me')}${Q}</li>
+<li class="msg them">${sr('them')}${A}</li>
+</ol>
 </figure>`,
 };
 

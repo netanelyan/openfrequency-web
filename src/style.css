@@ -522,6 +522,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .logo.instagram { color: #ff0069; }
 .logo.messenger { color: #00b2ff; }
 .logo.email { color: var(--ink-3); }
+.logo.web { color: var(--ink-3); }
 .logo.tiktok { color: var(--ink); }
 .logo.facebook { color: #0866ff; }
 .chat-top small .logo, .mail-subj small .logo { width: 13px; height: 13px; margin-inline-end: 4px; vertical-align: -2px; }

@@ -65,7 +65,8 @@
       "whatsapp",
       "instagram",
       "messenger",
-      "email"
+      "email",
+      "web"
     ],
     "channelsFrom": "config"
   },
