@@ -33,13 +33,18 @@ directly for a message it sends first (it used to say we pay Meta), the contract
 number staying the store's and working in the app on the phone), and the privacy page names Kapso. `test/site.test.mjs`
 checks both ways. The launch, in order, once a first store has connected through Kapso:
 
-1. `site.config.json`: `products.toran` `"live"`; `toran.channels` `["whatsapp", "email"]`, so Instagram and Messenger
-   read "בקרוב" (Kapso is WhatsApp only; until now all four are claimed by the owner's choice of 2026-10-25); in
-   `toran.today` the line that says Toran answers on Instagram and Messenger, and in `toran.notYet` the line about
-   connecting the store's number, brought to what is true that day; `legal.contractsUpdated` and
-   `legal.privacyUpdated` set to the day (Toran's contract and the Kapso line are new that day).
+1. `site.config.json`: `products.toran` `"live"`. `toran.channels` stays as the owner chose (all four since 2026-10-25):
+   WhatsApp connects through Kapso and Instagram and Messenger through Zernio (both built 2026-11-08; Zernio's webhook
+   is registered once, on the owner's Zernio account). Take a channel out of `toran.channels` only if it is not working
+   on the day: every channel list on the site (the hero, /join, the questions, the owner chat, the inbox line, the price
+   card) is built from it. `toran.today` and `toran.notYet` were brought to the truth on 2026-11-08 (they feed
+   `support.json`, what Toran's own support answers from); check them again that day. `legal.signupUpdated`,
+   `legal.contractsUpdated` and `legal.privacyUpdated` set to the day (Toran's contract, the cancel-in-the-account lines
+   and the Kapso and Zernio lines change with the switch).
 2. openfrequency-accounts: `TERMS_VERSION` in `src/accounts/signup.js` to the same day (the contracts are part of the
-   terms a sign-up accepts), and in its `.env` `OF_SIGNUP_PRODUCTS=teder,toran`, then `pm2 reload of-accounts`.
+   terms a sign-up accepts; `npm run release-check` there compares it with `legal.signupUpdated` here), and in its
+   `.env` `OF_SIGNUP_PRODUCTS=teder,toran`, then `pm2 reload of-accounts`. Its migration 13 (Toran's two plans) runs on
+   that start; take its backup first (`npm run backup`).
 3. This site: `npm test`, then `DEPLOY_HOST=tiyul-vps ./deploy/deploy.sh`.
 4. accounts' `/admin/waitlist`: the form opens with the launch message written; read it and send.
 

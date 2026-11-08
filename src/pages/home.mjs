@@ -22,7 +22,7 @@ import { chat } from '../chat.mjs';
 import { TORAN_SAVE } from '../forms.mjs';
 import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_DEMO, TORAN_TRY, foldButton, tederPriceLine, toranStart } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
-import { inList, liveChannels } from '../channels.mjs';
+import { NAMES, inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
 import { niches } from '../niches.mjs';
 
@@ -120,16 +120,24 @@ const trust = (cfg) => `
 // about the store; Toran answers from the conversations and the site, and acts only after "כן". Shown once Toran is
 // live: while it is soon, this whole section was a promise about a product nobody can buy yet, and it went (the owner,
 // 2026-11-01: "The mobile page is very long ... Cutting a section or two will help").
-const OWNER_CHAT = [
-  ['me', '20:41', 'מה קרה היום?'],
-  ['them', '20:41', 'היום פנו 23 לקוחות: 17 בוואטסאפ, 4 באינסטגרם ו-2 במייל. עניתי לבד ל-21. שתי שאלות מחכות לכם.'],
-  ['me', '20:42', 'מה שאלו?'],
-  ['them', '20:42', 'לקוחה באינסטגרם שואלת אם אפשר לאסוף מהמחסן באשדוד. לקוח בוואטסאפ שואל אם השמלה הירוקה תחזור למלאי.'],
-  ['me', '20:43', 'תעני לה שאפשר לאסוף בתיאום מראש'],
-  ['them', '20:43', 'אשלח לה: "אפשר לאסוף מהמחסן באשדוד, בתיאום מראש." לשלוח?'],
-  ['me', '20:43', 'כן'],
-  ['them', '20:43', 'נשלח. שמרתי את התשובה, ובפעם הבאה אענה על זה לבד.'],
-];
+// The day in the chat is told in the channels the site sells (toran.channels), so it never names one Toran is not on.
+const ownerChat = (cfg) => {
+  const ch = liveChannels(cfg);
+  const counts = ch.length >= 3 ? [17, 4, 2] : ch.length === 2 ? [21, 2] : [23];
+  const parts = counts.map((n, i) => `${n} ב${NAMES[ch[i]]}`);
+  const day = parts.length < 2 ? parts[0] : `${parts.slice(0, -1).join(', ')} ו-${parts.at(-1)}`;
+  const her = NAMES[ch[1] || ch[0]];
+  return [
+    ['me', '20:41', 'מה קרה היום?'],
+    ['them', '20:41', `היום פנו 23 לקוחות: ${day}. עניתי לבד ל-21. שתי שאלות מחכות לכם.`],
+    ['me', '20:42', 'מה שאלו?'],
+    ['them', '20:42', `לקוחה ב${her} שואלת אם אפשר לאסוף מהמחסן באשדוד. לקוח ב${NAMES[ch[0]]} שואל אם השמלה הירוקה תחזור למלאי.`],
+    ['me', '20:43', 'תעני לה שאפשר לאסוף בתיאום מראש'],
+    ['them', '20:43', 'אשלח לה: "אפשר לאסוף מהמחסן באשדוד, בתיאום מראש." לשלוח?'],
+    ['me', '20:43', 'כן'],
+    ['them', '20:43', 'נשלח. שמרתי את התשובה, ובפעם הבאה אענה על זה לבד.'],
+  ];
+};
 const assistant = (cfg) => `
 <section class="sec owner-sec" id="owner" aria-labelledby="owner-h">
 <div class="wrap owner-grid">
@@ -144,7 +152,7 @@ const assistant = (cfg) => `
 <li><b>על מה שואלים.</b> המוצרים שלקוחות שואלים עליהם הרבה, ומה מהם אזל מהמלאי.</li>
 </ul>
 </div>
-<div class="phone owner-phone">${chat({ id: 'owner-chat', who: 'תורן', sub: 'העוזר שלכם', face: mark('toran', 38), msgs: OWNER_CHAT, names: { me: 'אתם', them: 'תורן' } })}</div>
+<div class="phone owner-phone">${chat({ id: 'owner-chat', who: 'תורן', sub: 'העוזר שלכם', face: mark('toran', 38), msgs: ownerChat(cfg), names: { me: 'אתם', them: 'תורן' } })}</div>
 </div>
 </section>`;
 

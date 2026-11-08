@@ -167,9 +167,12 @@ test('with "open" and Toran live, sign-up is the first way in for both products,
   assert.match(join, /<input type="checkbox" name="toran" value="1" checked>/);
   assert.match(join, /<button class="btn" type="submit">לקבל דמו<\/button>/);
   assert.match(join, /מה קורה אחרי ההרשמה[\s\S]*נרשמים ומשלמים/);
-  // Toran's page: the sign-up in the first screen and on the price card, the demo as the second way.
+  // Toran's page: the sign-up in the first screen, and on the price card one button per plan with that plan picked
+  // (accounts' ?plan=store|big, TORAN-READINESS.md P0-1); the demo as the second way.
   const page = main(pages['toran/index.html']);
-  assert.equal(page.split(`href="${TORAN_SIGNUP}"`).length - 1, 2);
+  assert.equal(page.split(`href="${TORAN_SIGNUP}"`).length - 1, 1);
+  assert.ok(page.includes(`<a class="btn primary" href="${TORAN_SIGNUP}&amp;plan=store">להצטרף בחבילת חנות</a>`));
+  assert.ok(page.includes(`<a class="btn primary" href="${TORAN_SIGNUP}&amp;plan=big">להצטרף בחבילת חנות גדולה</a>`));
   assert.match(page, /<a class="btn" href="#demo">לנסות על החנות שלכם<\/a>/);
   // The home page's door for Toran, on its green: the first button white, the others the green's own.
   assert.ok(main(pages['index.html']).includes(`<a class="btn light" href="${TORAN_SIGNUP}">להצטרף לתורן</a><a class="btn on-color" href="/toran">לראות דמו</a><a class="btn on-color" href="/toran#demo">לנסות על החנות שלכם</a>`));

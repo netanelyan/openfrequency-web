@@ -132,7 +132,7 @@ ${channelWindow(cfg)}
 <div class="wrap side">
 <div>
 <h2 id="inbox-h">כל השיחות בתיבה אחת</h2>
-<p class="lede">מה שלקוחות כותבים ${inList(CHANNELS)} מגיע לרשימה אחת אצלכם. ליד כל שיחה רואים מאיפה היא הגיעה ומה קרה איתה: תורן ענה לבד, היא מחכה לכם, או שתיקנתם והוא למד.</p>
+<p class="lede">מה שלקוחות כותבים ${inList(liveChannels(cfg))} מגיע לרשימה אחת אצלכם. ליד כל שיחה רואים מאיפה היא הגיעה ומה קרה איתה: תורן ענה לבד, היא מחכה לכם, או שתיקנתם והוא למד.</p>
 ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבנייה, והיום תורן עונה ${inList(live)}.</p>` : ''}
 </div>
 <div class="stage glass">${inbox()}</div>
@@ -150,9 +150,11 @@ ${rowList('משאיר לכם', YOURS, { cls: 'yours', after: '<p class="quiet">�
 </div>
 </section>
 ${payBack(false)}
-${toranPricing(cfg, { cta: signupOpen(cfg) ? [signupUrl('toran'), TORAN_SIGNUP_LABEL] : ['#demo', 'לנסות את תורן על החנות שלכם'], includes: [
+${toranPricing(cfg, { cta: ['#demo', 'לנסות את תורן על החנות שלכם'], includes: [
   `עונה ללקוחות 24/7 ${soon.length ? `בכל הערוצים הפעילים, ${inList(live)}` : inList(live)}, מתוך מה שכתוב באתר שלכם`,
-  'תזכורות על עגלה נטושה, למי שהסכים לקבל מכם הודעות, כלולות במחיר',
+  // Under Kapso the store pays Meta itself for a WhatsApp message it starts (the contract's c-meta); by email nothing
+  // more (the owner's default, 2026-11-08: say it honestly, not "included").
+  'תזכורות על עגלה נטושה, למי שהסכים לקבל מכם הודעות. במייל זה בלי תוספת, ובוואטסאפ Meta גובה על כל תזכורת ישירות מכם',
   'כל השיחות בתיבה אחת, ושאלה שאין עליה תשובה באתר מגיעה אליכם',
   'בשבועיים הראשונים אנחנו עוברים איתכם על השיחות ומתקנים מה שצריך',
 ] })}

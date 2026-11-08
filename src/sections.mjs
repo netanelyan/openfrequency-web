@@ -69,9 +69,10 @@ export function tederPriceLine(cfg) {
 // connected we email the details (sign-up asks for an email and no phone) and Teder opens once the payment reaches us;
 // once one is, by card on the payment page in the account, and Teder opens once the payment is confirmed (accounts'
 // paywall opens a product only for a payment that covers today).
-export const payLine = (cfg) => (payProvider(cfg)
-  ? 'משלמים מראש לכל חודש, בכרטיס אשראי, בעמוד התשלום שבחשבון שלכם. תדר נפתח כשהתשלום מאושר.'
-  : 'אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום במייל. משלמים מראש לכל חודש, ותדר נפתח כשהתשלום מגיע אלינו.');
+// `product` is the one it opens: Teder by default, Toran on its own price card and questions (P1-5).
+export const payLine = (cfg, product = 'תדר') => (payProvider(cfg)
+  ? `משלמים מראש לכל חודש, בכרטיס אשראי, בעמוד התשלום שבחשבון שלכם. ${product} נפתח כשהתשלום מאושר.`
+  : `אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום במייל. משלמים מראש לכל חודש, ו${product} נפתח כשהתשלום מגיע אלינו.`);
 // The setup fee, as the self-serve terms say it (legal.mjs tederSub): beside the plans while sign-up is open. Closed, the
 // terms say Toran's rule (not refunded once we started building), so the plans say nothing more than the fee.
 export const NO_REFUND = 'דמי ההקמה לא מוחזרים.';
@@ -167,9 +168,11 @@ ${terms ? `<p class="terms-line">${terms}</p>` : ''}
 // is on, the way to talk to us past the bigger one, what both include, and how a store moves between them. The number
 // of conversations a month is the only thing that sets the plan: no credits, nothing charged per conversation.
 // Left out of the public draft until both prices are set.
+// While sign-up is open each card has its own button to accounts' sign-up with that plan picked (&plan=store or big),
+// as Teder's cards do, and the box under them says how paying works and offers the demo instead.
 const PLANS = [
-  ['store', 'חנות'],
-  ['big', 'חנות גדולה'],
+  ['store', 'חנות', 'בחבילת חנות'],
+  ['big', 'חנות גדולה', 'בחבילת חנות גדולה'],
 ];
 export function toranPricing(cfg, { includes, cta, id = 'price' }) {
   if (!PLANS.every(([k]) => cfg.has(`price.plans.${k}.monthly`)) && !cfg.banner) return '';
@@ -177,12 +180,14 @@ export function toranPricing(cfg, { includes, cta, id = 'price' }) {
   const offer = cfg.get('price.founding.on') === true
     ? `<p class="plan-offer"><b>הצעת מייסדים</b> ל-${count(cfg, 'price.founding.stores')} החנויות הראשונות שמצטרפות: ${amount(cfg, 'price.founding.monthly')} לחודש, ${said(cfg, 'price.founding.months', (n) => `ב-${n} החודשים הראשונים`)}.</p>`
     : '';
-  const card = ([k, name]) => `<article class="plan glass${k === 'store' && offer ? ' has-offer' : ''}">
+  const open = signupOpen(cfg);
+  const card = ([k, name, inIt]) => `<article class="plan glass${k === 'store' && offer ? ' has-offer' : ''}">
 <h3 class="plan-name">${name}</h3>
 <p class="figure"><span class="num">${count(cfg, `price.plans.${k}.monthly`)}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
 <p class="plan-vat">${vat}</p>
 <p class="plan-cap">עד <b>${count(cfg, `price.plans.${k}.conversations`)}</b> שיחות בחודש</p>
 ${k === 'store' ? offer : ''}
+${open ? `<a class="btn primary" href="${esc(signupUrl('toran', k))}">להצטרף ${inIt}</a>` : ''}
 </article>`;
   const fee = cfg.get('price.setup');
   const setupLine = fee == null ? cfg.ph('price.setup') : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת, ${vat}.`;
@@ -201,8 +206,8 @@ ${k === 'store' ? offer : ''}
 </div>
 <div class="price-main">
 <p class="price-name">${mark('toran', 36)}<b>תורן</b></p>
-<p class="price-notes">${setupLine} הדמו בחינם.</p>
-<a class="btn primary" href="${cta[0]}">${cta[1]}</a>
+<p class="price-notes">${setupLine} הדמו בחינם.${open ? ` ${payLine(cfg, 'תורן')}` : ''}</p>
+<a class="btn${open ? '' : ' primary'}" href="${cta[0]}">${cta[1]}</a>
 </div>
 </div>
 <p class="plan-fair"><b>כשמספר השיחות משתנה.</b> ${fair}</p>

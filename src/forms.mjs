@@ -3,6 +3,7 @@
 // While sign-up is open (signup in site.config.json), joining Teder is accounts' sign-up, so Teder's forms ask for what
 // they send, a sample slideshow, and the join form's button no longer says "join".
 import { esc, mark, signupOpen, tederByWa, tederNets, toranSoon } from './lib.mjs';
+import { inList, liveChannels } from './channels.mjs';
 
 // The first words of a WhatsApp message to us, when the endpoint can't take the form. {store} is the typed address.
 export const WA_TEXT = {
@@ -82,7 +83,7 @@ export function joinForm(cfg) {
   return `${open(cfg, 'join', '/join', 'demo join', 'join')}
 ${soon ? '<input type="hidden" name="teder" value="1">' : `<fieldset class="picks"><legend>במה מתחילים</legend>
 <div class="pick-row">
-${card('toran', 'תורן', 'עונה ללקוחות של החנות בוואטסאפ, באינסטגרם, במסנג׳ר ובמייל', true)}
+${card('toran', 'תורן', `עונה ללקוחות של החנות ${inList(liveChannels(cfg))}`, true)}
 ${card('teder', 'תדר', `כותב ומעצב מצגות בעברית ${tederNets(cfg)}`, false)}
 </div>
 </fieldset>`}

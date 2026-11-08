@@ -151,7 +151,10 @@ test('with "whatsapp", the privacy page says Teder learns the number from the me
   for (const pages of [built.wa, built.waLive]) {
     const html = said(pages['privacy/index.html']);
     assert.match(html, /בדמו של תורן ובמצגת לדוגמה של תדר, את מספר הנייד אנחנו מקבלים מההודעה ששולחים לנו בוואטסאפ עם הקוד מהטופס\./);
-    assert.match(html, /Meta: הודעות הוואטסאפ במספר הדמו ובמספרים המחוברים של החנויות, והפרסום והנתונים ב-Instagram\./);
+    // With Toran live, Meta also carries the stores' Instagram and Messenger messages (TORAN-READINESS.md P0-7).
+    assert.match(html, pages === built.waLive
+      ? /Meta: הודעות הוואטסאפ במספר הדמו ובמספרים המחוברים של החנויות, ההודעות באינסטגרם ובמסנג׳ר של החנויות שחיברו אותם, והפרסום והנתונים ב-Instagram\./
+      : /Meta: הודעות הוואטסאפ במספר הדמו ובמספרים המחוברים של החנויות, והפרסום והנתונים ב-Instagram\./);
     assert.match(html, /שיחות במספר הדמו, על תורן ועל תדר: 6 חודשים מההודעה האחרונה\./);
     assert.match(html, /עודכן לאחרונה ב-15 בנובמבר 2026/);
   }
@@ -160,7 +163,9 @@ test('with "whatsapp", the privacy page says Teder learns the number from the me
   for (const pages of [built.form, built.formLive]) {
     const html = said(pages['privacy/index.html']);
     assert.match(html, /\. בדמו של תורן, את מספר הנייד אנחנו מקבלים מההודעה/);
-    assert.match(html, /Meta: הודעות הוואטסאפ כשמספר החנות מחובר, והפרסום והנתונים ב-Instagram\./);
+    assert.match(html, pages === built.formLive
+      ? /Meta: הודעות הוואטסאפ כשמספר החנות מחובר, ההודעות באינסטגרם ובמסנג׳ר של החנויות שחיברו אותם, והפרסום והנתונים ב-Instagram\./
+      : /Meta: הודעות הוואטסאפ כשמספר החנות מחובר, והפרסום והנתונים ב-Instagram\./);
     assert.match(html, /שיחות במספר הדמו של תורן: 6 חודשים/);
     assert.doesNotMatch(html, /תדר, את מספר הנייד|15 בנובמבר/);
     assert.match(html, /עודכן לאחרונה ב-8 בנובמבר 2026/);
