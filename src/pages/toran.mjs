@@ -146,6 +146,7 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 ${rowList('עונה לבד', ALONE)}
 ${rowList('משאיר לכם', YOURS, { cls: 'yours', after: '<p class="quiet">כשאין באתר תשובה, הוא אומר ללקוח שהוא בודק, במקום לנחש, ושולח לכם את השאלה. מה שתענו הוא יזכור לפעם הבאה.</p>' })}
 </div>
+${/* What we can show, and nothing invented (PRODUCT.md, "Evidence on Hand"; TORAN-READINESS.md P1-17): the eval's own numbers, the example page built by Toran, and that the support button on every page is Toran. */ ''}<p class="lede">בבדיקה שעשינו על 150 שאלות מ-5 חנויות אמיתיות, תורן לא המציא אף מחיר, ואת כל 40 השאלות שלא הייתה להן תשובה באתר הוא העביר לחנות במקום לנחש. <a href="/toran/example">כך נראה עמוד דמו שתורן בונה לחנות</a>, וכפתור שירות הלקוחות שבכל עמוד באתר הזה הוא תורן, שעונה בשבילנו.</p>
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
