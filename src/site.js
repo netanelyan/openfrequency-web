@@ -7,6 +7,30 @@
   var still = matchMedia('(prefers-reduced-motion: reduce)').matches || root.classList.contains('a-still');
   var each = function (sel, fn, scope) { Array.prototype.forEach.call((scope || d).querySelectorAll(sel), fn); };
 
+  // The founders' offer (sections.mjs foundersBox): the real count of spots left, from openfrequency-accounts. Asked once
+  // a page. With no answer, or a strange one, the count stays hidden and the offer reads without a number; with no spot
+  // left, the whole box goes, so the page never shows an offer that is over.
+  var founders = d.querySelectorAll('[data-founders]');
+  if (founders.length && window.fetch) {
+    fetch(founders[0].getAttribute('data-founders'), { credentials: 'omit', cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (f) {
+        var spots = Number(f && f.spots), left = Number(f && f.left);
+        if (!(spots > 0) || !(left >= 0) || left > spots || spots % 1 || left % 1 || spots > 100) return;
+        each('[data-founders]', function (box) {
+          if (!left) { box.hidden = true; return; }
+          var dots = box.querySelector('.founders-dots');
+          for (var i = 0; i < spots; i++) {
+            var dot = dots.appendChild(d.createElement('i'));
+            if (i < spots - left) dot.className = 'taken';
+          }
+          box.querySelector('[data-founders-left]').innerHTML = 'נשארו <b>' + left + '</b> מתוך ' + spots + ' מקומות';
+          box.querySelector('[data-founders-count]').hidden = false;
+        });
+      })
+      .catch(function () {});
+  }
+
   // The header lifts once the page scrolls under it; the phone menu closes on a tap outside, a link, or Escape.
   var lift = function () { root.classList.toggle('scrolled', scrollY > 8); };
   addEventListener('scroll', lift, { passive: true });

@@ -16,7 +16,7 @@
 // its first sentence, with the button and the price under it: the steps below say how it is set up.
 import { mark, payProvider, signupOpen, signupUrl, tederNets, toranSoon } from '../lib.mjs';
 import { joinForm } from '../forms.mjs';
-import { NO_REFUND, tederPriceLine, tederStart, toranPriceLine } from '../sections.mjs';
+import { NO_REFUND, foundersBox, tederPriceLine, tederStart, toranPriceLine } from '../sections.mjs';
 import { TEDER, TORAN } from './faq.mjs';
 
 const AFTER = [
@@ -65,6 +65,7 @@ function price(cfg) {
 <ul class="join-prices">
 ${items.map(([name, label, , href]) => `<li>${mark(name, 40)}<span><b>${label}</b><span>${name === 'toran' ? toranPriceLine(cfg) : `${tederPriceLine(cfg)}${signupOpen(cfg) ? ` ${NO_REFUND}` : ''}`}</span></span><a href="${href}">פרטים</a></li>`).join('\n')}
 </ul>
+${foundersBox(cfg)}
 </div>
 </section>`;
 }

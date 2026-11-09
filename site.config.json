@@ -17,6 +17,10 @@
     "who": "אנחנו OpenFrequency, עסק קטן מישראל. אנחנו בונים כלים בעברית לעסקים קטנים ולחנויות אונליין.",
     "why": "עסק קטן צריך לעלות לטיקטוק ולאינסטגרם כמה פעמים בשבוע, ולכתוב ולעצב כל מצגת לוקח זמן שאין לו. בנינו את תדר כדי שיכתוב ויעצב אותן בעברית מתוך מקורות אמיתיים, ואתם רק מאשרים מה עולה."
   },
+  "founders": {
+    "on": true,
+    "spots": 10
+  },
   "price": {
     "vat": "excluded",
     "setup": 990,
@@ -29,12 +33,6 @@
         "monthly": 1190,
         "conversations": 1500
       }
-    },
-    "founding": {
-      "on": false,
-      "stores": 5,
-      "monthly": 390,
-      "months": 12
     },
     "fair": {
       "upMonths": 2,
@@ -92,8 +90,8 @@
     "host": "גרמניה",
     "leadMonths": 6,
     "updated": "2026-10-30",
-    "signupUpdated": "2026-11-08",
-    "contractsUpdated": "2026-11-08",
+    "signupUpdated": "2026-11-09",
+    "contractsUpdated": "2026-11-09",
     "privacyWaUpdated": "2026-10-31",
     "privacyUpdated": "2026-11-08",
     "accessibilityUpdated": "2026-11-04"

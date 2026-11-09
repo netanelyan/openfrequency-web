@@ -83,7 +83,7 @@ for (const [file, html] of files) {
     "style-src-attr 'unsafe-inline'", // the marks' size, style="--s:32px"
     "img-src 'self' data:",
     "font-src 'self'",
-    "connect-src 'self'",
+    "connect-src 'self' https://accounts.openfrequency.co.il", // the founders' count (sections.mjs foundersBox)
     "form-action 'self' https://wa.me https://api.whatsapp.com", // a Toran demo's plain post is sent on to WhatsApp
     "base-uri 'self'",
     "object-src 'none'",

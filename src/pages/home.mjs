@@ -20,7 +20,7 @@
 import { mark, glyphOnly, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { TORAN_SAVE } from '../forms.mjs';
-import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_SIGNUP_LABEL, TORAN_TRY, foldButton, tederPriceLine, toranPriceLine } from '../sections.mjs';
+import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_SIGNUP_LABEL, TORAN_TRY, foldButton, foundersBox, tederPriceLine, toranPriceLine } from '../sections.mjs';
 import { approvals, reel } from '../teder.mjs';
 import { NAMES, inList, liveChannels } from '../channels.mjs';
 import { clients } from '../clients.mjs';
@@ -91,6 +91,7 @@ ${reel}
 ${tederDoor}
 ${toranDoor}
 </div>
+${foundersBox(cfg, 'hero-founders')}
 </div>
 </section>`;
 };

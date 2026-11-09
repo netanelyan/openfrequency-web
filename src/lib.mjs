@@ -13,7 +13,7 @@ export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', 
 //         allowed values
 //   unless: the fact is not needed when this is true (the build then lets it stay empty)
 //   renamed: { old value: its new name }, a value the build refuses with the new name instead of the plain list
-const foundingOff = (raw) => raw.price?.founding?.on === false;
+const foundersOff = (raw) => raw.founders?.on === false;
 // Where a customer can write to a store; the ones in toran.channels are live, the rest are shown as coming.
 // web: the chat on the store's own site (openfrequency-toran src/channels/web.ts), no provider and no Meta in between
 // (TORAN-READINESS.md P1-18).
@@ -47,11 +47,11 @@ export const FACTS = {
   'price.plans.store.conversations': { label: 'כמה שיחות בחודש בחבילת חנות', kind: 'number' },
   'price.plans.big.monthly': { label: 'המחיר החודשי של חבילת חנות גדולה', kind: 'number' },
   'price.plans.big.conversations': { label: 'כמה שיחות בחודש בחבילת חנות גדולה', kind: 'number' },
-  // The founding offer, while on: the first stores get the Store plan at a lower price for their first months.
-  'price.founding.on': { label: 'הצעת המייסדים פעילה', kind: 'flag' },
-  'price.founding.stores': { label: 'לכמה חנויות ראשונות הצעת המייסדים', kind: 'number', unless: foundingOff },
-  'price.founding.monthly': { label: 'המחיר החודשי בהצעת המייסדים', kind: 'number', unless: foundingOff },
-  'price.founding.months': { label: 'לכמה חודשים הצעת המייסדים', kind: 'number', unless: foundingOff },
+  // The founders' offer, for every product (the owner, 2026-11-09): the first this many businesses that sign up pay no
+  // setup fee. The spots are counted by openfrequency-accounts (OF_FOUNDERS_SPOTS there, the same number), and the
+  // page shows the real count from there (sections.mjs foundersBox, src/site.js).
+  'founders.on': { label: 'מבצע המייסדים פעיל', kind: 'flag' },
+  'founders.spots': { label: 'לכמה עסקים ראשונים מבצע המייסדים', kind: 'number', unless: foundersOff },
   // How a store moves between the plans: up after this many months in a row above its plan, with notice this many
   // days ahead; down after this many months in a row under the smaller plan's conversations.
   'price.fair.upMonths': { label: 'אחרי כמה חודשים ברצף מעל החבילה עוברים למעלה', kind: 'number' },

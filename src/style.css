@@ -1216,8 +1216,21 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 /* Teder's plans (sections.mjs tederPricing): each card's setup fee and its own way in */
 .plan-fee { margin: 4px 0 0; color: var(--ink-2); font-size: var(--fs-small); }
 .plan .btn { justify-self: start; margin-top: 14px; }
-.plan-offer { margin: 14px 0 0; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--pc) 12%, transparent); font-size: var(--fs-small); line-height: 1.5; }
-.plan-offer b { color: var(--toran-name); }
+/* The founders' offer (sections.mjs foundersBox): the offer in a card of its own, then the real count from accounts as
+   a row of spots, the open ones filled, the taken ones faint (src/site.js fills it; until then it is hidden). */
+.founders { margin: 20px auto 0; max-width: 760px; padding: clamp(16px, 2.6vw, 22px) clamp(18px, 3vw, 28px); border-radius: var(--r); display: grid; gap: 6px; }
+.founders-h { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font: 700 clamp(17px, 2vw, 20px)/1.35 var(--display); }
+.founders-tag { padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent-fill) 14%, transparent); color: var(--accent); font: 600 13px/1.4 var(--text, inherit); }
+.founders-say { margin: 0; color: var(--ink-p); }
+.founders-count { margin-top: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.founders[hidden], .founders-count[hidden] { display: none; }
+.founders-dots { display: flex; gap: 6px; }
+.founders-dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--accent-fill); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-fill) 16%, transparent); }
+.founders-dots i.taken { background: var(--line-2, rgba(0, 0, 0, 0.16)); box-shadow: none; }
+.founders-left { color: var(--ink-p); font-variant-numeric: tabular-nums; }
+.founders-left b { color: var(--ink); font-size: 1.15em; }
+.co-hero .hero-founders { margin-top: 24px; }
+@media (max-width: 699px) { .founders-dots i { width: 10px; height: 10px; } .founders-dots { gap: 5px; } }
 .plan-more { margin: 16px 4px 28px; color: var(--ink-2); }
 .plan-fair { max-width: 70ch; margin: 22px 4px 0; color: var(--ink-2); }
 .plan-fair b { color: var(--ink); }

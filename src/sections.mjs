@@ -77,6 +77,22 @@ export const payLine = (cfg, product = 'תדר') => (payProvider(cfg)
 // terms say Toran's rule (not refunded once we started building), so the plans say nothing more than the fee.
 export const NO_REFUND = 'דמי ההקמה לא מוחזרים.';
 
+// The founders' offer (the owner, 2026-11-09: "lets do a founders sale for all of the products: no דמי הקמה for the
+// next 10 people", with a counter of the spots left): the offer in words, true while founders.on is, and a count the
+// page's script fills in from openfrequency-accounts' own number (FOUNDERS_URL, src/accounts/founders.js there). The
+// count is never written into the HTML: without a real answer it stays hidden and the offer reads without it, and when
+// no spot is left the script takes the whole box away (src/site.js). Shown while sign-up is open, since a spot is taken
+// at sign-up.
+export const FOUNDERS_URL = 'https://accounts.openfrequency.co.il/public/founders.json';
+export function foundersBox(cfg, cls = '') {
+  if (cfg.get('founders.on') !== true || !signupOpen(cfg)) return '';
+  return `<div class="founders glass${cls ? ` ${cls}` : ''}" data-founders="${FOUNDERS_URL}">
+<p class="founders-h"><span class="founders-tag">מבצע מייסדים</span><b>${count(cfg, 'founders.spots')} העסקים הראשונים שנרשמים לא משלמים דמי הקמה</b></p>
+<p class="founders-say">בתדר ובתורן, על כל מה שבוחרים בהרשמה. המחיר החודשי נשאר כמו שהוא.</p>
+<div class="founders-count" data-founders-count hidden><span class="founders-dots" aria-hidden="true"></span><span class="founders-left" data-founders-left></span></div>
+</div>`;
+}
+
 // While sign-up is open (signup in site.config.json): Teder's way in, the button to accounts' sign-up with the price
 // beside it, and, for who wants to see one first, the way to the free sample. sample: where the sample form is (null
 // when it follows right after, as on /join). cls: the button's classes, for the violet fields. more: buttons that sit
@@ -145,6 +161,7 @@ ${open ? `<a class="btn primary" href="${esc(signupUrl('teder', plan))}">להצ�
 <div class="wrap">
 <div class="sec-head"><h2 id="${id}-h">כמה זה עולה</h2><p class="lede">שתי חבילות, לפי מספר המצגות בחודש. כל השאר זהה בשתיהן.</p></div>
 <div class="plans">${TEDER_PLANS.map(card).join('\n')}</div>
+${foundersBox(cfg)}
 <p class="plan-more">צריכים יותר מ-${count(cfg, 'teder.slideshows')} מצגות בחודש? ${waWords(cfg, 'כתבו לנו בוואטסאפ')}.</p>
 <div class="price-card plan-both glass">
 <div class="price-incl${notes.length ? ' fold" data-fold' : '"'}>
@@ -163,9 +180,9 @@ ${terms ? `<p class="terms-line">${terms}</p>` : ''}
 </section>`;
 }
 
-// Toran's two plans, every number from site.config.json (price.plans, price.founding, price.fair, price.setup): a
-// card each with its monthly price and the conversations it covers, the founding offer on the smaller one while it
-// is on, the way to talk to us past the bigger one, what both include, and how a store moves between them. The number
+// Toran's two plans, every number from site.config.json (price.plans, price.fair, price.setup): a card each with its
+// monthly price and the conversations it covers, the founders' offer under them while it is on (foundersBox), the way
+// to talk to us past the bigger one, what both include, and how a store moves between them. The number
 // of conversations a month is the only thing that sets the plan: no credits, nothing charged per conversation.
 // Left out of the public draft until both prices are set.
 // While sign-up is open each card has its own button to accounts' sign-up with that plan picked (&plan=store or big),
@@ -177,16 +194,12 @@ const PLANS = [
 export function toranPricing(cfg, { includes, cta, id = 'price' }) {
   if (!PLANS.every(([k]) => cfg.has(`price.plans.${k}.monthly`)) && !cfg.banner) return '';
   const vat = vatOf(cfg);
-  const offer = cfg.get('price.founding.on') === true
-    ? `<p class="plan-offer"><b>הצעת מייסדים</b> ל-${count(cfg, 'price.founding.stores')} החנויות הראשונות שמצטרפות: ${amount(cfg, 'price.founding.monthly')} לחודש, ${said(cfg, 'price.founding.months', (n) => `ב-${n} החודשים הראשונים`)}.</p>`
-    : '';
   const open = signupOpen(cfg);
-  const card = ([k, name, inIt]) => `<article class="plan glass${k === 'store' && offer ? ' has-offer' : ''}">
+  const card = ([k, name, inIt]) => `<article class="plan glass">
 <h3 class="plan-name">${name}</h3>
 <p class="figure"><span class="num">${count(cfg, `price.plans.${k}.monthly`)}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
 <p class="plan-vat">${vat}</p>
 <p class="plan-cap">עד <b>${count(cfg, `price.plans.${k}.conversations`)}</b> שיחות בחודש</p>
-${k === 'store' ? offer : ''}
 ${open ? `<a class="btn primary" href="${esc(signupUrl('toran', k))}">להצטרף ${inIt}</a>` : ''}
 </article>`;
   const fee = cfg.get('price.setup');
@@ -198,6 +211,7 @@ ${open ? `<a class="btn primary" href="${esc(signupUrl('toran', k))}">להצטר
 <div class="wrap">
 <div class="sec-head"><h2 id="${id}-h">כמה זה עולה</h2><p class="lede">שתי חבילות, לפי מספר השיחות בחודש. כל השאר זהה בשתיהן.</p></div>
 <div class="plans">${PLANS.map(card).join('\n')}</div>
+${foundersBox(cfg)}
 <p class="plan-more">יותר מ-${count(cfg, 'price.plans.big.conversations')} שיחות בחודש? ${waWords(cfg, 'כתבו לנו בוואטסאפ')}, ונבנה חבילה לפי החנות.</p>
 <div class="price-card plan-both glass">
 <div class="price-incl">
@@ -216,14 +230,11 @@ ${terms ? `<p class="terms-line">${terms}</p>` : ''}
 </section>`;
 }
 
-// Toran's price in one sentence, for /join and the questions: both plans, VAT, the setup fee, and
-// the founding offer while it is on. Every number from the config.
+// Toran's price in one sentence, for /join and the questions: both plans, VAT and the setup fee. Every number from the
+// config; the founders' offer is its own box (foundersBox).
 export function toranPriceLine(cfg) {
   const fee = cfg.get('price.setup');
-  const offer = cfg.get('price.founding.on') === true
-    ? ` ל-${count(cfg, 'price.founding.stores')} החנויות הראשונות, חבילת חנות ב-${amount(cfg, 'price.founding.monthly')} לחודש ${said(cfg, 'price.founding.months', (n) => `ב-${n} החודשים הראשונים`)}.`
-    : '';
-  return `${amount(cfg, 'price.plans.store.monthly')} לחודש עד ${count(cfg, 'price.plans.store.conversations')} שיחות, או ${amount(cfg, 'price.plans.big.monthly')} לחודש עד ${count(cfg, 'price.plans.big.conversations')} שיחות, ${vatOf(cfg)}${fee == null ? `, ${cfg.ph('price.setup')}` : fee > 0 ? `, ועוד ${esc(ils(fee))} דמי הקמה, פעם אחת` : ''}.${offer}`;
+  return `${amount(cfg, 'price.plans.store.monthly')} לחודש עד ${count(cfg, 'price.plans.store.conversations')} שיחות, או ${amount(cfg, 'price.plans.big.monthly')} לחודש עד ${count(cfg, 'price.plans.big.conversations')} שיחות, ${vatOf(cfg)}${fee == null ? `, ${cfg.ph('price.setup')}` : fee > 0 ? `, ועוד ${esc(ils(fee))} דמי הקמה, פעם אחת` : ''}.`;
 }
 
 // What happens after the last paid month: the number, and how long the conversations are kept.
