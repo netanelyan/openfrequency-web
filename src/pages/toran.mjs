@@ -146,7 +146,15 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 ${rowList('עונה לבד', ALONE)}
 ${rowList('משאיר לכם', YOURS, { cls: 'yours', after: '<p class="quiet">כשאין באתר תשובה, הוא אומר ללקוח שהוא בודק, במקום לנחש, ושולח לכם את השאלה. מה שתענו הוא יזכור לפעם הבאה.</p>' })}
 </div>
-${/* What we can show, and nothing invented (PRODUCT.md, "Evidence on Hand"; TORAN-READINESS.md P1-17): the eval's own numbers, the example page built by Toran, and that the support button on every page is Toran. */ ''}<p class="lede">בבדיקה שעשינו על 150 שאלות מ-5 חנויות אמיתיות, תורן לא המציא אף מחיר, ואת כל 40 השאלות שלא הייתה להן תשובה באתר הוא העביר לחנות במקום לנחש. <a href="/toran/example">כך נראה עמוד דמו שתורן בונה לחנות</a>, וכפתור שירות הלקוחות שבכל עמוד באתר הזה הוא תורן, שעונה בשבילנו.</p>
+${/* What we can show, and nothing invented (PRODUCT.md, "Evidence on Hand"; TORAN-READINESS.md P1-17): the eval's own numbers, the example page built by Toran, and that the support button on every page is Toran. A card of its own with the numbers to scan, not a loose paragraph under the lists (the owner, 2026-11-09: "text like this looks like it was added outside of an html tag. design it better"). */ ''}<div class="proof glass" role="group" aria-labelledby="proof-h">
+<h3 id="proof-h">בדקנו את תורן על 5 חנויות אמיתיות</h3>
+<dl class="proof-nums">
+<div><dt>שאלות של לקוחות</dt><dd class="num">150</dd></div>
+<div><dt>מחירים שהוא המציא</dt><dd class="num">0</dd></div>
+<div><dt>שאלות בלי תשובה באתר, שהעביר לחנות במקום לנחש</dt><dd class="num">40<span> מתוך 40</span></dd></div>
+</dl>
+<p class="proof-more"><a href="/toran/example">כך נראה עמוד דמו שתורן בונה לחנות</a><span>כפתור שירות הלקוחות שבכל עמוד באתר הזה הוא תורן, שעונה בשבילנו.</span></p>
+</div>
 <p class="more">יש לכם עוד שאלות? <a href="/faq">כל השאלות והתשובות</a></p>
 </div>
 </section>
@@ -166,12 +174,30 @@ ${/* Abandoned carts as a feature of their own (the owner, 2026-11-08: "add aban
 <p class="quiet">מדליקים את זה בהגדרות, ובוחרים אחרי כמה זמן התזכורת יוצאת. במייל אין תוספת. בוואטסאפ Meta גובה על כל תזכורת ישירות מכם, לפי המחירון שלה.</p>
 </div>
 </section>
+${/* Order tracking (the owner, 2026-11-09: "add order tracking to toran. toran asks for an order number. a customer
+   must write from the phone number the order was placed from, and if it does not match, toran should ask for the
+   phone number"), as openfrequency-toran answers it (src/agent/tools.ts get_order_status, src/orders.ts fromOrder and
+   phoneGiven: the order number only, the order's own phone or email address, else its phone asked for; nothing said
+   before it matches; ORDER_TRIES = 3, then the store; Shopify, WooCommerce and Wix with a read-only key). */ ''}<section class="sec carts-sec" id="orders" aria-labelledby="orders-h">
+<div class="wrap narrow">
+<h2 id="orders-h">איפה ההזמנה שלי? <span class="hl">תורן בודק</span></h2>
+<p class="lede">לקוח ששואל על הזמנה מקבל תשובה מתוך מערכת ההזמנות של החנות: מה הסטטוס, איזו חברת משלוחים לוקחת אותה, ולינק המעקב.</p>
+<ul class="checks">
+<li><b>מספיק מספר הזמנה.</b> תורן מבקש מהלקוח רק את מספר ההזמנה. כשהוא כותב מהטלפון שההזמנה נעשתה ממנו, התשובה מגיעה מיד.</li>
+<li><b>מוודא שזה באמת הלקוח.</b> מי שכותב ממספר אחר, באינסטגרם, במסנג׳ר או בצ׳אט באתר, מתבקש קודם את מספר הטלפון שההזמנה נעשתה איתו, ומקבל תשובה רק כשהוא תואם.</li>
+<li><b>שומר על הפרטים.</b> עד שהטלפון תואם, תורן לא אומר שום דבר על ההזמנה, גם לא אם היא קיימת. אחרי שלושה ניסיונות שלא תאמו, השאלה עוברת אליכם.</li>
+<li><b>שינויים אצלכם.</b> תורן עונה על הסטטוס. בקשה לשנות הזמנה, לבטל אותה או לקבל החזר מגיעה אליכם לתיבה.</li>
+</ul>
+<p class="quiet">עובד עם <bdi dir="ltr">Shopify</bdi>, <bdi dir="ltr">WooCommerce</bdi> ו־<bdi dir="ltr">Wix</bdi>. מחברים פעם אחת מפתח שרק קורא הזמנות, בעמוד "מה הוא יודע" בחשבון.</p>
+</div>
+</section>
 ${payBack(false)}
 ${toranPricing(cfg, { cta: ['#demo', 'לנסות את תורן על החנות שלכם'], includes: [
   `עונה ללקוחות 24/7 ${soon.length ? `בכל הערוצים הפעילים, ${inList(live)}` : inList(live)}, מתוך מה שכתוב באתר שלכם`,
   // Under Kapso the store pays Meta itself for a WhatsApp message it starts (the contract's c-meta); by email nothing
   // more (the owner's default, 2026-11-08: say it honestly, not "included").
   'תזכורות על עגלה נטושה, למי שהסכים לקבל מכם הודעות. במייל זה בלי תוספת, ובוואטסאפ Meta גובה על כל תזכורת ישירות מכם',
+  'סטטוס הזמנה ולינק מעקב, רק ללקוח שההזמנה שלו',
   'כל השיחות בתיבה אחת, ושאלה שאין עליה תשובה באתר מגיעה אליכם',
   'בשבועיים הראשונים אנחנו עוברים איתכם על השיחות ומתקנים מה שצריך',
 ] })}
