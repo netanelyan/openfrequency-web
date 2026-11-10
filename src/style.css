@@ -674,7 +674,8 @@ label.f[hidden], .demo .when[hidden] { display: none; }
    the room back to the page */
 .clients { --fade: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent); margin: 6px 0 -34px; overflow: hidden; direction: ltr; -webkit-mask-image: var(--fade); mask-image: var(--fade); }
 @media (max-width: 699px) { .clients { --fade: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); } }
-.clients-row { display: flex; width: max-content; animation: clients calc(var(--n) * 8s) linear infinite; }
+/* slowly: a card every 14 seconds (the owner, 2026-11-10: "they should spin slowly") */
+.clients-row { display: flex; width: max-content; animation: clients calc(var(--n) * 14s) linear infinite; }
 .clients:hover .clients-row, .clients:focus-within .clients-row { animation-play-state: paused; }
 @keyframes clients { to { transform: translateX(-50%); } }
 .clients-list { display: flex; gap: 14px; margin: 0; padding: 16px 7px 44px; list-style: none; }
@@ -1313,14 +1314,10 @@ html.sk-on #main > :not(.sk-page) { display: none; }
   .toran-door .soon { background: #fff; color: var(--toran-ink); }
   /* The badges: each one's fact is on another page (home.mjs). */
   .trust-sec { display: none; }
-  /* The businesses stand still, a row to swipe, the way they are for anyone who asked for less motion; the doors keep
-     the room of a section above them. */
+  /* The businesses move slowly on a phone too (the owner, 2026-11-10: "they should spin slowly"); the doors keep the
+     room of a section above them. */
   .clients-sec { padding-top: 72px; }
-  .clients { overflow-x: auto; -webkit-mask-image: none; mask-image: none; direction: rtl; scrollbar-width: none; scroll-snap-type: x proximity; scroll-padding-inline: var(--gut); }
-  .clients::-webkit-scrollbar { display: none; }
-  .clients-row { animation: none; padding-inline: var(--gut); }
-  .clients-list[aria-hidden], .clients-list li[aria-hidden] { display: none; }
-  .client { scroll-snap-align: start; }
+  .client { width: 250px; }
   /* What it does in a store like yours: "בקרוב" and the product's name in the page's inks, the ticks grey; the blue
      button is the card's one colour. */
   .niche-sec { --pc: var(--ink-3); }

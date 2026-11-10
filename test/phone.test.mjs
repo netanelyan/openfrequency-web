@@ -110,7 +110,8 @@ test("on a phone the home page's first screen is one headline and Teder's door w
       if (got.mark) found.push(`${at}: the mark behind the headline is drawn`);
       if (got.marker !== 'none') found.push(`${at}: the headline has its marker (${got.marker})`);
       if (got.badges) found.push(`${at}: the badges show`);
-      if (got.strip !== 'none') found.push(`${at}: the strip of businesses moves (${got.strip})`);
+      // The owner, 2026-11-10: "they should spin slowly": the strip moves on a phone too.
+      if (got.strip !== 'clients') found.push(`${at}: the strip of businesses stands still (${got.strip})`);
       // Toran is on sale since 2026-11-08: no "בקרוב" on its door.
       if (got.soon !== null) found.push(`${at}: Toran's door still says "בקרוב" (${got.soon})`);
       // Opened, Teder's door has its price line, and Toran's its two buttons, as Teder's (the store's demo, joining).

@@ -30,7 +30,7 @@ export function clients() {
   const list = (hidden) => Array.from({ length: reps }, (_, r) => CLIENTS.map((c) => card(c, hidden || r > 0)).join('')).join('');
   return `
 <section class="clients-sec" aria-labelledby="clients-h">
-<div class="wrap"><h2 id="clients-h" class="clients-h"><span>העסקים של</span> <span class="clients-of">${mark('openfrequency', 28)}<b>OpenFrequency</b></span></h2>
+<div class="wrap"><h2 id="clients-h" class="clients-h"><span>העסקים עם</span> <span class="clients-of">${mark('openfrequency', 28)}<b>OpenFrequency</b></span></h2>
 <p class="clients-sub">אנחנו מריצים את העסקים האלה בעצמנו, ובהם הכרנו קודם את מה שתורן ותדר פותרים.</p></div>
 <div class="clients" style="--n:${CLIENTS.length * reps}">
 <div class="clients-row">

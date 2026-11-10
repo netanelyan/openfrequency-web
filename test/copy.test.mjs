@@ -42,7 +42,7 @@ test('the home page says what the products are, not where they rank, and the str
   assert.equal(h1, 'מצגות לרשתות ותשובות ללקוחות, בעברית');
   for (const [file, html] of Object.entries(pages)) assert.doesNotMatch(text(html), /המוביל|עסקים שעובדים עם/, file);
   const strip = /<section class="clients-sec"[\s\S]*?<\/section>/.exec(home)[0];
-  assert.equal(text(/<h2 id="clients-h"[^>]*>([\s\S]*?)<\/h2>/.exec(strip)[1]), 'העסקים של OpenFrequency');
+  assert.equal(text(/<h2 id="clients-h"[^>]*>([\s\S]*?)<\/h2>/.exec(strip)[1]), 'העסקים עם OpenFrequency');
   assert.match(text(strip), /אנחנו מריצים את העסקים האלה בעצמנו/);
   assert.doesNotMatch(strip, /href="https:\/\/openfrequency\.co\.il"/, 'OpenFrequency is not one of its own businesses in the strip');
 });
