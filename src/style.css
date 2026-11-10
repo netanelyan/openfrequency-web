@@ -104,9 +104,9 @@
   --night-ink-2: #c7c7cc;
   --glass: saturate(1.6) blur(24px);
   /* five sizes do all the visible work; fragments keep their interface sizes inside data-ui */
-  --fs-huge: clamp(88px, 15vw, 216px);
-  --fs-display: clamp(28px, 4.9vw, 72px);
-  --fs-lead: clamp(20px, 1.65vw, 24px);
+  --fs-huge: clamp(88px, calc(15vw / var(--z)), 216px);
+  --fs-display: clamp(28px, calc(4.9vw / var(--z)), 72px);
+  --fs-lead: clamp(20px, calc(1.65vw / var(--z)), 24px);
   --fs-body: 17px;
   --fs-small: 14px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -178,13 +178,19 @@
 /* ------------------------------------------------------------ the page and the browser's own surfaces */
 
 * { box-sizing: border-box; }
+/* A desk shows the site at 90% (the owner, 2026-11-09: "all of the websites look better on 90% zoom. make it the
+   default"), as Toran, Teder and accounts do. A phone keeps 100%: its text is already as small as it should be. --z
+   undoes the zoom where a length is the screen's (vw, vh): a zoomed 100vh is 90% of the screen, and a zoomed 4.9vw is
+   90% of what the browser's own 90% would leave it, so each is divided by it. */
+:root { --z: 1; }
+@media (min-width: 1000px) { :root { --z: 0.9; } html { zoom: 0.9; } }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--top) + 12px); scrollbar-color: var(--line-2) transparent; }
 /* On a desk the scrollbar takes one side of a right-to-left page; a gutter on both keeps the two margins equal. */
 @media (min-width: 900px) { html { scrollbar-gutter: stable both-edges; } }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--z));
   display: flex;
   flex-direction: column;
   background: var(--bg);
@@ -220,8 +226,8 @@ p:last-child { margin-bottom: 0; }
 .quiet { color: var(--ink-p); }
 .small { font-size: var(--fs-small); }
 /* Sections sit 128–240px apart on a desk; inside one, nothing is that far apart. */
-.sec { padding-block: clamp(56px, 8vw, 116px); }
-.sec-head { margin-bottom: clamp(28px, 4vw, 56px); }
+.sec { padding-block: clamp(56px, calc(8vw / var(--z)), 116px); }
+.sec-head { margin-bottom: clamp(28px, calc(4vw / var(--z)), 56px); }
 .sec-head p { margin-top: 14px; max-width: 60ch; }
 
 /* The frosted glass, where it means something: the header, and the stages the product's fragments stand on. */
@@ -417,7 +423,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); }
 
 /* The stage a fragment stands on: one pane of glass, the product at its true size on it. */
-.stage { display: grid; place-items: center; padding: clamp(16px, 3vw, 36px); }
+.stage { display: grid; place-items: center; padding: clamp(16px, calc(3vw / var(--z)), 36px); }
 
 /* ------------------------------------------------------------ the home page: the first screen */
 
@@ -427,7 +433,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .hero > .wrap { display: grid; gap: 24px; grid-template-areas: 'head' 'text' 'box'; }
 .hero-head { grid-area: head; }
 .hero-head .mark { margin-bottom: 16px; }
-.hero h1 { margin: 0; font-size: clamp(30px, 3.3vw, 46px); }
+.hero h1 { margin: 0; font-size: clamp(30px, calc(3.3vw / var(--z)), 46px); }
 .hero-text { grid-area: text; }
 .hero .lede { max-width: 36ch; }
 .hero-cta { margin-top: 24px; }
@@ -464,7 +470,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .ch-panel + .ch-panel { margin-top: 22px; }
 .tabbed .ch-panel + .ch-panel { margin-top: 0; }
 .tabbed .ch-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.ch-panel .stage { padding: clamp(10px, 1.6vw, 18px); }
+.ch-panel .stage { padding: clamp(10px, calc(1.6vw / var(--z)), 18px); }
 .ch-panel .chat { max-width: none; }
 .tabbed .ch-panel .chat { min-height: 268px; }
 .ch-note { margin: 12px 0 0; color: var(--ink-3); font-size: 13px; }
@@ -531,13 +537,13 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 /* Teder's platforms. TikTok: the phone playing the covers, on Teder's violet, cut by the card's bottom edge as on the
    home page. Instagram: a post, with its header, the slide, the dots and the caption. */
 .tt-stage { display: grid; justify-items: center; align-items: end; overflow: hidden; padding: 32px 16px 0; border-radius: var(--r); background: var(--teder); }
-.tt-stage .reel-sit { height: clamp(380px, 32vw, 440px); }
+.tt-stage .reel-sit { height: clamp(380px, calc(32vw / var(--z)), 440px); }
 .tt-stage .pop, .tt-stage .pop b { color: var(--ink); }
 /* On Teder's violet first screen: the text, and beside it the tabs, the phone standing on the violet itself and cut by
    its bottom edge, the post on glass above it. */
 .ch-field .ch-box { min-width: 0; }
 .ch-field .tt-stage { padding: 8px 0 0; border-radius: 0; background: none; }
-.ch-field .ch-panel .stage { margin-bottom: clamp(28px, 5vw, 64px); }
+.ch-field .ch-panel .stage { margin-bottom: clamp(28px, calc(5vw / var(--z)), 64px); }
 .ch-field .ch-tabs { background: rgba(255, 255, 255, 0.16); }
 .ch-field .ch-tabs button { color: #fff; }
 .ch-field .ch-tabs button[aria-selected="true"] { background: #fff; color: var(--teder-ink); }
@@ -545,7 +551,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .ch-field .ch-tabs button[aria-selected="true"] .logo.tiktok { color: #000; }
 .ch-field .ch-tabs button:not([aria-selected="true"]) .logo.facebook { color: #fff; }
 .ch-field .hero-cta { justify-self: start; }
-.ch-field h1 { font-size: clamp(30px, 3.3vw, 46px); }
+.ch-field h1 { font-size: clamp(30px, calc(3.3vw / var(--z)), 46px); }
 @media (min-width: 1000px) { .teder-field.ch-field { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); } }
 .tt-stage .pop small { color: var(--ink-3); }
 .igp-act svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
@@ -576,7 +582,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .ap-ok { grid-area: ok; justify-self: end; padding: 3px 12px; border-radius: 999px; background: var(--teder); color: #fff; font-size: 12px; font-weight: 700; }
 
 /* The join page: the headline, the products to tick, the form, then what happens after it. */
-.join-hero h1 { margin: 0 0 14px; font-size: clamp(32px, 4vw, 54px); }
+.join-hero h1 { margin: 0 0 14px; font-size: clamp(32px, calc(4vw / var(--z)), 54px); }
 .join-hero .demo { max-width: 620px; }
 .picks { grid-column: 1 / -1; min-width: 0; margin: 0; padding: 0; border: 0; }
 .picks legend { margin-bottom: 10px; padding: 0; font-size: var(--fs-small); font-weight: 600; }
@@ -632,7 +638,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
    phone that runs off the door's bottom edge: Toran's chat answering on glass, Teder's slides playing on its violet.
    A card pops out of each phone with what reaches the owner. On a phone the doors stack. */
 .co-hero { position: relative; isolation: isolate; overflow-x: clip; padding-block: 28px 16px; }
-.co-hero h1 { margin-top: 12px; max-width: 14em; font-size: clamp(32px, 4.3vw, 62px); }
+.co-hero h1 { margin-top: 12px; max-width: 14em; font-size: clamp(32px, calc(4.3vw / var(--z)), 62px); }
 /* A marker stroke under the words a headline is about: the company's blue on the home page, Toran's green on its page. */
 /* A product name under the marker keeps the marker alone, without its own underline. */
 .hl .pn { text-decoration: none; }
@@ -652,14 +658,14 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 @media (max-width: 699px) { .co-hero .lede, .co-soon { display: none; } }
 /* The mark's dots alone, large, faint and turned 30 degrees behind the headline, pushed toward the left edge. The doors' glass blurs them. */
 .co-bg { position: absolute; z-index: -1; top: -190px; left: clamp(-300px, calc(50% - 820px), -100px); color: var(--of); opacity: 0.2; pointer-events: none; }
-.co-bg svg { display: block; width: clamp(620px, 62vw, 940px); height: auto; transform: rotate(30deg); }
+.co-bg svg { display: block; width: clamp(620px, calc(62vw / var(--z)), 940px); height: auto; transform: rotate(30deg); }
 @media (max-width: 899px) { .co-bg { top: -20px; left: -260px; opacity: 0.16; } .co-bg svg { width: 680px; } }
 [data-theme="dark"] .co-bg { color: #8ea2ff; opacity: 0.22; }
 @media (max-width: 899px) { [data-theme="dark"] .co-bg { opacity: 0.16; } }
 /* Businesses that work with us: a strip under the doors that moves on its own (clients.mjs). Two identical lists move
    by one list's width, so the loop has no seam; it stops under the pointer or on focus, and stands still for anyone
    who asked for less motion, as a row they can scroll. */
-.clients-sec { padding-top: clamp(48px, 6vw, 80px); }
+.clients-sec { padding-top: clamp(48px, calc(6vw / var(--z)), 80px); }
 .clients-sub { max-width: 60ch; margin: 10px auto 0; color: var(--ink-2); font-size: var(--fs-small); text-align: center; }
 /* the title sits centred between two hairlines that fade out, our name in its own type with the mark */
 .clients-h { display: flex; align-items: center; justify-content: center; gap: 18px; color: var(--ink-2); font-size: var(--fs-lead); font-weight: 600; line-height: 1.3; text-align: center; }
@@ -692,9 +698,9 @@ label.f[hidden], .demo .when[hidden] { display: none; }
   .clients-row { margin-inline: auto; padding-inline: var(--gut); } /* still, the three sit in the middle of a wide screen */
   .clients-list[aria-hidden], .clients-list li[aria-hidden] { display: none; }
 }
-.doors { display: grid; gap: 14px; margin-top: clamp(28px, 4vw, 44px); }
+.doors { display: grid; gap: 14px; margin-top: clamp(28px, calc(4vw / var(--z)), 44px); }
 @media (min-width: 900px) { .doors { grid-template-columns: 1fr 1fr; gap: 18px; } .co-hero { padding-top: 48px; } }
-.door { --pad: clamp(18px, 2.2vw, 28px); display: flex; flex-direction: column; gap: 20px; min-width: 0; overflow: hidden; padding: var(--pad) var(--pad) 0; border-radius: var(--r); }
+.door { --pad: clamp(18px, calc(2.2vw / var(--z)), 28px); display: flex; flex-direction: column; gap: 20px; min-width: 0; overflow: hidden; padding: var(--pad) var(--pad) 0; border-radius: var(--r); }
 .door-top { display: flex; align-items: center; gap: 14px; }
 .door-top h2 { font-size: var(--fs-lead); line-height: 1.2; }
 .door-top p { margin: 6px 0 0; color: var(--ink-2); }
@@ -735,7 +741,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 @media (hover: hover) { .toran-door .btn.light:hover { background: var(--toran-hover); } .toran-door .btn.on-color:hover { background: rgba(0, 0, 0, 0.26); } }
 
 /* A phone, cut by the door's bottom edge: a dark frame, the island, and the screen inside. */
-.phone-sit { position: relative; width: min(100%, 330px); height: clamp(360px, 34vw, 420px); margin: auto auto 0; padding-top: 8px; }
+.phone-sit { position: relative; width: min(100%, 330px); height: clamp(360px, calc(34vw / var(--z)), 420px); margin: auto auto 0; padding-top: 8px; }
 .phone { position: relative; z-index: 2; height: 100%; padding: 10px 10px 0; border-radius: 46px 46px 0 0; background: #1d1d1f; box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.45), inset 0 0 0 1.5px rgba(255, 255, 255, 0.1); }
 .phone::before { content: ''; position: absolute; z-index: 3; top: 20px; left: 50%; width: 82px; height: 22px; border-radius: 999px; background: #000; transform: translateX(-50%); }
 .phone > .chat { height: 100%; max-width: none; border-radius: 36px 36px 0 0; }
@@ -769,7 +775,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
    phone keeps its full height under it. */
 @media (max-width: 699px) {
   .reel-sit { --lift: 80px; box-sizing: content-box; padding-top: var(--lift); }
-  .reel-sit .pop { top: 0; bottom: auto; inset-inline: 0; width: min(260px, calc(100vw - 2 * var(--gut) - 24px)); margin-inline: auto; }
+  .reel-sit .pop { top: 0; bottom: auto; inset-inline: 0; width: min(260px, calc(100vw / var(--z) - 2 * var(--gut) - 24px)); margin-inline: auto; }
   .reel-sit .fan { top: var(--lift); }
 }
 .fan img { position: absolute; top: 46%; left: 50%; width: 74%; height: auto; border-radius: 12px; box-shadow: 0 22px 40px -18px rgba(0, 0, 0, 0.6); transform: translate(-50%, -50%) translateX(var(--x, 0)) rotate(var(--rot, 0deg)); transition: transform 0.9s var(--ease-out); }
@@ -795,7 +801,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 /* The first screen is Teder's violet: what it makes and the waitlist on one side, its phone playing slides on the
    other, cut by the field's bottom edge. */
 .thero { padding: 20px var(--gut) 0; }
-.teder-field { position: relative; display: grid; gap: 36px; max-width: var(--max); margin-inline: auto; overflow: hidden; padding: clamp(28px, 5vw, 64px) clamp(20px, 5vw, 64px) 0; border-radius: var(--r); background: var(--teder); color: #fff; }
+.teder-field { position: relative; display: grid; gap: 36px; max-width: var(--max); margin-inline: auto; overflow: hidden; padding: clamp(28px, calc(5vw / var(--z)), 64px) clamp(20px, calc(5vw / var(--z)), 64px) 0; border-radius: var(--r); background: var(--teder); color: #fff; }
 .thero-text { display: grid; gap: 18px; align-content: start; }
 .thero-text > .mark { box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.35); }
 .teder-field h1, .teder-field h3 { color: #fff; }
@@ -812,7 +818,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 @media (min-width: 900px) {
   .thero { padding-top: 28px; }
   .teder-field { grid-template-columns: minmax(0, 1fr) 330px; gap: 48px; }
-  .thero-text { padding-bottom: clamp(40px, 5vw, 64px); }
+  .thero-text { padding-bottom: clamp(40px, calc(5vw / var(--z)), 64px); }
   .teder-field .wait { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
   .teder-field .reel-sit { align-self: end; height: 460px; }
 }
@@ -841,10 +847,10 @@ label.f[hidden], .demo .when[hidden] { display: none; }
    includes. The checks are in the product's colour. Side by side from a tablet, stacked on a phone. */
 .price-sec { --pc: var(--toran); }
 .price-sec.teder { --pc: var(--teder); }
-.price-card { display: grid; gap: 28px; padding: clamp(22px, 3.4vw, 40px); }
+.price-card { display: grid; gap: 28px; padding: clamp(22px, calc(3.4vw / var(--z)), 40px); }
 .price-main { display: grid; align-content: start; gap: 12px; }
 .price-name { display: flex; align-items: center; gap: 10px; margin: 0; font-size: var(--fs-lead); }
-.figure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.08em; margin: 6px 0 0; font: 800 clamp(48px, 5.4vw, 72px)/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.figure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.08em; margin: 6px 0 0; font: 800 clamp(48px, calc(5.4vw / var(--z)), 72px)/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
 .figure .cur { font-size: 0.55em; }
 .figure .per { margin-inline-start: 0.35em; font: 600 var(--fs-body)/1.2 var(--text); letter-spacing: 0; color: var(--ink-2); }
 .figure .ph { font-size: 0.5em; letter-spacing: 0; }
@@ -872,7 +878,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .faq-hero h1 { margin: 0 0 16px; }
 .faq-sec .wrap { display: grid; gap: 24px; }
 .faq-sec h2 { display: flex; align-items: center; gap: 14px; }
-.faq-sec h2 .mark { --s: clamp(36px, 4vw, 52px); }
+.faq-sec h2 .mark { --s: clamp(36px, calc(4vw / var(--z)), 52px); }
 .faq-sec + .faq-sec { padding-top: 0; }
 .faq details p a { color: #fff; }
 .faq { display: grid; gap: 8px; }
@@ -901,7 +907,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
    it (ink 12.3:1, ink-2 7.3:1), and white is the accent: an edge inside the panel, the line over the legal line, and
    the name. In dark it is the night panel the light theme had until then, with its inks (15.5:1 and 10.0:1), its
    hairline and the name at 7% white. */
-.foot { padding: clamp(40px, 6vw, 80px) var(--gut) var(--gut); }
+.foot { padding: clamp(40px, calc(6vw / var(--z)), 80px) var(--gut) var(--gut); }
 .foot-in {
   --foot: #dcdce1;
   --foot-ink: var(--ink);
@@ -909,7 +915,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
   --foot-rule: #ffffff;
   --foot-word: #ffffff;
   --foot-focus: var(--accent-fill);
-  position: relative; overflow: hidden; container-type: inline-size; max-width: var(--max); margin-inline: auto; padding: clamp(28px, 4vw, 48px) clamp(22px, 4vw, 48px) 0; border-radius: calc(var(--r) + 6px); background: var(--foot); color: var(--foot-ink-2);
+  position: relative; overflow: hidden; container-type: inline-size; max-width: var(--max); margin-inline: auto; padding: clamp(28px, calc(4vw / var(--z)), 48px) clamp(22px, calc(4vw / var(--z)), 48px) 0; border-radius: calc(var(--r) + 6px); background: var(--foot); color: var(--foot-ink-2);
   box-shadow: inset 0 0 0 1px #ffffff;
 }
 [data-theme="dark"] .foot-in { --foot: var(--night); --foot-ink: var(--night-ink); --foot-ink-2: var(--night-ink-2); --foot-rule: rgba(255, 255, 255, 0.1); --foot-word: rgba(255, 255, 255, 0.07); --foot-focus: #8ab4ff; box-shadow: none; }
@@ -930,7 +936,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .foot-talk { display: grid; justify-items: start; gap: 14px; }
 .foot-wa { color: var(--foot-ink); font: 600 var(--fs-lead)/1.3 var(--display); }
 .foot .ph { color: var(--foot-ink); }
-.foot-legal { margin: clamp(36px, 5vw, 56px) 0 0; padding-top: 18px; border-top: 1px solid var(--foot-rule); color: var(--foot-ink-2); font-size: 15px; }
+.foot-legal { margin: clamp(36px, calc(5vw / var(--z)), 56px) 0 0; padding-top: 18px; border-top: 1px solid var(--foot-rule); color: var(--foot-ink-2); font-size: 15px; }
 /* the name as a texture on the panel, white on the grey and 7% white on the night: pure decoration, so it is drawn by
    CSS (::before) and not read out or checked as text, which it could never pass */
 .foot-word::before { content: attr(data-word); }
@@ -940,7 +946,7 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 /* A wide screen: the panel grows past the page's column (60% of the screen, up to 1800px), so on an ultrawide it is the
    page's wide base and not a small card in the middle; the name along its bottom grows with it (13.4cqi). Up to a
    1920px screen it stays the page's width. */
-.foot-in { max-width: clamp(var(--max), 60vw, 1800px); }
+.foot-in { max-width: clamp(var(--max), calc(60vw / var(--z)), 1800px); }
 @media (min-width: 2000px) { .foot-in { padding: 64px 72px 0; } .foot-cols { gap: 72px; } }
 
 /* ------------------------------------------------------------ the Toran page */
@@ -966,11 +972,11 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 /* What we can prove (pages/toran.mjs #alone): the eval's numbers in a card of their own, each number large over its
    label, then the two proofs you can open yourself. Toran's green for the numbers; one row on a desk, a stack on a
    phone. */
-.proof { margin-top: 40px; padding: clamp(20px, 3vw, 32px); border-radius: var(--r); }
-.proof h3 { margin: 0 0 20px; font: 700 clamp(19px, 2.2vw, 23px)/1.25 var(--display); }
+.proof { margin-top: 40px; padding: clamp(20px, calc(3vw / var(--z)), 32px); border-radius: var(--r); }
+.proof h3 { margin: 0 0 20px; font: 700 clamp(19px, calc(2.2vw / var(--z)), 23px)/1.25 var(--display); }
 .proof-nums { margin: 0; display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .proof-nums > div { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 6px; padding: 16px 18px; border-radius: var(--r-m); background: var(--tile); }
-.proof-nums dd { margin: 0; white-space: nowrap; font: 700 clamp(34px, 4.2vw, 44px)/1 var(--display); color: var(--toran-name); font-variant-numeric: tabular-nums; }
+.proof-nums dd { margin: 0; white-space: nowrap; font: 700 clamp(34px, calc(4.2vw / var(--z)), 44px)/1 var(--display); color: var(--toran-name); font-variant-numeric: tabular-nums; }
 .proof-nums dd span { font-size: 0.45em; font-weight: 600; color: var(--ink-3); }
 .proof-nums dt { color: var(--ink-p); font-size: 15px; line-height: 1.4; }
 .proof-more { margin: 20px 0 0; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; color: var(--ink-p); }
@@ -1059,7 +1065,7 @@ input[aria-invalid='true'] { border-color: var(--warn); }
 .a11y-btn { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 1px solid var(--edge); border-radius: 50%; background: var(--surface-hi); -webkit-backdrop-filter: var(--glass); backdrop-filter: var(--glass); color: var(--ink); cursor: pointer; }
 .a11y-btn svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .a11y-btn svg circle { fill: currentColor; stroke: none; }
-.a11y-p { position: absolute; bottom: 60px; inset-inline-end: 0; display: grid; gap: 8px; width: min(280px, calc(100vw - 32px)); padding: 16px; border: 1px solid var(--edge); border-radius: var(--r); background: var(--surface-hi); -webkit-backdrop-filter: var(--glass); backdrop-filter: var(--glass); }
+.a11y-p { position: absolute; bottom: 60px; inset-inline-end: 0; display: grid; gap: 8px; width: min(280px, calc(100vw / var(--z) - 32px)); padding: 16px; border: 1px solid var(--edge); border-radius: var(--r); background: var(--surface-hi); -webkit-backdrop-filter: var(--glass); backdrop-filter: var(--glass); }
 .a11y-p h2 { margin: 0 0 4px; font-size: var(--fs-body); }
 .a11y-p [data-a] { min-height: 44px; padding: 10px 14px; border: 1px solid var(--line-2); border-radius: var(--r-m); background: transparent; color: var(--ink); font: inherit; text-align: start; cursor: pointer; }
 .a11y-p [data-a][aria-pressed="true"] { border-color: var(--accent-fill); background: var(--accent-fill); color: var(--accent-ink); }
@@ -1106,7 +1112,7 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 .niche-sec { --pc: var(--toran); }
 .niche-sec .sec-head { text-align: center; }
 .niche-sec .sec-head p { margin-inline: auto; }
-.niches { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(16px, 3vw, 40px); align-items: start; }
+.niches { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(16px, calc(3vw / var(--z)), 40px); align-items: start; }
 .niche-pick { position: absolute; opacity: 0; pointer-events: none; }
 .niche-list { border-radius: 26px; overflow: hidden; padding-bottom: 6px; }
 .niche-search { display: flex; align-items: center; gap: 10px; margin: 14px 14px 8px; padding: 0 16px; min-height: 48px; border-radius: 999px; background: var(--fill); }
@@ -1126,8 +1132,8 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 .niche-meta time { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .niche-badge { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; display: grid; place-items: center; background: #25d366; color: #fff; font: 700 12px/1 var(--text); font-style: normal; }
 .niche-none { margin: 14px 18px; color: var(--ink-2); }
-.niche-card { display: none; border-radius: 26px; padding: clamp(22px, 3vw, 34px); border: 2px solid color-mix(in srgb, var(--toran) 60%, transparent); }
-.niche-card h3 { margin: 14px 0 18px; font-size: clamp(22px, 2.4vw, 28px); }
+.niche-card { display: none; border-radius: 26px; padding: clamp(22px, calc(3vw / var(--z)), 34px); border: 2px solid color-mix(in srgb, var(--toran) 60%, transparent); }
+.niche-card h3 { margin: 14px 0 18px; font-size: clamp(22px, calc(2.4vw / var(--z)), 28px); }
 .niche-card .checks { margin-bottom: 24px; }
 .niche-card .checks b { color: var(--toran-name); }
 .niche-card .btn { width: 100%; min-height: 54px; }
@@ -1161,7 +1167,7 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 }
 
 /* ---- trust badges, before the businesses that work with us (home.mjs trust) */
-.trust-sec { padding-top: clamp(36px, 5vw, 64px); }
+.trust-sec { padding-top: clamp(36px, calc(5vw / var(--z)), 64px); }
 .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 12px; margin: 0 auto; padding: 0 var(--gut, 16px); list-style: none; }
 .trust li { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px 8px 14px; border-radius: 999px; background: var(--surface, rgba(255, 255, 255, 0.7)); box-shadow: inset 0 0 0 1px var(--line); font-size: 15px; font-weight: 600; color: var(--ink); }
 .trust svg { width: 22px; height: 22px; flex: none; fill: none; stroke: var(--toran); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -1182,9 +1188,9 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 .carts-sec .checks { margin-top: 22px; }
 .carts-sec .checks b { color: var(--ink); }
 .carts-sec .quiet { margin-top: 22px; }
-.owner-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
+.owner-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(28px, calc(5vw / var(--z)), 72px); align-items: center; }
 .owner-text .kicker { display: inline-block; margin: 0 0 14px; padding: 6px 14px; border-radius: 999px; background: color-mix(in srgb, var(--toran) 12%, transparent); color: var(--toran-name); font-size: 14px; font-weight: 700; }
-.owner-text h2 { font-size: clamp(32px, 4.4vw, 52px); line-height: 1.1; margin: 0 0 16px; }
+.owner-text h2 { font-size: clamp(32px, calc(4.4vw / var(--z)), 52px); line-height: 1.1; margin: 0 0 16px; }
 .owner-text h2 .hl { --hl: var(--toran); padding-inline: 0.08em; background: linear-gradient(transparent 58%, color-mix(in srgb, var(--hl) 30%, transparent) 58%, color-mix(in srgb, var(--hl) 30%, transparent) 92%, transparent 92%); }
 .owner-text .lede { margin-bottom: 24px; }
 .owner-text .checks b { color: var(--ink); }
@@ -1208,7 +1214,7 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 /* ---- Toran's two plans (sections.mjs toranPricing) and Teder's (tederPricing): a card each, what both include beside
    the setup fee and the way in, and (Toran) how a store moves between them */
 .plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.plan { display: grid; align-content: start; gap: 6px; padding: clamp(22px, 3vw, 34px); border-radius: var(--r-l, 26px); }
+.plan { display: grid; align-content: start; gap: 6px; padding: clamp(22px, calc(3vw / var(--z)), 34px); border-radius: var(--r-l, 26px); }
 .plan-name { margin: 0; font-size: var(--fs-lead); }
 .plan .figure { margin: 4px 0 0; }
 .plan-vat { margin: 0; color: var(--ink-2); font-size: var(--fs-small); }
@@ -1219,8 +1225,8 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 .plan .btn { justify-self: start; margin-top: 14px; }
 /* The founders' offer (sections.mjs foundersBox): the offer in a card of its own, then the real count from accounts as
    a row of spots, the open ones filled, the taken ones faint (src/site.js fills it; until then it is hidden). */
-.founders { margin: 20px auto 0; max-width: 760px; padding: clamp(16px, 2.6vw, 22px) clamp(18px, 3vw, 28px); border-radius: var(--r); display: grid; gap: 6px; }
-.founders-h { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font: 700 clamp(17px, 2vw, 20px)/1.35 var(--display); }
+.founders { margin: 20px auto 0; max-width: 760px; padding: clamp(16px, calc(2.6vw / var(--z)), 22px) clamp(18px, calc(3vw / var(--z)), 28px); border-radius: var(--r); display: grid; gap: 6px; }
+.founders-h { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font: 700 clamp(17px, calc(2vw / var(--z)), 20px)/1.35 var(--display); }
 .founders-tag { padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent-fill) 14%, transparent); color: var(--accent); font: 600 13px/1.4 var(--text, inherit); }
 .founders-say { margin: 0; color: var(--ink-p); }
 .founders-count { margin-top: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
@@ -1260,13 +1266,13 @@ html.is-loading .loadbar { opacity: 1; }
 html.is-loading .loadbar::before { animation: load-creep 14s var(--ease-out) forwards; }
 @keyframes load-creep { from { transform: scaleX(0.06); } to { transform: scaleX(0.94); } }
 html.sk-on #main > :not(.sk-page) { display: none; }
-.sk-page { padding-block: clamp(40px, 6vw, 88px); display: grid; gap: 24px; animation: sk-in 0.15s var(--ease-out) both; }
+.sk-page { padding-block: clamp(40px, calc(6vw / var(--z)), 88px); display: grid; gap: 24px; animation: sk-in 0.15s var(--ease-out) both; }
 @keyframes sk-in { from { opacity: 0; } }
 .sk-say { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .sk { display: block; height: 14px; border-radius: 7px; background: var(--fill); position: relative; overflow: hidden; }
 .sk::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--sk-hi), transparent); transform: translateX(100%); animation: sk-shine 1.4s linear infinite; }
 @keyframes sk-shine { to { transform: translateX(-100%); } }
-.sk.h1 { height: clamp(34px, 5vw, 56px); border-radius: 12px; max-width: 560px; }
+.sk.h1 { height: clamp(34px, calc(5vw / var(--z)), 56px); border-radius: 12px; max-width: 560px; }
 .sk.btn { width: 150px; height: 48px; border-radius: 999px; }
 .sk-lines { display: grid; gap: 12px; max-width: 620px; }
 .sk-tiles { display: grid; gap: 20px; }
@@ -1349,7 +1355,7 @@ html.sk-on #main > :not(.sk-page) { display: none; }
   .faq details p { padding: 0 18px 18px; }
 
   /* A thank-you, or a page that says what went wrong: the message alone on the first screen, the footer under it. */
-  .after { min-height: calc(100vh - var(--top)); min-height: calc(100svh - var(--top)); }
+  .after { min-height: calc(100vh / var(--z) - var(--top)); min-height: calc(100svh / var(--z) - var(--top)); }
 
   /* The legal pages: the sections' list shut under its one line, "מה יש בעמוד הזה". */
   .legal-toc:has(> .fold-btn:not([hidden])) { padding: 6px 20px; }
