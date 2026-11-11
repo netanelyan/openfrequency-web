@@ -124,6 +124,28 @@ if (support) fs.writeFileSync(path.join(OUT, 'support.json'), support);
 const copy = (from, to) => { fs.mkdirSync(path.dirname(path.join(OUT, to)), { recursive: true }); fs.copyFileSync(path.join(ROOT, from), path.join(OUT, to)); };
 for (const f of ['heebo-hebrew.woff2', 'heebo-latin.woff2', 'HEEBO-LICENSE.txt', 'space-mono-700-latin.woff2', 'SPACE-MONO-LICENSE.txt']) copy('assets/fonts/' + f, 'fonts/' + f);
 copy('assets/brand/svg/openfrequency-small.svg', 'favicon.svg');
+// /favicon.ico, for a browser or a crawler that asks for it by name (the pages name /favicon.svg): the 180px PNG as it
+// is, in an ICO's one-image header (an ICO may hold a PNG since Windows Vista; every browser reads it).
+{
+  const png = fs.readFileSync(path.join(ROOT, 'assets/brand/png/openfrequency-180.png'));
+  const head = Buffer.alloc(22);
+  head.writeUInt16LE(1, 2); // an icon
+  head.writeUInt16LE(1, 4); // one image
+  head.writeUInt8(180, 6); // width
+  head.writeUInt8(180, 7); // height
+  head.writeUInt16LE(1, 10); // planes
+  head.writeUInt16LE(32, 12); // bits a pixel
+  head.writeUInt32LE(png.length, 14);
+  head.writeUInt32LE(22, 18); // where the PNG starts
+  fs.writeFileSync(path.join(OUT, 'favicon.ico'), Buffer.concat([head, png]));
+}
+// /.well-known/security.txt (RFC 9116): where to report a weakness, as /security asks, good for 360 days from the build.
+if (!draft) {
+  const origin = `https://${cfg.get('domain')}`;
+  const expires = new Date(Date.now() + 360 * 24 * 3600 * 1000).toISOString();
+  fs.mkdirSync(path.join(OUT, '.well-known'), { recursive: true });
+  fs.writeFileSync(path.join(OUT, '.well-known/security.txt'), `Contact: mailto:${cfg.get('legal.email')}\nExpires: ${expires}\nPreferred-Languages: he, en\nCanonical: ${origin}/.well-known/security.txt\nPolicy: ${origin}/security#s-report\n`);
+}
 copy('assets/brand/png/openfrequency-180.png', 'apple-touch-icon.png');
 copy('assets/brand/png/openfrequency-512.png', 'icon-512.png');
 // The marks the emails show above their card (openfrequency-accounts src/mail/messages.js, MAIL_IMAGES): a mail
