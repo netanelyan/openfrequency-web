@@ -2,20 +2,27 @@
 // what Toran and Teder do before we built them. The heading and the line under it say they are ours; they are not
 // customers, and the strip never calls them that (the build's copy lint keeps market claims out too). To add one, put
 // its square icon in assets/clients/ and add a row here. The line says what the business does, in its own words from
-// its site. `pad` insets an icon that has no tile of its own, so it sits on white like the others.
+// its site. `pad` insets an icon that has no tile of its own, so it sits on white like the others. `url` is where its
+// card leads; a business without one that answers (no url) is a card that leads nowhere, never a link to a dead site.
 import { esc, mark } from './lib.mjs';
 
 export const CLIENTS = [
-  // We run on our own tools too; no logo file, so the card shows our mark.
-  { name: 'OpenFrequency', url: '/', line: 'תדר ותורן לחנויות אונליין' },
-  { name: 'חנות השופט', url: 'https://hashofet.com', logo: 'hashofet.png', pad: 3, line: 'חולצות כדורגל לקבוצות, לנבחרות ורטרו' },
+  // We run on our own tools too; no logo file, so the card shows our mark. It is on the home page, so it links nowhere.
+  { name: 'OpenFrequency', url: null, line: 'תדר ותורן לחנויות אונליין' },
+  // hashofet.com does not load (2026-11-11: its TLS handshake fails, and over http Cloudflare answers 409, a domain
+  // pointing at Shopify with no store connected), so the card has no link until the store is up again.
+  { name: 'חנות השופט', url: null, logo: 'hashofet.png', pad: 3, line: 'חולצות כדורגל לקבוצות, לנבחרות ורטרו' },
   { name: 'BrickDeal', url: 'https://brickdealil.com', logo: 'brickdeal.svg', line: 'דילים על אבני בנייה תואמות מאליאקספרס' },
   { name: 'טיול+', url: 'https://www.tiyulplus.com', logo: 'tiyulplus.svg', pad: 9, line: 'סוכן נסיעות חכם לישראלים' },
 ];
 
-const card = (c, hidden) => `<li${hidden ? ' aria-hidden="true"' : ''}><a class="client glass" href="${esc(c.url)}" rel="noopener"${hidden ? ' tabindex="-1"' : ''}>
-<span class="client-logo">${c.logo ? `<img src="/clients/${esc(c.logo)}" alt="" width="44" height="44" loading="lazy"${c.pad ? ` style="padding:${c.pad}px"` : ''}>` : mark('openfrequency', 44)}</span>
-<span class="client-t"><b>${esc(c.name)}</b><small>${esc(c.line)}</small></span></a></li>`;
+const card = (c, hidden) => {
+  const inner = `<span class="client-logo">${c.logo ? `<img src="/clients/${esc(c.logo)}" alt="" width="44" height="44" loading="lazy"${c.pad ? ` style="padding:${c.pad}px"` : ''}>` : mark('openfrequency', 44)}</span>
+<span class="client-t"><b>${esc(c.name)}</b><small>${esc(c.line)}</small></span>`;
+  return `<li${hidden ? ' aria-hidden="true"' : ''}>${c.url
+    ? `<a class="client glass" href="${esc(c.url)}" rel="noopener"${hidden ? ' tabindex="-1"' : ''}>\n${inner}</a>`
+    : `<div class="client glass">\n${inner}</div>`}</li>`;
+};
 
 // A strip that moves on its own and pauses under the pointer or the keyboard. The row is two identical lists side by
 // side, moved by exactly one list's width, so the loop has no seam. Each list repeats the businesses until it is
@@ -31,7 +38,7 @@ export function clients() {
   return `
 <section class="clients-sec" aria-labelledby="clients-h">
 <div class="wrap"><h2 id="clients-h" class="clients-h"><span>העסקים עם</span> <span class="clients-of">${mark('openfrequency', 28)}<b>OpenFrequency</b></span></h2>
-<p class="clients-sub">אנחנו מריצים את העסקים האלה בעצמנו, ובהם הכרנו קודם את מה שתורן ותדר פותרים.</p></div>
+<p class="clients-sub">את העסקים האלה אנחנו מנהלים בעצמנו, ושם נתקלנו קודם בבעיות שתורן ותדר פותרים.</p></div>
 <div class="clients" style="--n:${CLIENTS.length * reps}">
 <div class="clients-row">
 <ul class="clients-list">${list(false)}</ul>

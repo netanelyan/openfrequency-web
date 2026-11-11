@@ -43,8 +43,11 @@ test('the home page says what the products are, not where they rank, and the str
   for (const [file, html] of Object.entries(pages)) assert.doesNotMatch(text(html), /המוביל|עסקים שעובדים עם/, file);
   const strip = /<section class="clients-sec"[\s\S]*?<\/section>/.exec(home)[0];
   assert.equal(text(/<h2 id="clients-h"[^>]*>([\s\S]*?)<\/h2>/.exec(strip)[1]), 'העסקים עם OpenFrequency');
-  assert.match(text(strip), /אנחנו מריצים את העסקים האלה בעצמנו/);
+  assert.match(text(strip), /את העסקים האלה אנחנו מנהלים בעצמנו/);
   assert.doesNotMatch(strip, /href="https:\/\/openfrequency\.co\.il"/, 'OpenFrequency is not one of its own businesses in the strip');
+  // A card leads only where a site answers: hashofet.com did not load on 2026-11-11, and OpenFrequency's card is on the
+  // page it would link to.
+  assert.doesNotMatch(strip, /hashofet\.com|class="client glass" href="\/"/, 'no link to a dead site or to this page');
 });
 
 // The server sends each lead by email through Resend and has no Twilio sender (SERVER-FACTS.md, 2026-10-30), and

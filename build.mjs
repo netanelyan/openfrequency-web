@@ -10,7 +10,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { CHANNELS, ROOT, readConfig, lint, minifyCss, markNames, tederByWa, toranSoon } from './src/lib.mjs';
+import { CHANNELS, ROOT, readConfig, lint, minifyCss, markNames, signupOpen, tederByWa, toranSoon } from './src/lib.mjs';
 import { page } from './src/layout.mjs';
 import home from './src/pages/home.mjs';
 import toran from './src/pages/toran.mjs';
@@ -133,8 +133,9 @@ for (const f of fs.readdirSync(path.join(ROOT, 'assets/og'))) if (f.endsWith('.p
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/teder/showcase'), { recursive: true })) if (f.endsWith('.jpg')) copy('assets/teder/showcase/' + f, 'teder/showcase/' + f);
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/clients'))) copy('assets/clients/' + f, 'clients/' + f);
 // The page a store gets from Toran, for a made-up store, as Toran rendered it (assets/toran-example/README.md). Its
-// price card is written here from site.config.json (the Store plan, VAT, the setup fee), so the example never shows
-// a price the site no longer has; a page whose card can't be found stops the build rather than ship an old one.
+// price card is written here from site.config.json (both plans' monthly price and conversations, VAT, the setup fee),
+// into the places scripts/toran-example.mjs marked (data-cfg, data-cfg-conv, data-cfg-notes), so the example never
+// shows a price the site no longer has; a page whose marks can't be found stops the build rather than ship an old one.
 // While Toran is soon, the example has no price and no way to start: its buttons, the docked one and the line on
 // top lead to Toran's waitlist, and what it says about writing to Toran now says what it will be.
 {
@@ -152,17 +153,29 @@ for (const f of fs.readdirSync(path.join(ROOT, 'assets/clients'))) copy('assets/
     swap(/<div class="dock">[\s\S]*?<\/div>\n/, '');
     if (/\/toran#demo|class="figure"/.test(html)) throw new Error('assets/toran-example/index.html: a way to start Toran or a price is still there');
   }
-  const card = /<p class="figure">[\s\S]*?<\/p>\s*<p class="price-notes">[\s\S]*?<\/p>/;
-  if (!toranSoon(cfg) && !card.test(html)) throw new Error('assets/toran-example/index.html: no price card to write the price into');
+  const marks = {
+    price: /(<span class="num" data-cfg="(price\.plans\.(?:store|big)\.monthly)">)[^<]*(<\/span>)/g,
+    conversations: /(<span data-cfg-conv="(store|big)">)[^<]*(<\/span>)/g,
+    notes: /(<p class="price-notes" data-cfg-notes>)[^<]*(<\/p>)/,
+  };
+  const count = (re) => [...html.matchAll(new RegExp(re.source, 'g'))].length;
+  if (!toranSoon(cfg) && !(count(marks.price) === 2 && count(marks.conversations) === 2 && count(marks.notes) === 1)) throw new Error('assets/toran-example/index.html: no price card with both plans to write the prices into (scripts/toran-example.mjs marks it)');
   const n = (key) => cfg.get(key);
   const fee = n('price.setup');
   const vat = n('price.vat') === 'included' ? 'כולל מע״מ' : 'לא כולל מע״מ';
-  const priced = ['price.plans.store.monthly', 'price.plans.store.conversations', 'price.setup', 'price.vat'].every((k) => cfg.has(k));
+  const priced = ['price.plans.store.monthly', 'price.plans.store.conversations', 'price.plans.big.monthly', 'price.plans.big.conversations', 'price.setup', 'price.vat'].every((k) => cfg.has(k));
+  // The words are Toran's own (src/pitch/page.ts plansMain), with the config's numbers in them.
   const out = priced
-    ? html.replace(card, `<p class="figure"><span class="num">${n('price.plans.store.monthly').toLocaleString('he-IL')}</span><span class="cur">₪</span><span class="per">לחודש</span></p>\n        <p class="price-notes">${vat}, עד ${n('price.plans.store.conversations').toLocaleString('he-IL')} שיחות בחודש. ${fee > 0 ? `בחודש הראשון יש גם ${fee.toLocaleString('he-IL')} ₪ דמי הקמה, פעם אחת.` : 'אין דמי הקמה.'}</p>`)
-    : html.replace(card, '');
+    ? html
+      .replace(marks.price, (_, open, key, close) => `${open}${n(key).toLocaleString('he-IL')}${close}`)
+      .replace(marks.conversations, (_, open, plan, close) => `${open}עד ${n(`price.plans.${plan}.conversations`).toLocaleString('he-IL')} שיחות בחודש${close}`)
+      .replace(marks.notes, (_, open, close) => `${open}${vat}, ${fee > 0 ? `ועוד ${fee.toLocaleString('he-IL')} ₪ דמי הקמה, פעם אחת.` : 'אין דמי הקמה.'} חודש עמוס אחד לא עולה יותר.${close}`)
+    : html.replace(/\s*<section class="price"[\s\S]*?<\/section>/, '');
+  // Each plan's "להצטרף" is accounts' sign-up, there only while the site sends people to it (signup in
+  // site.config.json), as Toran's own page shows it only while Toran is sold.
+  const joins = /\s*<a class="join[^"]*" href="https:\/\/accounts\.openfrequency\.co\.il\/signup\?[^"]*" rel="noopener">[^<]*<\/a>/g;
   fs.mkdirSync(path.join(OUT, 'toran/example'), { recursive: true });
-  fs.writeFileSync(path.join(OUT, 'toran/example/index.html'), out);
+  fs.writeFileSync(path.join(OUT, 'toran/example/index.html'), signupOpen(cfg) ? out : out.replace(joins, ''));
 }
 for (const f of fs.readdirSync(path.join(ROOT, 'assets/toran-example/demo'))) copy('assets/toran-example/demo/' + f, 'toran/example/demo/' + f);
 
