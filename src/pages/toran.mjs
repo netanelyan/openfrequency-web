@@ -26,10 +26,13 @@ const ALONE = [
   'אם יש בחנות מוצר מסוים',
   'לקוחות שכותבים באנגלית',
 ];
+// An order's status Toran answers itself once the store's orders are connected (#orders); a change or a cancellation
+// it hands on, as it does an order question it can't look up.
 const YOURS = [
   'שאלה שאין עליה תשובה באתר',
   'בקשה להנחה או להחזר כספי',
-  'איפה הזמנה מסוימת נמצאת',
+  'בקשה לשנות הזמנה או לבטל אותה',
+  'שאלה על הזמנה, כשמערכת ההזמנות לא מחוברת',
 ];
 
 // What Toran is meant to pay back (the owner, 2026-11-06: each product an investment that comes back in customers and
@@ -146,12 +149,12 @@ ${soon.length ? `<p class="quiet">זו דוגמה. התיבה עוד בבניי�
 ${rowList('עונה לבד', ALONE)}
 ${rowList('משאיר לכם', YOURS, { cls: 'yours', after: '<p class="quiet">כשאין באתר תשובה, הוא אומר ללקוח שהוא בודק, במקום לנחש, ושולח לכם את השאלה. מה שתענו הוא יזכור לפעם הבאה.</p>' })}
 </div>
-${/* What we can show, and nothing invented (PRODUCT.md, "Evidence on Hand"; TORAN-READINESS.md P1-17): the eval's own numbers, the example page built by Toran, and that the support button on every page is Toran. A card of its own with the numbers to scan, not a loose paragraph under the lists (the owner, 2026-11-09: "text like this looks like it was added outside of an html tag. design it better"). */ ''}<div class="proof glass" role="group" aria-labelledby="proof-h">
+${/* What we can show, and nothing invented (PRODUCT.md, "Evidence on Hand"; TORAN-READINESS.md P1-17): the eval's own numbers (openfrequency-toran docs/milestones.md: 150 questions, no invented price reached a customer though the guard cut one, and the 40 that had to go to the store, 8 a store: no answer on the site, an order, a discount or refund, one prompt injection), the example page built by Toran, and that the support button on every page is Toran. A card of its own with the numbers to scan, not a loose paragraph under the lists (the owner, 2026-11-09: "text like this looks like it was added outside of an html tag. design it better"). */ ''}<div class="proof glass" role="group" aria-labelledby="proof-h">
 <h3 id="proof-h">בדקנו את תורן על 5 חנויות אמיתיות</h3>
 <dl class="proof-nums">
 <div><dt>שאלות של לקוחות</dt><dd class="num">150</dd></div>
-<div><dt>מחירים שהוא המציא</dt><dd class="num">0</dd></div>
-<div><dt>שאלות בלי תשובה באתר, שהעביר לחנות במקום לנחש</dt><dd class="num">40<span> מתוך 40</span></dd></div>
+<div><dt>מחירים מומצאים שהגיעו ללקוח</dt><dd class="num">0</dd></div>
+<div><dt>שאלות שהיה צריך להעביר לחנות, כמו בקשה להנחה או שאלה בלי תשובה באתר, והוא העביר במקום לנחש</dt><dd class="num">40<span> מתוך 40</span></dd></div>
 </dl>
 <p class="proof-more"><a href="/toran/example">כך נראה עמוד דמו שתורן בונה לחנות</a><span>כפתור שירות הלקוחות שבכל עמוד באתר הזה הוא תורן, שעונה בשבילנו.</span></p>
 </div>
@@ -164,7 +167,7 @@ ${/* Abandoned carts as a feature of their own (the owner, 2026-11-08: "add aban
    reminder to the store itself, said plainly. */ ''}<section class="sec carts-sec" id="carts" aria-labelledby="carts-h">
 <div class="wrap narrow">
 <h2 id="carts-h">עגלה שננטשה, <span class="hl">חוזרת</span></h2>
-<p class="lede">לקוח שהשאיר מוצרים בעגלה ולא שילם מקבל מתורן תזכורת אחת, בוואטסאפ או במייל, עם קישור ישר לעגלה שלו.</p>
+<p class="lede">לקוח שהשאיר מוצרים בעגלה ולא שילם מקבל מתורן תזכורת אחת, בוואטסאפ או במייל, עם לינק ישר לעגלה שלו.</p>
 <ul class="checks">
 <li><b>רק למי שהסכים.</b> התזכורת יוצאת רק ללקוח שאישר לקבל מכם הודעות, ובכל אחת יש דרך להפסיק.</li>
 <li><b>בשעה סבירה.</b> לא בלילה, לא בשבת ולא בחג. היא מחכה לבוקר.</li>

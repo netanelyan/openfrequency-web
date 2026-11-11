@@ -44,7 +44,7 @@ test('Teder\'s contract: numbered, dated, its prices from the config, and the te
   assert.ok(!h.includes('<nav class="legal-toc'), 'short enough to read through: no list of sections');
   assert.match(t, /1\. מה תדר עושה/);
   assert.match(t, /10\. דין ויצירת קשר/);
-  assert.match(t, /עודכן לאחרונה ב-9 בנובמבר 2026/, 'legal.contractsUpdated, the day the founders offer and the next-month cancelling came');
+  assert.match(t, /עודכן לאחרונה ב-12 בנובמבר 2026/, 'legal.contractsUpdated, the day the pre-launch audit was fixed: paid ahead for each month, the transfer details by email or WhatsApp, Zernio named, עוסק מורשה');
   // A new month's payment: 72 hours after the paid month ends, then Teder stops until it is paid (2026-11-03).
   assert.ok(t.includes('לפני שהחודש ששילמתם נגמר, נזכיר לכם לשלם על החודש הבא. אם התשלום הזה לא הגיע אלינו תוך 72 שעות מסוף החודש ששילמתם, תדר נעצר עד שישולם.'), 'the 72 hours');
   assert.doesNotMatch(t, /14 יום מההודעה/);

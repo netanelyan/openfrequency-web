@@ -17,7 +17,7 @@
 // While sign-up is open (signup), Teder's door has two buttons (the owner, 2026-11-05): the sample slideshow for your
 // store, and "להצטרף לתדר", which leads to /teder (whose own "להצטרף לתדר" is the one that goes to accounts' sign-up),
 // with the price under them. The headline stands alone, with no lines under it (the owner, 2026-11-05).
-import { mark, glyphOnly, signupOpen, tederNets, toranSoon } from '../lib.mjs';
+import { facebookOn, mark, glyphOnly, signupOpen, tederNets, toranSoon } from '../lib.mjs';
 import { chat } from '../chat.mjs';
 import { TORAN_SAVE } from '../forms.mjs';
 import { SIGNUP_LABEL, TEDER_SAMPLE, TORAN_SIGNUP_LABEL, TORAN_TRY, foldButton, foundersBox, tederPriceLine, toranPriceLine } from '../sections.mjs';
@@ -28,7 +28,9 @@ import { niches } from '../niches.mjs';
 
 // Toran's door: the sample chat on the customer's phone, in the words Toran uses (openfrequency-toran src/agent/intro.ts
 // and guard.ts). It says it is the store's bot, answers the first question from the site; the second isn't there, so
-// it says it isn't sure and passed the question to someone from the store, and the question pops up on the owner's phone.
+// it says it isn't sure and passed the question to someone from the store, and the owner gets the browser notification
+// Toran sends then, in its words (src/owners/waiting.ts pushWaiting: "לקוח של <store> מחכה לתשובה שלכם" and the
+// question; there is no WhatsApp alert to the owner, toran.notYet).
 const DOOR_CHAT = [
   ['me', '02:14', 'היי, יש את שמלת הפשתן הירוקה במידה M?'],
   ['them', '02:14', 'כאן הבוט של החנות. יש, נשארו 2 במידה M. היא 289 ₪, והמשלוח לוקח 3 עד 5 ימי עסקים.'],
@@ -68,7 +70,7 @@ ${soon
 <div class="door-in" id="door-toran-in">
 ${soon ? `<div class="start door-start"><div class="door-act"><a class="btn light" href="/toran#waitlist">${TORAN_SAVE}</a></div>\n<p class="start-alt">נכתוב לכם פעם אחת, כשתורן נפתח.</p></div>\n` : `${toranAct}\n`}<div class="phone-sit" data-play>
 <div class="phone">${chat({ id: 'door-chat', who: 'החנות שלכם', face: 'ח', msgs: DOOR_CHAT, names: { me: 'לקוח', them: 'החנות' } })}</div>
-<p class="pop" data-pop>${mark('toran', 28)}<span class="pop-h"><b>תורן</b><small>בטלפון שלכם, 02:16</small></span><span class="pop-t">לקוח שואל אם אפשר לאסוף מהמחסן. זה לא כתוב באתר. מה לענות לו?</span></p>
+<p class="pop" data-pop>${mark('toran', 28)}<span class="pop-h"><b>תורן</b><small>התראה בדפדפן, 02:16</small></span><span class="pop-t">לקוח של החנות מחכה לתשובה שלכם: ואפשר לאסוף מהמחסן?</span></p>
 </div>
 </div>
 </article>`;
@@ -97,11 +99,13 @@ ${foundersBox(cfg, 'hero-founders')}
 };
 
 // Before the businesses that work with us: what holds for every store, said once, each a thing the products do.
+// Each says who does it; the data is kept in the store's own account, and goes only to the services the privacy page
+// names.
 const BADGES = [
-  ['clock', 'עונה ללקוחות 24/7'],
-  ['doc', 'עונה רק מתוך האתר שלכם'],
+  ['clock', 'תורן עונה ללקוחות 24/7'],
+  ['doc', 'תורן עונה רק מתוך האתר שלכם'],
   ['check', 'תדר מפרסם רק מה שאישרתם'],
-  ['lock', 'המידע של כל חנות נשאר רק אצלה'],
+  ['lock', 'המידע של כל חנות נשמר בחשבון שלה'],
   ['gift', 'דמו חינם על החנות שלכם'],
 ];
 const BADGE_ICON = {
@@ -115,7 +119,7 @@ const BADGE_ICON = {
 const BADGES_SOON = [
   ['doc', 'כל עובדה במצגת נבדקת מול המקור'],
   ['check', 'תדר מפרסם רק מה שאישרתם'],
-  ['lock', 'המידע של כל חנות נשאר רק אצלה'],
+  ['lock', 'המידע של כל חנות נשמר בחשבון שלה'],
   ['gift', 'מצגת לדוגמה חינם מהחנות שלכם'],
 ];
 const trust = (cfg) => `
@@ -139,7 +143,7 @@ const ownerChat = (cfg) => {
     ['them', '20:41', `היום פנו 23 לקוחות: ${day}. עניתי לבד ל-21. שתי שאלות מחכות לכם.`],
     ['me', '20:42', 'מה שאלו?'],
     ['them', '20:42', `לקוחה ב${her} שואלת אם אפשר לאסוף מהמחסן באשדוד. לקוח ב${NAMES[ch[0]]} שואל אם השמלה הירוקה תחזור למלאי.`],
-    ['me', '20:43', 'תעני לה שאפשר לאסוף בתיאום מראש'],
+    ['me', '20:43', 'תענה לה שאפשר לאסוף בתיאום מראש'],
     ['them', '20:43', 'אשלח לה: "אפשר לאסוף מהמחסן באשדוד, בתיאום מראש." לשלוח?'],
     ['me', '20:43', 'כן'],
     ['them', '20:43', 'נשלח. שמרתי את התשובה, ובפעם הבאה אענה על זה לבד.'],
@@ -178,8 +182,8 @@ const tederDashboard = (cfg) => `
 <p class="lede">המצגות של היום מחכות לכם במסך אחד של תדר. רואים כל אחת, מאשרים, ורק מה שאישרתם עולה.</p>
 <ul class="checks fold-x" id="owner-teder-more">
 <li><b>מאשרים בלחיצה.</b> כל מצגת לבד, או את כל המצגות של היום בבת אחת.</li>
-<li><b>מצגת שלא מתאימה חוזרת מתוקנת.</b> דוחים אותה, כותבים במילים שלכם מה לשנות, ותדר כותב גרסה חדשה לאישור.</li>
-<li><b>מה שאישרתם מחכה בטיוטות של טיקטוק.</b> נשאר רק להוסיף סאונד ולפרסם.</li>
+<li><b>מצגת שלא מתאימה, דוחים.</b> כותבים במילים שלכם מה לא מתאים, ובוחרים: מצגת אחרת לאותו יום, או שתדר יכתוב אותה מחדש לאישור.</li>
+<li><b>בטיקטוק, מה שאישרתם מחכה בטיוטות.</b> נשאר רק להוסיף סאונד ולפרסם. באינסטגרם${facebookOn(cfg) ? ' ובפייסבוק' : ''} המצגת עולה לבד, בשעה שנקבעה.</li>
 </ul>
 ${foldButton('owner-teder-more', 'עוד פרטים')}
 </div>
@@ -189,7 +193,9 @@ ${foldButton('owner-teder-more', 'עוד פרטים')}
 
 export default (cfg) => ({
   path: '/',
-  title: 'מצגות בעברית לטיקטוק ולאינסטגרם לחנויות | OpenFrequency',
+  // The headline, over both products (P1-16 of the 2026-11-11 audit: the title said Teder alone, and WhatsApp and Google
+  // show it).
+  title: 'מצגות לרשתות ותשובות ללקוחות, בעברית | OpenFrequency',
   description: toranSoon(cfg)
     ? `תדר כותב ומעצב מצגות בעברית ${tederNets(cfg)}. תורן, שיענה ללקוחות של החנות 24/7 מתוך מה שכתוב באתר, נפתח בקרוב.`
     : `תדר כותב ומעצב מצגות בעברית ${tederNets(cfg)}. תורן עונה ללקוחות של החנות 24/7 ${inList(liveChannels(cfg))}, מתוך מה שכתוב באתר.`,

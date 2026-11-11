@@ -3,19 +3,10 @@
 // too). None of them is indexed. Each has one thing to do next, its one blue button (the owner, 2026-11-06: "every
 // screen should have one action. main button should look the most important"); the way home is the header's mark,
 // so a second button to the home page is left out, and so are the 404's buttons to pages the header's menu has.
-import { esc, toranSoon } from '../lib.mjs';
+import { esc } from '../lib.mjs';
 import { waAny } from '../forms.mjs';
 
 const plain = (path, title, body) => (cfg) => ({ path, title: `${title} | OpenFrequency`, description: title, noindex: true, body: body(cfg) });
-
-export const thanks = plain('/thanks', 'קיבלנו את הכתובת של החנות', (cfg) => `
-<section class="sec after">
-<div class="wrap narrow" data-rise>
-<h1>קיבלנו את הכתובת של החנות</h1>
-<p class="lede">${cfg.has('demo.time') || cfg.banner ? `תוך ${cfg.t('demo.time')} נשלח` : 'כשהדמו מוכן, נשלח'} לכם לוואטסאפ לינק לעמוד עם הדמו. אם החנות לא על Shopify, WooCommerce או Wix, נכתוב לכם ונגיד מה אפשר.</p>
-<div class="actions"><a class="btn primary" href="/">לעמוד הבית</a></div>
-</div>
-</section>`);
 
 // Our WhatsApp, for when the form can't take it; until we have a number, the public draft doesn't offer it.
 const hasWa = (cfg) => cfg.has('whatsapp') || cfg.banner;
@@ -25,6 +16,20 @@ const waButton = (cfg, label) => {
     ? `<a class="btn primary" href="https://wa.me/${wa}?text=${esc(encodeURIComponent(waAny(cfg)))}">${label}</a>`
     : hasWa(cfg) ? `<span class="btn primary">${label} ${cfg.ph('whatsapp')}</span>` : '';
 };
+
+// A demo's form posted without JS lands here only when the endpoint has no demo number to send it on to (TORAN_DEMO_WA,
+// server/lead.mjs reply): the request is saved, but its code never reached the visitor, so nothing would come to them.
+// The page asks for the one thing that makes it work, a message on WhatsApp, whose number is where the link goes (the
+// 2026-11-11 audit, P2-32); with no number of ours, the way home.
+export const thanks = plain('/thanks', 'קיבלנו את הכתובת של החנות', (cfg) => `
+<section class="sec after">
+<div class="wrap narrow" data-rise>
+<h1>קיבלנו את הכתובת של החנות</h1>
+<p class="lede">${hasWa(cfg) ? 'נשאר רק לשלוח לנו הודעה בוואטסאפ עם הכתובת של החנות. למספר שממנו תכתבו נשלח לינק לעמוד עם הדמו, כשהוא מוכן.' : 'כשהדמו מוכן, נשלח לכם לוואטסאפ לינק לעמוד עם הדמו.'} אם החנות לא על Shopify, WooCommerce או Wix, נכתוב לכם ונגיד מה אפשר.</p>
+<div class="actions">${waButton(cfg, 'לשלוח בוואטסאפ') || '<a class="btn primary" href="/">לעמוד הבית</a>'}</div>
+</div>
+</section>`);
+
 
 export const thanksTeder = plain('/thanks/teder', 'קיבלנו את הכתובת של החנות', () => `
 <section class="sec after">
@@ -51,7 +56,7 @@ export const tryAgain = plain('/try-again', 'הפרטים לא הגיעו אלי
 <div class="wrap narrow" data-rise>
 <h1>הפרטים לא הגיעו אלינו</h1>
 <p class="lede">${hasWa(cfg) ? 'הטופס לא נשלח. אפשר לשלוח לנו את הכתובת של החנות בוואטסאפ, או לנסות שוב בעוד כמה דקות.' : 'הטופס לא נשלח. אפשר לנסות שוב בעוד כמה דקות.'}</p>
-<div class="actions">${button}<a class="btn" href="${toranSoon(cfg) ? '/join' : '/toran#demo'}">לנסות שוב</a></div>
+<div class="actions">${button}<a class="btn" href="/join">לנסות שוב</a></div>
 </div>
 </section>`;
 });

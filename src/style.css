@@ -459,9 +459,13 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent-fill); b
 .soon-bar { padding-top: 16px; }
 .soon-bar p { margin: 0; padding: 12px 16px; border-radius: var(--r); background: var(--warn-bg); font-size: var(--fs-small); line-height: 1.55; }
 .soon-bar .soon { margin-inline-end: 6px; background: var(--sheet); }
-/* On a phone the four tabs share the width: the name, and "בקרוב" under it. */
+/* On a phone the tabs share the width: the mark, the name, and "בקרוב" under it. A row of more than three (Toran's five
+   channels) does so at every width: side by side they were wider than the box on a desk, and the last one was cut with
+   no way to reach it (the 2026-11-11 audit, P1-2). */
+.ch-tabs.fill { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; }
+.ch-tabs.fill button { flex-direction: column; justify-content: center; gap: 3px; min-height: 52px; padding: 6px 4px; font-size: 14px; }
 @media (max-width: 559px) {
-  .ch-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; width: 100%; }
+  .ch-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; }
   .ch-tabs button { flex-direction: column; justify-content: center; gap: 3px; min-height: 52px; padding: 6px 4px; font-size: 14px; }
   .ch-tabs .soon { padding: 0 6px; font-size: 10px; }
 }
@@ -747,6 +751,9 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .phone > .chat { height: 100%; max-width: none; border-radius: 36px 36px 0 0; }
 .phone .chat-top { padding-top: 44px; }
 .phone .msgs { flex: 1; }
+/* Toran's door: the chat keeps its newest messages in view, as a phone does, so the last answer is never cut by the
+   door's edge (the 2026-11-11 audit, P2-3); the first lines go up under the chat's top bar. */
+.toran-door .phone .msgs { min-height: 0; overflow: hidden; justify-content: flex-end; }
 /* What reaches the owner: a notification card that pops out over the phone's edge once the chat has played. */
 .pop { position: absolute; z-index: 4; top: 14px; inset-inline-start: clamp(-40px, -3vw, -8px); display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; width: min(272px, 86%); margin: 0; padding: 12px 14px; border-radius: 18px; background: var(--sheet); color: var(--ink); box-shadow: 0 18px 40px -14px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--line); font-size: 14px; line-height: 1.4; }
 .pop .mark { --s: 28px; border-radius: 8px; }
@@ -811,6 +818,9 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .teder-field input { background: rgba(255, 255, 255, 0.95); color: #1d1d1f; border-color: transparent; }
 .teder-field .btn { background: #fff; color: var(--teder-ink); }
 @media (hover: hover) { .teder-field .btn:hover { background: var(--teder-hover); } }
+/* The second button on the violet stays the quiet one, so joining is the one main button (the 2026-11-11 audit, P1-3). */
+.teder-field .btn.on-color { background: rgba(255, 255, 255, 0.16); color: #fff; }
+@media (hover: hover) { .teder-field .btn.on-color:hover { background: rgba(255, 255, 255, 0.26); } }
 .teder-field .small { margin-top: 10px; color: rgba(255, 255, 255, 0.86); }
 .teder-field .done h3, .teder-field .done p { color: #fff; }
 .teder-field .pop, .teder-field .pop b { max-width: none; color: var(--ink); }
@@ -856,6 +866,10 @@ label.f[hidden], .demo .when[hidden] { display: none; }
 .figure .ph { font-size: 0.5em; letter-spacing: 0; }
 .price-notes { margin: 0; color: var(--ink-2); max-width: 36ch; }
 .price-main .btn { justify-self: start; margin-top: 10px; }
+/* The price box's column is its own width, never its button's: a long button wraps inside it (the 2026-11-11 audit,
+   P1-1, /toran at 760-899px). */
+.price-main { grid-template-columns: minmax(0, 1fr); }
+.price-main .btn { max-width: 100%; white-space: normal; text-align: center; line-height: 1.25; padding-block: 10px; }
 .price-incl h3 { margin: 0 0 14px; font-size: var(--fs-body); color: var(--ink-2); }
 .checks { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
 .checks li { position: relative; padding-inline-start: 34px; line-height: 1.5; }
@@ -1188,6 +1202,9 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 .carts-sec .checks { margin-top: 22px; }
 .carts-sec .checks b { color: var(--ink); }
 .carts-sec .quiet { margin-top: 22px; }
+/* A heading never touches the line under it (the owner, 2026-11-01: "spacing, everywhere"; the 2026-11-11 audit, P1-4). */
+.carts-sec h2 + .lede, #sample h2 + .lede { margin-top: 14px; }
+#join-faq-h + .faq { margin-top: 22px; }
 .owner-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(28px, calc(5vw / var(--z)), 72px); align-items: center; }
 .owner-text .kicker { display: inline-block; margin: 0 0 14px; padding: 6px 14px; border-radius: 999px; background: color-mix(in srgb, var(--toran) 12%, transparent); color: var(--toran-name); font-size: 14px; font-weight: 700; }
 .owner-text h2 { font-size: clamp(32px, calc(4.4vw / var(--z)), 52px); line-height: 1.1; margin: 0 0 16px; }
@@ -1241,7 +1258,13 @@ html.a-contrast[data-theme="dark"] { --ink-2: #f5f5f7; --ink-3: #e5e5ea; --ink-p
 .plan-more { margin: 16px 4px 28px; color: var(--ink-2); }
 .plan-fair { max-width: 70ch; margin: 22px 4px 0; color: var(--ink-2); }
 .plan-fair b { color: var(--ink); }
-@media (min-width: 760px) {
+/* The card with both plans' notes stays one column up to 959px, as on a phone: side by side, its price box had a
+   quarter of a tablet's width and its button ran off the screen. */
+@media (min-width: 800px) and (max-width: 959px) {
+  .price-card.plan-both { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .plan-both .price-incl { padding-inline-start: 0; border-inline-start: 0; }
+}
+@media (min-width: 960px) {
   .price-card.plan-both { grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); }
   .plan-both .price-incl { padding-inline-start: 0; border-inline-start: 0; }
   .plan-both .price-main { padding-inline-start: 40px; border-inline-start: 1px solid var(--line); }

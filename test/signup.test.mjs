@@ -50,18 +50,19 @@ const section = (html, id) => new RegExp(`<section class="legal-part" aria-label
 // /join's first step (Teder alone, and both products with Toran live), and the terms (Teder's section and the price).
 const PAY = {
   manual: {
-    card: 'אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום במייל. משלמים מראש לכל חודש, ותדר נפתח כשהתשלום מגיע אלינו.',
-    step: 'פותחים חשבון עם המייל שלכם ובוחרים חבילה. אנחנו שולחים לכם במייל את פרטי התשלום על החודש הראשון ועל דמי ההקמה, ותדר נפתח כשהתשלום מגיע אלינו.',
-    both: 'פותחים חשבון עם המייל שלכם ובוחרים תורן, תדר או שניהם. אנחנו שולחים לכם את פרטי התשלום במייל, והמוצרים נפתחים כשהתשלום מגיע אלינו.',
-    sub: 'תשלום. המנוי חודשי, ומשלמים עליו מראש. אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום במייל, ותדר נפתח כשהתשלום מגיע אלינו. יש שתי חבילות',
-    price: 'בתדר אנחנו שולחים את פרטי התשלום במייל אחרי שפותחים את החשבון, והשירות נפתח כשהתשלום מגיע אלינו, כמו שכתוב בסעיף על המנוי לתדר',
+    // A bank transfer, its details by email or on WhatsApp (openfrequency-accounts src/accounts/pay.js), since 2026-11-12.
+    card: 'משלמים בהעברה בנקאית, מראש לכל חודש. אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי ההעברה, במייל או בוואטסאפ, ותדר נפתח כשהתשלום מגיע אלינו.',
+    step: 'פותחים חשבון עם המייל שלכם ובוחרים חבילה. על החודש הראשון ועל דמי ההקמה משלמים בהעברה בנקאית: את פרטי ההעברה אנחנו שולחים במייל או בוואטסאפ, ותדר נפתח כשהתשלום מגיע אלינו.',
+    both: 'פותחים חשבון עם המייל שלכם ובוחרים תורן, תדר או שניהם. משלמים בהעברה בנקאית: את פרטי ההעברה אנחנו שולחים במייל או בוואטסאפ, והמוצרים נפתחים כשהתשלום מגיע אלינו.',
+    sub: 'תשלום. המנוי חודשי, ומשלמים עליו מראש, בהעברה בנקאית. אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי ההעברה, במייל או בוואטסאפ, ותדר נפתח כשהתשלום מגיע אלינו. יש שתי חבילות',
+    price: 'משלמים בהעברה בנקאית: את פרטי ההעברה אנחנו שולחים במייל או בוואטסאפ אחרי שפותחים את החשבון, והשירות נפתח כשהתשלום מגיע אלינו, כמו שכתוב בסעיף על המנוי לתדר',
   },
   provider: {
     card: 'משלמים מראש לכל חודש, בכרטיס אשראי, בעמוד התשלום שבחשבון שלכם. תדר נפתח כשהתשלום מאושר.',
     step: 'פותחים חשבון עם המייל שלכם ובוחרים חבילה. את החודש הראשון ואת דמי ההקמה משלמים בכרטיס אשראי, בעמוד התשלום שבחשבון, ותדר נפתח כשהתשלום מאושר.',
     both: 'פותחים חשבון עם המייל שלכם, בוחרים תורן, תדר או שניהם, ומשלמים בכרטיס אשראי, בעמוד התשלום שבחשבון. המוצרים נפתחים כשהתשלום מאושר.',
     sub: 'תשלום. המנוי חודשי, ומשלמים עליו מראש, בכרטיס אשראי, בעמוד התשלום שבחשבון. תדר נפתח כשהתשלום מאושר. יש שתי חבילות',
-    price: 'בתדר משלמים בכרטיס אשראי, בעמוד התשלום שבחשבון, והשירות נפתח כשהתשלום מאושר, כמו שכתוב בסעיף על המנוי לתדר',
+    price: 'משלמים בכרטיס אשראי, בעמוד התשלום שבחשבון, והשירות נפתח כשהתשלום מאושר, כמו שכתוב בסעיף על המנוי לתדר',
   },
 };
 const NO_REFUND = 'דמי ההקמה לא מוחזרים.';
@@ -94,8 +95,9 @@ test('with "closed", nothing links to sign-up and Teder is offered by its sample
   assert.ok(!text(main(pages['faq/index.html'])).includes('איך מבטלים את תדר'));
   const terms = main(pages['terms/index.html']);
   assert.doesNotMatch(terms, /t-teder-sub/);
-  // With sign-up closed, the terms carry legal.updated, the legal pages' own date (the privacy page changed on 2026-10-30).
-  assert.match(terms, /עודכן לאחרונה ב-30 באוקטובר 2026/);
+  // With sign-up closed, the terms carry legal.updated, the legal pages' own date (the security page changed on
+  // 2026-11-12: sign-in with Google).
+  assert.match(terms, /עודכן לאחרונה ב-12 בנובמבר 2026/);
   assert.match(text(section(terms, 't-stop')), /דמי הקמה לא מוחזרים אחרי שהתחלנו לבנות את החיבור לחנות שלכם/);
   assert.doesNotMatch(support.status, /signup/);
 });
@@ -123,7 +125,7 @@ test('with "open", Teder\'s first screens have sign-up, the demo and the sample 
   assert.equal(heading(teder, 'demo-h'), 'רוצים קודם לראות מצגת מהחנות שלכם?');
   assert.match(teder, /data-form="teder"[\s\S]*?<button class="btn primary" type="submit">לקבל מצגת לדוגמה<\/button>/);
   // What is left to a business that set Teder up on its own.
-  assert.match(teder, /קורא רק מהמקורות שבחרתם/);
+  assert.match(teder, /קורא מהמקורות שבחרתם, וכל עובדה מהם מגיעה עם ציטוט מילה במילה\. עובדה בלי מקור מסומנת "לא ממקור, כדאי לבדוק"/);
   assert.match(teder, /לחבר את טיקטוק, את אינסטגרם ואת פייסבוק, פעם אחת/);
   // The home page's door. It sells Teder, so its price is under the buttons, both plans with VAT and the setup fees,
   // and, shut on a phone, the lowest monthly price with VAT is its short line (the owner, 2026-11-01: "The hero: sell
@@ -150,7 +152,9 @@ test('with "open", /join starts with sign-up and its price, then the sample form
   assert.match(join, /<section class="sec" id="sample" aria-labelledby="sample-h">\n<div class="wrap narrow">\n<h2 id="sample-h">רוצים קודם לראות מצגת מהחנות שלכם\?<\/h2>/);
   // The second way, so a grey pill under sign-up's blue (the owner, 2026-11-06: "main button should look the most important").
   assert.match(join, /<button class="btn" type="submit">לקבל מצגת לדוגמה<\/button>/);
-  assert.match(join, /<input type="hidden" name="teder" value="1">/, 'the sample form asks for Teder, with nothing to pick');
+  // Teder's sample is asked for by a code sent on WhatsApp (teder.demoBy), on /join as on /teder (2026-11-12).
+  assert.match(join, /<input type="hidden" name="by" value="whatsapp">\n<input type="hidden" name="product" value="teder">/, 'the sample form asks for Teder, with nothing to pick');
+  assert.doesNotMatch(join, /name="contact"/, 'and no number to type: the one that sends the code is where it goes');
   assert.match(join, /מה קורה אחרי ההרשמה[\s\S]*נרשמים ומשלמים[\s\S]*בוחרים מקורות[\s\S]*עוברים על המצגות לדוגמה[\s\S]*מעלים לאוויר/);
   assert.ok(text(join).includes('איך מבטלים את תדר?'));
   assert.match(pages['join/index.html'], /<meta name="description" content="פותחים חשבון בתדר/);
@@ -167,7 +171,9 @@ test('with "open" and Toran live, sign-up is the first way in for both products,
   const form = join.indexOf('data-form="join"'), open = join.indexOf('<a class="btn primary" href="https://accounts.openfrequency.co.il/signup">לפתוח חשבון</a>');
   assert.ok(open > 0 && form > open, 'the account before the demo form');
   assert.ok(!join.includes(`href="${TORAN_SIGNUP}"`) && !join.includes(`href="${SIGNUP}"`), 'no second main button per product');
-  assert.match(join, /<input type="checkbox" name="toran" value="1" checked>/);
+  // One product a request, each by its own code (forms.mjs joinForm): Toran's demo picked to start with.
+  assert.match(join, /<input type="radio" name="product" value="toran" checked>/);
+  assert.match(join, /<input type="radio" name="product" value="teder">/);
   assert.match(join, /<button class="btn" type="submit">לקבל דמו<\/button>/);
   assert.match(join, /מה קורה אחרי ההרשמה[\s\S]*נרשמים ומשלמים/);
   // Toran's page: the sign-up in the first screen, and on the price card one button per plan with that plan picked
@@ -191,7 +197,7 @@ test('with "open", the FAQ and the support export say how to sign up and cancel'
   assert.ok(text(faq).includes(`בעמוד ההרשמה . ${PAY.manual.card} הפרטים בעמוד של תדר`));
   assert.match(text(faq), /איך מבטלים את תדר\? בחשבון שלכם, בכל זמן/);
   assert.match(faq, /href="\/terms#t-teder-sub">בתנאי השימוש<\/a>/);
-  assert.match(faq, /רק מהמקורות שבחרתם בהקמה/);
+  assert.match(text(faq), /מהמקורות שבחרתם בהקמה, מתוך אלה שתדר מצא לחנות שלכם\. כל עובדה מהם מגיעה עם ציטוט מילה במילה/);
   assert.ok(support.status.includes(SIGNUP), 'the support status gives the sign-up address');
   assert.ok(support.faq.some((f) => f.q === 'איך מבטלים את תדר?'));
 });
@@ -199,8 +205,8 @@ test('with "open", the FAQ and the support export say how to sign up and cancel'
 test('with "open", the terms carry Teder\'s self-serve section and their own date; Toran\'s stay', () => {
   const closed = main(built.closed.pages['terms/index.html']);
   const terms = main(built.open.pages['terms/index.html']);
-  assert.match(terms, /עודכן לאחרונה ב-9 בנובמבר 2026/);
-  assert.equal(config.legal.signupUpdated, '2026-11-09', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION), moved with the founders offer and the next-month cancelling');
+  assert.match(terms, /עודכן לאחרונה ב-12 בנובמבר 2026/);
+  assert.equal(config.legal.signupUpdated, '2026-11-12', 'the terms version accounts stores once sign-up opens (its TERMS_VERSION), moved with the pre-launch audit: sign-in with Google, the bot said in every first answer, very unusual use, paying by bank transfer');
   assert.match(terms, /<li><a href="#t-stop">הפסקה וביטול<\/a><\/li><li><a href="#t-teder-sub">המנוי לתדר<\/a><\/li>/);
   const sub = text(section(terms, 't-teder-sub'));
   for (const words of [
@@ -231,8 +237,8 @@ test('with "open", the terms carry Teder\'s self-serve section and their own dat
   assert.match(section(terms, 't-deal'), /href="\/teder\/contract"/);
   assert.doesNotMatch(section(closed, 't-deal'), /\/contract/);
   // The other legal pages keep their own date (the privacy page's is the later of legal.privacyWaUpdated, while Teder's
-  // sample is asked for on WhatsApp, and legal.privacyUpdated, the reminders to pay on WhatsApp).
-  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-8 בנובמבר 2026/);
+  // sample is asked for on WhatsApp, and legal.privacyUpdated, sign-in with Google and no YouTube, 2026-11-12).
+  assert.match(main(built.open.pages['privacy/index.html']), /עודכן לאחרונה ב-12 בנובמבר 2026/);
 });
 
 // A new month's payment has 72 hours after the paid month ends (the owner, 2026-11-03: "A user has 72 hours to pay for
@@ -242,7 +248,8 @@ test('the terms: a new month not paid within 72 hours of the end of the paid mon
   for (const b of [built.closed, built.open]) {
     const part = text(section(main(b.pages['terms/index.html']), 't-price'));
     assert.ok(part.includes('לפני שהחודש ששילמתם נגמר, נזכיר לכם לשלם על החודש הבא. אם התשלום הזה לא הגיע אלינו תוך 72 שעות מסוף החודש ששילמתם, השירות נעצר עד שישולם.'), part);
-    assert.ok(part.includes('ביטול חיוב מול חברת האשראי על שירות שקיבלתם הוא הפרה של ההסכם'), 'the rest of the paragraph stays');
+    // Paid by bank transfer (payment "manual"), there is no card charge to cancel, so no line about one.
+    assert.ok(!part.includes('ביטול חיוב מול חברת האשראי'), 'no chargeback line without a card');
     assert.doesNotMatch(text(main(b.pages['terms/index.html'])), /14 יום מההודעה|לא הוסדר/);
   }
 });
@@ -264,11 +271,15 @@ test('the monthly report says it comes by email, and the two plans are 15 and 40
     const teder = main(b.pages['teder/index.html']);
     assert.match(teder, /<li>דוח תוצאות שמגיע אליכם במייל בכל חודש<\/li>/);
     const plans = [...teder.matchAll(/<article class="plan glass">[\s\S]*?<\/article>/g)].map((m) => text(m[0]).trim());
-    assert.match(plans[0], /^חבילה קטנה 490 ₪ לחודש לא כולל מע״מ 15 מצגות מוצעות בחודש, ועד 4 החלפות בחודש הראשון יש גם 990 ₪ דמי הקמה, פעם אחת\./);
-    assert.match(plans[1], /^חבילה מלאה 790 ₪ לחודש לא כולל מע״מ 40 מצגות מוצעות בחודש, ועד 10 החלפות בחודש הראשון יש גם 1,490 ₪ דמי הקמה, פעם אחת\./);
+    // A month's slideshows are the ones approved (openfrequency-teder src/budget/quota.js), said the same way everywhere.
+    assert.match(plans[0], /^חבילה קטנה 490 ₪ לחודש לא כולל מע״מ 15 מצגות בחודש, ועד 4 החלפות בחודש הראשון יש גם 990 ₪ דמי הקמה, פעם אחת\./);
+    assert.match(plans[1], /^חבילה מלאה 790 ₪ לחודש לא כולל מע״מ 40 מצגות בחודש, ועד 10 החלפות בחודש הראשון יש גם 1,490 ₪ דמי הקמה, פעם אחת\./);
+    assert.match(text(teder), /נספרות רק מצגות שאישרתם\. מצגת שדחיתם לא נספרת, ובמקומה מגיעה מצגת אחרת לאותו יום/);
+    assert.match(text(teder), /החלפה היא מצגת שדחיתם וביקשתם שתדר יכתוב אותה מחדש לפי מה שכתבתם/);
+    assert.match(text(main(b.pages['faq/index.html'])), /ונספרות רק מצגות שאישרתם\. כשאישרתם את כולן, תדר לא כותב מצגות חדשות עד החודש הבא/);
     // TED-17: the slideshows are counted by the calendar month, said beside the price and in the FAQ.
-    assert.match(text(teder), /נספרות לפי חודש קלנדרי, מה-1 בחודש ועד סופו, גם כשהתשלום שלכם יורד בתאריך אחר/);
-    assert.match(text(main(b.pages['faq/index.html'])), /החודש נספר לפי לוח השנה, מה-1 בחודש ועד סופו, גם כשהתשלום שלכם יורד בתאריך אחר/);
+    assert.match(text(teder), /נספרות לפי חודש קלנדרי, מה-1 בחודש ועד סופו, גם כשאתם משלמים בתאריך אחר/);
+    assert.match(text(main(b.pages['faq/index.html'])), /החודש נספר לפי לוח השנה, מה-1 בחודש ועד סופו, גם כשאתם משלמים בתאריך אחר/);
   }
 });
 

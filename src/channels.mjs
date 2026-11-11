@@ -13,9 +13,10 @@ export const NAMES = { whatsapp: 'וואטסאפ', instagram: 'אינסטגרם'
 // A channel's name with its mark in front.
 export const named = (c) => `${LOGOS[c]}${NAMES[c]}`;
 
-// The sample: one store, one dress, one price, all made up, and the caption says so.
+// The sample: one store, one dress, one price, all made up, and the caption says so. The answer opens the way Toran's
+// first answer in every conversation does, on every channel (openfrequency-toran src/agent/intro.ts botLine).
 const Q = 'היי, יש את שמלת הפשתן הירוקה במידה M?';
-const A = 'יש, נשארו 2 במידה M. היא 289 ₪, והמשלוח עד הבית לוקח 3 עד 5 ימי עסקים.';
+const A = 'כאן הבוט של החנות. יש, נשארו 2 במידה M. היא 289 ₪, והמשלוח עד הבית לוקח 3 עד 5 ימי עסקים.';
 const WHO = { me: 'לקוחה', them: 'החנות' };
 const sr = (who, time) => `<span class="sr">${WHO[who]}${time ? `, ${time}` : ''}. </span>`;
 
@@ -75,9 +76,10 @@ const soon = '<span class="soon">בקרוב</span>';
 // Tabs over one window, for Toran's channels and Teder's platforms alike: each item is { key, name (HTML), window
 // (HTML), bare } (bare: the window brings its own stage, instead of the glass one). The tab list is hidden until the
 // script makes it work (site.js, [data-channels]); until then the windows are a stacked list, each under its name.
+// More than three tabs (Toran's five channels) share the row's width at every width (style.css .ch-tabs.fill).
 export function tabBox(items, { label, note }) {
   return `<div class="ch-box" data-channels>
-<div class="ch-tabs" role="tablist" aria-label="${label}" hidden>
+<div class="ch-tabs${items.length > 3 ? ' fill' : ''}" role="tablist" aria-label="${label}" hidden>
 ${items.map((t, i) => `<button type="button" role="tab" id="tab-${t.key}" aria-controls="ch-${t.key}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${t.name}</button>`).join('\n')}
 </div>
 ${items.map((t) => `<div class="ch-panel" id="ch-${t.key}">

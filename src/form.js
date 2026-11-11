@@ -11,24 +11,44 @@
   // /join?p=teder (or toran) ticks that product alone, unless it can't be ticked (Toran, while it is soon).
   var p = new URLSearchParams(location.search).get('p');
   // While Toran is soon there is no picker: Teder is a hidden field, always asked for, and there is nothing to tick.
+  // While Teder's sample is asked for by WhatsApp the two cards are one choice (radio buttons named product), and
+  // there is no number to type: each product is answered with its own code (forms.mjs joinForm).
   var jf = document.querySelector('form[data-form=join]');
   var box = function (k) { var x = jf.elements[k]; return x && x.type === 'checkbox' ? x : null; };
-  var asked = function (k) { var x = jf.elements[k]; return !!x && (x.type === 'hidden' || x.checked); };
-  if (jf && (p === 'teder' || p === 'toran') && box(p)) ['toran', 'teder'].forEach(function (k) { if (box(k)) box(k).checked = k === p; });
-  // On the join page the WhatsApp number is Teder's, so it shows (and is asked for) only while Teder is ticked, and each
-  // line under the button only while its product is.
+  var radio = function (k) { return jf.querySelector('input[type=radio][name=product][value=' + k + ']'); };
+  var asked = function (k) {
+    var r = radio(k);
+    if (r) return r.checked;
+    var one = jf.elements.product;
+    if (one && one.type === 'hidden') return one.value === k;
+    var x = jf.elements[k];
+    return !!x && (x.type === 'hidden' || x.checked);
+  };
+  if (jf && (p === 'teder' || p === 'toran')) {
+    if (radio(p)) radio(p).checked = true;
+    else if (box(p)) ['toran', 'teder'].forEach(function (k) { if (box(k)) box(k).checked = k === p; });
+  }
+  // On the join page the WhatsApp number, where there is one, is Teder's, so it shows (and is asked for) only while
+  // Teder is ticked, and each line under the button only while its product is.
   if (jf) {
     var sync = function () {
       var teder = asked('teder'), contact = jf.elements.contact;
-      contact.closest('label').hidden = !teder;
-      contact.required = teder;
-      jf.elements.store.closest('label').classList.toggle('wide', !teder);
+      if (contact) {
+        contact.closest('label').hidden = !teder;
+        contact.required = teder;
+        jf.elements.store.closest('label').classList.toggle('wide', !teder);
+      }
       jf.querySelectorAll('[data-for]').forEach(function (x) { x.hidden = !asked(x.getAttribute('data-for')); });
     };
     jf.addEventListener('change', sync);
     sync();
   }
-  for (var i = 0; i < forms.length; i++) forms[i].addEventListener('submit', send);
+  // The messages under the button say what is missing, in Hebrew (the templates), so the browser's own bubble, in the
+  // browser's language, is not shown first; without script the browser still checks the required fields.
+  for (var i = 0; i < forms.length; i++) {
+    forms[i].noValidate = true;
+    forms[i].addEventListener('submit', send);
+  }
 
   function send(e) {
     e.preventDefault();

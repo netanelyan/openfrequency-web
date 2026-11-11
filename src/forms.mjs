@@ -25,7 +25,9 @@ const open = (cfg, kind, page, cls, id = '') =>
 ${honeypot}`;
 
 // How long a demo takes, as the forms say it; until it is set, the public draft says only that it comes when ready.
-const within = (cfg) => (cfg.has('demo.time') || cfg.banner ? `תוך ${cfg.t('demo.time')}` : null);
+// "Usually": Toran sends the link by itself once the page is ready, and a page that needs a hand from us takes longer
+// (the 2026-11-11 audit, P2-15; openfrequency-toran src/ops/actions.ts).
+const within = (cfg) => (cfg.has('demo.time') || cfg.banner ? `בדרך כלל תוך ${cfg.t('demo.time')}` : null);
 
 // The message under a form's button. It stays in the page, empty, from the start: a live region that appears together
 // with its words is often not read out, so form.js only changes what is inside it, and the stylesheet keeps it out of
@@ -77,26 +79,33 @@ ${status(id)}
 // the picker showed Toran's card, marked "בקרוב", that couldn't be ticked, beside Teder's, ticked: a choice with one answer.
 // While sign-up is open the form is /join's second way, under sign-up's blue button, so its own button is a grey pill;
 // on a phone the two share the first screen.
+// While Teder's sample is asked for by a code sent on WhatsApp (teder.demoBy "whatsapp"; the 2026-11-11 audit, P1-14:
+// every demo is asked for with a code), /join asks for it that way too: no number to type, and one product a request,
+// picked on two cards that work as one choice (product=toran or teder), since a code is one product's (Toran's
+// demo_requests) and the message that sends it is one. Teder rides by=whatsapp, as on /teder; the endpoint answers
+// either with a code and its WhatsApp link (server/lead.mjs). With "form", the form is as it was: both can be ticked,
+// and Teder's number is typed.
 export function joinForm(cfg) {
   const soon = toranSoon(cfg);
-  const card = (name, label, what, on) => `<label class="pick"><input type="checkbox" name="${name === 'toran' ? 'toran' : 'teder'}" value="1"${on ? ' checked' : ''}><span class="pick-box">${mark(name, 44)}<span><b>${label}</b><small>${what}</small></span><span class="pick-tick" aria-hidden="true"></span></span></label>`;
+  const byWa = tederByWa(cfg);
+  const card = (name, label, what, on) => `<label class="pick"><input ${byWa ? `type="radio" name="product" value="${name}"` : `type="checkbox" name="${name}" value="1"`}${on ? ' checked' : ''}><span class="pick-box">${mark(name, 44)}<span><b>${label}</b><small>${what}</small></span><span class="pick-tick" aria-hidden="true"></span></span></label>`;
+  const only = byWa ? '<input type="hidden" name="product" value="teder">' : '<input type="hidden" name="teder" value="1">';
   return `${open(cfg, 'join', '/join', 'demo join', 'join')}
-${soon ? '<input type="hidden" name="teder" value="1">' : `<fieldset class="picks"><legend>במה מתחילים</legend>
+${byWa ? '<input type="hidden" name="by" value="whatsapp">\n' : ''}${soon ? only : `<fieldset class="picks"><legend>במה מתחילים</legend>
 <div class="pick-row">
 ${card('toran', 'תורן', `עונה ללקוחות של החנות ${inList(liveChannels(cfg))}`, true)}
 ${card('teder', 'תדר', `כותב ומעצב מצגות בעברית ${tederNets(cfg)}`, false)}
 </div>
 </fieldset>`}
-${storeField(false)}
-${contactField(soon ? 'הוואטסאפ שלכם' : 'הוואטסאפ שלכם, למצגת של תדר', soon)}
+${byWa ? storeField(true) : `${storeField(false)}\n${contactField(soon ? 'הוואטסאפ שלכם' : 'הוואטסאפ שלכם, למצגת של תדר', soon)}`}
 <button class="btn${signupOpen(cfg) ? '' : ' primary'}" type="submit">${!signupOpen(cfg) ? 'להצטרף' : soon ? 'לקבל מצגת לדוגמה' : 'לקבל דמו'}</button>
 ${soon ? '' : `<p class="when" data-for="toran">${toranWhen(cfg)}</p>`}
-<p class="when" data-for="teder">${tederWhen}</p>
+<p class="when" data-for="teder">${byWa ? tederCodeWhen : tederWhen}</p>
 ${status('join')}
 </form>`;
 }
 
-// Once per page that has a form. forms: the page's own word for its forms, 'teder' on /teder.
+// Once per page that has a form. forms: the page's own word for its forms, 'teder' on /teder, 'join' on /join.
 export function formCopy(cfg, forms = true) {
   const wa = '<a class="btn sm primary" data-wa href="#">לשלוח בוואטסאפ</a>';
   // A Toran demo, from its form or the join page's: the request's code, and the button that writes it to the demo
@@ -107,10 +116,12 @@ export function formCopy(cfg, forms = true) {
   // Either way the visitor is told one thing (the owner, 2026-11-01: "just tell him to send the message in the url AS
   // IS. everything should be easy for a user"): press the button and send the message as it is. The code is shown only
   // when there is no button to press (no demo number), as what to send us.
-  const tederCode = forms === 'teder' && tederByWa(cfg);
+  // With Teder's sample asked for by WhatsApp, /join asks for it by code too (joinForm), so its thank-you is the code's,
+  // even while Toran is soon, and no thank-you anywhere speaks of a number typed in the form.
+  const tederCode = (forms === 'teder' || forms === 'join') && tederByWa(cfg);
   const send = '<p data-wa-say>לחצו על הכפתור ושלחו את ההודעה כמו שהיא.</p><p data-no-wa hidden>שלחו לנו בוואטסאפ את הקוד <bdi class="code" data-code></bdi>.</p>';
   return `${tederCode ? `<template id="done-code"><div class="done" tabindex="-1"><h3>נשאר רק לשלוח לנו הודעה בוואטסאפ</h3>${send}<a class="btn primary" data-wa-go href="#">לשלוח בוואטסאפ</a></div></template>
-` : toranSoon(cfg) ? '' : `<template id="done-code"><div class="done" tabindex="-1"><h3>נשאר רק לשלוח לנו הודעה בוואטסאפ</h3>${send}<p data-teder hidden>את המצגת לדוגמה של תדר נשלח למספר שכתבתם בטופס.</p><a class="btn primary" data-wa-go href="#">לשלוח בוואטסאפ</a></div></template>
+` : toranSoon(cfg) ? '' : `<template id="done-code"><div class="done" tabindex="-1"><h3>נשאר רק לשלוח לנו הודעה בוואטסאפ</h3>${send}${tederByWa(cfg) ? '' : '<p data-teder hidden>את המצגת לדוגמה של תדר נשלח למספר שכתבתם בטופס.</p>'}<a class="btn primary" data-wa-go href="#">לשלוח בוואטסאפ</a></div></template>
 `}<template id="done-teder"><div class="done" tabindex="-1"><h3>קיבלנו את הכתובת של <bdi data-store></bdi></h3><p>כשהמצגת לדוגמה מוכנה, נשלח לכם אותה לוואטסאפ, בגודל של טיקטוק ושל אינסטגרם.</p></div></template>
 ${toranSoon(cfg) ? `<template id="done-waitlist"><div class="done" tabindex="-1"><h3>רשמנו אתכם</h3><p>כשתורן נפתח, נכתוב לכם לטלפון או למייל שהשארתם.</p></div></template>
 <template id="msg-contact-waitlist"><p>צריך מספר נייד ישראלי, למשל 050-1234567, או כתובת מייל, כדי שנוכל לכתוב לכם כשתורן נפתח.</p></template>

@@ -60,7 +60,7 @@ export const FACTS = {
   'price.commitmentMonths': { label: 'חודשי התחייבות, 0 אם אין', kind: 'number' },
   'price.stops': { label: 'מתי החיוב נעצר', kind: ['period-end', 'immediately'] },
   'price.keepDays': { label: 'כמה ימים שומרים את השיחות אחרי שמפסיקים', kind: 'number' },
-  // For the privacy and terms pages, and nowhere else.
+  // For the legal pages, and the business number for the footer too (layout.mjs).
   'legal.name': { label: 'השם המשפטי', kind: 'text' },
   'legal.number': { label: 'מספר העוסק', kind: 'text' },
   'legal.email': { label: 'מייל ליצירת קשר', kind: 'text' },
@@ -100,7 +100,7 @@ export const FACTS = {
   'teder.facebook': { label: 'תדר מפרסם גם בפייסבוק', kind: 'flag' },
   // How /teder's form asks for the sample slideshow: 'form' is the site as it was (the address and a typed WhatsApp
   // number); 'whatsapp' takes the address only and answers like Toran's demo, with a code the visitor sends us on
-  // WhatsApp, so the number proves itself (README, "How Teder's sample is asked for"). The join form is not affected.
+  // WhatsApp, so the number proves itself (README, "How Teder's sample is asked for"). The join form asks the same way then, one product a request (forms.mjs joinForm).
   'teder.demoBy': { label: 'מצגת לדוגמה של תדר מבקשים בטופס עם מספר (form) או בקוד בוואטסאפ (whatsapp)', kind: ['form', 'whatsapp'] },
   'toran.channels': { label: 'הערוצים שתורן עונה בהם היום', kind: 'channels' },
   // Where the list of live channels comes from: 'config' (toran.channels above, whatever Toran says), or 'toran'

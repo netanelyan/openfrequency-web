@@ -70,12 +70,21 @@ export function tederPriceLine(cfg) {
 // once one is, by card on the payment page in the account, and Teder opens once the payment is confirmed (accounts'
 // paywall opens a product only for a payment that covers today).
 // `product` is the one it opens: Teder by default, Toran on its own price card and questions (P1-5).
+// Manual means a bank transfer (the owner, 2026-11-03): its details come in the welcome email, or on WhatsApp through
+// "לתשלום בוואטסאפ" (openfrequency-accounts src/accounts/pay.js, Toran answering with the amount and the details).
 export const payLine = (cfg, product = 'תדר') => (payProvider(cfg)
   ? `משלמים מראש לכל חודש, בכרטיס אשראי, בעמוד התשלום שבחשבון שלכם. ${product} נפתח כשהתשלום מאושר.`
-  : `אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי התשלום במייל. משלמים מראש לכל חודש, ו${product} נפתח כשהתשלום מגיע אלינו.`);
+  : `משלמים בהעברה בנקאית, מראש לכל חודש. אחרי שפותחים את החשבון, אנחנו שולחים לכם את פרטי ההעברה, במייל או בוואטסאפ, ו${product} נפתח כשהתשלום מגיע אלינו.`);
 // The setup fee, as the self-serve terms say it (legal.mjs tederSub): beside the plans while sign-up is open. Closed, the
 // terms say Toran's rule (not refunded once we started building), so the plans say nothing more than the fee.
 export const NO_REFUND = 'דמי ההקמה לא מוחזרים.';
+
+// Very unusual use (the owner, 2026-11-11): when a customer's month of AI costs us a high share of what they pay, the AI
+// part stops until the next month unless we lift it, and we tell them (openfrequency-toran src/agent/spend.ts: every
+// question goes to the owner; openfrequency-teder src/billing/ai-share.js: nothing new is written, what was approved
+// still goes out). One line for each product, in the FAQ and the terms, with no number or share in it.
+export const TORAN_UNUSUAL = 'בשימוש חריג מאוד, הרבה מעבר לחבילה, תורן יכול להפסיק לענות לבד עד החודש הבא, ואז הוא מעביר אליכם כל שאלה. אם זה קורה, אנחנו מודיעים לכם.';
+export const TEDER_UNUSUAL = 'בשימוש חריג מאוד, הרבה מעבר לחבילה, תדר יכול להפסיק לכתוב מצגות חדשות עד החודש הבא. מה שכבר אישרתם ממשיך לעלות, ואם זה קורה, אנחנו מודיעים לכם.';
 
 // The founders' offer (the owner, 2026-11-09: "lets do a founders sale for all of the products: no דמי הקמה for the
 // next 10 people", with a counter of the spots left): the offer in words, true while founders.on is, and a count the
@@ -127,8 +136,9 @@ function termsLine(cfg, toran) {
   const stops = cfg.get('price.stops');
   if (!((n != null && stops) || cfg.banner)) return '';
   const stopWords = stops === 'period-end' ? 'החיוב נעצר בסוף החודש שכבר שולם' : stops === 'immediately' ? 'החיוב נעצר מאותו יום' : cfg.ph('price.stops');
-  // Teder bought through sign-up is cancelled in the account, not by writing to us.
-  const write = !toran && signupOpen(cfg) ? 'מבטלים בחשבון, בכל זמן' : waWords(cfg, 'כותבים לנו');
+  // Bought through sign-up, Teder and Toran alike are cancelled in the account (accounts' /subscription/<product>/cancel),
+  // not by writing to us; the price card is Toran's only while it is sold.
+  const write = signupOpen(cfg) ? 'מבטלים בחשבון, בכל זמן' : waWords(cfg, 'כותבים לנו');
   const commit = n == null ? cfg.ph('price.commitmentMonths') : n === 0 ? 'אין התחייבות, משלמים חודש בחודש.' : `ההתחייבות היא ל-${n} חודשים.`;
   const stop = n > 0 ? 'אחרי זה, כדי להפסיק' : 'כדי להפסיק';
   return toran && stops === 'period-end'
@@ -150,7 +160,7 @@ export function tederPricing(cfg, { includes, notes = [], cta = null, alt = '', 
 <h3 class="plan-name">${name}</h3>
 <p class="figure"><span class="num">${count(cfg, `${k}.monthly`)}</span><span class="cur">₪</span><span class="per">לחודש</span></p>
 <p class="plan-vat">${vatOf(cfg)}</p>
-<p class="plan-cap"><b>${count(cfg, `${k}.slideshows`)}</b> מצגות מוצעות בחודש, ועד <b>${count(cfg, `${k}.redos`)}</b> החלפות</p>
+<p class="plan-cap"><b>${count(cfg, `${k}.slideshows`)}</b> מצגות בחודש, ועד <b>${count(cfg, `${k}.redos`)}</b> החלפות</p>
 <p class="plan-fee">${fee == null ? cfg.ph(`${k}.setup`) : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת.${open ? ` ${NO_REFUND}` : ''}`}</p>
 ${open ? `<a class="btn primary" href="${esc(signupUrl('teder', plan))}">להצטרף ${inIt}</a>` : ''}
 </article>`;
@@ -205,6 +215,10 @@ ${open ? `<a class="btn primary" href="${esc(signupUrl('toran', k))}">להצטר
   const fee = cfg.get('price.setup');
   const setupLine = fee == null ? cfg.ph('price.setup') : fee === 0 ? 'אין דמי הקמה.' : `בחודש הראשון יש גם ${esc(ils(fee))} דמי הקמה, פעם אחת, ${vat}.`;
   const fair = `חודש עמוס אחד לא עולה לכם יותר. רק אחרי ${said(cfg, 'price.fair.upMonths', months)} ברצף מעל החבילה, החנות עוברת לחבילה הגדולה, ואנחנו כותבים לכם בוואטסאפ ${said(cfg, 'price.fair.noticeDays', days)} לפני. אחרי ${said(cfg, 'price.fair.downMonths', months)} ברצף מתחת ל-${count(cfg, 'price.plans.store.conversations')} שיחות, היא חוזרת לחבילת חנות.`;
+  // What a conversation is, said once, as openfrequency-toran counts it (src/plans.ts counted, src/channels/conversations.ts):
+  // one customer on one of the store's channels, one open conversation until a week of silence, an email thread its
+  // own; counted once in each Israel calendar month the customer wrote in it; the demo number never.
+  const conversation = 'שיחה היא לקוח אחד שכותב לחנות בערוץ אחד, לא משנה כמה הודעות. אחרי שבוע בלי הודעות, ההודעה הבאה שלו פותחת שיחה חדשה, ובמייל כל שרשור הוא שיחה. כל שיחה נספרת פעם אחת בכל חודש שהלקוח כתב בה, והשיחות בדמו לא נספרות.';
   const terms = termsLine(cfg, true);
   return `
 <section class="sec price-sec toran" id="${id}" aria-labelledby="${id}-h">
@@ -224,6 +238,7 @@ ${foundersBox(cfg)}
 <a class="btn${open ? '' : ' primary'}" href="${cta[0]}">${cta[1]}</a>
 </div>
 </div>
+<p class="plan-fair"><b>מה נחשב שיחה.</b> ${conversation}</p>
 <p class="plan-fair"><b>כשמספר השיחות משתנה.</b> ${fair}</p>
 ${terms ? `<p class="terms-line">${terms}</p>` : ''}
 </div>

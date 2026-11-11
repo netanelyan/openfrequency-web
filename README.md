@@ -12,10 +12,10 @@ frosted glass, the system typeface with Heebo behind it); the marks are the bran
 The first entry in `site.config.json` is the one switch for whether Toran is on sale:
 
 ```json
-"products": { "toran": "soon" }
+"products": { "toran": "live" }
 ```
 
-- `"soon"` (now, until Meta approves WhatsApp): Toran stays on show, marked "בקרוב", and nobody can buy it, start it or
+- `"soon"` (until 2026-11-08, when Toran went on sale): Toran stays on show, marked "בקרוב", and nobody can buy it, start it or
   ask for its demo. Teder comes first and is offered exactly as before. Every page reads the switch: the home page (Teder's
   headline, Toran's one line with the badge, its green door with the badge and one button to the waitlist, "שמרו לי
   מקום", its lines in the future, and no section on Toran as the owner's assistant),
@@ -24,7 +24,8 @@ The first entry in `site.config.json` is the one switch for whether Toran is on 
   the future, its demo questions out), the menus and footer, the meta and Open Graph lines, `/toran/example` (no price,
   no buttons), the privacy page (a line on what the waitlist keeps), and `npm run support` (Toran opens soon, Teder is
   available, no Toran plans).
-- `"live"`: the site as it was before the switch, word for word (`test/site.test.mjs` builds both and checks).
+- `"live"` (now, since 2026-11-08): Toran is sold, with its price, its demo by a WhatsApp code and sign-up
+  (`test/site.test.mjs` builds both and checks).
 
 **Selling Toran (prepared 2026-11-08, not switched).** Stores connect their own WhatsApp through Kapso (openfrequency-toran,
 `docs/connecting-channels.md`), so `"live"` now also changes three legal lines, each only while Toran is sold: the
@@ -135,7 +136,10 @@ message `היי, אשמח לדמו של תדר לחנות <store>.` and, on its 
 is the one the sample goes to, so it proves itself, and Toran keeps one demo per number per product (below, "Leads").
 The line under the button and the thank-you say so, and the privacy page says that Teder
 too learns the number from the message, that Meta carries the demo number's messages and that those chats are kept as
-Toran's are; nothing else on the site changes, and the join form keeps its number field. `test/teder-demo.test.mjs`
+Toran's are. Since 2026-11-12 (the pre-launch audit, P1-14: every demo is asked for with a code) the switch changes
+`/join` too: its two cards are one choice, Toran's demo or Teder's sample (a code is one product's at Toran, and one
+message carries one code), there is no number to type, and Teder's goes with `by=whatsapp`, answered with its own code;
+with `"form"` the join form is as it was, both can be ticked and Teder's number is typed. `test/teder-demo.test.mjs`
 builds both and checks that every other page is the same, byte for byte. Before turning it on: `TORAN_DEMO_WA` set on
 the server, our demo number answering, and Toran's `/internal/lead` taking `product` live on the server. A Toran from
 before that reads only `url` and `code`, and would take the request as a demo of Toran's. **Turning it on, set

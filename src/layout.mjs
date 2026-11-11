@@ -21,8 +21,11 @@ const products = (cfg) => {
 // The pages about both products. Each price is on its product's page, so there is no price link of its own.
 const LINKS = () => [['/faq', 'שאלות']];
 
-// Where a customer manages their tools: openfrequency-accounts, which sends anyone not signed in to its login.
+// Where a customer manages their tools: openfrequency-accounts, which sends anyone not signed in to its login. Its
+// button says what a first visit finds there, a sign-in, and is grey, so each page's own main button stays the one blue
+// (the 2026-11-11 audit, P1-5).
 const TOOLS = 'https://accounts.openfrequency.co.il/';
+export const TOOLS_LABEL = 'כניסה לחשבון';
 
 const menuIcon = `<svg class="i open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg><svg class="i close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
 
@@ -62,12 +65,12 @@ function header(cfg, current) {
   const sheet = `<div class="sheet-products">${PRODUCTS.map(([href, name, label, what]) =>
     `<a class="prod" href="${href}"${here(href)}>${mark(name, 40)}<span><b>${label}</b><small>${what}</small></span></a>`).join('')}</div>
 <div class="sheet-links">${LINKS(cfg).map(([href, label]) => `<a href="${href}"${here(href)}>${label}</a>`).join('')}<a href="/join"${here('/join')}>הצטרפות</a></div>
-<a class="btn primary" href="${TOOLS}">לניהול הכלים</a>`;
+<a class="btn" href="${TOOLS}">${TOOLS_LABEL}</a>`;
   return `<header class="top">
 <div class="bar">
 <a class="brand" href="/"${current === '/' ? ' aria-current="page"' : ''}>${mark('openfrequency', 32)}<b>OpenFrequency</b></a>
 <nav class="nav" aria-label="ראשי">${nav}</nav>
-<div class="bar-end">${themeButton}<a class="btn primary sm cta" href="${TOOLS}">לניהול הכלים</a></div>
+<div class="bar-end">${themeButton}<a class="btn sm cta" href="${TOOLS}">${TOOLS_LABEL}</a></div>
 <details class="menu"><summary aria-label="תפריט">${menuIcon}</summary><nav aria-label="ראשי">${sheet}</nav></details>
 </div>
 </header>`;
@@ -97,7 +100,7 @@ ${LINKS(cfg).reverse().map(([href, label]) => `<li><a href="${href}">${label}</a
 </ul></nav>
 <div class="foot-talk"><h2>דברו איתנו</h2>${waLink}<p class="foot-cta-t">רוצים לראות את זה על החנות שלכם?</p><a class="foot-cta" href="/join">דמו חינם לחנות שלכם<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></a></div>
 </div>
-<p class="foot-legal">© 2026 OpenFrequency</p>
+<p class="foot-legal">© 2026 OpenFrequency · עוסק מורשה ${cfg.t('legal.number')}</p>
 <p class="foot-word" aria-hidden="true" data-word="OpenFrequency"></p>
 </div>
 </footer>`;

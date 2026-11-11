@@ -234,7 +234,7 @@ test("from 700px the phone's cuts aren't made: the sentences left out on a phone
 // someone needs them, and if an option isnt relevant dont show it"), on a phone and on a desk: no page's first screen
 // shows more than one main button (the filled blue, or the white one on a product's colour); a thank-you page and the
 // 404 have one button and it is the main one; and no form offers a choice that can't be taken. /join, while Toran is
-// soon, asks for Teder's sample with nothing to pick, and with script its WhatsApp field shows and is required.
+// soon, asks for Teder's sample with nothing to pick; with Toran on sale it picks one product a request, by its code.
 test('every screen has one main button: at most one on any first screen, phone and desk; one and only one after a form; nothing to pick that cannot be picked', async () => {
   const found = [];
   for (const [width, height] of [[390, 844], [1440, 900]]) {
@@ -261,14 +261,17 @@ test('every screen has one main button: at most one on any first screen, phone a
     await page.goto(`${origin}/join/`);
     const join = await page.evaluate(() => {
       const f = document.querySelector('form[data-form=join]');
-      return { picks: Boolean(f.querySelector('.picks')), contact: f.elements.contact.closest('label').hidden === false && f.elements.contact.required, teder: f.elements.teder.type === 'checkbox' ? f.elements.teder.checked : f.elements.teder.value };
+      const line = (k) => !f.querySelector(`[data-for=${k}]`).hidden;
+      return { picks: Boolean(f.querySelector('.picks')), contact: Boolean(f.elements.contact), toran: f.querySelector('input[name=product][value=toran]').checked, lines: [line('toran'), line('teder')] };
     });
-    // With Toran on sale /join picks: Toran ticked first, the WhatsApp number (Teder's sample) hidden and not asked for
-    // until Teder is ticked, then shown and required.
-    if (!join.picks || join.contact || join.teder !== false) found.push(`${width} /join: ${JSON.stringify(join)} (the picker, Toran ticked, no number asked)`);
-    await page.evaluate(() => { const t = document.querySelector('form[data-form=join] input[name=teder]'); t.checked = true; t.dispatchEvent(new Event('change', { bubbles: true })); });
-    const tick = await page.evaluate(() => { const f = document.querySelector('form[data-form=join]'); return f.elements.contact.closest('label').hidden === false && f.elements.contact.required; });
-    if (!tick) found.push(`${width} /join: Teder ticked, the number isn't shown and required`);
+    // With Toran on sale and Teder's sample asked for by WhatsApp (the pre-launch audit, P1-14), /join picks one product a
+    // request: Toran's demo to start with, no number to type for either, and the line under the button the picked one's.
+    if (!join.picks || join.contact || !join.toran || join.lines.join() !== 'true,false') found.push(`${width} /join: ${JSON.stringify(join)} (the picker, Toran picked, no number asked)`);
+    await page.evaluate(() => { const t = document.querySelector('form[data-form=join] input[name=product][value=teder]'); t.checked = true; t.dispatchEvent(new Event('change', { bubbles: true })); });
+    const tick = await page.evaluate(() => { const f = document.querySelector('form[data-form=join]'); return { contact: Boolean(f.elements.contact), toran: !f.querySelector('[data-for=toran]').hidden, teder: !f.querySelector('[data-for=teder]').hidden, novalidate: f.noValidate }; });
+    if (tick.contact || tick.toran || !tick.teder) found.push(`${width} /join: Teder picked, ${JSON.stringify(tick)} (no number, Teder's line alone)`);
+    // The Hebrew messages under the button say what is missing, never the browser's own bubble (P2-33).
+    if (!tick.novalidate) found.push(`${width} /join: the browser checks the form itself`);
     await ctx.close();
   }
   assert.deepEqual(found, []);

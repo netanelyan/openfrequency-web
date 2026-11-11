@@ -316,6 +316,10 @@ html.a-contrast { --ink-2: #1d1d1f; --ink-3: #1d1d1f; --link: #0050a0; --glass: 
 @media (min-width: 980px) { .wrap:has(.with-shelf) > .example { width: min(1040px, 100vw - 64px); margin-inline: calc((100% - min(1040px, 100vw - 64px)) / 2); box-sizing: border-box; } }
 /* The link in the store's bubble at full white: at 0.92 it fell to 4.47:1 on the store's colour. */
 .msg .lnk { opacity: 1; }
+/* Two plans side by side need the card's whole width: in the price column of a two-column card (Toran's pitch.css from
+   640px) the big plan ran into the list beside it. The list goes under them. */
+.price-card { grid-template-columns: minmax(0, 1fr); }
+.plans { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
 </style>
 <style>
 /* The accessibility panel, on every page Toran serves (the dashboard, its sign-in refusals and errors, the pitch pages and

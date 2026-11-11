@@ -61,7 +61,11 @@ const EXAMPLE_CSS = `.example { margin: 14px 0 0; padding: 12px 16px; border-rad
 @media (max-width: 559px) { .example { padding: 10px 14px; font-size: 13.5px; line-height: 1.5; } }
 @media (min-width: 980px) { .wrap:has(.with-shelf) > .example { width: min(1040px, 100vw - 64px); margin-inline: calc((100% - min(1040px, 100vw - 64px)) / 2); box-sizing: border-box; } }
 /* The link in the store's bubble at full white: at 0.92 it fell to 4.47:1 on the store's colour. */
-.msg .lnk { opacity: 1; }`;
+.msg .lnk { opacity: 1; }
+/* Two plans side by side need the card's whole width: in the price column of a two-column card (Toran's pitch.css from
+   640px) the big plan ran into the list beside it. The list goes under them. */
+.price-card { grid-template-columns: minmax(0, 1fr); }
+.plans { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }`;
 must(/<link rel="stylesheet" href="\/static\/brand\.css">\n<link rel="stylesheet" href="\/static\/pitch\.css">\n<link rel="stylesheet" href="\/s\/[^"]+\/theme\.css">\n/,
   `<style>\n${brandCss()}\n${css('pitch.css')}\n${themeCss(d)}\n${EXAMPLE_CSS}\n</style>\n`, 'stylesheets');
 must(/<link rel="stylesheet" href="\/static\/a11y\.css">\n<script src="\/static\/a11y\.js"><\/script>/, `<style>\n${css('a11y.css')}\n</style>\n<script>\n${css('a11y.js')}\n</script>`, 'accessibility head');

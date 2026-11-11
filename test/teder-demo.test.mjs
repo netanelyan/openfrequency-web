@@ -1,8 +1,8 @@
 // The switch in site.config.json, teder.demoBy, built both ways from a copy of the config (the real one is not
 // touched, and neither is dist/): "form" is the site as it was, word for word, /teder's form asking for the store's
 // address and a WhatsApp number; "whatsapp" asks for the address only and is answered like Toran's demo, with a code
-// to send us on WhatsApp, so the number proves itself. Only /teder changes (and the privacy page, below); the join
-// form keeps its number. The privacy page says Teder learns the number from the message too, under its own date
+// to send us on WhatsApp, so the number proves itself. /teder changes, /join's form asks the same way (one product a
+// request, no number), and the privacy page, below. The privacy page says Teder learns the number from the message too, under its own date
 // (legal.privacyWaUpdated), and a "whatsapp" build without that date stops. The endpoint's side (by=whatsapp, the code, the handover to Toran) is in lead.test.mjs.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -80,16 +80,25 @@ test('the switch is a fact with two values, the config says "whatsapp" (our numb
   assert.match(gone.b.stderr + gone.b.stdout, /"teder\.demoBy" is not there/);
 });
 
-test('the switch changes /teder and the privacy page only: every other page is the same either way, byte for byte', () => {
-  for (const [form, wa, changes] of [[built.form, built.wa, ['teder/index.html', 'privacy/index.html']], [built.formLive, built.waLive, ['teder/index.html', 'privacy/index.html']]]) {
+// Since 2026-11-12 (the pre-launch audit, P1-14: every demo is asked for with a code) the switch changes /join too, whose
+// form asks for Teder's sample the same way, and with Toran live /toran's thank-you, which no longer speaks of a number
+// typed in a form.
+test('the switch changes /teder, /join and the privacy page, and with Toran live /toran\'s thank-you: every other page is the same either way, byte for byte', () => {
+  for (const [form, wa, changes] of [[built.form, built.wa, ['teder/index.html', 'join/index.html', 'privacy/index.html']], [built.formLive, built.waLive, ['teder/index.html', 'join/index.html', 'toran/index.html', 'privacy/index.html']]]) {
     assert.deepEqual(Object.keys(wa).sort(), Object.keys(form).sort(), 'the same pages');
     for (const file of Object.keys(form)) {
       if (changes.includes(file)) assert.notEqual(wa[file], form[file], file);
       else assert.equal(wa[file], form[file], `${file} changed with the switch`);
     }
   }
-  // /join keeps its WhatsApp number for Teder either way: it is sign-up's form, not the sample's.
-  assert.match(built.wa['join/index.html'], /<input name="contact" type="tel"/);
+  // With "whatsapp", /join asks for no number: the one that sends the code is where the sample goes. With "form", as before.
+  for (const pages of [built.wa, built.waLive]) {
+    const join = /<form class="demo join"[\s\S]*?<\/form>/.exec(pages['join/index.html'])[0];
+    assert.doesNotMatch(join, /name="contact"|type="tel"/);
+    assert.match(join, /<input type="hidden" name="by" value="whatsapp">/);
+  }
+  assert.match(built.waLive['join/index.html'], /<input type="radio" name="product" value="toran" checked>[\s\S]*<input type="radio" name="product" value="teder">/, 'one product a request');
+  for (const pages of [built.form, built.formLive]) assert.match(pages['join/index.html'], /<input name="contact" type="tel"/);
 });
 
 test('with "form", /teder is as it was: its form takes the address and a WhatsApp number, and the page has nothing else of the switch', () => {
@@ -134,11 +143,17 @@ test('with "whatsapp", /teder\'s thank-you is one line, to send the ready messag
     assert.doesNotMatch(done, /הקוד של הבקשה הוא|מהמספר שתרצו/, 'no mechanics to read');
     assert.ok(template(html, 'done-teder'), 'the thank-you for an answer with no code stays');
   }
-  // Toran's own, where Toran's forms are, word for word as with "form", and as simple.
-  for (const file of ['toran/index.html', 'join/index.html']) assert.equal(template(built.waLive[file], 'done-code'), template(built.formLive[file], 'done-code'), file);
-  const toran = template(built.waLive['toran/index.html'], 'done-code');
-  assert.match(toran, /<p data-wa-say>לחצו על הכפתור ושלחו את ההודעה כמו שהיא\.<\/p>/);
-  assert.match(toran, /<p data-teder hidden>/);
+  // Toran's own, where Toran's forms are, as simple; with "whatsapp" no thank-you speaks of a number typed in a form, since
+  // /join asks for Teder's sample by its code too. With "form", /join's can say the sample goes to the typed number.
+  for (const file of ['toran/index.html', 'join/index.html']) {
+    const wa = template(built.waLive[file], 'done-code');
+    assert.match(wa, /<p data-wa-say>לחצו על הכפתור ושלחו את ההודעה כמו שהיא\.<\/p>/, file);
+    assert.doesNotMatch(wa, /data-teder|למספר שכתבתם/, file);
+    assert.match(template(built.formLive[file], 'done-code'), /<p data-teder hidden>/, file);
+  }
+  // While Toran is soon, /join's form asks for Teder's sample, by its code with "whatsapp": its thank-you is the code's.
+  assert.equal(template(built.wa['join/index.html'], 'done-code'), template(built.wa['teder/index.html'], 'done-code'));
+  assert.equal(codeTemplates(built.form['join/index.html']), 0);
   // form.js shows done-code for any answer with a code, which is how /teder's shows, and without a demo number it drops
   // the button and the line about it and shows the code (src/form.js, done).
   const js = fs.readFileSync(path.join(ROOT, 'src/form.js'), 'utf8');
@@ -158,8 +173,8 @@ test('with "whatsapp", the privacy page says Teder learns the number from the me
     assert.match(html, /שיחות במספר הדמו, על תורן ועל תדר: 6 חודשים מההודעה האחרונה\./);
     assert.match(html, /עודכן לאחרונה ב-15 בנובמבר 2026/);
   }
-  // With "form", the page as it was, under its own date (legal.privacyUpdated, later than the legal pages' 30
-  // October).
+  // With "form", the page as it was, under its own date (legal.privacyUpdated, 2026-11-12, the day sign-in with Google
+  // was named and YouTube taken out; the legal pages' own date is the same day).
   for (const pages of [built.form, built.formLive]) {
     const html = said(pages['privacy/index.html']);
     assert.match(html, /\. בדמו של תורן, את מספר הנייד אנחנו מקבלים מההודעה/);
@@ -168,7 +183,7 @@ test('with "whatsapp", the privacy page says Teder learns the number from the me
       : /Meta: הודעות הוואטסאפ כשמספר החנות מחובר, והפרסום והנתונים ב-Instagram\./);
     assert.match(html, /שיחות במספר הדמו של תורן: 6 חודשים/);
     assert.doesNotMatch(html, /תדר, את מספר הנייד|15 בנובמבר/);
-    assert.match(html, /עודכן לאחרונה ב-8 בנובמבר 2026/);
+    assert.match(html, /עודכן לאחרונה ב-12 בנובמבר 2026/);
   }
   // The other legal pages keep their date either way.
   for (const file of ['terms/index.html', 'security/index.html', 'accessibility/index.html']) assert.equal(built.wa[file], built.form[file], file);

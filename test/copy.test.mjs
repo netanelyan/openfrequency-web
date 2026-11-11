@@ -63,7 +63,12 @@ test('the privacy page says a lead reaches us by email, and what we keep for an 
   assert.ok(part('p-share').includes('Resend , ארצות הברית: מיילים של כניסה לשירות, המיילים שתורן מקבל ועונה עליהם, והמייל שמגיע אלינו על כל טופס.'));
   assert.ok(part('p-customers').includes('את שם העסק, שכותבים בהרשמה. כשצריך מספר עוסק וכתובת לחשבונית, אנחנו מבקשים אותם מכם.'));
   assert.ok(!part('p-customers').includes('פרטים לחשבונית'));
-  assert.match(privacy, /עודכן לאחרונה ב-8 בנובמבר 2026/, 'legal.privacyUpdated, the day the first message to a store went on WhatsApp from our number, later than legal.privacyWaUpdated');
+  assert.match(privacy, /עודכן לאחרונה ב-12 בנובמבר 2026/, 'legal.privacyUpdated, the day sign-in with Google was named and YouTube taken out, later than legal.privacyWaUpdated');
+  // Sign-in is by an emailed link or with Google (openfrequency-accounts), and Teder posts to TikTok, Instagram and a
+  // Facebook Page, never to YouTube (the 2026-11-11 audit, P1-17).
+  assert.ok(part('p-customers').includes('נכנסים עם קישור שנשלח למייל או עם חשבון Google, ולכן אין לנו סיסמה שלכם.'));
+  assert.ok(part('p-share').includes('Google : כניסה לחשבון עם Google, למי שבוחר בה.'));
+  assert.doesNotMatch(text(privacy), /YouTube/);
   // The reminders to pay on WhatsApp (2026-11-04): to the number the account was paid from and the one linked to it,
   // and "הפסק" stops them, while the emails go on (openfrequency-accounts src/web/daily.js, openfrequency-toran
   // src/billing/remind.ts).

@@ -230,7 +230,7 @@ test("Teder's form with by=whatsapp takes the store's address only, like Toran's
   assert.equal(validate({ source: 'teder', store: 'shop.co.il' }).error, 'contact', 'without by=whatsapp, as before');
   assert.equal(validate({ source: 'teder', by: 'form', store: 'shop.co.il' }).error, 'contact');
   assert.equal(validate({ source: 'teder', store: 'shop.co.il', contact: '0501234567' }).byWa, undefined);
-  assert.equal(validate({ source: 'join', teder: '1', by: 'whatsapp', store: 'shop.co.il' }).error, 'contact', 'the join form is not affected');
+  assert.equal(validate({ source: 'join', teder: '1', by: 'whatsapp', store: 'shop.co.il' }).error, 'contact', 'a join post with Teder ticked, as before the join form asked by code');
   const wa = tederWaLink('shop.co.il', 'REQ-AB12CD', '+972-50-000-0099');
   assert.equal(new URL(wa).origin + new URL(wa).pathname, 'https://wa.me/972500000099', "Toran's demo number");
   assert.equal(waText(wa), 'היי, אשמח לדמו של תדר לחנות shop.co.il.\nהקוד מהאתר: REQ-AB12CD');
@@ -456,6 +456,26 @@ test('the join page asks for one or both demos: Toran by its code, Teder by its 
   assert.deepEqual([body.saved, CODE.test(body.code)], [['demo'], true]);
   res = await post({ source: 'join', teder: '1', store: 'teder-only.co.il', contact: '0530000002', page: '/join' }, { json: false });
   assert.equal(res.headers.get('location'), '/thanks/teder');
+});
+
+// With Teder's sample asked for by WhatsApp, the join form asks for one product a request, each by its own code (the
+// pre-launch audit of 2026-11-11, P1-14): product=toran, or product=teder with by=whatsapp, and no number.
+test('the join page by code: product=toran is a Toran demo, product=teder with by=whatsapp a Teder demo handed to Toran, neither with a number', async () => {
+  assert.deepEqual(validate({ source: 'join', product: 'teder', by: 'whatsapp', store: 'www.j-shop.co.il', page: '/join' }), { lead: { source: 'teder', store: 'j-shop.co.il', contact: null, page: '/join' }, sources: ['teder'], byWa: true });
+  assert.deepEqual(validate({ source: 'join', product: 'toran', by: 'whatsapp', store: 'j-shop.co.il', page: '/join' }), { lead: { source: 'demo', store: 'j-shop.co.il', contact: null, page: '/join' }, sources: ['demo'] });
+  assert.equal(validate({ source: 'join', product: 'teder', store: 'j-shop.co.il' }).error, 'contact', 'Teder without by=whatsapp still needs its number');
+  assert.equal(validate({ source: 'join', product: 'both', store: 'j-shop.co.il' }).error, 'products', 'a product that is not one');
+  await settle();
+  const toIntake = handed.length;
+  let body = await (await post({ source: 'join', product: 'teder', by: 'whatsapp', store: 'join-teder.co.il', page: '/join' })).json();
+  assert.deepEqual(body, { ok: true, source: 'teder', store: 'join-teder.co.il', saved: ['teder'], code: body.code, wa: tederWaLink('join-teder.co.il', body.code, DEMO_WA) });
+  await settle();
+  assert.deepEqual(handed.slice(toIntake).map((h) => [h.path, h.body]), [['/toran/internal/lead', { url: 'https://join-teder.co.il/', code: body.code, product: 'teder' }]], "to Toran, which hands it to Teder once the code arrives");
+  body = await (await post({ source: 'join', product: 'toran', by: 'whatsapp', store: 'join-toran.co.il', page: '/join' })).json();
+  assert.deepEqual([body.saved, CODE.test(body.code), body.wa], [['demo'], true, toranWaLink('join-toran.co.il', body.code, DEMO_WA)]);
+  // Without JS the post goes on to WhatsApp, with the message that holds the code.
+  const res = await post({ source: 'join', product: 'teder', by: 'whatsapp', store: 'join-plain.co.il', page: '/join' }, { json: false });
+  assert.match(res.headers.get('location'), new RegExp(`^https://wa\\.me/${DEMO_WA}\\?text=`));
 });
 
 test("without TORAN_DEMO_WA a Toran demo still gets its code, with no link", async () => {

@@ -73,7 +73,9 @@
 // names Teder and holds the code on the same second line. It is handed to Toran, not Teder, as
 // {url, code, product: 'teder'}: Toran keeps one demo per number per product, by the number its message comes from,
 // and hands the request to Teder itself. No typed number, so the site's one-per-number check doesn't apply to it; the
-// limits and the honeypot do. The join form and a Teder post without by=whatsapp are as above.
+// limits and the honeypot do. The join form asks the same way then (since 2026-11-12): one product a request,
+// product=toran or product=teder with by=whatsapp, each answered with its own code. A Teder post without by=whatsapp,
+// and a join post with toran=1 and teder=1 ticked, are as above.
 import crypto from 'node:crypto';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -219,7 +221,10 @@ export function email(s) {
 // both, ticked as toran=1 and teder=1. Each takes the store's address; Teder's also a WhatsApp number, which Toran's
 // doesn't need (lead.contact is null then). `sources` is the demos asked for, one saved row each. 'waitlist' is
 // Toran's waitlist: a phone or an email in contact, and the store's address only if one is sent and it is valid.
-// Teder's form with by=whatsapp (teder.demoBy) takes no number, like Toran's, and the result says byWa: true.
+// Teder's form with by=whatsapp (teder.demoBy) takes no number, like Toran's, and the result says byWa: true. So does
+// the join form when Teder's sample is asked for that way: it then asks for one product a request, product=toran or
+// product=teder (a code is one product's at Toran, and one message carries one code), with by=whatsapp for Teder's.
+// The ticked toran=1 and teder=1 of the join form before that are still taken, as before, for a page a browser kept.
 export function validate(f) {
   const source = f.source;
   if (source !== 'demo' && source !== 'teder' && source !== 'join' && source !== 'waitlist') return { error: 'bad' };
@@ -230,11 +235,14 @@ export function validate(f) {
     return { lead: { source, store: storeHost(f.store), contact, page }, sources: [source] };
   }
   const ticked = (v) => v === '1' || v === 1 || v === true || v === 'on';
-  const sources = source !== 'join' ? [source] : [...(ticked(f.toran) ? ['demo'] : []), ...(ticked(f.teder) ? ['teder'] : [])];
+  const picked = source === 'join' && (f.product === 'toran' || f.product === 'teder') ? f.product : null;
+  const sources = source !== 'join' ? [source]
+    : picked ? [picked === 'toran' ? 'demo' : 'teder']
+    : [...(ticked(f.toran) ? ['demo'] : []), ...(ticked(f.teder) ? ['teder'] : [])];
   if (!sources.length) return { error: 'products' };
   const store = storeHost(f.store);
   if (!store) return { error: 'store' };
-  if (source === 'teder' && f.by === 'whatsapp') return { lead: { source, store, contact: null, page }, sources, byWa: true };
+  if ((source === 'teder' || picked === 'teder') && f.by === 'whatsapp') return { lead: { source: 'teder', store, contact: null, page }, sources, byWa: true };
   const contact = sources.includes('teder') ? mobile(f.contact) : null;
   if (sources.includes('teder') && !contact) return { error: 'contact' };
   return { lead: { source: sources[0], store, contact, page }, sources };

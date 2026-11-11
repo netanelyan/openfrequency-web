@@ -54,7 +54,8 @@ ${img(SAMPLE, 'ig', true)}
 ], { label: 'איפה המצגת עולה' });
 
 // The approval screen: the slideshows of the day, each with where it goes out and what happened to it.
-const STATUS = { yours: 'מחכה לאישור', fixed: 'אושרה, תעלה ב-19:40', alone: 'עלתה' };
+// Short enough that a title keeps two lines beside its status on a 360px phone.
+const STATUS = { yours: 'מחכה לאישור', fixed: 'תעלה ב-19:40', alone: 'עלתה' };
 const DAY = [['coffee', 'yours'], ['bakery', 'fixed'], ['pets', 'alone'], ['plants', 'yours']];
 export const approvals = (cfg) => `<div class="inbox approvals" data-ui role="group" aria-label="המצגות של היום, דוגמה">
 <div class="inbox-top">${mark('teder', 28)}<b>המצגות של היום</b><span class="tag">דוגמה</span></div>

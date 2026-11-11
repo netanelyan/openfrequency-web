@@ -86,7 +86,7 @@ test('with "soon", Toran keeps its pages with a "בקרוב" badge and its waitl
   const join = main(pages['join/index.html']);
   assert.doesNotMatch(join, /class="picks"|class="pick|במה מתחילים/, 'no picker on /join');
   assert.match(join, /<input type="hidden" name="teder" value="1">/);
-  assert.doesNotMatch(join, /href="\/toran#waitlist"|class="join-tools"|לניהול הכלים/, 'no second way beside the form');
+  assert.doesNotMatch(join, /href="\/toran#waitlist"|class="join-tools"|כניסה לחשבון/, 'no second way beside the form');
   assert.match(visible(pages['faq/index.html']), /<h2 id="faq-toran">[\s\S]*?<span class="soon">בקרוב<\/span><\/h2>/);
   assert.ok(pages['thanks/waitlist/index.html'], "the waitlist's thank-you without JS");
   for (const file of ['index.html', 'toran/index.html', 'join/index.html', 'faq/index.html']) {
