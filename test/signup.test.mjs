@@ -125,8 +125,8 @@ test('with "open", Teder\'s first screens have sign-up, the demo and the sample 
   assert.equal(heading(teder, 'demo-h'), 'רוצים קודם לראות מצגת מהחנות שלכם?');
   assert.match(teder, /data-form="teder"[\s\S]*?<button class="btn primary" type="submit">לקבל מצגת לדוגמה<\/button>/);
   // What is left to a business that set Teder up on its own.
-  assert.match(teder, /קורא מהמקורות שבחרתם, וכל עובדה מהם מגיעה עם ציטוט מילה במילה\. עובדה בלי מקור מסומנת "לא ממקור, כדאי לבדוק"/);
-  assert.match(teder, /לחבר את טיקטוק, את אינסטגרם ואת פייסבוק, פעם אחת/);
+  assert.match(text(teder), /קורא מהמקורות שבחרתם, ומאלה שתדר מוסיף בעצמו, כמו ויקיפדיה, וכל עובדה מהם מגיעה עם ציטוט מילה במילה\. עובדה בלי מקור מסומנת "בלי מקור, כדאי לבדוק"/);
+  assert.match(teder, /לחבר את טיקטוק, את אינסטגרם ואת פייסבוק(?!, פעם אחת)/);
   // The home page's door. It sells Teder, so its price is under the buttons, both plans with VAT and the setup fees,
   // and, shut on a phone, the lowest monthly price with VAT is its short line (the owner, 2026-11-01: "The hero: sell
   // Teder, which you can buy now"; until then the door, like /teder's top, had no price).
@@ -197,7 +197,7 @@ test('with "open", the FAQ and the support export say how to sign up and cancel'
   assert.ok(text(faq).includes(`בעמוד ההרשמה . ${PAY.manual.card} הפרטים בעמוד של תדר`));
   assert.match(text(faq), /איך מבטלים את תדר\? בחשבון שלכם, בכל זמן/);
   assert.match(faq, /href="\/terms#t-teder-sub">בתנאי השימוש<\/a>/);
-  assert.match(text(faq), /מהמקורות שבחרתם בהקמה, מתוך אלה שתדר מצא לחנות שלכם\. כל עובדה מהם מגיעה עם ציטוט מילה במילה/);
+  assert.match(text(faq), /מהמקורות שבחרתם בהקמה, מתוך אלה שתדר מצא לחנות שלכם, ומאלה שתדר מוסיף בעצמו, כמו ויקיפדיה\. כל עובדה מהם מגיעה עם ציטוט מילה במילה/);
   assert.ok(support.status.includes(SIGNUP), 'the support status gives the sign-up address');
   assert.ok(support.faq.some((f) => f.q === 'איך מבטלים את תדר?'));
 });
@@ -259,8 +259,8 @@ test('the terms promise only the take-downs we can do: published posts stay on t
     const part = text(section(main(b.pages['terms/index.html']), 't-teder'));
     assert.ok(!part.includes('ונוריד אותה'), 'the old promise to take any post down');
     assert.ok(part.includes('מצגת שעלתה נמצאת בחשבונות שלכם בטיקטוק, באינסטגרם ובפייסבוק, ואפשר למחוק אותה שם'));
-    assert.ok(part.includes('נוריד מהצד שלנו את מה שהחיבור שלנו מאפשר, למשל באינסטגרם'));
-    assert.ok(part.includes('מצגת בטיקטוק מוחקים בעצמכם, בחשבון הטיקטוק שלכם'));
+    assert.ok(part.includes('נוריד מהצד שלנו את מה שהחיבור שלנו מאפשר, למשל בעמוד הפייסבוק'));
+    assert.ok(part.includes('מצגת בטיקטוק ובאינסטגרם מוחקים בעצמכם, באפליקציה'));
   }
 });
 
@@ -274,7 +274,7 @@ test('the monthly report says it comes by email, and the two plans are 15 and 40
     // A month's slideshows are the ones approved (openfrequency-teder src/budget/quota.js), said the same way everywhere.
     assert.match(plans[0], /^חבילה קטנה 490 ₪ לחודש לא כולל מע״מ 15 מצגות בחודש, ועד 4 החלפות בחודש הראשון יש גם 990 ₪ דמי הקמה, פעם אחת\./);
     assert.match(plans[1], /^חבילה מלאה 790 ₪ לחודש לא כולל מע״מ 40 מצגות בחודש, ועד 10 החלפות בחודש הראשון יש גם 1,490 ₪ דמי הקמה, פעם אחת\./);
-    assert.match(text(teder), /נספרות רק מצגות שאישרתם\. מצגת שדחיתם לא נספרת, ובמקומה מגיעה מצגת אחרת לאותו יום/);
+    assert.match(text(teder), /נספרות רק מצגות שאישרתם\. מצגת שדחיתם לא נספרת\. במקומה מגיעה מצגת אחרת לאותו יום/);
     assert.match(text(teder), /החלפה היא מצגת שדחיתם וביקשתם שתדר יכתוב אותה מחדש לפי מה שכתבתם/);
     assert.match(text(main(b.pages['faq/index.html'])), /ונספרות רק מצגות שאישרתם\. כשאישרתם את כולן, תדר לא כותב מצגות חדשות עד החודש הבא/);
     // TED-17: the slideshows are counted by the calendar month, said beside the price and in the FAQ.
@@ -346,6 +346,6 @@ test('Facebook is in every list of where Teder posts while teder.facebook is on,
   assert.match(teder, /<h1 id="hero-h"><span class="hl">מצגות אוטומטיות<\/span> בעברית לטיקטוק, לאינסטגרם ולפייסבוק<\/h1>/);
   assert.match(teder, /<button type="button" role="tab" id="tab-facebook"/, "the Facebook post under its own tab");
   assert.match(text(teder), /מפרסם באינסטגרם ובפייסבוק בשעה שנקבעה/);
-  assert.match(text(teder), /לחבר את טיקטוק, את אינסטגרם ואת פייסבוק, פעם אחת/);
+  assert.match(text(teder), /לחבר את טיקטוק, את אינסטגרם ואת פייסבוק(?!, פעם אחת)/);
   assert.match(text(main(built.open.pages['privacy/index.html'])), /או עמוד Facebook/);
 });
