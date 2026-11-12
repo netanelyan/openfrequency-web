@@ -86,7 +86,8 @@ export const FACTS = {
   // the other legal pages (2026-11-01: the page is light, and dark is the header's button, no longer the device's).
   'legal.accessibilityUpdated': { label: 'תאריך העדכון של הצהרת הנגישות, YYYY-MM-DD', kind: 'text' },
   'toran.today': { label: 'מה תורן עושה היום', kind: 'lines' },
-  'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines' },
+  // Empty is an answer too: nothing the site says Toran does is still missing (2026-11-12, the WhatsApp alert went live).
+  'toran.notYet': { label: 'מה תורן עוד לא עושה', kind: 'lines', unless: () => true },
   // Teder's two plans, the same product with a different number of slideshows: the full one (teder.*) and the small one
   // (teder.small.*). accounts sells them as plan=full and plan=small (signupUrl below).
   'teder.monthly': { label: 'המחיר החודשי של החבילה המלאה של תדר', kind: 'number' },
