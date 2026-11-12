@@ -23,8 +23,8 @@ const mail = (cfg) => {
   return v == null ? cfg.ph('legal.email') : `<a href="mailto:${esc(v)}" dir="ltr">${esc(v)}</a>`;
 };
 // An עוסק מורשה: VAT is added to every invoice (the 2026-11-11 audit, P1-18). The name in Hebrew as the VAT office has
-// it, and a street address, are the owner's to give; until then the name is in English and the city alone.
-const who = (cfg) => `OpenFrequency, עסק של <bdi>${cfg.t('legal.name')}</bdi>, עוסק מורשה מספר ${cfg.t('legal.number')}, מאשדוד`;
+// it and the street address, as the owner gave them on 2026-11-12; "מרחוב..." as a contract names a party's address.
+const who = (cfg) => `OpenFrequency, עסק של <bdi>${cfg.t('legal.name')}</bdi>, עוסק מורשה מספר ${cfg.t('legal.number')}, מ${cfg.t('legal.address')}`;
 /** Each product's short contract, the one a customer accepts on sign-up (accounts' sign-up form links it). */
 export const TEDER_CONTRACT = '/teder/contract';
 export const TORAN_CONTRACT = '/toran/contract';
@@ -385,6 +385,7 @@ ${ul([
   `רכז הנגישות: <bdi>${cfg.t('legal.name')}</bdi>`,
   `מייל: ${mail(cfg)}`,
   `וואטסאפ: ${waWords(cfg, 'לכתוב לנו')}`,
+  `כתובת: ${cfg.t('legal.address')}`,
 ])}`],
     ['a-date', 'עדכון ההצהרה', `<p>ההצהרה עודכנה ב-${updated(cfg, 'legal.accessibilityUpdated')}.</p>`],
   ],

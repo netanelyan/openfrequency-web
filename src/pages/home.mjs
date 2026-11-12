@@ -30,7 +30,7 @@ import { niches } from '../niches.mjs';
 // and guard.ts). It says it is the store's bot, answers the first question from the site; the second isn't there, so
 // it says it isn't sure and passed the question to someone from the store, and the owner gets the browser notification
 // Toran sends then, in its words (src/owners/waiting.ts pushWaiting: "לקוח של <store> מחכה לתשובה שלכם" and the
-// question; there is no WhatsApp alert to the owner, toran.notYet).
+// question; since 2026-11-12 it goes to the owner's WhatsApp too, toran.today).
 const DOOR_CHAT = [
   ['me', '02:14', 'היי, יש את שמלת הפשתן הירוקה במידה M?'],
   ['them', '02:14', 'כאן הבוט של החנות. יש, נשארו 2 במידה M. היא 289 ₪, והמשלוח לוקח 3 עד 5 ימי עסקים.'],

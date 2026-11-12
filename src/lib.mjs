@@ -63,6 +63,7 @@ export const FACTS = {
   // For the legal pages, and the business number for the footer too (layout.mjs).
   'legal.name': { label: 'השם המשפטי', kind: 'text' },
   'legal.number': { label: 'מספר העוסק', kind: 'text' },
+  'legal.address': { label: 'הכתובת של העסק', kind: 'text' },
   'legal.email': { label: 'מייל ליצירת קשר', kind: 'text' },
   'legal.court': { label: 'העיר של בית המשפט המוסמך', kind: 'text' },
   'legal.host': { label: 'באיזו מדינה השרת', kind: 'text' },

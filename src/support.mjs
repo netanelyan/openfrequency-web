@@ -119,7 +119,7 @@ export function supportExport(cfg) {
   const pages = [
     soon
       ? { kind: 'about', title: 'מה פתוח עכשיו: תדר פתוח, תורן נפתח בקרוב', url: `${origin}/toran`, text: soonStatus }
-      : { kind: 'about', title: 'מה תורן עושה היום, ומה עוד לא', url: `${origin}/toran`, text: `מה תורן עושה היום:\n${today.map((x) => `- ${x}`).join('\n')}\n\nמה עוד לא עובד בתורן:\n${notYet.map((x) => `- ${x}`).join('\n')}\n\n${tederWhere}` },
+      : { kind: 'about', title: 'מה תורן עושה היום, ומה עוד לא', url: `${origin}/toran`, text: `מה תורן עושה היום:\n${today.map((x) => `- ${x}`).join('\n')}\n\n${notYet.length ? `מה עוד לא עובד בתורן:\n${notYet.map((x) => `- ${x}`).join('\n')}\n\n` : ''}${tederWhere}` },
     { kind: 'about', title: 'מי אנחנו', url: origin, text: `${cfg.get('about.who')}\n${cfg.get('about.why')}` },
     ...pricing.map((p) => ({ kind: 'payment', title: p.title, url: p.url, text: p.text })),
     ...legal,
